@@ -1,0 +1,22 @@
+﻿Precedence      Operator        Description                                 Associativity       Status
+==========================================================================================================
+    1 	        ++ -- 	        Suffix/postfix increment and decrement 	    Left-to-right       WIP
+                () 	            Function call                                                   WIP
+                [] 	            Array/Hashtable subscripting                                    WIP
+                . 	            Member access                                                   WIP
+    2 	        ++ -- 	        Prefix increment and decrement 	            Right-to-left       WIP
+                - 	            Unary minus                                                      √
+                ! 	            Logical NOT                                                      √
+                (type) 	        Cast                                                            WIP
+    3 	        * / % 	        Multiplication, division, and modulo 	    Left-to-right       Modulo WIP
+    4 	        + - 	        Addition and subtraction                                         √
+    6 	        < <= 	        Less than and Less than or equal                                 √
+                > >= 	        Greater than and greater than or equal                           √
+    7 	        == != 	        Equals and not equals                                            √
+    11 	        && 	            Logical AND                                                      √                                                     
+    12 	        || 	            Logical OR                                                       √
+    13          ??              Conditional operator                        Right-to-Left       WIP
+    14       	?: 	            Ternary operator 	                        Right-to-Left       WIP
+    15 	        = 	            Assignment                                                      WIP
+                += -= 	        Assignment by sum and difference                                WIP
+                *= /= %= 	    Assignment by product, quotient, and modulo                     WIP

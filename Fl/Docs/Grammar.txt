@@ -1,0 +1,87 @@
+﻿program	-> declaration*
+
+### Declarations
+
+declaration	-> func_declaration 
+			| variable_declaration
+			| constant_declaration
+			| statement
+
+variable_declaration -> VAR IDENTIFIER ( "=" expression )? ";"
+
+constant_declaration -> CONST IDENTIFIER "=" expression ";"
+
+func_declaration -> "func" IDENTIFIER "(" func_params? ")" "{" declaration* "}"
+
+func_params -> IDENTIFIER ( "," IDENTIFIER )*
+
+### Statements
+
+statement	-> expression_statement
+			| if_statement
+			| while_statement
+			| for_statement
+			| break_statement
+			| continue_statement
+			| return_statement
+			| block
+
+parenthesized_expr -> "(" expression ")" ( statement | ";" )
+
+braced_expr -> expression block
+
+expression_statement	-> expression ";"
+
+block	-> "{" declaration* "}"
+
+### Conditional Statements
+
+if_statement -> "if" ( parenthesized_expr | braced_expr ) ( "else" ( statement | ";" ) )?
+
+### Loop statements
+
+while_statement -> "while" ( parenthesized_expr | braced_expr )
+
+for_statement -> "for" "(" ( variable_declaration | expression_statement ) expression? ";" expression? ")" statement
+			   | "for" ( variable_declaration | expression_statement ) expression? ";" expression? block
+
+break_statement -> "break" INTEGER? ";"
+
+continue_statement -> "continue" ";"
+
+return_statement -> "return" expression? ";"
+
+### Expressions
+
+expression	-> expression_assignment
+
+expression_assignment	-> IDENTIFIER ( "=" expression_assignment )?
+						| or_expression
+
+or_expression	-> and_expression ( "||" and_expression )*
+
+and_expression	-> equality_expression ( "&&" equality_expression )*
+
+equality_expression	-> comparison_expression ( ( "!=" | "==" ) comparison_expression )*
+
+comparison_expression	-> addition_expression ( ( ">" | ">=" | "<" | "<=" ) addition_expression )*
+
+addition_expression	-> multiplication_expression ( ( "-" | "+" ) multiplication_expression )*
+
+multiplication_expression	-> unary_expression ( ( "/" | "*" ) unary_expression )*
+
+unary_expression	-> ( "!" | "-" ) invocation
+
+invocation -> primary ( "." IDENTIFIER | "(" arguments? ")" )*
+
+arguments -> expression ( "," expression )*
+
+primary	-> "true" 
+		| "false" 
+		| "null" 
+		| INTEGER 
+		| DOUBLE 
+		| DECIMAL 
+		| STRING 
+		| IDENTIFIER
+		| "(" expression ")"
