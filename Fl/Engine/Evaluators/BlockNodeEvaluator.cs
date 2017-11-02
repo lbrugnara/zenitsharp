@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.StdLib;
+using Fl.Engine.Symbols;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,12 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class BlockNodeEvaluator : INodeEvaluator<AstEvaluator, AstBlockNode, ScopeEntry>
+    class BlockNodeEvaluator : INodeEvaluator<AstEvaluator, AstBlockNode, Symbol>
     {
-        public ScopeEntry Evaluate(AstEvaluator evaluator, AstBlockNode node)
+        public Symbol Evaluate(AstEvaluator evaluator, AstBlockNode node)
         {            
             evaluator.NewScope(ScopeType.Common);
-            ScopeEntry tmp = null;
+            Symbol tmp = null;
             try
             {
                 foreach (AstNode statement in node.Statements)

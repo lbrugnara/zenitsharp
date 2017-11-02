@@ -3,7 +3,8 @@
 
 using Fl;
 using Fl.Engine;
-using Fl.Engine.StdLib;
+using Fl.Engine.Evaluators;
+using Fl.Engine.Symbols;
 using Fl.Parser;
 using Fl.Parser.Ast;
 using System;
@@ -33,7 +34,7 @@ namespace FlInterpreter
 
                     Parser p = new Parser();
                     AstNode ast = p.Parse(tokens);
-                    ScopeEntry result = eval.Process(ast);
+                    Symbol result = eval.Process(ast);
                     if (result != null)
                         Console.WriteLine($":: {result.ToDebugStr()}");
                 }

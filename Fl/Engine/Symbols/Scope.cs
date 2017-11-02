@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Fl.Engine
+namespace Fl.Engine.Symbols
 {
     public enum ScopeType
     {
@@ -19,36 +19,39 @@ namespace Fl.Engine
     public class Scope
     {
         #region Private Constants
-        private const string FlReturnKey = "@__flreturn";
+        private const string FlReturnKey = "@flreturn";
         #endregion
 
         #region Private Fields
+        private Scope _Global;
         private Scope _Parent;
         private ScopeType _ScopeType;
-        private Dictionary<string, ScopeEntry> _Map;
+        private Dictionary<string, Symbol> _Map;
 
         private bool _Break;
         private bool _Continue;
         #endregion
 
         #region Constructors
-        public Scope(ScopeType type, Scope parent = null)
+        public Scope(ScopeType type, Scope global, Scope parent)
         {
+            _Global = global;
             _Parent = parent;
             _ScopeType = type;
-            _Map = new Dictionary<string, ScopeEntry>();
+            _Map = new Dictionary<string, Symbol>();
         }
 
-        public Scope(Scope parent = null)
+        public Scope(Scope global = null, Scope parent = null)
         {
+            _Global = global;
             _Parent = parent;
             _ScopeType = ScopeType.Common;
-            _Map = new Dictionary<string, ScopeEntry>();
+            _Map = new Dictionary<string, Symbol>();
         }
         #endregion
 
         #region Indexers
-        public ScopeEntry this[string var]
+        public Symbol this[string var]
         {
             get
             {
@@ -57,58 +60,22 @@ namespace Fl.Engine
                 {
                     if (scp._Map.ContainsKey(var))
                         return scp._Map[var];
-                    scp = scp._Parent;
+                    scp = ScopeType == ScopeType.Function ? scp._Global : scp._Parent;
                 }
                 return null;
             }
         }
 
-        public ScopeEntry this[object var]
+        public Symbol this[object var]
         {
             get
             {
                 return var == null ? null : this[var.ToString()];
             }
         }
-       /* public ScopeEntry this[string var]
-        {
-            get
-            {
-                var scp = this;
-                while (scp != null)
-                {
-                    if (scp._Map.ContainsKey(var))
-                        return scp._Map[var];
-                    scp = scp._Parent;
-                }
-                return null;
-            }
-            set
-            {
-                if (!_Map.ContainsKey(var) && (_Parent == null || _Parent.IsDefined(var, true)))
-                    throw new AstWalkerException($"Symbol {var} does not exist in the current context");
-                if (_Map.ContainsKey(var))
-                    _Map[var] = value;
-                else
-                    _Parent[var] = value;
-            }
-        }
+        #endregion
 
-        public ScopeEntry this[object var]
-        {
-            get
-            {
-                return var == null ? null : this[var.ToString()];
-            }
-            set
-            {
-                if (var != null)
-                    this[var.ToString()] = value;
-            }
-        }*/
-            #endregion
-
-            #region Public Properties
+        #region Public Properties
         public ScopeType ScopeType { get => _ScopeType; }
 
         public bool MustReturn
@@ -156,7 +123,7 @@ namespace Fl.Engine
             }
         }
 
-        public ScopeEntry ReturnValue
+        public Symbol ReturnValue
         {
             get
             {
@@ -181,7 +148,7 @@ namespace Fl.Engine
         #endregion
 
         #region Public Methods
-        public void NewSymbol(string name, ScopeEntry initializer = null)
+        public void NewSymbol(string name, Symbol initializer = null)
         {
             if (_Map.ContainsKey(name))
                 throw new AstWalkerException($"Symbol {name} is already defined in this scope");
@@ -192,14 +159,18 @@ namespace Fl.Engine
             _Map[name] = initializer;
         }
 
-        public void UpdateSymbol(string name, ScopeEntry value)
+        public void UpdateSymbol(string name, Symbol value)
         {
-            if (!_Map.ContainsKey(name) && (_Parent == null || _Parent.IsDefined(name, true)))
+            if (!_Map.ContainsKey(name) && (_Parent == null || !_Parent.IsDefined(name, true)))
                 throw new AstWalkerException($"Symbol {name} does not exist in the current context");
 
             if (_Map.ContainsKey(name))
             {
                 _Map[name] = value;
+            }
+            else if (ScopeType == ScopeType.Function)
+            {
+                _Global.UpdateSymbol(name, value);
             }
             else
             {
@@ -216,7 +187,7 @@ namespace Fl.Engine
                 {
                     if (scp._Map.ContainsKey(var))
                         return true;
-                    scp = scp._Parent;
+                    scp = ScopeType == ScopeType.Function ? scp._Global : scp._Parent;
                 }
                 return false;
             }
@@ -269,19 +240,25 @@ namespace Fl.Engine
             _Continue = false;
         }
 
-        #endregion
-
-        #region Private Methods
-        private bool IsScopeType(ScopeType type)
+        public void Import(Scope scope)
         {
-            var scp = this;
-            while (scp != null)
+            var keys = scope._Map.Keys;
+            foreach (var k in keys)
             {
-                if (scp._ScopeType == type)
-                    return true;
-                scp = scp._Parent;
+                var s = scope._Map[k];
+                if (s.IsCallable && s.Storage == StorageType.Constant)
+                    continue;
+                _Map[k] = s;
             }
-            return false;
+        }
+
+        public void Using(FlNamespace ns)
+        {
+            var keys = ns.Members.Keys;
+            foreach (var k in keys)
+            {
+                _Map[k] = ns.Members[k];
+            }
         }
         #endregion
     }

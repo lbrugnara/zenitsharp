@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Engine.Evaluators;
+using Fl.Engine.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,9 +13,9 @@ namespace Fl.Engine.StdLib.sys.lang
     {
         public override string Name => "debug";
 
-        public override ScopeEntry Invoke(AstEvaluator evaluator, List<ScopeEntry> args)
+        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
         {
-            args.ForEach(a => System.Console.WriteLine(a.IsNamespace ? a.NamespaceValue.ShowNamespace() : a.ToDebugStr()));
+            args.ForEach(a => System.Console.WriteLine(a.IsNamespace ? a.AsNamespace.ShowNamespace() : a.ToDebugStr()));
             return null;
         }
     }

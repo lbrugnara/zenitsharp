@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.StdLib;
+using Fl.Engine.Symbols;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -9,18 +10,18 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class ForNodeEvaluator : INodeEvaluator<AstEvaluator, AstForNode, ScopeEntry>
+    class ForNodeEvaluator : INodeEvaluator<AstEvaluator, AstForNode, Symbol>
     {
-        public ScopeEntry Evaluate(AstEvaluator evaluator, AstForNode fornode)
+        public Symbol Evaluate(AstEvaluator evaluator, AstForNode fornode)
         {
             evaluator.NewScope(ScopeType.Loop);
             try
             {
                 fornode.Init.Exec(evaluator);
-                ScopeEntry result = fornode.Condition.Exec(evaluator);
+                Symbol result = fornode.Condition.Exec(evaluator);
                 if (!result.IsBool)
-                    throw new AstWalkerException($"Cannot convert type {result.DataType} to {ScopeEntryType.Boolean}");
-                while (result.BoolValue)
+                    throw new AstWalkerException($"Cannot convert type {result.DataType} to {SymbolType.Boolean}");
+                while (result.AsBool)
                 {
                     fornode.Body.Exec(evaluator);
                     if (evaluator.CurrentScope.MustBreak)

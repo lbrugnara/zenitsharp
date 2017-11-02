@@ -2,7 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 
-namespace Fl.Engine
+namespace Fl.Engine.Symbols
 {
     public enum StorageType
     {

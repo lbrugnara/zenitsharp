@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.StdLib;
+using Fl.Engine.Symbols;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -9,11 +9,11 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class AccessorNodeEvaluator : INodeEvaluator<AstEvaluator, AstAccessorNode, ScopeEntry>
+    class AccessorNodeEvaluator : INodeEvaluator<AstEvaluator, AstAccessorNode, Symbol>
     {
-        public ScopeEntry Evaluate(AstEvaluator evaluator, AstAccessorNode invoke)
+        public Symbol Evaluate(AstEvaluator evaluator, AstAccessorNode invoke)
         {
-            ScopeEntry entry = null;
+            Symbol entry = null;
             var self = invoke.Self.Value.ToString();
 
             // If the identifier exists in the current scope, return it
@@ -32,9 +32,9 @@ namespace Fl.Engine.Evaluators
                 entry = invoke.Member.Exec(evaluator);
 
                 // ... if it is a namespace and "self" is not defined, throw the exception
-                if (entry.IsNamespace && entry.NamespaceValue[self] == null)
+                if (entry.IsNamespace && entry.AsNamespace[self] == null)
                     throw new AstWalkerException($"Symbol '{self}' is not defined");
-                entry = entry.NamespaceValue[self];                
+                entry = entry.AsNamespace[self];                
             }
             return entry;
         }

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.StdLib;
+using Fl.Engine.Symbols;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,7 @@ namespace Fl.Engine.Evaluators
         private List<AstNode> _Body;
 
         public Func(Token name, AstParametersNode parameters, List<AstNode> body)
+            : base (StorageType.Variable)
         {
             _Identifier = name;
             _Params = parameters;
@@ -26,7 +27,7 @@ namespace Fl.Engine.Evaluators
 
         public AstParametersNode Parameters => _Params;
 
-        public override ScopeEntry Invoke(AstEvaluator evaluator, List<ScopeEntry> args)
+        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
         {
             if (args.Count != _Params.Parameters.Count)
                 throw new AstWalkerException($"Function {_Identifier.Value} expects {_Params.Parameters.Count} arguments but received {args.Count}");
@@ -49,13 +50,13 @@ namespace Fl.Engine.Evaluators
             {
                 evaluator.DestroyScope();
             }
-            return new ScopeEntry(ScopeEntryType.Null, null);
+            return new Symbol(SymbolType.Null, null);
         }
     }
 
-    class FuncDeclNodeEvaluator : INodeEvaluator<AstEvaluator, AstFuncDeclNode, ScopeEntry>
+    class FuncDeclNodeEvaluator : INodeEvaluator<AstEvaluator, AstFuncDeclNode, Symbol>
     {
-        public ScopeEntry Evaluate(AstEvaluator evaluator, AstFuncDeclNode funcdecl)
+        public Symbol Evaluate(AstEvaluator evaluator, AstFuncDeclNode funcdecl)
         {
             var func = new Func(funcdecl.Identifier, funcdecl.Parameters, funcdecl.Body);
             evaluator.CurrentScope.NewSymbol(funcdecl.Identifier.Value.ToString(), func);

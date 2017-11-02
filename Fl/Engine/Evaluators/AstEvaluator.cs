@@ -1,19 +1,17 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.Evaluators;
-using Fl.Engine.StdLib;
+using Fl.Engine.Symbols;
 using Fl.Parser.Ast;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Fl.Engine
+namespace Fl.Engine.Evaluators
 {
-    public class AstEvaluator : IAstWalker<ScopeEntry>
+    public class AstEvaluator : IAstWalker<Symbol>
     {
-        private Stack<Scope> _Scopes;
-
+        private SymbolTable _Symbols;
         private AstNodeEvaluator _AstNodeEvaluator;
         private UnaryNodeEvaluator _UnaryNodeEvaluator;
         private BinaryNodeEvaluator _BinaryNodeEvaluator;
@@ -35,11 +33,7 @@ namespace Fl.Engine
 
         public AstEvaluator()
         {
-            _Scopes = new Stack<Scope>();
-            _Scopes.Push(new Scope());
-
-            StdLibInitializer.Import(CurrentScope);
-
+            _Symbols = new SymbolTable();
             _AstNodeEvaluator = new AstNodeEvaluator();
             _UnaryNodeEvaluator = new UnaryNodeEvaluator();
             _BinaryNodeEvaluator = new BinaryNodeEvaluator();
@@ -60,20 +54,13 @@ namespace Fl.Engine
             _ReturnNodeEvaluator = new ReturnNodeEvaluator();
         }
 
-        public Scope CurrentScope => _Scopes.Peek();
+        public Scope CurrentScope => _Symbols.CurrentScope;
 
-        public void NewScope(ScopeType scopeType)
-        {
-            Scope enclosing = CurrentScope;
-            _Scopes.Push(new Scope(scopeType, enclosing));
-        }
+        public void NewScope(ScopeType scopeType) => _Symbols.NewScope(scopeType);
 
-        public void DestroyScope()
-        {
-            _Scopes.Pop();
-        }
+        public void DestroyScope() => _Symbols.DestroyScope();
 
-        public ScopeEntry Process(AstNode node)
+        public Symbol Process(AstNode node)
         {
             object n = node;
             switch (n)

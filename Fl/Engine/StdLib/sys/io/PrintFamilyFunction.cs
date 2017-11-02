@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Engine.Evaluators;
+using Fl.Engine.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,7 +13,7 @@ namespace Fl.Engine.StdLib.sys.io
     {
         public override string Name => "print";
 
-        public override ScopeEntry Invoke(AstEvaluator evaluator, List<ScopeEntry> args)
+        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
         {
             args.ForEach(a => System.Console.Write(a));
             return null;
@@ -22,7 +24,7 @@ namespace Fl.Engine.StdLib.sys.io
     {
         public override string Name => "println";
 
-        public override ScopeEntry Invoke(AstEvaluator evaluator, List<ScopeEntry> args)
+        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
         {
             args.ForEach(a => System.Console.WriteLine(a));
             return null;

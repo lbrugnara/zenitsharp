@@ -6,18 +6,18 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Fl.Engine
+namespace Fl.Engine.Symbols
 {
-    public class FlNamespace : ScopeEntry
+    public class FlNamespace : Symbol
     {
         private FlNamespace _Parent;
-        private Dictionary<string, ScopeEntry> _Map;
+        private Dictionary<string, Symbol> _Map;
 
         public FlNamespace(string name, FlNamespace parent = null)
         {
-            _DataType = ScopeEntryType.Namespace;
+            _DataType = SymbolType.Namespace;
             _Value = this;
-            _Map = new Dictionary<string, ScopeEntry>();
+            _Map = new Dictionary<string, Symbol>();
             Name = name;
             _Parent = parent;            
             if (_Parent != null)
@@ -31,7 +31,7 @@ namespace Fl.Engine
         public string FullName => (_Parent != null ? $"{_Parent.FullName}." : "") + $"{Name}";
 
         #region Indexers
-        public ScopeEntry this[string var]
+        public Symbol this[string var]
         {
             get
             {
@@ -46,7 +46,7 @@ namespace Fl.Engine
         }
         #endregion
 
-        public Dictionary<string, ScopeEntry> Members
+        public Dictionary<string, Symbol> Members
         {
             get
             {
@@ -61,9 +61,9 @@ namespace Fl.Engine
             string indent = new string(' ', childindent);
             foreach (var key in _Map.Keys)
             {
-                ScopeEntry child = _Map[key];
+                Symbol child = _Map[key];
                 if (child.IsNamespace)
-                    str += $"\n{child.NamespaceValue.ShowNamespace(childindent)}";
+                    str += $"\n{child.AsNamespace.ShowNamespace(childindent)}";
                 else
                     str += $"\n{indent}{child.ToDebugStr()}";
             }
