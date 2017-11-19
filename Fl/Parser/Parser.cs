@@ -552,21 +552,61 @@ namespace Fl.Parser
             return ExpressionAssignment();
         }
 
+        private AstNode LambdaExpression()
+        {
+            AstParametersNode lambdaParams = LambdaParams();
+            var arrow = Consume(TokenType.RightArrow);
+            AstNode expr = Match(TokenType.LeftBrace) ? Block() : Expression();
+            return new AstFuncDeclNode(arrow, lambdaParams, new List<AstNode>() { expr });
+        }
+
+        private AstParametersNode LambdaParams()
+        {
+            List<Token> parameters = new List<Token>();
+            bool parenthesis = false;
+            if (Match(TokenType.LeftParen))
+            {
+                parenthesis = true;
+                Consume();
+            }
+            while (Match(TokenType.Identifier))
+            {
+                parameters.Add(Consume(TokenType.Identifier));
+                if (Match(TokenType.Comma))
+                    Consume();
+            }
+            if (parenthesis)
+                Consume(TokenType.RightParen);
+            return new AstParametersNode(parameters);
+        }
+
         // Rule:
         // expression_assignment	-> IDENTIFIER ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
         //			                | or_expression
         private AstNode ExpressionAssignment()
         {
-            if (Match(TokenType.Identifier))
+            if (Match(TokenType.Identifier) && MatchAnyFrom(1, TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
             {
                 Token identifier = Consume(TokenType.Identifier);
-                if (MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
-                {
-                    Token assignmentop = Consume();
-                    AstNode expression = ExpressionAssignment();
-                    return new AstAssignmentNode(identifier, assignmentop, expression);
-                }
-                Restore(identifier);
+                Token assignmentop = Consume();
+                AstNode expression = Expression();
+                return new AstAssignmentNode(identifier, assignmentop, expression);
+            }
+            else if (
+                // =>
+                Match(TokenType.RightArrow)
+                // a =>
+                || Match(TokenType.Unknown, TokenType.RightArrow)
+                // a,b =>
+                || MatchFrom(CountRepeatedMatchesFrom(0, TokenType.Unknown, TokenType.Comma), TokenType.RightArrow)
+                // () =>
+                || Match(TokenType.LeftParen, TokenType.RightParen, TokenType.RightArrow)
+                // (a) =>
+                || Match(TokenType.LeftParen, TokenType.Unknown, TokenType.RightParen, TokenType.RightArrow)
+                // (a,b) =>
+                || (Match(TokenType.LeftParen) && MatchFrom(1 + CountRepeatedMatchesFrom(1, TokenType.Unknown, TokenType.Comma), TokenType.RightParen, TokenType.RightArrow)))
+            {
+                return LambdaExpression();
             }
             return OrExpression();
         }

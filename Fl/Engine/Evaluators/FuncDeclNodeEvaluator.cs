@@ -25,7 +25,7 @@ namespace Fl.Engine.Evaluators
             _Env = env;
         }
 
-        public override string Name => _Identifier.Value.ToString();
+        public override string Name => _Identifier.Type == TokenType.RightArrow ? "<lambda>" : _Identifier.Value.ToString();
 
         public AstParametersNode Parameters => _Params;
 
@@ -44,11 +44,12 @@ namespace Fl.Engine.Evaluators
                     new Symbol(args[i].Type, StorageType.Variable, new FlObject(args[i].Type, args[i].Value))
                 );
             }
+            FlObject ret = null;
             try
-            {
+            {                
                 foreach (var decl in _Body)
                 {
-                    decl.Exec(evaluator);
+                    ret = decl.Exec(evaluator);
                     if (evaluator.Symtable.MustReturn)
                         return evaluator.Symtable.ReturnValue;
                 }
@@ -57,6 +58,8 @@ namespace Fl.Engine.Evaluators
             {
                 evaluator.Symtable.DestroyScope();
             }
+            if (_Identifier.Type == TokenType.RightArrow && ret != null)
+                return ret;
             return new FlObject(ObjectType.Null, null);
         }
     }

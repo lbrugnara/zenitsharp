@@ -5,6 +5,7 @@ namespace Fl
 {
     public enum TokenType
     {
+        Unknown,
         // Types
         Integer,
         Double,
@@ -66,6 +67,7 @@ namespace Fl
         Semicolon,
         Comma,
         Dot,
+        RightArrow,
         Function,
         Namespace
     }

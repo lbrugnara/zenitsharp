@@ -277,6 +277,11 @@ namespace Fl
                         type = TokenType.Equal;
                         val += Consume();
                     }
+                    else if (Peek() == '>')
+                    {
+                        type = TokenType.RightArrow;
+                        val += Consume();
+                    }
                     break;
                 case '&':
                     if (Peek(2) == "&&")

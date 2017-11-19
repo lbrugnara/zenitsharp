@@ -65,7 +65,16 @@ return_statement -> "return" expression? ";"
 expression	-> expression_assignment
 
 expression_assignment	-> IDENTIFIER ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
+						| lambda_expression
 						| or_expression
+
+lambda_expression -> lambda_params "=>" lambda_body
+
+lambda_params -> "(" func_params ")"
+			  | func_params
+
+lambda_body -> block
+			| expression
 
 or_expression	-> and_expression ( "||" and_expression )*
 
