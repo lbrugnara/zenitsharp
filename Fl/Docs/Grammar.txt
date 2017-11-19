@@ -11,7 +11,7 @@ variable_declaration -> VAR IDENTIFIER ( "=" expression )? ";"
 
 constant_declaration -> CONST IDENTIFIER "=" expression ";"
 
-func_declaration -> "func" IDENTIFIER "(" func_params? ")" "{" declaration* "}"
+func_declaration -> "fn" IDENTIFIER "(" func_params? ")" "{" declaration* "}"
 
 func_params -> IDENTIFIER ( "," IDENTIFIER )*
 
@@ -42,8 +42,17 @@ if_statement -> "if" ( parenthesized_expr | braced_expr ) ( "else" ( statement |
 
 while_statement -> "while" ( parenthesized_expr | braced_expr )
 
-for_statement -> "for" "(" ( variable_declaration | expression_statement ) expression? ";" expression? ")" statement
-			   | "for" ( variable_declaration | expression_statement ) expression? ";" expression? block
+for_statement -> "for" "(" for_initializer? ";" expression? ";" for_iterator? ")" statement
+			   | "for" for_initializer? ";" expression? ";" for_iterator? block
+
+for_initializer -> for_declaration
+				| expression ( "," expression )*
+
+for_declaration -> VAR local_var_declaration ( "," local_var_declaration )*
+
+local_var_declaration -> IDENTIFIER ( "=" expression )
+
+for_iterator -> expression ( "," expression )*
 
 break_statement -> "break" INTEGER? ";"
 

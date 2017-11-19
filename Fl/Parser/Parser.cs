@@ -28,12 +28,23 @@ namespace Fl.Parser
 
         private bool Match(params TokenType[] type)
         {
-            var l = type.Length;
-            if (l + _Pointer > _Tokens.Count)
+            return MatchFrom(0, type);
+        }
+
+        private bool MatchFrom(int offset, params TokenType[] types)
+        {
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
+
+            var l = types.Length;
+            if (l + _Pointer + offset > _Tokens.Count)
                 return false;
-            for (int i = 0; i < type.Length; i++)
-                if (_Tokens[_Pointer + i].Type != type[i])
+            for (int i = 0; i < types.Length; i++)
+            {
+                if (types[i] == TokenType.Unknown)
+                    continue;
+                if (_Tokens[_Pointer + i + offset].Type != types[i])
                     return false;
+            }
             return true;
         }
 
@@ -43,11 +54,55 @@ namespace Fl.Parser
             return t != null && types.Contains(t.Type);
         }
 
+        private bool MatchAnyFrom(int offset, params TokenType[] types)
+        {
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
+            var t = PeekFrom(offset);
+            return t != null && types.Contains(t.Type);
+        }
+
+        private int CountRepeatedMatchesFrom(int offset, params TokenType[] types)
+        {
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
+
+            int q = 0;
+            var l = types.Length;
+            if (l + _Pointer + offset > _Tokens.Count)
+                return 0;
+
+            int i = 0;
+            bool valid = true;
+            while (valid && i + offset + _Pointer < _Tokens.Count)
+            {
+                for (int j = 0; j < types.Length; j++, i++)
+                {
+                    if (types[j] == TokenType.Unknown)
+                    {
+                        q++;
+                        continue;
+                    }
+                    if (_Pointer + i + offset >= _Tokens.Count || _Tokens[_Pointer + i + offset].Type != types[j])
+                    {
+                        valid = false;
+                        break;
+                    }
+                    q++;
+                }
+            }
+            return q >= types.Length ? q : 0;
+        }
+
         private Token Peek()
         {
             return _Pointer < _Tokens.Count ? _Tokens[_Pointer] : null;
         }
-        
+
+        private Token PeekFrom(int offset)
+        {
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
+            return _Pointer + offset < _Tokens.Count ? _Tokens[_Pointer + offset] : null;
+        }
+
         private Token Consume(TokenType type, string message = null)
         {
             if (!HasInput())
@@ -244,88 +299,174 @@ namespace Fl.Parser
             return new AstWhileNode(kw, condition, body);
         }
 
+        #region for_statement
+
         // Rule:
-        // for_statement -> "for" "(" ( variable_declaration | expression_statement ) expression? ";" expression? ")" statement
-		//	              | "for" (variable_declaration | expression_statement ) expression? ";" expression? block
+        // for_statement -> "for" "(" for_initializer? ";" expression? ";" for_iterator? ")" statement
+        // 			      | "for" for_initializer? ";" expression? ";" for_iterator? block
         private AstNode ForStatement()
         {
+            if (Match(TokenType.For, TokenType.LeftParen))
+            {
+                return ParenthesizedForStatemet();
+            }
             Token kw = Consume(TokenType.For);
 
-            AstNode init = null;
-            AstNode condition = null;
-            AstNode increment = null;
+            AstNode forInitializer = null;
+            AstNode expression = null;
+            AstNode forIterator = null;
             AstNode body = null;
 
-            if (Match(TokenType.LeftParen))
+            // Initializer
+            if (Match(TokenType.Semicolon))
             {
-                // Init
-                Consume(TokenType.LeftParen);
-                if (Match(TokenType.Variable))
-                    init = VarDeclaration();
-                else if (Match(TokenType.Semicolon))
-                    init = new AstNoOpNode(Consume(TokenType.Semicolon));
-                else
-                    init = ExpressionStatement();
-
-                // Test
-                if (Match(TokenType.Semicolon))
-                {
-                    Consume(TokenType.Semicolon);
-                    condition = new AstLiteralNode(new Token() { Type = TokenType.Boolean, Value = true }); // Hack: do an infinite loop
-                }
-                else
-                {
-                    condition = Expression();
-                    Consume(TokenType.Semicolon);
-                }
-
-                // Incr
-                if (Match(TokenType.RightParen))
-                {
-                    increment = new AstNoOpNode(Peek());
-                }
-                else
-                {
-                    increment = Expression();
-                }
-                Consume(TokenType.RightParen);
-                body = Match(TokenType.Semicolon) ? new AstNoOpNode(Consume(TokenType.Semicolon)) : Statement();
+                forInitializer = new AstNoOpNode(Consume());
             }
             else
             {
-                // Init
-                if (Match(TokenType.Variable))
-                    init = VarDeclaration();
-                else if (Match(TokenType.Semicolon))
-                    init = new AstNoOpNode(Consume(TokenType.Semicolon));
-                else
-                    init = ExpressionStatement();
-
-                // Test
-                if (Match(TokenType.Semicolon))
-                {
-                    Consume(TokenType.Semicolon);
-                    condition = new AstLiteralNode(new Token() { Type = TokenType.Boolean, Value = true }); // Hack: do an infinite loop
-                }
-                else
-                {
-                    condition = Expression();
-                    Consume(TokenType.Semicolon);
-                }
-
-                // Incr
-                if (Match(TokenType.LeftBrace))
-                {
-                    increment = new AstNoOpNode(Peek());
-                }
-                else
-                {
-                    increment = Expression();
-                }
-                body = Block();
+                forInitializer = ForInitializer();
+                Consume(TokenType.Semicolon);
             }
-            return new AstForNode(kw, init, condition, increment, body);
+            // Expression
+            if (Match(TokenType.Semicolon))
+            {
+                expression = new AstNoOpNode(Consume());
+            }
+            else
+            {
+                expression = Expression();
+                Consume(TokenType.Semicolon);
+            }
+
+            // Iterator
+            if (Match(TokenType.LeftBrace))
+            {
+                forIterator = new AstNoOpNode(Peek()); // Get a reference of the line/col
+            }
+            else
+            {
+                forIterator = ForIterator();
+            }
+
+            // Body
+            body = Block();
+            return new AstForNode(kw, forInitializer, expression, forIterator, body);
         }
+
+        // Rule: (continuation)
+        // for_statement -> "for" "(" for_initializer? ";" expression? ";" for_iterator? ")" statement
+        private AstNode ParenthesizedForStatemet()
+        {
+            Token kw = Consume(TokenType.For);
+            Consume(TokenType.LeftParen);
+
+            AstNode forInitializer = null;
+            AstNode expression = null;
+            AstNode forIterator = null;
+            AstNode body = null;
+
+            // Initializer
+            if (Match(TokenType.Semicolon))
+            {
+                forInitializer = new AstNoOpNode(Consume());
+            }
+            else
+            {
+                forInitializer = ForInitializer();
+                Consume(TokenType.Semicolon);
+            }
+
+            // Expression
+            if (Match(TokenType.Semicolon))
+            {
+                expression = new AstNoOpNode(Consume());
+            }
+            else
+            {
+                expression = Expression();
+                Consume(TokenType.Semicolon);
+            }
+
+            // Iterator
+            if (Match(TokenType.RightParen))
+            {
+                forIterator = new AstNoOpNode(Consume());
+            }
+            else
+            {
+                forIterator = ForIterator();
+                Consume(TokenType.RightParen);
+            }
+
+            // Body
+            body = Match(TokenType.Semicolon) ? new AstNoOpNode(Consume(TokenType.Semicolon)) : Statement();
+            return new AstForNode(kw, forInitializer, expression, forIterator, body);
+        }
+
+        // Rule:
+        // for_initializer -> for_declaration
+        // 				    | expression ( "," expression )*
+        private AstNode ForInitializer()
+        {
+            if (Match(TokenType.Variable))
+            {
+                return ForDeclaration();
+            }
+            List<AstNode> exprs = new List<AstNode>();
+            exprs.Add(Expression());
+            while (Match(TokenType.Comma))
+            {
+                Consume();
+                exprs.Add(Expression());
+            }
+            // TODO: Check if DeclarationNode is correct
+            return new AstDeclarationNode(exprs);
+        }
+
+        // Rule:
+        // for_declaration -> VAR local_var_declaration ( "," local_var_declaration )*
+        private AstNode ForDeclaration()
+        {
+            Token var = Consume(TokenType.Variable);
+            List<AstNode> decls = new List<AstNode>();
+            decls.Add(LocalVarDeclaration());
+            while (Match(TokenType.Comma))
+            {
+                Consume();
+                decls.Add(LocalVarDeclaration());
+            }
+            return new AstDeclarationNode(decls);
+        }
+
+        // Rule:
+        // local_var_declaration -> IDENTIFIER ( "=" expression )
+        private AstNode LocalVarDeclaration()
+        {
+            Token id = Consume(TokenType.Identifier);
+            AstNode expr = null;
+            if (Match(TokenType.Assignment))
+            {
+                Consume(TokenType.Assignment);
+                expr = Expression();
+            }
+            return new AstVariableNode(id, expr);
+        }
+
+        // Rule:
+        // for_iterator -> expression ( "," expression )*
+        private AstNode ForIterator()
+        {
+            List<AstNode> exprs = new List<AstNode>();
+            exprs.Add(Expression());
+            while (Match(TokenType.Comma))
+            {
+                Consume();
+                exprs.Add(Expression());
+            }
+            // TODO: Check if DeclarationNode is correct
+            return new AstDeclarationNode(exprs);
+        }
+        #endregion
 
         // Rule:
         // if_statement -> "if" (parenthesized_expr | braced_expr ) ( "else" (statement | ";" ) )?

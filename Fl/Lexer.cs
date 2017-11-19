@@ -73,7 +73,7 @@ namespace Fl
         {
             if (amount <= 0)
                 throw new ArgumentException("Amount must be greater than 0");
-            return _Pointer + amount < _Source.Length ? _Source.Substring(_Pointer, amount) : null;
+            return _Pointer + amount <= _Source.Length ? _Source.Substring(_Pointer, amount) : null;
         }
 
         private char Consume()
@@ -107,9 +107,8 @@ namespace Fl
                 _Col = 0;
             }
 
-            // Consume Whitespaces
-            while (HasInput() && char.IsWhiteSpace(Peek()))
-                Consume();
+            // Consume Whitespaces and Comments
+            while (HasInput() && (char.IsWhiteSpace(Peek()) && Consume() != '\0' || RemoveComment()));
 
             if (!HasInput())
                 return null;
@@ -136,6 +135,25 @@ namespace Fl
                 Col = col,
                 Value = value
             };
+        }
+
+        private bool RemoveComment()
+        {
+            string s = Peek(2);
+            char c = '\n';
+            if (s == "//")
+            {
+                while (HasInput() && (c = Peek()) != '\n') Consume();
+                Consume();
+                return true;
+            }
+            else if (s == "/*")
+            {
+                while (HasInput() && (s = Peek(2)) != "*/") Consume();
+                Consume(2);
+                return true;
+            }
+            return false;
         }
 
         private Token CheckPunctuation()
