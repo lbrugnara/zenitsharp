@@ -32,6 +32,7 @@ namespace Fl.Engine.Evaluators
         private ReturnNodeEvaluator _ReturnNodeEvaluator;
         private CallableNodeEvaluator _CallNodeEvaluator;
         private FuncDeclNodeEvaluator _FuncDeclNodeEvaluator;
+        private NullCoalescingNodeEvaluator _NullCoalescingNodeEvaluator;
 
         public AstEvaluator()
         {
@@ -56,6 +57,7 @@ namespace Fl.Engine.Evaluators
             _CallNodeEvaluator = new CallableNodeEvaluator();
             _FuncDeclNodeEvaluator = new FuncDeclNodeEvaluator();
             _ReturnNodeEvaluator = new ReturnNodeEvaluator();
+            _NullCoalescingNodeEvaluator = new NullCoalescingNodeEvaluator();
         }
 
         public SymbolTable Symtable => _Symbols;
@@ -103,6 +105,8 @@ namespace Fl.Engine.Evaluators
                     return _FuncDeclNodeEvaluator.Evaluate(this, func);
                 case AstReturnNode ret:
                     return _ReturnNodeEvaluator.Evaluate(this, ret);
+                case AstNullCoalescingNode nc:
+                    return _NullCoalescingNodeEvaluator.Evaluate(this, nc);
                 case AstNoOpNode np:
                     return null;
             }

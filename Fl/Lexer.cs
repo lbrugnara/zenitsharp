@@ -170,6 +170,8 @@ namespace Fl
                 case '.':
                     return BuildToken(TokenType.Dot, Consume(), line, col);
                 case '?':
+                    if (Peek(2) == "??")
+                        return BuildToken(TokenType.QuestionQuestion, Consume(2), line, col);
                     return BuildToken(TokenType.Question, Consume(), line, col);
                 case ':':
                     return BuildToken(TokenType.Colon, Consume(), line, col);

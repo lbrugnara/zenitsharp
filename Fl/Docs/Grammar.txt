@@ -68,7 +68,9 @@ expression_assignment	-> IDENTIFIER ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expre
 						| lambda_expression
 						| conditional_expression
 
-conditional_expression -> or_expression ( '?' expression ':' expression )*
+conditional_expression -> null_coalescing_expression ( '?' expression ':' expression )?
+
+null_coalescing_expression -> or_expression ( '??' null_coalescing_expression )?
 
 lambda_expression -> lambda_params "=>" lambda_body
 

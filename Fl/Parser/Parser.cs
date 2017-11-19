@@ -613,17 +613,31 @@ namespace Fl.Parser
         }
 
         // Rule:
-        // conditional_expression -> or_expression ( '?' expression ':' expression )*
+        // conditional_expression -> null_coalescing_expression ( '?' expression ':' expression )?
         private AstNode ConditionalExpression()
         {
-            AstNode orExpr = OrExpression();
+            AstNode nullCoalescingExpr = NullCoalescingExpression();
             if (Match(TokenType.Question))
             {
                 Token q = Consume();
                 AstNode trueExpr = Expression();
                 Consume(TokenType.Colon);
                 AstNode falseExpr = Expression();
-                return new AstIfNode(q, orExpr, trueExpr, falseExpr);
+                return new AstIfNode(q, nullCoalescingExpr, trueExpr, falseExpr);
+            }
+            return nullCoalescingExpr;
+        }
+
+        // Rule:
+        // null_coalescing_expression -> or_expression ( '??' null_coalescing_expression )?
+        private AstNode NullCoalescingExpression()
+        {
+            AstNode orExpr = OrExpression();
+            if (Match(TokenType.QuestionQuestion))
+            {
+                Token q = Consume();
+                AstNode rightExpr = NullCoalescingExpression();
+                return new AstNullCoalescingNode(q, orExpr, rightExpr);
             }
             return orExpr;
         }
