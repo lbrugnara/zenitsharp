@@ -597,7 +597,7 @@ namespace Fl.Parser
                 // =>
                 Match(TokenType.RightArrow)
                 // a =>
-                || Match(TokenType.Unknown, TokenType.RightArrow)
+                || (!Match(TokenType.LeftParen) && Match(TokenType.Unknown, TokenType.RightArrow))
                 // a,b =>
                 || MatchFrom(CountRepeatedMatchesFrom(0, TokenType.Unknown, TokenType.Comma), TokenType.RightArrow)
                 // () =>

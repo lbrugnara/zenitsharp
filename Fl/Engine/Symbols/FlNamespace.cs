@@ -23,7 +23,7 @@ namespace Fl.Engine.Symbols
             _Parent = parent;            
             if (_Parent != null)
             {
-                _Parent[Name] = new Symbol(ObjectType.Namespace, StorageType.Constant, this);
+                _Parent.AddSymbol(Name,new Symbol(ObjectType.Namespace, StorageType.Constant), this);
             }
         }
 
@@ -40,10 +40,12 @@ namespace Fl.Engine.Symbols
                     return _Map[var];
                 return null;
             }
-            set
-            {
-                _Map[var] = value;
-            }
+        }
+
+        public void AddSymbol(string name, Symbol s, FlObject o)
+        {
+            s.DoBinding($"{Owner?.Name ?? Name}", name, o);
+            _Map[name] = s;
         }
         #endregion
 

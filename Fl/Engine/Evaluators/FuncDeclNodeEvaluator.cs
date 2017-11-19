@@ -11,10 +11,12 @@ namespace Fl.Engine.Evaluators
 {
     public class Func : FlCallable
     {
+        private static int UnboundLambda = 1;
         private Token _Identifier;
         private AstParametersNode _Params;
         private List<AstNode> _Body;
         private Scope _Env;
+        private string _Name;
 
         public Func(Token name, AstParametersNode parameters, List<AstNode> body, Scope env = null)
             : base ()
@@ -23,9 +25,12 @@ namespace Fl.Engine.Evaluators
             _Params = parameters;
             _Body = body;
             _Env = env;
+            _Name = _Identifier.Type == TokenType.RightArrow ? $"<lambda@{{{UnboundLambda++}}}>" : _Identifier.Value.ToString();
         }
 
-        public override string Name => _Identifier.Type == TokenType.RightArrow ? "<lambda>" : _Identifier.Value.ToString();
+        public override string Name => _Name;
+
+        public bool IsLambda => _Identifier.Type == TokenType.RightArrow;
 
         public AstParametersNode Parameters => _Params;
 
@@ -41,7 +46,8 @@ namespace Fl.Engine.Evaluators
                 evaluator.Symtable.AddSymbol(
                     _Params.Parameters[i].Value.ToString(),
                     // by-value
-                    new Symbol(args[i].Type, StorageType.Variable, new FlObject(args[i].Type, args[i].Value))
+                    new Symbol(args[i].Type, StorageType.Variable),
+                    new FlObject(args[i].Type, args[i].Value)
                 );
             }
             FlObject ret = null;
@@ -69,13 +75,17 @@ namespace Fl.Engine.Evaluators
         public FlObject Evaluate(AstEvaluator evaluator, AstFuncDeclNode funcdecl)
         {
             var func = new Func(funcdecl.Identifier, funcdecl.Parameters, funcdecl.Body, evaluator.Symtable.IsFunctionEnv() ? evaluator.Symtable.GetCurrentFunctionEnv() : null);
+
+            if (func.IsLambda)
+                return func;
+
             if (evaluator.Symtable.HasSymbol(func.Name))
             {
                 evaluator.Symtable.UpdateSymbol(func.Name, func);
             }
             else
             {
-                evaluator.Symtable.AddSymbol(func.Name, new Symbol(ObjectType.Function, StorageType.Variable, func));
+                evaluator.Symtable.AddSymbol(func.Name, new Symbol(ObjectType.Function, StorageType.Variable), func);
             }
             return func;
         }

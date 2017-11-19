@@ -94,13 +94,13 @@ namespace Fl.Engine.Symbols
         /// </summary>
         /// <param name="name">Name of the symbol to create</param>
         /// <param name="symbol">Contains attributes and information about the symbol</param>
-        public void AddSymbol(string name, Symbol symbol)
+        public void AddSymbol(string name, Symbol symbol, FlObject binding)
         {
             Scope current = CurrentScope;
             if (current.HasSymbol(name))
                 throw new SymbolException($"Symbol '{name}' is already defined in this scope");
             
-            current.AddSymbol(name, symbol);
+            current.AddSymbol(name, symbol, binding);
         }
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Fl.Engine.Symbols
                 {
                     if (scp.ScopeType == ScopeType.Function)
                     {
-                        scp.AddSymbol(Scope.FlReturnKey, new Symbol(value.Type, StorageType.Constant, value));
+                        scp.AddSymbol(Scope.FlReturnKey, new Symbol(value.Type, StorageType.Constant), value);
                         return;
                     }
                     scp = _Scopes.ElementAtOrDefault(--i);

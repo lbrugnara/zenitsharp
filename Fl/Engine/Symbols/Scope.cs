@@ -13,21 +13,25 @@ namespace Fl.Engine.Symbols
     {
         Common,
         Function,
-        Environment,
         Loop
     }
 
     public class Scope
     {
-        #region Private Constants
+        #region Static fields
+        private static int ScopeN = 1;
+        #endregion
+
+        #region Constants
         public const string FlReturnKey = "@flreturn";
         #endregion
 
         #region Private Fields
         private ScopeType _ScopeType;
         private Dictionary<string, Symbol> _Map;
+        // Contains the environment of the binding time for closures
         private Scope _Env;
-
+        private string _Name;
         private bool _Break;
         private bool _Continue;
         #endregion
@@ -38,6 +42,7 @@ namespace Fl.Engine.Symbols
             _ScopeType = type;
             _Map = new Dictionary<string, Symbol>();
             _Env = env;
+            _Name = ScopeN == 1 ? "<global>" : $"<scope@{{{ScopeN++}}}>";
         }
         #endregion
 
@@ -70,9 +75,10 @@ namespace Fl.Engine.Symbols
         #endregion
 
         #region Public Methods
-        public void AddSymbol(string name, Symbol initializer)
+        public void AddSymbol(string name, Symbol symbol, FlObject binding)
         {
-            _Map[name] = initializer;
+            symbol.DoBinding(_Name, name, binding);
+            _Map[name] = symbol;
         }
 
         public void UpdateSymbol(string name, FlObject obj)

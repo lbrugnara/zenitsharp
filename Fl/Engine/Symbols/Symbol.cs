@@ -14,18 +14,29 @@ namespace Fl.Engine.Symbols
         protected FlObject _Value;
         protected string _Name;
 
-        public Symbol(ObjectType type, StorageType storage, FlObject value = null)
+        public Symbol(ObjectType type, StorageType storage)
         {
             _ObjectType = type;
             _StorageType = storage;
-            _Value = value;
-            _Value.RefInc(this);
         }
 
         public ObjectType Type => _ObjectType;
         public StorageType Storage => _StorageType;
         public FlObject Binding => _Value;
-        public string Name { get => _Name; set => _Name = value; }
+        public string Name => _Name;
+
+        public override string ToString()
+        {
+            return _Name ?? "";
+        }
+
+        public void DoBinding(string scope, string name, FlObject val)
+        {
+            _Name = $"{scope}.{name}";
+            _ObjectType = val.Type;
+            _Value = val;
+            _Value.RefInc(this);
+        }
 
         public void UpdateBinding(FlObject newval)
         {

@@ -38,13 +38,13 @@ namespace Fl.Engine.Symbols
 
         public Symbol Owner => _Refs.FirstOrDefault();
 
-        public void RefInc(Symbol s)
+        public virtual void RefInc(Symbol s)
         {
             if (_Value is FlObject)
                 _Refs.Add(s);
         }
 
-        public void RefDec(Symbol s)
+        public virtual void RefDec(Symbol s)
         {
             if (_Value is FlObject)
                 _Refs.Remove(s);
