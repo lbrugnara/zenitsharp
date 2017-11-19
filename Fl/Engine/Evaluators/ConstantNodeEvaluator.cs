@@ -10,14 +10,14 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class ConstantNodeEvaluator : INodeEvaluator<AstEvaluator, AstConstantNode, Symbol>
+    class ConstantNodeEvaluator : INodeEvaluator<AstEvaluator, AstConstantNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstConstantNode constdec)
+        public FlObject Evaluate(AstEvaluator evaluator, AstConstantNode constdec)
         {
             string constname = constdec.Identifier.Value.ToString();
-            Symbol init = constdec.Initializer.Exec(evaluator);
-            init = new Symbol(init.DataType, StorageType.Constant, init.Value);
-            evaluator.CurrentScope.NewSymbol(constname, init);
+            FlObject init = constdec.Initializer.Exec(evaluator);
+            init = new FlObject(init.Type, init.Value);
+            evaluator.Symtable.AddSymbol(constname, new Symbol(init.Type, StorageType.Constant, init));
             return init;
         }
     }

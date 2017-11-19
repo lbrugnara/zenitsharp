@@ -7,6 +7,7 @@ namespace Fl.Engine.Symbols
     public enum StorageType
     {
         Variable,
-        Constant
+        Constant,
+        Literal
     }
 }

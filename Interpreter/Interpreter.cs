@@ -5,6 +5,7 @@ using Fl;
 using Fl.Engine;
 using Fl.Engine.Evaluators;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Exceptions;
 using Fl.Parser;
 using Fl.Parser.Ast;
 using System;
@@ -34,13 +35,24 @@ namespace FlInterpreter
 
                     Parser p = new Parser();
                     AstNode ast = p.Parse(tokens);
-                    Symbol result = eval.Process(ast);
+                    FlObject result = eval.Process(ast);
                     if (result != null)
                         Console.WriteLine($":: {result.ToDebugStr()}");
                 }
                 catch (Exception e)
                 {
-                    string type = (e is AstWalkerException) ? "Runtime" : (e is ParsingException) ? "Parsing" : "Unknown";
+                    string type = "Unknown";
+                    switch (e)
+                    {
+                        case AstWalkerException awe:
+                        case SymbolException se:
+                        case ScopeOperationException soe:
+                            type = "Runtime";
+                            break;
+                        case ParsingException pe:
+                            type = "Parsing";
+                            break;                        
+                    }
                     var tmp = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"{type} Error: {e.Message}");

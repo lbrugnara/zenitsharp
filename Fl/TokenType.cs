@@ -21,9 +21,15 @@ namespace Fl
         Minus,
         Multiplication,
         Division,
+        Increment,
+        Decrement,
 
         // Assignment
         Assignment,
+        IncrementAndAssign,
+        DecrementAndAssign,
+        MultAndAssign,
+        DivideAndAssign,
 
         // Equality
         Equal,

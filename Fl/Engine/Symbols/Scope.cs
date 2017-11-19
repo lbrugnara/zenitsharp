@@ -13,40 +13,31 @@ namespace Fl.Engine.Symbols
     {
         Common,
         Function,
+        Environment,
         Loop
     }
 
     public class Scope
     {
         #region Private Constants
-        private const string FlReturnKey = "@flreturn";
+        public const string FlReturnKey = "@flreturn";
         #endregion
 
         #region Private Fields
-        private Scope _Global;
-        private Scope _Parent;
         private ScopeType _ScopeType;
         private Dictionary<string, Symbol> _Map;
+        private Scope _Env;
 
         private bool _Break;
         private bool _Continue;
         #endregion
 
         #region Constructors
-        public Scope(ScopeType type, Scope global, Scope parent)
+        public Scope(ScopeType type, Scope env = null)
         {
-            _Global = global;
-            _Parent = parent;
             _ScopeType = type;
             _Map = new Dictionary<string, Symbol>();
-        }
-
-        public Scope(Scope global = null, Scope parent = null)
-        {
-            _Global = global;
-            _Parent = parent;
-            _ScopeType = ScopeType.Common;
-            _Map = new Dictionary<string, Symbol>();
+            _Env = env;
         }
         #endregion
 
@@ -55,14 +46,7 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                var scp = this;
-                while (scp != null)
-                {
-                    if (scp._Map.ContainsKey(var))
-                        return scp._Map[var];
-                    scp = ScopeType == ScopeType.Function ? scp._Global : scp._Parent;
-                }
-                return null;
+                return _Map.ContainsKey(var) ? _Map[var] : _Env != null && _Env._Map.ContainsKey(var) ? _Env._Map[var] : null;
             }
         }
 
@@ -76,168 +60,32 @@ namespace Fl.Engine.Symbols
         #endregion
 
         #region Public Properties
+        public bool HasSymbol(string s) => _Map.ContainsKey(s) || _Env != null && _Env._Map.ContainsKey(s);
+
+        public bool Break { get => _Break; set => _Break = value; }
+
+        public bool Continue { get => _Continue; set => _Continue = value; }
+
         public ScopeType ScopeType { get => _ScopeType; }
-
-        public bool MustReturn
-        {
-            get
-            {
-                var scp = this;
-                while (scp != null)
-                {
-                    if (scp._ScopeType == ScopeType.Function && scp._Map.ContainsKey(FlReturnKey))
-                        return true;
-                    scp = scp._Parent;
-                }
-                return false;
-            }
-        }
-
-        public bool MustBreak
-        {
-            get
-            {
-                var scp = this;
-                while (scp != null)
-                {
-                    if (scp._ScopeType == ScopeType.Loop && scp._Break)
-                        return true;
-                    scp = scp._Parent;
-                }
-                return false;
-            }
-        }
-
-        public bool MustContinue
-        {
-            get
-            {
-                var scp = this;
-                while (scp != null)
-                {
-                    if (scp._ScopeType == ScopeType.Loop && scp._Continue)
-                        return true;
-                    scp = scp._Parent;
-                }
-                return false;
-            }
-        }
-
-        public Symbol ReturnValue
-        {
-            get
-            {
-                return _Map.ContainsKey(FlReturnKey) ? _Map[FlReturnKey] : null;
-            }
-            set
-            {
-                var scp = this;
-                while (scp != null)
-                {
-                    if (scp._ScopeType == ScopeType.Function)
-                    {
-                        scp._Map[FlReturnKey] = value;
-                        return;
-                    }
-                    scp = scp._Parent;
-                }
-                throw new AstWalkerException("Cannot return a value from a non-function scope");
-            }
-        }
-
         #endregion
 
         #region Public Methods
-        public void NewSymbol(string name, Symbol initializer = null)
+        public void AddSymbol(string name, Symbol initializer)
         {
-            if (_Map.ContainsKey(name))
-                throw new AstWalkerException($"Symbol {name} is already defined in this scope");
-
-            //if (_ScopeType != ScopeType.Function && _Parent != null && _Parent.IsDefined(name, true))
-            //    throw new AstWalkerException($"Symbol {name} is already defined in an enclosing scope");
-
             _Map[name] = initializer;
         }
 
-        public void UpdateSymbol(string name, Symbol value)
+        public void UpdateSymbol(string name, FlObject obj)
         {
-            if (!_Map.ContainsKey(name) && (_Parent == null || !_Parent.IsDefined(name, true)))
-                throw new AstWalkerException($"Symbol {name} does not exist in the current context");
-
             if (_Map.ContainsKey(name))
             {
-                _Map[name] = value;
+                _Map[name].UpdateBinding(obj);
             }
-            else if (ScopeType == ScopeType.Function)
+            else if (_Env != null && _Env._Map.ContainsKey(name))
             {
-                _Global.UpdateSymbol(name, value);
+                _Env._Map[name].UpdateBinding(obj);
             }
-            else
-            {
-                _Parent.UpdateSymbol(name, value);
-            }
-        }
-
-        public bool IsDefined(string var, bool inChain = false)
-        {
-            if (inChain)
-            {
-                var scp = this;
-                while (scp != null)
-                {
-                    if (scp._Map.ContainsKey(var))
-                        return true;
-                    scp = ScopeType == ScopeType.Function ? scp._Global : scp._Parent;
-                }
-                return false;
-            }
-            return _Map.ContainsKey(var);
-        }
-
-        public void SetBreak(int nbreaks)
-        {
-            if (_ScopeType != ScopeType.Loop && _Parent == null)
-                throw new AstWalkerException("Cannot break in a non-loop scope");
-
-            var scp = this;
-            while (scp != null)
-            {
-                if (scp._ScopeType == ScopeType.Loop)
-                {
-                    scp._Break = true;
-                    if (--nbreaks == 0)
-                        break;
-                }
-                scp = scp._Parent;
-                if (scp == null && nbreaks >= 0)
-                    throw new AstWalkerException(nbreaks > 0 ? $"Cannot break more than {nbreaks} loops" : "Cannot break in a non-loop scope");
-            }
-        }
-
-        public void SetContinue()
-        {
-            if (_ScopeType != ScopeType.Loop && _Parent == null)
-                throw new AstWalkerException("Cannot continue in a non-loop scope");
-
-            var scp = this;
-            while (scp != null)
-            {
-                if (scp._ScopeType == ScopeType.Loop)
-                {
-                    scp._Continue = true;
-                    break;
-                }
-                scp = scp._Parent;
-                if (scp == null)
-                    throw new AstWalkerException("Cannot continue in a non-loop scope");
-            }
-        }
-
-        public void DoContinue()
-        {
-            if (_ScopeType != ScopeType.Loop)
-                throw new AstWalkerException("Cannot continue in a non-loop scope");
-            _Continue = false;
+            else throw new Parser.Ast.AstWalkerException($"Symbol {name} does not exist in the current context");
         }
 
         public void Import(Scope scope)
@@ -246,7 +94,7 @@ namespace Fl.Engine.Symbols
             foreach (var k in keys)
             {
                 var s = scope._Map[k];
-                if (s.IsCallable && s.Storage == StorageType.Constant)
+                if (s.Binding.IsCallable && s.Storage == StorageType.Constant)
                     continue;
                 _Map[k] = s;
             }

@@ -8,21 +8,22 @@ using System.Text;
 
 namespace Fl.Engine.Symbols
 {
-    public class FlNamespace : Symbol
+    public class FlNamespace : FlObject
     {
         private FlNamespace _Parent;
         private Dictionary<string, Symbol> _Map;
 
         public FlNamespace(string name, FlNamespace parent = null)
+            : base(ObjectType.Namespace, null)
         {
-            _DataType = SymbolType.Namespace;
+            _ObjectType = ObjectType.Namespace;
             _Value = this;
             _Map = new Dictionary<string, Symbol>();
             Name = name;
             _Parent = parent;            
             if (_Parent != null)
             {
-                _Parent[Name] = this;
+                _Parent[Name] = new Symbol(ObjectType.Namespace, StorageType.Constant, this);
             }
         }
 
@@ -62,10 +63,10 @@ namespace Fl.Engine.Symbols
             foreach (var key in _Map.Keys)
             {
                 Symbol child = _Map[key];
-                if (child.IsNamespace)
-                    str += $"\n{child.AsNamespace.ShowNamespace(childindent)}";
+                if (child.Type == ObjectType.Namespace)
+                    str += $"\n{child.Binding.AsNamespace.ShowNamespace(childindent)}";
                 else
-                    str += $"\n{indent}{child.ToDebugStr()}";
+                    str += $"\n{indent}{child.Binding.ToDebugStr()}";
             }
             return str;
         }

@@ -7,11 +7,11 @@ using Fl.Parser.Ast;
 
 namespace Fl.Engine.Evaluators
 {
-    class ContinueNodeEvaluator : INodeEvaluator<AstEvaluator, AstContinueNode, Symbol>
+    class ContinueNodeEvaluator : INodeEvaluator<AstEvaluator, AstContinueNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstContinueNode cnode)
+        public FlObject Evaluate(AstEvaluator evaluator, AstContinueNode cnode)
         {
-            evaluator.CurrentScope.SetContinue();
+            evaluator.Symtable.SetContinue();
             return null;
         }
     }

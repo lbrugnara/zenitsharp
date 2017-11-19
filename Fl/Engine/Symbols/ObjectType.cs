@@ -2,9 +2,11 @@
 // Full copyright and license information in LICENSE file
 
 
+using System.Linq;
+
 namespace Fl.Engine.Symbols
 {
-    public enum SymbolType
+    public enum ObjectType
     {
         Integer,
         Double,

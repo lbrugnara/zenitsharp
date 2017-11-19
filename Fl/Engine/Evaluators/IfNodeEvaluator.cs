@@ -10,24 +10,24 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class IfNodeEvaluator : INodeEvaluator<AstEvaluator, AstIfNode, Symbol>
+    class IfNodeEvaluator : INodeEvaluator<AstEvaluator, AstIfNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstIfNode ifnode)
+        public FlObject Evaluate(AstEvaluator evaluator, AstIfNode ifnode)
         {
-            evaluator.NewScope(ScopeType.Common);
+            evaluator.Symtable.NewScope(ScopeType.Common);
             try
             {
-                Symbol result = ifnode.Condition.Exec(evaluator);
+                FlObject result = ifnode.Condition.Exec(evaluator);
                 if (!result.IsBool)
-                    throw new AstWalkerException($"Cannot convert type {result.DataType} to {SymbolType.Boolean}");
+                    throw new AstWalkerException($"Cannot convert type {result.Type} to {ObjectType.Boolean}");
                 if (result.AsBool)
-                    return ifnode.Then != null ? ifnode.Then.Exec(evaluator) : null;
+                    return ifnode.Then?.Exec(evaluator);
                 if (ifnode.Else != null)
                     return ifnode.Else.Exec(evaluator);
             }
             finally
             {
-                evaluator.DestroyScope();
+                evaluator.Symtable.DestroyScope();
             }
             return null;
         }

@@ -10,43 +10,42 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class LiteralNodeEvaluator : INodeEvaluator<AstEvaluator, AstLiteralNode, Symbol>
+    class LiteralNodeEvaluator : INodeEvaluator<AstEvaluator, AstLiteralNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstLiteralNode literal)
+        public FlObject Evaluate(AstEvaluator evaluator, AstLiteralNode literal)
         {
-            SymbolType? dataType = null;
+            ObjectType? dataType = null;
             object val = literal.Primary.Value;
             switch (literal.Primary.Type)
             {
                 case TokenType.Boolean:
                     val = bool.Parse(literal.Primary.Value.ToString());
-                    dataType = SymbolType.Boolean;
+                    dataType = ObjectType.Boolean;
                     break;
                 case TokenType.Integer:
                     val = int.Parse(literal.Primary.Value.ToString());
-                    dataType = SymbolType.Integer;
+                    dataType = ObjectType.Integer;
                     break;
                 case TokenType.Double:
                     val = double.Parse(literal.Primary.Value.ToString());
-                    dataType = SymbolType.Double;
+                    dataType = ObjectType.Double;
                     break;
                 case TokenType.Decimal:
                     val = decimal.Parse(literal.Primary.Value.ToString());
-                    dataType = SymbolType.Decimal;
+                    dataType = ObjectType.Decimal;
                     break;
                 case TokenType.String:
                     val = literal.Primary.Value.ToString();
-                    dataType = SymbolType.String;
+                    dataType = ObjectType.String;
                     break;
                 case TokenType.Identifier:
-                    return evaluator.CurrentScope[literal.Primary.Value];
+                    return evaluator.Symtable.GetSymbol(literal.Primary.Value).Binding;
                 case TokenType.Null:
                     val = null;
-                    dataType = SymbolType.Null;
+                    dataType = ObjectType.Null;
                     break;
             }
-            // TODO: Variables and Constants need to resolve the evtype too
-            return new Symbol(dataType.Value, val);
+            return new FlObject(dataType.Value, val);
         }
     }
 }

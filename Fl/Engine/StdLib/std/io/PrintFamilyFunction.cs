@@ -7,13 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Fl.Engine.StdLib.sys.io
+namespace Fl.Engine.StdLib.std.io
 {
     public class PrintFunction : FlCallable
     {
         public override string Name => "print";
 
-        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
+        public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
         {
             args.ForEach(a => System.Console.Write(a));
             return null;
@@ -24,7 +24,7 @@ namespace Fl.Engine.StdLib.sys.io
     {
         public override string Name => "println";
 
-        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
+        public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
         {
             args.ForEach(a => System.Console.WriteLine(a));
             return null;

@@ -9,11 +9,13 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    public class AstEvaluator : IAstWalker<Symbol>
+    public class AstEvaluator : IAstWalker<FlObject>
     {
         private SymbolTable _Symbols;
         private AstNodeEvaluator _AstNodeEvaluator;
         private UnaryNodeEvaluator _UnaryNodeEvaluator;
+        private UnaryPrefixNodeEvaluator _UnaryPrefixNodeEvaluator;
+        private UnaryPostfixNodeEvaluator _UnaryPostfixNodeEvaluator;
         private BinaryNodeEvaluator _BinaryNodeEvaluator;
         private AssignmentNodeEvaluator _AssignmentNodeEvaluator;
         private ConstantNodeEvaluator _ConstantNodeEvaluator;
@@ -36,6 +38,8 @@ namespace Fl.Engine.Evaluators
             _Symbols = new SymbolTable();
             _AstNodeEvaluator = new AstNodeEvaluator();
             _UnaryNodeEvaluator = new UnaryNodeEvaluator();
+            _UnaryPrefixNodeEvaluator = new UnaryPrefixNodeEvaluator();
+            _UnaryPostfixNodeEvaluator = new UnaryPostfixNodeEvaluator();
             _BinaryNodeEvaluator = new BinaryNodeEvaluator();
             _AssignmentNodeEvaluator = new AssignmentNodeEvaluator();
             _ConstantNodeEvaluator = new ConstantNodeEvaluator();
@@ -54,19 +58,19 @@ namespace Fl.Engine.Evaluators
             _ReturnNodeEvaluator = new ReturnNodeEvaluator();
         }
 
-        public Scope CurrentScope => _Symbols.CurrentScope;
+        public SymbolTable Symtable => _Symbols;
 
-        public void NewScope(ScopeType scopeType) => _Symbols.NewScope(scopeType);
-
-        public void DestroyScope() => _Symbols.DestroyScope();
-
-        public Symbol Process(AstNode node)
+        public FlObject Process(AstNode node)
         {
             object n = node;
             switch (n)
             {
+                case AstUnaryPrefixNode uprefix:
+                    return _UnaryPrefixNodeEvaluator.Evaluate(this, uprefix);
+                case AstUnaryPostfixNode upostfix:
+                    return _UnaryPostfixNodeEvaluator.Evaluate(this, upostfix);
                 case AstUnaryNode u:
-                    return _UnaryNodeEvaluator.Evaluate(this, u);
+                    return _UnaryNodeEvaluator.Evaluate(this, u);                
                 case AstBinaryNode b:
                     return _BinaryNodeEvaluator.Evaluate(this, b);
                 case AstAssignmentNode a:

@@ -10,21 +10,21 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class ForNodeEvaluator : INodeEvaluator<AstEvaluator, AstForNode, Symbol>
+    class ForNodeEvaluator : INodeEvaluator<AstEvaluator, AstForNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstForNode fornode)
+        public FlObject Evaluate(AstEvaluator evaluator, AstForNode fornode)
         {
-            evaluator.NewScope(ScopeType.Loop);
+            evaluator.Symtable.NewScope(ScopeType.Loop);
             try
             {
                 fornode.Init.Exec(evaluator);
-                Symbol result = fornode.Condition.Exec(evaluator);
+                FlObject result = fornode.Condition.Exec(evaluator);
                 if (!result.IsBool)
-                    throw new AstWalkerException($"Cannot convert type {result.DataType} to {SymbolType.Boolean}");
+                    throw new AstWalkerException($"Cannot convert type {result.Type} to {ObjectType.Boolean}");
                 while (result.AsBool)
                 {
                     fornode.Body.Exec(evaluator);
-                    if (evaluator.CurrentScope.MustBreak)
+                    if (evaluator.Symtable.MustBreak)
                         break;
                     fornode.Increment.Exec(evaluator);
                     result = fornode.Condition.Exec(evaluator);
@@ -32,7 +32,7 @@ namespace Fl.Engine.Evaluators
             }
             finally
             {
-                evaluator.DestroyScope();
+                evaluator.Symtable.DestroyScope();
             }
             return null;
         }

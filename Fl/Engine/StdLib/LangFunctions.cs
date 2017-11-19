@@ -14,7 +14,7 @@ namespace Fl.Engine.StdLib
     {
         public override string Name => "import";
 
-        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
+        public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
         {
             args.ForEach(a => {
                 Lexer l = new Lexer(System.IO.File.ReadAllText(a.AsString));
@@ -29,7 +29,7 @@ namespace Fl.Engine.StdLib
                 Parser.Ast.AstNode ast = p.Parse(tokens);
                 AstEvaluator ev = new AstEvaluator();
                 ev.Process(ast);
-                evaluator.CurrentScope.Import(ev.CurrentScope);
+                evaluator.Symtable.Import(ev.Symtable.GlobalScope);
             });
             return null;
         }
@@ -39,12 +39,12 @@ namespace Fl.Engine.StdLib
     {
         public override string Name => "using";
 
-        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
+        public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
         {
             args.ForEach(e => {
                 if (!e.IsNamespace)
                     throw new AstWalkerException($"{e.AsString} is not a namespace");
-                evaluator.CurrentScope.Using(e.AsNamespace);
+                evaluator.Symtable.Using(e.AsNamespace);
             });
             return null;
         }

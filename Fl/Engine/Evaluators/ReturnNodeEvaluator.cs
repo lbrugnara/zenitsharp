@@ -7,12 +7,12 @@ using Fl.Parser.Ast;
 
 namespace Fl.Engine.Evaluators
 {
-    class ReturnNodeEvaluator : INodeEvaluator<AstEvaluator, AstReturnNode, Symbol>
+    class ReturnNodeEvaluator : INodeEvaluator<AstEvaluator, AstReturnNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstReturnNode wnode)
+        public FlObject Evaluate(AstEvaluator evaluator, AstReturnNode wnode)
         {
-            Symbol retval = wnode.Expression?.Exec(evaluator) ?? new Symbol(SymbolType.Null, null);
-            evaluator.CurrentScope.ReturnValue = retval;
+            FlObject retval = wnode.Expression?.Exec(evaluator) ?? new FlObject(ObjectType.Null, null);
+            evaluator.Symtable.ReturnValue = new FlObject(retval.Type, retval.Value);
             return retval;
         }
     }

@@ -7,13 +7,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Fl.Engine.StdLib.sys.lang
+namespace Fl.Engine.StdLib.std.lang
 {
     public class DebugFunction : FlCallable
     {
         public override string Name => "debug";
 
-        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
+        public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
         {
             args.ForEach(a => System.Console.WriteLine(a.IsNamespace ? a.AsNamespace.ShowNamespace() : a.ToDebugStr()));
             return null;

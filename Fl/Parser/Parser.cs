@@ -4,6 +4,7 @@
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Fl.Parser
@@ -36,6 +37,12 @@ namespace Fl.Parser
             return true;
         }
 
+        private bool MatchAny(params TokenType[] types)
+        {
+            var t = Peek();
+            return t != null && types.Contains(t.Type);
+        }
+
         private Token Peek()
         {
             return _Pointer < _Tokens.Count ? _Tokens[_Pointer] : null;
@@ -59,6 +66,11 @@ namespace Fl.Parser
             return _Tokens[_Pointer++];
         }
 
+        private void Restore(Token t)
+        {
+            _Pointer--;
+        }
+
         #region Grammar
 
         // Rule:
@@ -67,7 +79,14 @@ namespace Fl.Parser
         {            
             List<AstNode> statements = new List<AstNode>();
             while (HasInput())
+            {
+                if (Match(TokenType.Semicolon))
+                {
+                    Consume();
+                    continue;
+                }
                 statements.Add(Declaration());
+            }
             return new AstDeclarationNode(statements);
         }
 
@@ -393,16 +412,20 @@ namespace Fl.Parser
         }
 
         // Rule:
-        // expression_assignment -> IDENTIFIER "=" expression_assignment
-		//			              | or_expression
+        // expression_assignment	-> IDENTIFIER ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
+        //			                | or_expression
         private AstNode ExpressionAssignment()
         {
-            if (Match(TokenType.Identifier, TokenType.Assignment))
+            if (Match(TokenType.Identifier))
             {
                 Token identifier = Consume(TokenType.Identifier);
-                Consume(TokenType.Assignment);
-                AstNode expression = ExpressionAssignment();
-                return new AstAssignmentNode(identifier, expression);
+                if (MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
+                {
+                    Token assignmentop = Consume();
+                    AstNode expression = ExpressionAssignment();
+                    return new AstAssignmentNode(identifier, assignmentop, expression);
+                }
+                Restore(identifier);
             }
             return OrExpression();
         }
@@ -495,21 +518,30 @@ namespace Fl.Parser
         }
 
         // Rule:
-        // unary_expression	-> ( "!" | "-" ) invocation
+        // unary_expression	-> ( "!" | "-" ) unary_expression
+        // 					| ( "++" | "--" ) primary_expression
+        // 					| primary_expression ( "++" | "--" )?
         private AstNode UnaryExpression()
         {
-            Token op = null;
             if (Match(TokenType.Not) || Match(TokenType.Minus))
             {
-                op = Consume();
+                Token op = Consume();
+                return new AstUnaryNode(op, UnaryExpression());
             }
-            return new AstUnaryNode(op, Invocation());
+            else if (Match(TokenType.Increment) || Match(TokenType.Decrement))
+            {
+                Token op = Consume();
+                return new AstUnaryPrefixNode(op, PrimaryExpression());
+            }
+            var expr = PrimaryExpression();
+            if (Match(TokenType.Increment) || Match(TokenType.Decrement))
+                return new AstUnaryPostfixNode(Consume(), expr);
+            return new AstUnaryNode(null, expr);
         }
 
         // Rule:
-        // TODO: invocation -> primary ( "." IDENTIFIER | "(" arguments? ")" )*
-        // invocation -> primary ( "(" arguments? ")" )*
-        private AstNode Invocation()
+        // primary_expression -> primary ( "." IDENTIFIER | "(" arguments? ")" )*
+        private AstNode PrimaryExpression()
         {
             AstNode primary = Primary();
             while (true)

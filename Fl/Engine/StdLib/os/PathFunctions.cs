@@ -13,10 +13,10 @@ namespace Fl.Engine.StdLib.os
     {
         public override string Name => "cwd";
 
-        public override Symbol Invoke(AstEvaluator evaluator, List<Symbol> args)
+        public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
         {
             if (args.Count == 0)
-                return new Symbol(SymbolType.String, System.IO.Directory.GetCurrentDirectory());
+                return new FlObject(ObjectType.String, System.IO.Directory.GetCurrentDirectory());
             System.IO.Directory.SetCurrentDirectory(args[0].AsString);
             return args[0];
         }

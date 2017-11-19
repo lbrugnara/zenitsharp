@@ -10,11 +10,11 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class BinaryNodeEvaluator : INodeEvaluator<AstEvaluator, AstBinaryNode, Symbol>
+    class BinaryNodeEvaluator : INodeEvaluator<AstEvaluator, AstBinaryNode, FlObject>
     {
-        private static readonly SymbolType[] Numeric = new SymbolType[] { SymbolType.Integer, SymbolType.Double, SymbolType.Decimal };
+        private static readonly ObjectType[] Numeric = new ObjectType[] { ObjectType.Integer, ObjectType.Double, ObjectType.Decimal };
 
-        public Symbol Evaluate(AstEvaluator evaluator, AstBinaryNode binary)
+        public FlObject Evaluate(AstEvaluator evaluator, AstBinaryNode binary)
         {
             Token token = binary.Operator;
             switch (token.Type)
@@ -40,96 +40,96 @@ namespace Fl.Engine.Evaluators
             throw new AstWalkerException($"Unhandled operator {token.Type}");
         }
 
-        private Symbol ExecMultOperator(AstEvaluator evaluator,  AstBinaryNode binary)
+        private FlObject ExecMultOperator(AstEvaluator evaluator,  AstBinaryNode binary)
         {
-            Symbol leftres = binary.Left.Exec(evaluator);
-            Symbol rightres = binary.Right.Exec(evaluator);
+            FlObject leftres = binary.Left.Exec(evaluator);
+            FlObject rightres = binary.Right.Exec(evaluator);
 
-            if (!Numeric.Contains(leftres.DataType) || !Numeric.Contains(rightres.DataType))
+            if (!Numeric.Contains(leftres.Type) || !Numeric.Contains(rightres.Type))
             {
-                throw new AstWalkerException($"Operator '{binary.Operator.Type}' cannot be applied to operands of type '{leftres.DataType}' and '{rightres.DataType}'");
+                throw new AstWalkerException($"Operator '{binary.Operator.Type}' cannot be applied to operands of type '{leftres.Type}' and '{rightres.Type}'");
             }
 
             switch (binary.Operator.Type)
             {
                 case TokenType.Multiplication:
-                    if (leftres.DataType == SymbolType.Decimal || rightres.DataType == SymbolType.Decimal)
-                        return new Symbol(SymbolType.Decimal, leftres.AsDecimal * rightres.AsDecimal);
+                    if (leftres.Type == ObjectType.Decimal || rightres.Type == ObjectType.Decimal)
+                        return new FlObject(ObjectType.Decimal, leftres.AsDecimal * rightres.AsDecimal);
 
-                    if (leftres.DataType == SymbolType.Double || rightres.DataType == SymbolType.Double)
-                        return new Symbol(SymbolType.Double, leftres.AsDouble * rightres.AsDouble);
+                    if (leftres.Type == ObjectType.Double || rightres.Type == ObjectType.Double)
+                        return new FlObject(ObjectType.Double, leftres.AsDouble * rightres.AsDouble);
 
-                    return new Symbol(SymbolType.Integer, leftres.AsInt * rightres.AsInt);
+                    return new FlObject(ObjectType.Integer, leftres.AsInt * rightres.AsInt);
 
                 case TokenType.Division:
-                    if (leftres.DataType == SymbolType.Decimal || rightres.DataType == SymbolType.Decimal)
-                        return new Symbol(SymbolType.Decimal, leftres.AsDecimal / rightres.AsDecimal);
+                    if (leftres.Type == ObjectType.Decimal || rightres.Type == ObjectType.Decimal)
+                        return new FlObject(ObjectType.Decimal, leftres.AsDecimal / rightres.AsDecimal);
 
                     // Integer will be promoted to double
-                    return new Symbol(SymbolType.Double, leftres.AsDouble / rightres.AsDouble);
+                    return new FlObject(ObjectType.Double, leftres.AsDouble / rightres.AsDouble);
             }
             throw new AstWalkerException($"Unhandled operator {binary.Operator.Type}");
         }
 
-        private Symbol ExecAdditionOperator(AstEvaluator evaluator,  AstBinaryNode binary)
+        private FlObject ExecAdditionOperator(AstEvaluator evaluator,  AstBinaryNode binary)
         {
-            Symbol leftres = binary.Left.Exec(evaluator);
-            Symbol rightres = binary.Right.Exec(evaluator);
+            FlObject leftres = binary.Left.Exec(evaluator);
+            FlObject rightres = binary.Right.Exec(evaluator);
 
-            if (!Numeric.Contains(leftres.DataType) || !Numeric.Contains(rightres.DataType))
+            if (!Numeric.Contains(leftres.Type) || !Numeric.Contains(rightres.Type))
             {
-                if (leftres.DataType != SymbolType.String && rightres.DataType != SymbolType.String)
-                    throw new AstWalkerException($"Operator '{binary.Operator.Type}' cannot be applied to operands of type '{leftres.DataType}' and '{rightres.DataType}'");
+                if (leftres.Type != ObjectType.String && rightres.Type != ObjectType.String)
+                    throw new AstWalkerException($"Operator '{binary.Operator.Type}' cannot be applied to operands of type '{leftres.Type}' and '{rightres.Type}'");
             }
 
             switch (binary.Operator.Type)
             {
                 case TokenType.Addition:
-                    if (leftres.DataType == SymbolType.String || rightres.DataType == SymbolType.String)
-                        return new Symbol(SymbolType.String, leftres.AsString + rightres.AsString);
+                    if (leftres.Type == ObjectType.String || rightres.Type == ObjectType.String)
+                        return new FlObject(ObjectType.String, leftres.AsString + rightres.AsString);
 
-                    if (leftres.DataType == SymbolType.Decimal || rightres.DataType == SymbolType.Decimal)
-                        return new Symbol(SymbolType.Decimal, leftres.AsDecimal + rightres.AsDecimal);
+                    if (leftres.Type == ObjectType.Decimal || rightres.Type == ObjectType.Decimal)
+                        return new FlObject(ObjectType.Decimal, leftres.AsDecimal + rightres.AsDecimal);
 
-                    if (leftres.DataType == SymbolType.Double || rightres.DataType == SymbolType.Double)
-                        return new Symbol(SymbolType.Double, leftres.AsDouble + rightres.AsDouble);
+                    if (leftres.Type == ObjectType.Double || rightres.Type == ObjectType.Double)
+                        return new FlObject(ObjectType.Double, leftres.AsDouble + rightres.AsDouble);
 
-                    return new Symbol(SymbolType.Integer, leftres.AsInt + rightres.AsInt);
+                    return new FlObject(ObjectType.Integer, leftres.AsInt + rightres.AsInt);
                 case TokenType.Minus:
-                    if (leftres.DataType == SymbolType.Decimal || rightres.DataType == SymbolType.Decimal)
-                        return new Symbol(SymbolType.Decimal, leftres.AsDecimal - rightres.AsDecimal);
+                    if (leftres.Type == ObjectType.Decimal || rightres.Type == ObjectType.Decimal)
+                        return new FlObject(ObjectType.Decimal, leftres.AsDecimal - rightres.AsDecimal);
 
-                    if (leftres.DataType == SymbolType.Double || rightres.DataType == SymbolType.Double)
-                        return new Symbol(SymbolType.Double, leftres.AsDouble - rightres.AsDouble);
+                    if (leftres.Type == ObjectType.Double || rightres.Type == ObjectType.Double)
+                        return new FlObject(ObjectType.Double, leftres.AsDouble - rightres.AsDouble);
 
-                    return new Symbol(SymbolType.Integer, leftres.AsInt - rightres.AsInt);
+                    return new FlObject(ObjectType.Integer, leftres.AsInt - rightres.AsInt);
             }
             throw new AstWalkerException($"Unhandled operator {binary.Operator.Type}");
         }
 
-        private Symbol ExecEqualityOperator(AstEvaluator evaluator,  AstBinaryNode binary)
+        private FlObject ExecEqualityOperator(AstEvaluator evaluator,  AstBinaryNode binary)
         {
-            Symbol leftres = binary.Left.Exec(evaluator);
-            Symbol rightres = binary.Right.Exec(evaluator);
+            FlObject leftres = binary.Left.Exec(evaluator);
+            FlObject rightres = binary.Right.Exec(evaluator);
 
             if (leftres.IsNull && rightres.IsNull)
-                return new Symbol(SymbolType.Boolean, true);
+                return new FlObject(ObjectType.Boolean, true);
 
             bool equals = false;
 
             if (leftres.Value != null && rightres.Value != null)
             {
                 // Check Numbers
-                if (Numeric.Contains(leftres.DataType) && Numeric.Contains(rightres.DataType))
+                if (Numeric.Contains(leftres.Type) && Numeric.Contains(rightres.Type))
                 {
-                    if (leftres.DataType == SymbolType.Decimal || rightres.DataType == SymbolType.Decimal)
+                    if (leftres.Type == ObjectType.Decimal || rightres.Type == ObjectType.Decimal)
                         equals = leftres.AsDecimal == rightres.AsDecimal;
-                    else if (leftres.DataType == SymbolType.Double || rightres.DataType == SymbolType.Double)
+                    else if (leftres.Type == ObjectType.Double || rightres.Type == ObjectType.Double)
                         equals = leftres.AsDouble == rightres.AsDouble;
                     else
                         equals = leftres.AsInt == rightres.AsInt;
                 }
-                else if (leftres.DataType == rightres.DataType)
+                else if (leftres.Type == rightres.Type)
                 {
                     equals = leftres.Value.Equals(rightres.Value);
                 }
@@ -138,85 +138,85 @@ namespace Fl.Engine.Evaluators
             switch (binary.Operator.Type)
             {
                 case TokenType.Equal:
-                    return new Symbol(SymbolType.Boolean, equals);
+                    return new FlObject(ObjectType.Boolean, equals);
                 case TokenType.NotEqual:
-                    return new Symbol(SymbolType.Boolean, !equals);
+                    return new FlObject(ObjectType.Boolean, !equals);
             }
             throw new AstWalkerException($"Unhandled operator {binary.Operator.Type}");
         }
 
-        private Symbol ExecComparisonOperator(AstEvaluator evaluator,  AstBinaryNode binary)
+        private FlObject ExecComparisonOperator(AstEvaluator evaluator,  AstBinaryNode binary)
         {
-            Symbol leftres = binary.Left.Exec(evaluator);
-            Symbol rightres = binary.Right.Exec(evaluator);
+            FlObject leftres = binary.Left.Exec(evaluator);
+            FlObject rightres = binary.Right.Exec(evaluator);
 
             switch (binary.Operator.Type)
             {
                 case TokenType.GreatThan:
-                    if (leftres.DataType == SymbolType.Decimal || rightres.DataType == SymbolType.Decimal)
-                        return new Symbol(SymbolType.Boolean, leftres.AsDecimal > rightres.AsDecimal);
+                    if (leftres.Type == ObjectType.Decimal || rightres.Type == ObjectType.Decimal)
+                        return new FlObject(ObjectType.Boolean, leftres.AsDecimal > rightres.AsDecimal);
 
-                    if (leftres.DataType == SymbolType.Double || rightres.DataType == SymbolType.Double)
-                        return new Symbol(SymbolType.Boolean, leftres.AsDouble > rightres.AsDouble);
+                    if (leftres.Type == ObjectType.Double || rightres.Type == ObjectType.Double)
+                        return new FlObject(ObjectType.Boolean, leftres.AsDouble > rightres.AsDouble);
 
-                    if ((leftres.DataType == SymbolType.Integer || rightres.DataType == SymbolType.Integer))
-                        return new Symbol(SymbolType.Boolean, leftres.AsInt > rightres.AsInt);
+                    if ((leftres.Type == ObjectType.Integer || rightres.Type == ObjectType.Integer))
+                        return new FlObject(ObjectType.Boolean, leftres.AsInt > rightres.AsInt);
 
-                    if (leftres.DataType == SymbolType.String && rightres.DataType == SymbolType.String)
-                        return new Symbol(SymbolType.Boolean, leftres.AsString.CompareTo(rightres.AsString) > 0);
+                    if (leftres.Type == ObjectType.String && rightres.Type == ObjectType.String)
+                        return new FlObject(ObjectType.Boolean, leftres.AsString.CompareTo(rightres.AsString) > 0);
                     break;
 
                 case TokenType.GreatThanEqual:
-                    if (leftres.DataType == SymbolType.Decimal || rightres.DataType == SymbolType.Decimal)
-                        return new Symbol(SymbolType.Boolean, leftres.AsDecimal >= rightres.AsDecimal);
+                    if (leftres.Type == ObjectType.Decimal || rightres.Type == ObjectType.Decimal)
+                        return new FlObject(ObjectType.Boolean, leftres.AsDecimal >= rightres.AsDecimal);
 
-                    if (leftres.DataType == SymbolType.Double || rightres.DataType == SymbolType.Double)
-                        return new Symbol(SymbolType.Boolean, leftres.AsDouble >= rightres.AsDouble);
+                    if (leftres.Type == ObjectType.Double || rightres.Type == ObjectType.Double)
+                        return new FlObject(ObjectType.Boolean, leftres.AsDouble >= rightres.AsDouble);
 
-                    if ((leftres.DataType == SymbolType.Integer || rightres.DataType == SymbolType.Integer))
-                        return new Symbol(SymbolType.Boolean, leftres.AsInt >= rightres.AsInt);
+                    if ((leftres.Type == ObjectType.Integer || rightres.Type == ObjectType.Integer))
+                        return new FlObject(ObjectType.Boolean, leftres.AsInt >= rightres.AsInt);
 
-                    if (leftres.DataType == SymbolType.String && rightres.DataType == SymbolType.String)
-                        return new Symbol(SymbolType.Boolean, leftres.AsString.CompareTo(rightres.AsString) >= 0);
+                    if (leftres.Type == ObjectType.String && rightres.Type == ObjectType.String)
+                        return new FlObject(ObjectType.Boolean, leftres.AsString.CompareTo(rightres.AsString) >= 0);
                     break;
 
                 case TokenType.LessThan:
-                    if (leftres.DataType == SymbolType.Decimal || rightres.DataType == SymbolType.Decimal)
-                        return new Symbol(SymbolType.Boolean, leftres.AsDecimal < rightres.AsDecimal);
+                    if (leftres.Type == ObjectType.Decimal || rightres.Type == ObjectType.Decimal)
+                        return new FlObject(ObjectType.Boolean, leftres.AsDecimal < rightres.AsDecimal);
 
-                    if (leftres.DataType == SymbolType.Double || rightres.DataType == SymbolType.Double)
-                        return new Symbol(SymbolType.Boolean, leftres.AsDouble < rightres.AsDouble);
+                    if (leftres.Type == ObjectType.Double || rightres.Type == ObjectType.Double)
+                        return new FlObject(ObjectType.Boolean, leftres.AsDouble < rightres.AsDouble);
 
-                    if ((leftres.DataType == SymbolType.Integer || rightres.DataType == SymbolType.Integer))
-                        return new Symbol(SymbolType.Boolean, leftres.AsInt < rightres.AsInt);
+                    if ((leftres.Type == ObjectType.Integer || rightres.Type == ObjectType.Integer))
+                        return new FlObject(ObjectType.Boolean, leftres.AsInt < rightres.AsInt);
 
-                    if (leftres.DataType == SymbolType.String && rightres.DataType == SymbolType.String)
-                        return new Symbol(SymbolType.Boolean, leftres.AsString.CompareTo(rightres.AsString) < 0);
+                    if (leftres.Type == ObjectType.String && rightres.Type == ObjectType.String)
+                        return new FlObject(ObjectType.Boolean, leftres.AsString.CompareTo(rightres.AsString) < 0);
                     break;
 
                 case TokenType.LessThanEqual:
-                    if (leftres.DataType == SymbolType.Decimal || rightres.DataType == SymbolType.Decimal)
-                        return new Symbol(SymbolType.Boolean, leftres.AsDecimal <= rightres.AsDecimal);
+                    if (leftres.Type == ObjectType.Decimal || rightres.Type == ObjectType.Decimal)
+                        return new FlObject(ObjectType.Boolean, leftres.AsDecimal <= rightres.AsDecimal);
 
-                    if (leftres.DataType == SymbolType.Double || rightres.DataType == SymbolType.Double)
-                        return new Symbol(SymbolType.Boolean, leftres.AsDouble <= rightres.AsDouble);
+                    if (leftres.Type == ObjectType.Double || rightres.Type == ObjectType.Double)
+                        return new FlObject(ObjectType.Boolean, leftres.AsDouble <= rightres.AsDouble);
 
-                    if ((leftres.DataType == SymbolType.Integer || rightres.DataType == SymbolType.Integer))
-                        return new Symbol(SymbolType.Boolean, leftres.AsInt <= rightres.AsInt);
+                    if ((leftres.Type == ObjectType.Integer || rightres.Type == ObjectType.Integer))
+                        return new FlObject(ObjectType.Boolean, leftres.AsInt <= rightres.AsInt);
 
-                    if (leftres.DataType == SymbolType.String && rightres.DataType == SymbolType.String)
-                        return new Symbol(SymbolType.Boolean, leftres.AsString.CompareTo(rightres.AsString) <= 0);
+                    if (leftres.Type == ObjectType.String && rightres.Type == ObjectType.String)
+                        return new FlObject(ObjectType.Boolean, leftres.AsString.CompareTo(rightres.AsString) <= 0);
                     break;
                 default:
                     throw new AstWalkerException($"Unhandled operator {binary.Operator.Type}");
             }
-            throw new AstWalkerException($"Operator '{binary.Operator.Type}' cannot be applied to operands of type '{leftres.DataType}' and '{rightres.DataType}'");
+            throw new AstWalkerException($"Operator '{binary.Operator.Type}' cannot be applied to operands of type '{leftres.Type}' and '{rightres.Type}'");
         }
 
-        private Symbol ExecLogicalOperator(AstEvaluator evaluator,  AstBinaryNode binary)
+        private FlObject ExecLogicalOperator(AstEvaluator evaluator,  AstBinaryNode binary)
         {
-            Symbol leftres = binary.Left.Exec(evaluator);
-            Symbol rightres = binary.Right.Exec(evaluator);
+            FlObject leftres = binary.Left.Exec(evaluator);
+            FlObject rightres = binary.Right.Exec(evaluator);
 
             bool l = !leftres.IsBool ? leftres.Value != null : leftres.AsBool;
             bool r = !rightres.IsBool ? rightres.Value != null : rightres.AsBool;
@@ -224,9 +224,9 @@ namespace Fl.Engine.Evaluators
             switch (binary.Operator.Type)
             {
                 case TokenType.And:
-                    return new Symbol(SymbolType.Boolean, l && r);
+                    return new FlObject(ObjectType.Boolean, l && r);
                 case TokenType.Or:
-                    return new Symbol(SymbolType.Boolean, l || r);
+                    return new FlObject(ObjectType.Boolean, l || r);
             }
             throw new AstWalkerException($"Unhandled operator {binary.Operator.Type}");
         }

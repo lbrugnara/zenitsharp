@@ -55,7 +55,7 @@ return_statement -> "return" expression? ";"
 
 expression	-> expression_assignment
 
-expression_assignment	-> IDENTIFIER ( "=" expression_assignment )?
+expression_assignment	-> IDENTIFIER ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
 						| or_expression
 
 or_expression	-> and_expression ( "||" and_expression )*
@@ -70,9 +70,11 @@ addition_expression	-> multiplication_expression ( ( "-" | "+" ) multiplication_
 
 multiplication_expression	-> unary_expression ( ( "/" | "*" ) unary_expression )*
 
-unary_expression	-> ( "!" | "-" ) invocation
+unary_expression	-> ( "!" | "-" ) unary_expression
+					| ( "++" | "--" ) primary_expression
+					| primary_expression ( "++" | "--" )?
 
-invocation -> primary ( "." IDENTIFIER | "(" arguments? ")" )*
+primary_expression -> primary ( "." IDENTIFIER | "(" arguments? ")" )*
 
 arguments -> expression ( "," expression )*
 

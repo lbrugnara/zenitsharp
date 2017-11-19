@@ -10,29 +10,29 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class WhileNodeEvaluator : INodeEvaluator<AstEvaluator, AstWhileNode, Symbol>
+    class WhileNodeEvaluator : INodeEvaluator<AstEvaluator, AstWhileNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstWhileNode wnode)
+        public FlObject Evaluate(AstEvaluator evaluator, AstWhileNode wnode)
         {
-            evaluator.NewScope(ScopeType.Loop);
+            evaluator.Symtable.NewScope(ScopeType.Loop);
             try
             {
-                Symbol result = wnode.Condition.Exec(evaluator);
+                FlObject result = wnode.Condition.Exec(evaluator);
                 if (!result.IsBool)
-                    throw new AstWalkerException($"Cannot convert type {result.DataType} to {SymbolType.Boolean}");
+                    throw new AstWalkerException($"Cannot convert type {result.Type} to {ObjectType.Boolean}");
                 while (result.AsBool)
                 {
                     wnode.Body.Exec(evaluator);
-                    if (evaluator.CurrentScope.MustBreak)
+                    if (evaluator.Symtable.MustBreak)
                         break;
-                    if (evaluator.CurrentScope.MustContinue)
-                        evaluator.CurrentScope.DoContinue();
+                    if (evaluator.Symtable.MustContinue)
+                        evaluator.Symtable.DoContinue();
                     result = wnode.Condition.Exec(evaluator);
                 }
             }
             finally
             {
-                evaluator.DestroyScope();
+                evaluator.Symtable.DestroyScope();
             }
             return null;
         }

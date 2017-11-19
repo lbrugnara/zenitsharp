@@ -13,28 +13,29 @@ namespace Fl.Engine.StdLib
         public static void Import(Scope scope)
         {
             // Namespace: global
-            scope.NewSymbol("import", new ImportFunction());
-            scope.NewSymbol("using", new UsingFunction());
+            scope.AddSymbol("import", new Symbol(ObjectType.Function, StorageType.Constant, new ImportFunction()));
+            scope.AddSymbol("using", new Symbol(ObjectType.Function, StorageType.Constant, new UsingFunction()));
 
-            // Namespace: sys
-            FlNamespace sys = new FlNamespace("sys");
+            // Namespace: std
+            FlNamespace std = new FlNamespace("std");
 
-            // Namespace: sys.lang
-            FlNamespace lang = new FlNamespace("lang", sys);
-            lang["debug"] = new sys.lang.DebugFunction();
+            // Namespace: std.lang
+            FlNamespace lang = new FlNamespace("lang", std);
+            lang["debug"] = new Symbol(ObjectType.Function, StorageType.Constant, new std.lang.DebugFunction());
+            lang["version"] = new Symbol(ObjectType.Function, StorageType.Constant, new FlObject(ObjectType.String, "0.0.1a"));
 
-            // Namespace: sys.io
-            FlNamespace io = new FlNamespace("io", sys);
-            io["print"] = new sys.io.PrintFunction();
-            io["println"] = new sys.io.PrintLnFunction();
+            // Namespace: std.io
+            FlNamespace io = new FlNamespace("io", std);
+            io["print"] = new Symbol(ObjectType.Function, StorageType.Constant, new std.io.PrintFunction());
+            io["println"] = new Symbol(ObjectType.Function, StorageType.Constant, new std.io.PrintLnFunction());
 
             // Namespace: os
             FlNamespace os = new FlNamespace("os");
-            os["cwd"] = new os.CwdFunction();
+            os["cwd"] = new Symbol(ObjectType.Function, StorageType.Constant, new os.CwdFunction());
 
             // Init
-            scope.NewSymbol("sys", sys);
-            scope.NewSymbol("os", os);
+            scope.AddSymbol(std.Name, new Symbol(ObjectType.Namespace, StorageType.Constant, std));
+            scope.AddSymbol(os.Name, new Symbol(ObjectType.Namespace, StorageType.Constant, os));
         }
     }
 }

@@ -11,11 +11,11 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    public class CallableNodeEvaluator : INodeEvaluator<AstEvaluator, AstCallableNode, Symbol>
+    public class CallableNodeEvaluator : INodeEvaluator<AstEvaluator, AstCallableNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstCallableNode node)
+        public FlObject Evaluate(AstEvaluator evaluator, AstCallableNode node)
         {
-            Symbol target = node.Callable.Exec(evaluator);
+            FlObject target = node.Callable.Exec(evaluator);
             if (!target.IsCallable)
                 throw new AstWalkerException($"{target.ToString()} is not a callable object");
             return target.AsCallable.Invoke(evaluator, node.Arguments.Expressions.Select(a => a.Exec(evaluator)).ToList());

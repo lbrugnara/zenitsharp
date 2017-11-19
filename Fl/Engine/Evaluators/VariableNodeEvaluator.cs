@@ -10,13 +10,15 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class VariableNodeEvaluator : INodeEvaluator<AstEvaluator, AstVariableNode, Symbol>
+    class VariableNodeEvaluator : INodeEvaluator<AstEvaluator, AstVariableNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstVariableNode vardecl)
+        public FlObject Evaluate(AstEvaluator evaluator, AstVariableNode vardecl)
         {
+            // Get the variable name
             string varname = vardecl.Identifier.Value.ToString();
-            Symbol init = vardecl.Initializer != null ? vardecl.Initializer.Exec(evaluator) : new Symbol(SymbolType.Null, null);
-            evaluator.CurrentScope.NewSymbol(varname, init);
+            // Build the Symbol information from an initializer or use null
+            FlObject init = vardecl.Initializer != null ? vardecl.Initializer.Exec(evaluator) : new FlObject(ObjectType.Null, null);
+            evaluator.Symtable.AddSymbol(varname, new Symbol(init.Type, StorageType.Variable, init));
             return init;
         }
     }

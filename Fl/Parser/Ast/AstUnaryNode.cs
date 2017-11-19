@@ -8,7 +8,7 @@ namespace Fl.Parser.Ast
     public class AstUnaryNode : AstNode
     {
         public Token Operator { get; }
-        public AstNode Left { get; }        
+        public AstNode Left { get; }
 
         public AstUnaryNode(Token t, AstNode left)
         {

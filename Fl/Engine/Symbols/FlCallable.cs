@@ -10,17 +10,16 @@ using System.Text;
 
 namespace Fl.Engine.Symbols
 {
-    public abstract class FlCallable : Symbol
+    public abstract class FlCallable : FlObject
     {
         public abstract string Name { get; }
 
-        public FlCallable(StorageType st = StorageType.Constant)
+        public FlCallable()
+            : base(ObjectType.Function, null)
         {
-            _DataType = SymbolType.Function;
-            _StorageType = st;
             _Value = this;
         }
 
-        public abstract Symbol Invoke(AstEvaluator evaluator, List<Symbol> args);        
+        public abstract FlObject Invoke(AstEvaluator evaluator, List<FlObject> args);        
     }
 }

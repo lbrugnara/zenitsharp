@@ -7,14 +7,14 @@ using Fl.Parser.Ast;
 
 namespace Fl.Engine.Evaluators
 {
-    class BreakNodeEvaluator : INodeEvaluator<AstEvaluator, AstBreakNode, Symbol>
+    class BreakNodeEvaluator : INodeEvaluator<AstEvaluator, AstBreakNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstBreakNode wnode)
+        public FlObject Evaluate(AstEvaluator evaluator, AstBreakNode wnode)
         {
-            Symbol breakval = wnode.Number?.Exec(evaluator) ?? new Symbol(SymbolType.Integer, 1);
+            FlObject breakval = wnode.Number?.Exec(evaluator) ?? new FlObject(ObjectType.Integer, 1);
             if (!breakval.IsInt)
                 throw new AstWalkerException($"Break expression only allows integer values");
-            evaluator.CurrentScope.SetBreak(breakval.AsInt);
+            evaluator.Symtable.SetBreak(breakval.AsInt);
             return breakval;
         }
     }

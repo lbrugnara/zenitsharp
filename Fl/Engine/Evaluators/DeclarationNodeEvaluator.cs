@@ -10,11 +10,11 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class DeclarationNodeEvaluator : INodeEvaluator<AstEvaluator, AstDeclarationNode, Symbol>
+    class DeclarationNodeEvaluator : INodeEvaluator<AstEvaluator, AstDeclarationNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstDeclarationNode decls)
+        public FlObject Evaluate(AstEvaluator evaluator, AstDeclarationNode decls)
         {
-            Symbol tmp = null;
+            FlObject tmp = null;
             foreach (AstNode statement in decls.Statements)
             {
                 tmp = statement.Exec(evaluator);

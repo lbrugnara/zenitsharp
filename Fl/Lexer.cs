@@ -8,13 +8,29 @@ namespace Fl
 {
     public class Lexer
     {
-        // Input
+        /// <summary>
+        /// Input source
+        /// </summary>
         private string _Source;
-        // Source ptr
+        
+        /// <summary>
+        /// Keep track of the current char of source that is being pointed
+        /// </summary>
         private int _Pointer;
+        
+        /// <summary>
+        /// Track lines numbers
+        /// </summary>
         private int _Line;
+
+        /// <summary>
+        /// Track column numbers
+        /// </summary>
         private int _Col;
 
+        /// <summary>
+        /// Set of Fl's reserved words
+        /// </summary>
         private static readonly Dictionary<string, TokenType> _Keywords = new Dictionary<string, TokenType>()
         {
             { "null", TokenType.Null },
@@ -29,7 +45,7 @@ namespace Fl
             { "break", TokenType.Break },
             { "continue", TokenType.Continue },
             { "return", TokenType.Return },
-            { "func", TokenType.Function },
+            { "fn", TokenType.Function },
             { "namespace", TokenType.Namespace }
         };
 
@@ -82,6 +98,8 @@ namespace Fl
         public Token NextToken()
         {
             char c = Peek();
+
+            // Consume new line and update line and col number
             if (c == '\n')
             {
                 Consume();
@@ -89,14 +107,14 @@ namespace Fl
                 _Col = 0;
             }
 
+            // Consume Whitespaces
             while (HasInput() && char.IsWhiteSpace(Peek()))
-            {
                 Consume();
-            }
 
             if (!HasInput())
                 return null;
 
+            // Check tokens
             Token t = CheckPunctuation()
                     ?? CheckParen()
                     ?? CheckBrace()
@@ -272,25 +290,60 @@ namespace Fl
 
             int col = _Col;
             int line = _Line;
+            string val = null;
             TokenType? type = null;
             switch (c)
             {
                 case '+':
                     type = TokenType.Addition;
+                    val = Consume().ToString();
+                    if (Peek() == '+')
+                    {
+                        type = TokenType.Increment;
+                        val += Consume().ToString();
+                    }
+                    else if (Peek() == '=')
+                    {
+                        type = TokenType.IncrementAndAssign;
+                        val += Consume().ToString();
+                    }
                     break;
                 case '-':
                     type = TokenType.Minus;
+                    val = Consume().ToString();
+                    if (Peek() == '-')
+                    {
+                        type = TokenType.Decrement;
+                        val += Consume().ToString();
+                    }
+                    else if (Peek() == '=')
+                    {
+                        type = TokenType.DecrementAndAssign;
+                        val += Consume().ToString();
+                    }
                     break;
                 case '*':
                     type = TokenType.Multiplication;
+                    val = Consume().ToString();
+                    if (Peek() == '=')
+                    {
+                        type = TokenType.MultAndAssign;
+                        val += Consume().ToString();
+                    }
                     break;
                 case '/':
                     type = TokenType.Division;
+                    val = Consume().ToString();
+                    if (Peek() == '=')
+                    {
+                        type = TokenType.DivideAndAssign;
+                        val += Consume().ToString();
+                    }
                     break;
                 default:
                     return null;
             }
-            return BuildToken(type.Value, Consume(), line, col);
+            return BuildToken(type.Value, val, line, col);
         }
 
         private Token CheckIdentifier()

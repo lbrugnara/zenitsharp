@@ -3,25 +3,36 @@
 
 using Fl.Engine.Symbols;
 using Fl.Parser.Ast;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class AccessorNodeEvaluator : INodeEvaluator<AstEvaluator, AstAccessorNode, FlObject>
+    class OperandUnaryNode
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstAccessorNode invoke)
+        private AstAccessorNode GetAccessorNode(AstUnaryNode node)
         {
+            var tmp = node;
+            while (tmp != null && !(tmp.Left is AstAccessorNode))
+            {
+                tmp = tmp.Left as AstUnaryNode;
+            }
+            return tmp?.Left as AstAccessorNode;
+        }
+
+        public Symbol GetSymbol(AstEvaluator evaluator, AstUnaryNode node)
+        {
+            AstAccessorNode accessor = GetAccessorNode(node);
+            if (accessor == null)
+                return null;
+
             Symbol entry = null;
-            var self = invoke.Self.Value.ToString();
+            var self = accessor.Self.Value.ToString();
 
             // If the identifier exists in the current scope, return it
             if (evaluator.Symtable.HasSymbol(self))
             {
                 entry = evaluator.Symtable.GetSymbol(self);
             }
-            else if (invoke.Member == null)
+            else if (accessor.Member == null)
             {
                 // If there is no member of "self" it means this (self) symbol doesn't exist
                 throw new AstWalkerException($"Symbol '{self}' is not defined");
@@ -29,14 +40,14 @@ namespace Fl.Engine.Evaluators
             else
             {
                 // If there is a member, resolve it ...                
-                FlObject ns = invoke.Member.Exec(evaluator);
+                FlObject ns = accessor.Member.Exec(evaluator);
 
                 // ... if it is a namespace and "self" is not defined, throw the exception
                 if (ns.IsNamespace && ns.AsNamespace[self] == null)
                     throw new AstWalkerException($"Symbol '{self}' is not defined");
-                entry = ns.AsNamespace[self];                
+                entry = ns.AsNamespace[self];
             }
-            return entry.Binding;
+            return entry;
         }
     }
 }

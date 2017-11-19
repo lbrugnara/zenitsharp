@@ -10,24 +10,24 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class BlockNodeEvaluator : INodeEvaluator<AstEvaluator, AstBlockNode, Symbol>
+    class BlockNodeEvaluator : INodeEvaluator<AstEvaluator, AstBlockNode, FlObject>
     {
-        public Symbol Evaluate(AstEvaluator evaluator, AstBlockNode node)
+        public FlObject Evaluate(AstEvaluator evaluator, AstBlockNode node)
         {            
-            evaluator.NewScope(ScopeType.Common);
-            Symbol tmp = null;
+            evaluator.Symtable.NewScope(ScopeType.Common);
+            FlObject tmp = null;
             try
             {
                 foreach (AstNode statement in node.Statements)
                 {
                     tmp = statement.Exec(evaluator);
-                    if (evaluator.CurrentScope.MustBreak || evaluator.CurrentScope.MustContinue || evaluator.CurrentScope.MustReturn)
+                    if (evaluator.Symtable.MustBreak || evaluator.Symtable.MustContinue || evaluator.Symtable.MustReturn)
                         break;                    
                 }
             }
             finally
             {
-                evaluator.DestroyScope();
+                evaluator.Symtable.DestroyScope();
             }
             return tmp;
         }
