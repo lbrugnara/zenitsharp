@@ -66,7 +66,9 @@ expression	-> expression_assignment
 
 expression_assignment	-> IDENTIFIER ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
 						| lambda_expression
-						| or_expression
+						| conditional_expression
+
+conditional_expression -> or_expression ( '?' expression ':' expression )*
 
 lambda_expression -> lambda_params "=>" lambda_body
 

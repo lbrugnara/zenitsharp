@@ -69,6 +69,8 @@ namespace Fl
         Dot,
         RightArrow,
         Function,
-        Namespace
+        Namespace,
+        Question,
+        Colon
     }
 }

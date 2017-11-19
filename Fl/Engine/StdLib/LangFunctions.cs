@@ -28,6 +28,7 @@ namespace Fl.Engine.StdLib
                 Parser.Parser p = new Fl.Parser.Parser();
                 Parser.Ast.AstNode ast = p.Parse(tokens);
                 AstEvaluator ev = new AstEvaluator();
+                ev.Symtable.GetSymbol("os").Binding.AsNamespace["cwd"].Binding.AsCallable.Invoke(ev, new List<FlObject>() { new FlObject(ObjectType.String, System.IO.Directory.GetParent(a.AsString)) });
                 ev.Process(ast);
                 evaluator.Symtable.Import(ev.Symtable.GlobalScope);
             });

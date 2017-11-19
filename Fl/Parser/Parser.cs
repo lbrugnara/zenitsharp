@@ -582,7 +582,8 @@ namespace Fl.Parser
 
         // Rule:
         // expression_assignment	-> IDENTIFIER ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
-        //			                | or_expression
+        // 						     | lambda_expression
+        // 						     | conditional_expression        
         private AstNode ExpressionAssignment()
         {
             if (Match(TokenType.Identifier) && MatchAnyFrom(1, TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
@@ -608,7 +609,23 @@ namespace Fl.Parser
             {
                 return LambdaExpression();
             }
-            return OrExpression();
+            return ConditionalExpression();
+        }
+
+        // Rule:
+        // conditional_expression -> or_expression ( '?' expression ':' expression )*
+        private AstNode ConditionalExpression()
+        {
+            AstNode orExpr = OrExpression();
+            if (Match(TokenType.Question))
+            {
+                Token q = Consume();
+                AstNode trueExpr = Expression();
+                Consume(TokenType.Colon);
+                AstNode falseExpr = Expression();
+                return new AstIfNode(q, orExpr, trueExpr, falseExpr);
+            }
+            return orExpr;
         }
 
         // Rule:

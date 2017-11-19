@@ -169,6 +169,10 @@ namespace Fl
                     return BuildToken(TokenType.Comma, Consume(), line, col);
                 case '.':
                     return BuildToken(TokenType.Dot, Consume(), line, col);
+                case '?':
+                    return BuildToken(TokenType.Question, Consume(), line, col);
+                case ':':
+                    return BuildToken(TokenType.Colon, Consume(), line, col);
             }
             return null;
         }
