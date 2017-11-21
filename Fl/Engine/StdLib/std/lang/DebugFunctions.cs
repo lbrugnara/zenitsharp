@@ -3,6 +3,7 @@
 
 using Fl.Engine.Evaluators;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Types;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +16,7 @@ namespace Fl.Engine.StdLib.std.lang
 
         public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
         {
-            args.ForEach(a => System.Console.WriteLine(a.IsNamespace ? a.AsNamespace.ShowNamespace() : a.ToDebugStr()));
+            args.ForEach(a => System.Console.WriteLine(a.ObjectType == NamespaceType.Value ? (a as FlNamespace).ToDebugStr() : a.ToDebugStr()));
             return null;
         }
     }

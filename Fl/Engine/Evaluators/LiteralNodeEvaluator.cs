@@ -3,6 +3,7 @@
 
 using Fl.Engine.StdLib;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -14,38 +15,22 @@ namespace Fl.Engine.Evaluators
     {
         public FlObject Evaluate(AstEvaluator evaluator, AstLiteralNode literal)
         {
-            ObjectType? dataType = null;
-            object val = literal.Primary.Value;
             switch (literal.Primary.Type)
             {
                 case TokenType.Boolean:
-                    val = bool.Parse(literal.Primary.Value.ToString());
-                    dataType = ObjectType.Boolean;
-                    break;
+                    return new FlBoolean(bool.Parse(literal.Primary.Value.ToString()));
                 case TokenType.Integer:
-                    val = int.Parse(literal.Primary.Value.ToString());
-                    dataType = ObjectType.Integer;
-                    break;
+                    return new FlInteger(int.Parse(literal.Primary.Value.ToString()));
                 case TokenType.Double:
-                    val = double.Parse(literal.Primary.Value.ToString());
-                    dataType = ObjectType.Double;
-                    break;
+                    return new FlDouble(double.Parse(literal.Primary.Value.ToString()));
                 case TokenType.Decimal:
-                    val = decimal.Parse(literal.Primary.Value.ToString());
-                    dataType = ObjectType.Decimal;
-                    break;
+                    return new FlDecimal(decimal.Parse(literal.Primary.Value.ToString()));
                 case TokenType.String:
-                    val = literal.Primary.Value.ToString();
-                    dataType = ObjectType.String;
-                    break;
+                    return new FlString(literal.Primary.Value.ToString());
                 case TokenType.Identifier:
                     return evaluator.Symtable.GetSymbol(literal.Primary.Value).Binding;
-                case TokenType.Null:
-                    val = null;
-                    dataType = ObjectType.Null;
-                    break;
             }
-            return new FlObject(dataType.Value, val);
+            return FlNull.Value;
         }
     }
 }

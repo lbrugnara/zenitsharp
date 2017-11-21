@@ -3,6 +3,7 @@
 
 using Fl.Engine.StdLib;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -23,21 +24,14 @@ namespace Fl.Engine.Evaluators
             switch (unary.Operator.Type)
             {
                 case TokenType.Not:
-                    if (result.Type == ObjectType.Boolean)
-                        return new FlObject(ObjectType.Boolean, !result.AsBool);
-                    throw new AstWalkerException($"Operator '!' cannot be applied to operand of type {result.Type}");
+                    if (result.ObjectType != BoolType.Value)
+                        throw new AstWalkerException($"Operator '!' cannot be applied to operand of type {result.ObjectType}");
+                    result = new FlBoolean(!(result as FlBoolean).Value);
+                    break;
                 case TokenType.Minus:
-                    switch (result.Type)
-                    {
-                        case ObjectType.Integer:
-                            return new FlObject(ObjectType.Integer, -1 * result.AsInt);
-                        case ObjectType.Double:
-                            return new FlObject(ObjectType.Double, -1.0 * result.AsDouble);
-                        case ObjectType.Decimal:
-                            return new FlObject(ObjectType.Decimal, -1.0M * result.AsDecimal);
-                        default:
-                            throw new AstWalkerException($"Operator '-' cannot be applied to operand of type {result.Type}");
-                    }
+                    FlOperand operand = new FlOperand(result);
+                    result = operand.Negative();
+                    break;
             }
             return result;
         }

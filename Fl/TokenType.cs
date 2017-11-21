@@ -64,6 +64,9 @@ namespace Fl
         RightParen,
         LeftBrace,
         RightBrace,
+        LeftBracket,
+        RightBracket,
+        
         Semicolon,
         Comma,
         Dot,
@@ -72,6 +75,6 @@ namespace Fl
         Namespace,
         Question,
         QuestionQuestion,
-        Colon
+        Colon,
     }
 }

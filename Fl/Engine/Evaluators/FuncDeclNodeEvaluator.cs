@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,11 @@ namespace Fl.Engine.Evaluators
 
         public AstParametersNode Parameters => _Params;
 
+        public override FlObject Clone()
+        {
+            return new Func(_Identifier, _Params, _Body, _Env);
+        }
+
         public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
         {
             if (args.Count != _Params.Parameters.Count)
@@ -46,8 +52,8 @@ namespace Fl.Engine.Evaluators
                 evaluator.Symtable.AddSymbol(
                     _Params.Parameters[i].Value.ToString(),
                     // by-value
-                    new Symbol(args[i].Type, StorageType.Variable),
-                    new FlObject(args[i].Type, args[i].Value)
+                    new Symbol(StorageType.Variable),
+                    args[i].Clone()
                 );
             }
             FlObject ret = null;
@@ -66,7 +72,7 @@ namespace Fl.Engine.Evaluators
             }
             if (_Identifier.Type == TokenType.RightArrow && ret != null)
                 return ret;
-            return new FlObject(ObjectType.Null, null);
+            return FlNull.Value;
         }
     }
 
@@ -85,7 +91,7 @@ namespace Fl.Engine.Evaluators
             }
             else
             {
-                evaluator.Symtable.AddSymbol(func.Name, new Symbol(ObjectType.Function, StorageType.Variable), func);
+                evaluator.Symtable.AddSymbol(func.Name, new Symbol(StorageType.Variable), func);
             }
             return func;
         }

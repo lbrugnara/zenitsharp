@@ -16,9 +16,10 @@ namespace Fl.Engine.StdLib.os
         public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
         {
             if (args.Count == 0)
-                return new FlObject(ObjectType.String, System.IO.Directory.GetCurrentDirectory());
-            System.IO.Directory.SetCurrentDirectory(args[0].AsString);
-            return args[0];
+                return new FlString(System.IO.Directory.GetCurrentDirectory());
+            var dir = (args[0] as FlString);
+            System.IO.Directory.SetCurrentDirectory(dir.Value);
+            return dir;
         }
     }
 }

@@ -1,21 +1,25 @@
-﻿program	-> declaration*
+﻿# Start
 
-### Declarations
+program	-> declaration*
+
+# Declarations
 
 declaration	-> func_declaration 
 			| variable_declaration
 			| constant_declaration
 			| statement
 
-variable_declaration -> VAR IDENTIFIER ( "=" expression )? ";"
-
-constant_declaration -> CONST IDENTIFIER "=" expression ";"
-
 func_declaration -> "fn" IDENTIFIER "(" func_params? ")" "{" declaration* "}"
 
 func_params -> IDENTIFIER ( "," IDENTIFIER )*
 
-### Statements
+variable_declaration -> variable_type IDENTIFIER ( "=" expression )? ";"
+
+variable_type -> VAR ( '[' ']' )?
+
+constant_declaration -> CONST IDENTIFIER "=" expression ";"
+
+# Statements
 
 statement	-> expression_statement
 			| if_statement
@@ -64,7 +68,7 @@ return_statement -> "return" expression? ";"
 
 expression	-> expression_assignment
 
-expression_assignment	-> IDENTIFIER ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
+expression_assignment	-> IDENTIFIER ( "." IDENTIFIER | "(" arguments? ")" )* ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
 						| lambda_expression
 						| conditional_expression
 

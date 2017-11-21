@@ -207,7 +207,7 @@ namespace Fl.Engine.Symbols
                 {
                     if (scp.ScopeType == ScopeType.Function)
                     {
-                        scp.AddSymbol(Scope.FlReturnKey, new Symbol(value.Type, StorageType.Constant), value);
+                        scp.AddSymbol(Scope.FlReturnKey, new Symbol(StorageType.Constant), value);
                         return;
                     }
                     scp = _Scopes.ElementAtOrDefault(--i);
@@ -264,8 +264,9 @@ namespace Fl.Engine.Symbols
             }
         }
 
-        public void SetBreak(int nbreaks)
+        public void SetBreak(FlInteger intobj)
         {
+            int nbreaks = intobj.Value;
             int orignbreaks = nbreaks;
             int i = _Scopes.Count - 1;
             var scp = i >= 0 ? _Scopes[i] : throw new ScopeOperationException("Cannot break in a non-loop scope");

@@ -11,8 +11,8 @@ namespace Fl.Engine.Evaluators
     {
         public FlObject Evaluate(AstEvaluator evaluator, AstReturnNode wnode)
         {
-            FlObject retval = wnode.Expression?.Exec(evaluator) ?? new FlObject(ObjectType.Null, null);
-            evaluator.Symtable.ReturnValue = new FlObject(retval.Type, retval.Value);
+            FlObject retval = wnode.Expression?.Exec(evaluator) ?? FlNull.Value;
+            evaluator.Symtable.ReturnValue = retval;
             return retval;
         }
     }

@@ -2,6 +2,8 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.StdLib;
+using Fl.Engine.Symbols.Exceptions;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -9,13 +11,6 @@ using System.Text;
 
 namespace Fl.Engine.Symbols
 {
-    public enum ScopeType
-    {
-        Common,
-        Function,
-        Loop
-    }
-
     public class Scope
     {
         #region Static fields
@@ -91,7 +86,7 @@ namespace Fl.Engine.Symbols
             {
                 _Env._Map[name].UpdateBinding(obj);
             }
-            else throw new Parser.Ast.AstWalkerException($"Symbol {name} does not exist in the current context");
+            else throw new SymbolException($"Symbol {name} does not exist in the current context");
         }
 
         public void Import(Scope scope)
@@ -100,7 +95,7 @@ namespace Fl.Engine.Symbols
             foreach (var k in keys)
             {
                 var s = scope._Map[k];
-                if (s.Binding.IsCallable && s.Storage == StorageType.Constant)
+                if (s.Binding.ObjectType == FunctionType.Value && s.Storage == StorageType.Constant)
                     continue;
                 _Map[k] = s;
             }

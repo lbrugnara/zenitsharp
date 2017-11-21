@@ -3,6 +3,7 @@
 
 using Fl.Engine.StdLib;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,9 @@ namespace Fl.Engine.Evaluators
         public FlObject Evaluate(AstEvaluator evaluator, AstCallableNode node)
         {
             FlObject target = node.Callable.Exec(evaluator);
-            if (!target.IsCallable)
+            if (target.ObjectType != FunctionType.Value)
                 throw new AstWalkerException($"{target.ToString()} is not a callable object");
-            return target.AsCallable.Invoke(evaluator, node.Arguments.Expressions.Select(a => a.Exec(evaluator)).ToList());
+            return (target as FlCallable).Invoke(evaluator, node.Arguments.Expressions.Select(a => a.Exec(evaluator)).ToList());
         }
     }
 }

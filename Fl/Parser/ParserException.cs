@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Fl.Parser
 {
-    public class ParsingException : Exception
+    public class ParserException : Exception
     {
-        public ParsingException(string message)
+        public ParserException(string message)
             : base(message)
         {
         }

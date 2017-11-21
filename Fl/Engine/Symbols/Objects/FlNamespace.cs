@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.StdLib;
+using Fl.Engine.Symbols.Types;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,24 +13,28 @@ namespace Fl.Engine.Symbols
     {
         private FlNamespace _Parent;
         private Dictionary<string, Symbol> _Map;
+        private string _Name;
+
+        public override object RawValue => FullName; // TODO:
+
+        public override bool IsPrimitive => false;
+
+        public override ObjectType ObjectType => NamespaceType.Value;
 
         public FlNamespace(string name, FlNamespace parent = null)
-            : base(ObjectType.Namespace, null)
         {
-            _ObjectType = ObjectType.Namespace;
-            _Value = this;
-            _Map = new Dictionary<string, Symbol>();
-            Name = name;
+            _Name = name;
+            _Map = new Dictionary<string, Symbol>();            
             _Parent = parent;            
             if (_Parent != null)
             {
-                _Parent.AddSymbol(Name,new Symbol(ObjectType.Namespace, StorageType.Constant), this);
+                _Parent.AddSymbol(_Name, new Symbol(StorageType.Constant), this);
             }
         }
 
-        public string Name  { get; }
+        public string Name => _Name;
 
-        public string FullName => (_Parent != null ? $"{_Parent.FullName}." : "") + $"{Name}";
+        public string FullName => (_Parent != null ? $"{_Parent.FullName}." : "") + $"{_Name}";
 
         #region Indexers
         public Symbol this[string var]
@@ -44,7 +49,7 @@ namespace Fl.Engine.Symbols
 
         public void AddSymbol(string name, Symbol s, FlObject o)
         {
-            s.DoBinding($"{Owner?.Name ?? Name}", name, o);
+            s.DoBinding(_Name, name, o);
             _Map[name] = s;
         }
         #endregion
@@ -57,20 +62,9 @@ namespace Fl.Engine.Symbols
             }
         }
 
-        public string ShowNamespace(int tabs = 0)
+        public override FlObject Clone()
         {
-            string str = new string(' ', tabs) + base.ToDebugStr();
-            int childindent = tabs + 2;
-            string indent = new string(' ', childindent);
-            foreach (var key in _Map.Keys)
-            {
-                Symbol child = _Map[key];
-                if (child.Type == ObjectType.Namespace)
-                    str += $"\n{child.Binding.AsNamespace.ShowNamespace(childindent)}";
-                else
-                    str += $"\n{indent}{child.Binding.ToDebugStr()}";
-            }
-            return str;
+            return new FlNamespace(_Name, _Parent);
         }
     }
 }

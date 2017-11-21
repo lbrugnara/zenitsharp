@@ -117,12 +117,15 @@ namespace Fl
             Token t = CheckPunctuation()
                     ?? CheckParen()
                     ?? CheckBrace()
+                    ?? CheckBracket()
                     ?? CheckNumber()
                     ?? CheckLogicalOperator()
                     ?? CheckArithmeticOperators()
                     ?? CheckString()
                     ?? CheckIdentifier();
 
+            if (t == null && HasInput())
+                throw new LexerException($"Unrecognized symbol '{_Source[_Pointer]}'");
             return t;
         }
 
@@ -197,6 +200,16 @@ namespace Fl
             int line = _Line;
             int col = _Col;
             return BuildToken(c == '{' ? TokenType.LeftBrace : TokenType.RightBrace, Consume(), line, col);
+        }
+
+        private Token CheckBracket()
+        {
+            char c = Peek();
+            if (c != '[' && c != ']')
+                return null;
+            int line = _Line;
+            int col = _Col;
+            return BuildToken(c == '[' ? TokenType.LeftBracket : TokenType.RightBracket, Consume(), line, col);
         }
 
         private Token CheckNumber()

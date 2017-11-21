@@ -3,6 +3,7 @@
 
 using Fl.Engine.StdLib;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -18,16 +19,17 @@ namespace Fl.Engine.Evaluators
             try
             {
                 FlObject result = wnode.Condition.Exec(evaluator);
-                if (!result.IsBool)
-                    throw new AstWalkerException($"Cannot convert type {result.Type} to {ObjectType.Boolean}");
-                while (result.AsBool)
+                if (result.ObjectType != BoolType.Value)
+                    throw new AstWalkerException($"Cannot convert type {result.ObjectType} to {BoolType.Value}");
+                var boolResult = (result as FlBoolean);
+                while (boolResult.Value)
                 {
                     wnode.Body.Exec(evaluator);
                     if (evaluator.Symtable.MustBreak)
                         break;
                     if (evaluator.Symtable.MustContinue)
                         evaluator.Symtable.DoContinue();
-                    result = wnode.Condition.Exec(evaluator);
+                    boolResult = wnode.Condition.Exec(evaluator) as FlBoolean;
                 }
             }
             finally

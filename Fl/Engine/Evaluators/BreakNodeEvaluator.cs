@@ -3,6 +3,7 @@
 
 using Fl.Engine.StdLib;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 
 namespace Fl.Engine.Evaluators
@@ -11,10 +12,10 @@ namespace Fl.Engine.Evaluators
     {
         public FlObject Evaluate(AstEvaluator evaluator, AstBreakNode wnode)
         {
-            FlObject breakval = wnode.Number?.Exec(evaluator) ?? new FlObject(ObjectType.Integer, 1);
-            if (!breakval.IsInt)
+            FlObject breakval = wnode.Number?.Exec(evaluator) ?? new FlInteger(1);
+            if (breakval.ObjectType != IntegerType.Value)
                 throw new AstWalkerException($"Break expression only allows integer values");
-            evaluator.Symtable.SetBreak(breakval.AsInt);
+            evaluator.Symtable.SetBreak(breakval as FlInteger);
             return breakval;
         }
     }

@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Engine.Symbols.Exceptions;
+using Fl.Engine.Symbols.Types;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,20 +11,19 @@ namespace Fl.Engine.Symbols
 {
     public class Symbol
     {
-        protected ObjectType _ObjectType;
         protected StorageType _StorageType;
-        protected FlObject _Value;
+        protected FlObject _Binding;
         protected string _Name;
 
-        public Symbol(ObjectType type, StorageType storage)
+        public Symbol(StorageType storage)
         {
-            _ObjectType = type;
             _StorageType = storage;
+            _Binding = FlNull.Value;
         }
 
-        public ObjectType Type => _ObjectType;
+        public ObjectType ObjectType => _Binding?.ObjectType;
         public StorageType Storage => _StorageType;
-        public FlObject Binding => _Value;
+        public FlObject Binding => _Binding;
         public string Name => _Name;
 
         public override string ToString()
@@ -32,18 +33,19 @@ namespace Fl.Engine.Symbols
 
         public void DoBinding(string scope, string name, FlObject val)
         {
+            if (_Binding != FlNull.Value)
+                throw new SymbolException($"Cannot re-bind symbol {Name}");
             _Name = $"{scope}.{name}";
-            _ObjectType = val.Type;
-            _Value = val;
-            _Value.RefInc(this);
+            if (val == null)
+                val = FlNull.Value;
+            _Binding = val;
         }
 
         public void UpdateBinding(FlObject newval)
         {
-            _ObjectType = newval.Type;
-            _Value.RefDec(this);
-            _Value = newval;
-            _Value.RefInc(this);
+            if (_Binding != FlNull.Value && _Binding.ObjectType != newval.ObjectType)
+                throw new SymbolException($"Cannot implicitly convert type '{newval.ObjectType}' to '{_Binding.ObjectType}'");
+            _Binding = newval;
         }
     }
 }

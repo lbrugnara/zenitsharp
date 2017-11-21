@@ -2,18 +2,23 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 
 namespace Fl.Engine.Evaluators
 {
     class OperandUnaryNode
     {
+        private static AccessorNodeEvaluator _AccessorEv = new AccessorNodeEvaluator();
+
         private AstAccessorNode GetAccessorNode(AstUnaryNode node)
         {
             var tmp = node;
             while (tmp != null && !(tmp.Left is AstAccessorNode))
             {
                 tmp = tmp.Left as AstUnaryNode;
+                if (tmp is AstUnaryPrefixNode || tmp is AstUnaryPostfixNode)
+                    throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
             }
             return tmp?.Left as AstAccessorNode;
         }
@@ -24,30 +29,7 @@ namespace Fl.Engine.Evaluators
             if (accessor == null)
                 return null;
 
-            Symbol entry = null;
-            var self = accessor.Self.Value.ToString();
-
-            // If the identifier exists in the current scope, return it
-            if (evaluator.Symtable.HasSymbol(self))
-            {
-                entry = evaluator.Symtable.GetSymbol(self);
-            }
-            else if (accessor.Member == null)
-            {
-                // If there is no member of "self" it means this (self) symbol doesn't exist
-                throw new AstWalkerException($"Symbol '{self}' is not defined");
-            }
-            else
-            {
-                // If there is a member, resolve it ...                
-                FlObject ns = accessor.Member.Exec(evaluator);
-
-                // ... if it is a namespace and "self" is not defined, throw the exception
-                if (ns.IsNamespace && ns.AsNamespace[self] == null)
-                    throw new AstWalkerException($"Symbol '{self}' is not defined");
-                entry = ns.AsNamespace[self];
-            }
-            return entry;
+            return _AccessorEv.GetSymbol(evaluator, accessor);
         }
     }
 }

@@ -14,11 +14,15 @@ namespace Fl.Engine.Evaluators
     {
         public FlObject Evaluate(AstEvaluator evaluator, AstVariableNode vardecl)
         {
+            // Get the variable type
+            var type = vardecl.Type;
+            // attributes
+            bool isArray = type.Dimensions?.Count > 0; // By now allow 1-dimension arrays
             // Get the variable name
             string varname = vardecl.Identifier.Value.ToString();
             // Build the Symbol information from an initializer or use null
-            FlObject init = vardecl.Initializer != null ? vardecl.Initializer.Exec(evaluator) : new FlObject(ObjectType.Null, null);
-            evaluator.Symtable.AddSymbol(varname, new Symbol(init.Type, StorageType.Variable), init);
+            FlObject init = vardecl.Initializer != null ? vardecl.Initializer.Exec(evaluator) : FlNull.Value;
+            evaluator.Symtable.AddSymbol(varname, new Symbol(StorageType.Variable), init);
             return init;
         }
     }

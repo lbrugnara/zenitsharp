@@ -109,7 +109,7 @@ namespace Fl.Parser
                 return null;
 
             if (!Match(type))
-                throw new ParsingException(message ?? $"Expects {type} but received {Peek().Type}");
+                throw new ParserException(message ?? $"Expects {type} but received {Peek().Type}");
 
             return _Tokens[_Pointer++];
         }
@@ -412,8 +412,9 @@ namespace Fl.Parser
             {
                 return ForDeclaration();
             }
-            List<AstNode> exprs = new List<AstNode>();
-            exprs.Add(Expression());
+            List<AstNode> exprs = new List<AstNode> {
+                Expression()
+            };
             while (Match(TokenType.Comma))
             {
                 Consume();
@@ -427,20 +428,21 @@ namespace Fl.Parser
         // for_declaration -> VAR local_var_declaration ( "," local_var_declaration )*
         private AstNode ForDeclaration()
         {
-            Token var = Consume(TokenType.Variable);
-            List<AstNode> decls = new List<AstNode>();
-            decls.Add(LocalVarDeclaration());
+            AstVariableTypeNode type = VariableType();
+            List<AstNode> decls = new List<AstNode> {
+                LocalVarDeclaration(type)
+            };
             while (Match(TokenType.Comma))
             {
                 Consume();
-                decls.Add(LocalVarDeclaration());
+                decls.Add(LocalVarDeclaration(type));
             }
             return new AstDeclarationNode(decls);
         }
 
         // Rule:
         // local_var_declaration -> IDENTIFIER ( "=" expression )
-        private AstNode LocalVarDeclaration()
+        private AstVariableNode LocalVarDeclaration(AstVariableTypeNode type)
         {
             Token id = Consume(TokenType.Identifier);
             AstNode expr = null;
@@ -449,15 +451,16 @@ namespace Fl.Parser
                 Consume(TokenType.Assignment);
                 expr = Expression();
             }
-            return new AstVariableNode(id, expr);
+            return new AstVariableNode(type, id, expr);
         }
 
         // Rule:
         // for_iterator -> expression ( "," expression )*
         private AstNode ForIterator()
         {
-            List<AstNode> exprs = new List<AstNode>();
-            exprs.Add(Expression());
+            List<AstNode> exprs = new List<AstNode> {
+                Expression()
+            };
             while (Match(TokenType.Comma))
             {
                 Consume();
@@ -518,10 +521,10 @@ namespace Fl.Parser
         }
 
         // Rule:
-        // variable_declaration -> VAR IDENTIFIER ( "=" expression )? ";"
+        // variable_declaration -> variable_type IDENTIFIER ( "=" expression )? ";"
         private AstNode VarDeclaration()
         {
-            Consume(TokenType.Variable);
+            AstVariableTypeNode variableType = VariableType();
             Token identifier = Consume(TokenType.Identifier);
             AstNode expression = null;
             if (Match(TokenType.Assignment))
@@ -530,7 +533,25 @@ namespace Fl.Parser
                 expression = Expression();
             }
             Consume(TokenType.Semicolon);
-            return new AstVariableNode(identifier, expression);
+            return new AstVariableNode(variableType, identifier, expression);
+        }
+
+        // Rule:
+        // variable_type -> VAR ( '[' ']' )*
+        private AstVariableTypeNode VariableType()
+        {
+            Token varType = Consume(TokenType.Variable);
+            if (Match(TokenType.LeftBracket))
+            {
+                List<Token> dimensions = new List<Token>();
+                while (Match(TokenType.LeftBracket))
+                {
+                    dimensions.Add(Consume(TokenType.LeftBracket));
+                    dimensions.Add(Consume(TokenType.RightBracket));
+                }
+                return new AstVariableTypeNode(varType, dimensions);
+            }
+            return new AstVariableTypeNode(varType);
         }
 
         // Rule:
@@ -581,17 +602,47 @@ namespace Fl.Parser
         }
 
         // Rule:
-        // expression_assignment	-> IDENTIFIER ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
+        // expression_assignment	-> IDENTIFIER ( "." IDENTIFIER | "(" arguments? ")" )* ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
         // 						     | lambda_expression
         // 						     | conditional_expression        
         private AstNode ExpressionAssignment()
         {
-            if (Match(TokenType.Identifier) && MatchAnyFrom(1, TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
+            if (Match(TokenType.Identifier) && MatchAnyFrom(1, TokenType.Dot, TokenType.LeftParen, TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
             {
+                int checkpoint = _Pointer;
                 Token identifier = Consume(TokenType.Identifier);
-                Token assignmentop = Consume();
-                AstNode expression = Expression();
-                return new AstAssignmentNode(identifier, assignmentop, expression);
+                AstNode primary = new AstAccessorNode(identifier, null);
+                while (true)
+                {
+                    if (Match(TokenType.LeftParen))
+                    {
+                        Consume();
+                        AstArgumentsNode arguments = Arguments();
+                        Consume(TokenType.RightParen);
+                        primary = new AstCallableNode(primary, arguments);
+                    }
+                    else if (Match(TokenType.Dot))
+                    {
+                        Consume();
+                        primary = new AstAccessorNode(Consume(TokenType.Identifier), primary);
+                    }
+                    else break;
+                }
+                if (MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
+                {
+                    Token assignmentop = Consume();
+                    AstNode expression = Expression();
+
+                    if (primary is AstCallableNode)
+                        throw new ParserException($"Left-hand side of an assignment must be a variable.");
+                    if ((primary as AstAccessorNode).Member != null)
+                        return new AstAssignmentNode(primary as AstAccessorNode, assignmentop, expression);
+                    return new AstAssignmentNode(identifier, assignmentop, expression);
+                }
+
+                // If we are not seeing an assignment operator, then try again with ConditionalExpression
+                _Pointer = checkpoint;
+                return ConditionalExpression();
             }
             else if (
                 // =>
@@ -809,7 +860,7 @@ namespace Fl.Parser
                 && !Match(TokenType.Decimal)
                 && !Match(TokenType.String)
                 && !Match(TokenType.Identifier))
-                throw new ParsingException($"Expects primary but received {Peek().Type}");
+                throw new ParserException($"Expects primary but received {Peek().Type}");
 
             return Match(TokenType.Identifier) ? (AstNode)new AstAccessorNode(Consume(), null) : new AstLiteralNode(Consume());
         }

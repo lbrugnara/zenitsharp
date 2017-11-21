@@ -37,7 +37,7 @@ namespace FlInterpreter
                     AstNode ast = p.Parse(tokens);
                     FlObject result = eval.Process(ast);
                     if (result != null)
-                        Console.WriteLine($":: {result.ToDebugStr()}");
+                        Console.WriteLine($"<= {result.ToDebugStr()}");
                 }
                 catch (Exception e)
                 {
@@ -49,7 +49,7 @@ namespace FlInterpreter
                         case ScopeOperationException soe:
                             type = "Runtime";
                             break;
-                        case ParsingException pe:
+                        case ParserException pe:
                             type = "Parsing";
                             break;                        
                     }

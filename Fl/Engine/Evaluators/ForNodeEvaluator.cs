@@ -3,6 +3,7 @@
 
 using Fl.Engine.StdLib;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -19,9 +20,9 @@ namespace Fl.Engine.Evaluators
             {
                 fornode.Init.Exec(evaluator);
                 FlObject result = fornode.Condition.Exec(evaluator);
-                if (result != null && !result.IsBool)
-                    throw new AstWalkerException($"Cannot convert type {result.Type} to {ObjectType.Boolean}");
-                while (result == null || result.AsBool)
+                if (result != null && result.ObjectType != BoolType.Value)
+                    throw new AstWalkerException($"Cannot convert type {result.ObjectType} to {BoolType.Value}");
+                while (result == null || (result as FlBoolean).Value)
                 {
                     fornode.Body.Exec(evaluator);
                     if (evaluator.Symtable.MustBreak)
