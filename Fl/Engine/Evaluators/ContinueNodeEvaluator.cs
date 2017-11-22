@@ -3,6 +3,7 @@
 
 using Fl.Engine.StdLib;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Objects;
 using Fl.Parser.Ast;
 
 namespace Fl.Engine.Evaluators

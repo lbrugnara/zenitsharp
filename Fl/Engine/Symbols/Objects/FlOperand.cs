@@ -4,7 +4,7 @@
 using Fl.Engine.Symbols.Types;
 using System;
 
-namespace Fl.Engine.Symbols
+namespace Fl.Engine.Symbols.Objects
 {
     public class FlOperand
     {
@@ -200,15 +200,15 @@ namespace Fl.Engine.Symbols
         {
             if (_Ref.ObjectType == IntegerType.Value && n.ObjectType == IntegerType.Value)
             {
-                return new FlInteger((int)_Ref.RawValue * (int)n.RawValue);
+                return new FlInteger((int)_Ref.RawValue / (int)n.RawValue);
             }
             else if (_Ref.ObjectType == DoubleType.Value && n.ObjectType == DoubleType.Value)
             {
-                return new FlDouble((double)_Ref.RawValue * (double)n.RawValue);
+                return new FlDouble((double)_Ref.RawValue / (double)n.RawValue);
             }
             else if (_Ref.ObjectType == DecimalType.Value && n.ObjectType == DecimalType.Value)
             {
-                return new FlDecimal((decimal)_Ref.RawValue * (decimal)n.RawValue);
+                return new FlDecimal((decimal)_Ref.RawValue / (decimal)n.RawValue);
             }
             throw new Exception($"Operator '/' cannot be applied to operands of type '{n.ObjectType}' and '{_Ref.ObjectType}'");
         }
@@ -278,7 +278,7 @@ namespace Fl.Engine.Symbols
             {
                 (_Ref as FlDecimal).Value /= (n as FlDecimal).Value;
             }
-            throw new Exception($"Operator '*=' cannot be applied to operands of type '{n.ObjectType}' and '{_Ref.ObjectType}'");
+            throw new Exception($"Operator '/=' cannot be applied to operands of type '{n.ObjectType}' and '{_Ref.ObjectType}'");
         }
 
         public FlObject Negative()

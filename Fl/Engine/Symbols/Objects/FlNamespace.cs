@@ -2,12 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.StdLib;
+using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Types;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Fl.Engine.Symbols
+namespace Fl.Engine.Symbols.Objects
 {
     public class FlNamespace : FlObject
     {
@@ -37,7 +38,7 @@ namespace Fl.Engine.Symbols
         public string FullName => (_Parent != null ? $"{_Parent.FullName}." : "") + $"{_Name}";
 
         #region Indexers
-        public Symbol this[string var]
+        public override Symbol this[string var]
         {
             get
             {
@@ -65,6 +66,11 @@ namespace Fl.Engine.Symbols
         public override FlObject Clone()
         {
             return new FlNamespace(_Name, _Parent);
+        }
+
+        public override FlObject ConvertTo(ObjectType type)
+        {
+            throw new CastException($"Cannot convert type {ObjectType} to {type}");
         }
     }
 }

@@ -2,13 +2,14 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.StdLib;
+using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Fl.Engine.Symbols
+namespace Fl.Engine.Symbols.Objects
 {
     public abstract class FlObject
     {
@@ -29,5 +30,15 @@ namespace Fl.Engine.Symbols
         }
 
         public abstract FlObject Clone();
+
+        public abstract FlObject ConvertTo(ObjectType type);
+
+        public virtual Symbol this[string membername]
+        {
+            get
+            {
+                throw new SymbolException($"{ObjectType} does not contain a definition of '{membername}'");
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ using Fl.Engine;
 using Fl.Engine.Evaluators;
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Exceptions;
+using Fl.Engine.Symbols.Objects;
 using Fl.Parser;
 using Fl.Parser.Ast;
 using System;

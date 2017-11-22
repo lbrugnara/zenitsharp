@@ -3,6 +3,7 @@
 
 using Fl.Engine.Evaluators;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Objects;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,7 +14,7 @@ namespace Fl.Engine.StdLib.std.io
     {
         public override string Name => "print";
 
-        public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
+        public override FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
         {
             args.ForEach(a => System.Console.Write(a));
             return null;
@@ -24,7 +25,7 @@ namespace Fl.Engine.StdLib.std.io
     {
         public override string Name => "println";
 
-        public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
+        public override FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
         {
             args.ForEach(a => System.Console.WriteLine(a));
             return null;

@@ -76,6 +76,13 @@ namespace Fl
             return _Pointer + amount <= _Source.Length ? _Source.Substring(_Pointer, amount) : null;
         }
 
+        private char Lookahead(int offset)
+        {
+            if (offset <= 0)
+                throw new ArgumentException("Amount must be greater than 0");
+            return _Pointer + offset <= _Source.Length ? _Source[_Pointer + offset] : '\0';
+        }
+
         private char Consume()
         {
             char c = _Pointer < _Source.Length ? _Source[_Pointer] : '\0';
@@ -229,7 +236,7 @@ namespace Fl
                 {
                     val += Consume();
                 }
-                else if (c == '.')
+                else if (c == '.' && char.IsDigit(Lookahead(1)))
                 {
                     val += Consume();
                     type = TokenType.Double;

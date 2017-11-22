@@ -106,10 +106,30 @@ namespace Fl.Parser
         private Token Consume(TokenType type, string message = null)
         {
             if (!HasInput())
-                return null;
+            {
+                // ; is optional at the end of the input
+                if (type == TokenType.Semicolon)
+                {
+                    var lt = _Tokens.LastOrDefault();
+                    return new Token()
+                    {
+                        Line = lt?.Line ?? 0,
+                        Col = lt?.Col+1 ?? 0,
+                        Type = TokenType.Semicolon,
+                        Value = ";"
+                    };
+                }
+                Token t = _Tokens.ElementAtOrDefault(_Pointer - 1);
+                if (t != null)
+                    throw new ParserException(message ?? $"Expects {type} at line {t.Line}:{t.Col}");
+                throw new ParserException(message ?? $"Expects {type} the end of the input");
+            }
 
             if (!Match(type))
-                throw new ParserException(message ?? $"Expects {type} but received {Peek().Type}");
+            {
+                Token t = _Tokens.ElementAtOrDefault(_Pointer - 1);
+                throw new ParserException(message ?? $"Expects {type} but received {Peek().Type} at line {t.Line}:{t.Col}");
+            }
 
             return _Tokens[_Pointer++];
         }
@@ -644,23 +664,29 @@ namespace Fl.Parser
                 _Pointer = checkpoint;
                 return ConditionalExpression();
             }
-            else if (
-                // =>
-                Match(TokenType.RightArrow)
-                // a =>
-                || (!Match(TokenType.LeftParen) && Match(TokenType.Unknown, TokenType.RightArrow))
-                // a,b =>
-                || MatchFrom(CountRepeatedMatchesFrom(0, TokenType.Unknown, TokenType.Comma), TokenType.RightArrow)
-                // () =>
-                || Match(TokenType.LeftParen, TokenType.RightParen, TokenType.RightArrow)
-                // (a) =>
-                || Match(TokenType.LeftParen, TokenType.Unknown, TokenType.RightParen, TokenType.RightArrow)
-                // (a,b) =>
-                || (Match(TokenType.LeftParen) && MatchFrom(1 + CountRepeatedMatchesFrom(1, TokenType.Unknown, TokenType.Comma), TokenType.RightParen, TokenType.RightArrow)))
+            else if (MatchLambda())
             {
                 return LambdaExpression();
             }
             return ConditionalExpression();
+        }
+
+        private bool MatchLambda()
+        {
+            // =>
+            bool arrow = Match(TokenType.RightArrow);
+            // a =>
+            bool paramArrow = (!Match(TokenType.LeftParen) && Match(TokenType.Unknown, TokenType.RightArrow));
+            // a,b =>
+            bool paramListArrow = MatchFrom(CountRepeatedMatchesFrom(0, TokenType.Unknown, TokenType.Comma), TokenType.RightArrow);
+            // () =>
+            bool parentArrow = Match(TokenType.LeftParen, TokenType.RightParen, TokenType.RightArrow);
+            // (a) =>
+            bool parentParamArrow = (!MatchFrom(1, TokenType.LeftParen) && Match(TokenType.LeftParen, TokenType.Unknown, TokenType.RightParen, TokenType.RightArrow));
+            // (a,b) =>
+            bool parentParamListArrow = (Match(TokenType.LeftParen) && MatchFrom(1 + CountRepeatedMatchesFrom(1, TokenType.Unknown, TokenType.Comma), TokenType.RightParen, TokenType.RightArrow));
+
+            return arrow || paramArrow || paramListArrow || parentArrow || parentParamArrow || parentParamListArrow;
         }
 
         // Rule:

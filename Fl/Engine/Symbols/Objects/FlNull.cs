@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Types;
 
-namespace Fl.Engine.Symbols
+namespace Fl.Engine.Symbols.Objects
 {
     public class FlNull : FlObject
     {
@@ -28,7 +29,13 @@ namespace Fl.Engine.Symbols
 
         public override FlObject Clone()
         {
-            return new FlNull();
+            return _Instance;
+        }
+
+        public override FlObject ConvertTo(ObjectType type)
+        {
+            return _Instance;
+            //throw new CastException($"Cannot convert type {ObjectType} to {type}");
         }
     }
 }

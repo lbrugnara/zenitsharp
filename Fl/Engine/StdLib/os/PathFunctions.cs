@@ -3,6 +3,7 @@
 
 using Fl.Engine.Evaluators;
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Objects;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,7 +14,7 @@ namespace Fl.Engine.StdLib.os
     {
         public override string Name => "cwd";
 
-        public override FlObject Invoke(AstEvaluator evaluator, List<FlObject> args)
+        public override FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
         {
             if (args.Count == 0)
                 return new FlString(System.IO.Directory.GetCurrentDirectory());

@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Types;
 
-namespace Fl.Engine.Symbols
+namespace Fl.Engine.Symbols.Objects
 {
     public class FlString : FlObject
     {
@@ -25,6 +26,20 @@ namespace Fl.Engine.Symbols
         public override FlObject Clone()
         {
             return new FlString(_RawValue);
+        }
+
+        public override FlObject ConvertTo(ObjectType type)
+        {
+            if (type == StringType.Value)
+            {
+                return this.Clone();
+            }
+            throw new CastException($"Cannot convert type {ObjectType} to {type}");
+        }
+
+        public override string ToDebugStr()
+        {
+            return $"\"{RawValue}\" ({ObjectType})";
         }
     }
 }

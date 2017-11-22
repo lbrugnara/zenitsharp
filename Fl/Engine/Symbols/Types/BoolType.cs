@@ -1,4 +1,7 @@
-﻿namespace Fl.Engine.Symbols.Types
+﻿// Copyright (c) Leonardo Brugnara
+// Full copyright and license information in LICENSE file
+
+namespace Fl.Engine.Symbols.Types
 {
     public class BoolType : ObjectType
     {

@@ -2,12 +2,14 @@
 // Full copyright and license information in LICENSE file
 
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Fl.Engine.Symbols.Exceptions
 {
-    public class ScopeOperationException : Exception
+    public class CastException : Exception
     {
-        public ScopeOperationException(string msg) : base(msg)
+        public CastException(string msg) : base(msg)
         {
         }
     }

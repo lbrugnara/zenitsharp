@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.Symbols;
+using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System;
@@ -19,12 +20,8 @@ namespace Fl.Engine.Evaluators
 
             if (invoke.Member != null) {
                 // If there is a member, resolve it ...                
-                FlObject ns = invoke.Member.Exec(evaluator);
-
-                // ... if it is a namespace and "self" is not defined, throw the exception
-                if (ns.ObjectType == NamespaceType.Value && (ns as FlNamespace)[self] == null)
-                    throw new AstWalkerException($"Symbol '{self}' is not defined");
-                entry = (ns as FlNamespace)[self];
+                FlObject obj = invoke.Member.Exec(evaluator);
+                entry = obj[self];
             }
             else if (evaluator.Symtable.HasSymbol(self)) // If the identifier exists in the current scope, return it
             {
@@ -42,12 +39,8 @@ namespace Fl.Engine.Evaluators
             if (invoke.Member != null)
             {
                 // If there is a member, resolve it ...                
-                FlObject ns = invoke.Member.Exec(evaluator);
-
-                // ... if it is a namespace and "self" is not defined, throw the exception
-                if (ns.ObjectType == NamespaceType.Value && (ns as FlNamespace)[self] == null)
-                    throw new AstWalkerException($"Symbol '{self}' is not defined");
-                entry = (ns as FlNamespace)[self];
+                FlObject obj = invoke.Member.Exec(evaluator);
+                entry = obj[self];
             }
             else if (evaluator.Symtable.HasSymbol(self)) // If the identifier exists in the current scope, return it
             {
