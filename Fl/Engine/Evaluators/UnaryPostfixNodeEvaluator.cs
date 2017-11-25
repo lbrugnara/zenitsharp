@@ -19,7 +19,7 @@ namespace Fl.Engine.Evaluators
             FlObject symbolValue = unary.Left.Exec(evaluator);
 
             Symbol symbol = GetSymbol(evaluator, unary);
-            if (symbol == null || symbol.Storage != StorageType.Variable)
+            if (symbol == null || symbol.SymbolType != SymbolType.Variable)
                 throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
 
             FlOperand symboloperand = new FlOperand(symbolValue);

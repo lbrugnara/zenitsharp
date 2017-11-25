@@ -11,15 +11,12 @@ namespace Fl.Engine.Symbols.Objects
     {
         #region Private Fields
         private int _RawValue;
-        private Dictionary<string, Symbol> _Members;
         #endregion
 
         #region Constructor
         public FlInteger(int value)
         {
             _RawValue = value;
-            _Members = new Dictionary<string, Symbol>();
-            RegisterMembers();
         }
         #endregion
 
@@ -60,24 +57,9 @@ namespace Fl.Engine.Symbols.Objects
             throw new CastException($"Cannot convert type {ObjectType} to {type}");
         }
 
-        public override Symbol this[string membername]
-        {
-            get
-            {
-                if (_Members.ContainsKey(membername))
-                    return _Members[membername];
-                return base[membername];
-            }
-        }
         #endregion
 
         #region Private methods
-        public void RegisterMembers()
-        {
-            Symbol ts = new Symbol(StorageType.Constant);
-            ts.DoBinding("int", "str", new FlMethod("str", this, (self, args) => new FlString(self.RawValue.ToString())));
-            _Members["str"] = ts;
-        }        
         #endregion
     }
 }

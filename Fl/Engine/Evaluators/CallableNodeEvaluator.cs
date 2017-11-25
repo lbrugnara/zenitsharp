@@ -18,9 +18,34 @@ namespace Fl.Engine.Evaluators
         public FlObject Evaluate(AstEvaluator evaluator, AstCallableNode node)
         {
             FlObject target = node.Callable.Exec(evaluator);
-            if (target.ObjectType != FunctionType.Value)
-                throw new AstWalkerException($"{target.ToString()} is not a callable object");
-            return (target as FlCallable).Invoke(evaluator.Symtable, node.Arguments.Expressions.Select(a => a.Exec(evaluator)).ToList());
+
+            if (target is FlClass)
+            {
+                var clasz = (target as FlClass);
+
+                if (node.New != null)
+                {
+                    var newInstance = clasz.Activator.Invoke();
+                    target = clasz.GetConstructor(node.Arguments.Count);
+                    if (target == null)
+                    {                        
+                        if (newInstance == null)
+                            throw new AstWalkerException($"{clasz} does not contain a constructor that accepts {node.Arguments.Count}");
+                        return newInstance;
+                    }
+                    return (target as FlConstructor).Bind(newInstance).Invoke(evaluator.Symtable, node.Arguments.Expressions.Select(a => a.Exec(evaluator)).ToList());
+                }
+                else
+                { 
+                    target = clasz.StaticConstructor ?? throw new AstWalkerException($"{target} does not contain a definition for the static constructor");
+                }
+            }
+
+            if (target is FlFunction)
+            {
+                return (target as FlFunction).Invoke(evaluator.Symtable, node.Arguments.Expressions.Select(a => a.Exec(evaluator)).ToList());
+            }
+            throw new AstWalkerException($"{target} is not a callable object");
         }
     }
 }

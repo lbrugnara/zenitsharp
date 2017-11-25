@@ -6,11 +6,11 @@ using Fl.Engine.Symbols.Types;
 
 namespace Fl.Engine.Symbols.Objects
 {
-    public class FlBoolean : FlObject
+    public class FlBool : FlObject
     {
         private bool _RawValue;
 
-        public FlBoolean(bool value)
+        public FlBool(bool value)
         {
             _RawValue = value;
         }
@@ -25,12 +25,16 @@ namespace Fl.Engine.Symbols.Objects
 
         public override FlObject Clone()
         {
-            return new FlBoolean(_RawValue);
+            return new FlBool(_RawValue);
         }
 
         public override FlObject ConvertTo(ObjectType type)
         {
-            if (type == StringType.Value)
+            if (type == BoolType.Value)
+            {
+                return this.Clone();
+            }
+            else if (type == StringType.Value)
             {
                 return new FlString(_RawValue.ToString());
             }

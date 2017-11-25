@@ -23,7 +23,7 @@ namespace Fl.Engine.Evaluators
             string varname = vardecl.Identifier.Value.ToString();
             // Build the Symbol information from an initializer or use null
             FlObject init = vardecl.Initializer != null ? vardecl.Initializer.Exec(evaluator) : FlNull.Value;
-            evaluator.Symtable.AddSymbol(varname, new Symbol(StorageType.Variable), init);
+            evaluator.Symtable.AddSymbol(varname, new Symbol(SymbolType.Variable), init);
             return init;
         }
     }

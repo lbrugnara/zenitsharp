@@ -13,5 +13,7 @@ namespace Fl.Parser.Ast
         {
             Expressions = args;
         }
+
+        public int Count => Expressions?.Count ?? 0;
     }
 }

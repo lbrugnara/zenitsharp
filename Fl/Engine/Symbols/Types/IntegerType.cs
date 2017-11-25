@@ -11,9 +11,8 @@ namespace Fl.Engine.Symbols.Types
 
         public static IntegerType Value => _Instance != null ? _Instance : (_Instance = new IntegerType());
 
-        public override string ToString()
-        {
-            return "integer";
-        }
+        public override string Name => "int";
+
+        public override string ClassName => "int";
     }
 }

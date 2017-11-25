@@ -9,11 +9,13 @@ namespace Fl.Parser.Ast
     {
         public AstNode Callable { get; }
         public AstArgumentsNode Arguments { get; }
+        public Token New { get; }
 
-        public AstCallableNode(AstNode callable, AstArgumentsNode args)
+        public AstCallableNode(AstNode callable, AstArgumentsNode args, Token newt = null)
         {
             Callable = callable;
             Arguments = args;
+            New = newt;
         }
     }
 }

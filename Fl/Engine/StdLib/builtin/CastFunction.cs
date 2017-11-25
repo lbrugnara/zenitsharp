@@ -9,9 +9,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Fl.Engine.StdLib.BuiltIn
+namespace Fl.Engine.StdLib.builtin
 {
-    public class CastFunction : FlCallable
+    public class CastFunction : FlFunction
     {
         private string _Name;
         private ObjectType _Type;

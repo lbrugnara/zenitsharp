@@ -19,7 +19,7 @@ namespace Fl.Engine.Evaluators
             switch (literal.Primary.Type)
             {
                 case TokenType.Boolean:
-                    return new FlBoolean(bool.Parse(literal.Primary.Value.ToString()));
+                    return new FlBool(bool.Parse(literal.Primary.Value.ToString()));
                 case TokenType.Integer:
                     return new FlInteger(int.Parse(literal.Primary.Value.ToString()));
                 case TokenType.Double:

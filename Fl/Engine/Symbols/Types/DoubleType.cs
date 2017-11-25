@@ -11,9 +11,8 @@ namespace Fl.Engine.Symbols.Types
 
         public static DoubleType Value => _Instance != null ? _Instance : (_Instance = new DoubleType());
 
-        public override string ToString()
-        {
-            return "double";
-        }
+        public override string Name => "double";
+
+        public override string ClassName => "double";
     }
 }

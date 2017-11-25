@@ -11,9 +11,8 @@ namespace Fl.Engine.Symbols.Types
 
         public static ArrayType Value => _Instance != null ? _Instance : (_Instance = new ArrayType());
 
-        public override string ToString()
-        {
-            return "array";
-        }
+        public override string Name => "array";
+
+        public override string ClassName => "Array";
     }
 }

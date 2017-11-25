@@ -828,26 +828,82 @@ namespace Fl.Parser
             return new AstUnaryNode(null, expr);
         }
 
+        private AstAccessorNode TryGetAccessor(AstNode primary)
+        {
+            AstNode tmp = primary;
+            while (tmp != null)
+            {
+                if (tmp is AstAccessorNode)
+                    return tmp as AstAccessorNode;
+
+                if (tmp is AstCallableNode)
+                {
+                    tmp = (tmp as AstCallableNode).Callable;
+                    continue;
+                }
+            }
+            return null;
+        }
+
+        private AstLiteralNode TryGetLiteral(AstNode primary)
+        {
+            AstNode tmp = primary;
+            while (tmp != null)
+            {
+                if (tmp is AstLiteralNode)
+                    return tmp as AstLiteralNode;
+
+                if (tmp is AstAccessorNode)
+                {
+                    tmp = (tmp as AstAccessorNode).Member;
+                    continue;
+                }
+                else if (tmp is AstCallableNode)
+                {
+                    tmp = (tmp as AstCallableNode).Callable;
+                    continue;
+                }
+            }
+            return null;
+        }
+
         // Rule:
         // primary_expression -> primary ( "." IDENTIFIER | "(" arguments? ")" )*
         private AstNode PrimaryExpression()
         {
+            Token newt = null;
+            if (Match(TokenType.New))
+            {
+                newt = Consume();
+            }
             AstNode primary = Primary();
+            int checkpoint = _Pointer;
             while (true)
             {
                 if (Match(TokenType.LeftParen))
                 {
+                    if (TryGetAccessor(primary) == null && TryGetLiteral(primary)?.Primary?.Type != TokenType.Identifier)
+                        throw new ParserException($"'{primary}' is not an invokable object");
                     Consume();
                     AstArgumentsNode arguments = Arguments();
                     Consume(TokenType.RightParen);
-                    primary = new AstCallableNode(primary, arguments);
+                    primary = new AstCallableNode(primary, arguments, newt);
                 }
                 else if (Match(TokenType.Dot))
                 {
                     Consume();
                     primary = new AstAccessorNode(Consume(TokenType.Identifier), primary);
                 }
-                else break;
+                else
+                {
+                    if (_Pointer == checkpoint 
+                        && (primary is AstLiteralNode && (primary as AstLiteralNode).Primary.Type != TokenType.Identifier)
+                        && newt != null)
+                        throw new ParserException($"Type expected");
+                    if (_Pointer == checkpoint && (primary is AstAccessorNode) && newt != null)
+                        primary = new AstCallableNode(primary, new AstArgumentsNode(new List<AstNode>()), newt);
+                    break;
+                }
 
             }
             return primary;

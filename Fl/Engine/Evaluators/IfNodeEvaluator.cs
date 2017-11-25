@@ -22,7 +22,7 @@ namespace Fl.Engine.Evaluators
                 FlObject result = ifnode.Condition.Exec(evaluator);
                 if (result.ObjectType != BoolType.Value)
                     throw new AstWalkerException($"Cannot convert type {result.ObjectType} to {BoolType.Value}");
-                if ((result as FlBoolean).Value)
+                if ((result as FlBool).Value)
                     return ifnode.Then?.Exec(evaluator);
                 if (ifnode.Else != null)
                     return ifnode.Else.Exec(evaluator);

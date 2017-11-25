@@ -9,9 +9,13 @@ namespace Fl.Engine.Symbols.Types
 {
     public abstract class ObjectType
     {
+        public abstract string Name { get; }
+
+        public abstract string ClassName { get; }
+
         public override string ToString()
         {
-            return "object";
+            return Name ?? "object";
         }
     }
 }

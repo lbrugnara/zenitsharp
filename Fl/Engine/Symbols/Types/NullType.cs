@@ -11,9 +11,8 @@ namespace Fl.Engine.Symbols.Types
 
         public static NullType Value => _Instance != null ? _Instance : (_Instance = new NullType());
 
-        public override string ToString()
-        {
-            return "null";
-        }
+        public override string Name => "null";
+
+        public override string ClassName => "null";
     }
 }

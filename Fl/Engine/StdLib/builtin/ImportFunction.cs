@@ -6,9 +6,9 @@ using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
 using System.Collections.Generic;
 
-namespace Fl.Engine.StdLib.BuiltIn
+namespace Fl.Engine.StdLib.builtin
 {
-    public class ImportFunction : FlCallable
+    public class ImportFunction : FlFunction
     {
         public override string Name => "import";
 
@@ -28,7 +28,7 @@ namespace Fl.Engine.StdLib.BuiltIn
                 Parser.Ast.AstNode ast = p.Parse(tokens);
                 AstEvaluator ev = new AstEvaluator();
                 FlNamespace os = (ev.Symtable.GetSymbol("os").Binding as FlNamespace);
-                (os["cwd"].Binding as FlCallable).Invoke(symboltable, new List<FlObject>() { new FlString(System.IO.Directory.GetParent(flString.Value).FullName) });
+                (os["cwd"].Binding as FlFunction).Invoke(symboltable, new List<FlObject>() { new FlString(System.IO.Directory.GetParent(flString.Value).FullName) });
                 ev.Process(ast);
                 symboltable.Import(ev.Symtable.GlobalScope);
             });

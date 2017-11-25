@@ -23,7 +23,7 @@ namespace Fl.Engine.Evaluators
                 FlObject result = fornode.Condition.Exec(evaluator);
                 if (result != null && result.ObjectType != BoolType.Value)
                     throw new AstWalkerException($"Cannot convert type {result.ObjectType} to {BoolType.Value}");
-                while (result == null || (result as FlBoolean).Value)
+                while (result == null || (result as FlBool).Value)
                 {
                     fornode.Body.Exec(evaluator);
                     if (evaluator.Symtable.MustBreak)

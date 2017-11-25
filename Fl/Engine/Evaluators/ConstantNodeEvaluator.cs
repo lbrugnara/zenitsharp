@@ -17,7 +17,7 @@ namespace Fl.Engine.Evaluators
         {
             string constname = constdec.Identifier.Value.ToString();
             FlObject init = constdec.Initializer.Exec(evaluator);
-            evaluator.Symtable.AddSymbol(constname, new Symbol(StorageType.Constant), init);
+            evaluator.Symtable.AddSymbol(constname, new Symbol(SymbolType.Constant), init);
             return init;
         }
     }

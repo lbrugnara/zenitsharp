@@ -67,14 +67,18 @@ namespace Fl
         LeftBracket,
         RightBracket,
         
+        // Punctuation
         Semicolon,
         Comma,
         Dot,
         RightArrow,
-        Function,
-        Namespace,
         Question,
         QuestionQuestion,
         Colon,
+
+        // More keywords
+        Function,
+        Namespace,
+        New
     }
 }

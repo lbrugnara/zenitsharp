@@ -46,7 +46,8 @@ namespace Fl
             { "continue", TokenType.Continue },
             { "return", TokenType.Return },
             { "fn", TokenType.Function },
-            { "namespace", TokenType.Namespace }
+            { "namespace", TokenType.Namespace },
+            { "new", TokenType.New }
         };
 
         public Lexer(string source)

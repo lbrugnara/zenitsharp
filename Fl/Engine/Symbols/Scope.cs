@@ -96,7 +96,7 @@ namespace Fl.Engine.Symbols
             foreach (var k in keys)
             {
                 var s = scope._Map[k];
-                if (s.Binding.ObjectType == FunctionType.Value && s.Storage == StorageType.Constant)
+                if (s.Binding.ObjectType == FuncType.Value && s.SymbolType == SymbolType.Constant)
                     continue;
                 _Map[k] = s;
             }

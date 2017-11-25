@@ -89,10 +89,10 @@ namespace Fl.Engine.Evaluators
             FlObject rightres = binary.Right.Exec(evaluator);
 
             if (leftres.ObjectType == NullType.Value && rightres.ObjectType == NullType.Value)
-                return new FlBoolean(true);
+                return new FlBool(true);
 
             FlOperand leftoperand = new FlOperand(leftres);
-            FlBoolean equals = leftoperand.Equals(rightres);
+            FlBool equals = leftoperand.Equals(rightres);
 
             switch (binary.Operator.Type)
             {
@@ -130,15 +130,15 @@ namespace Fl.Engine.Evaluators
             FlObject leftres = binary.Left.Exec(evaluator);
             FlObject rightres = binary.Right.Exec(evaluator);
 
-            bool l = leftres.ObjectType != BoolType.Value ? leftres.RawValue != null : (leftres as FlBoolean).Value;
-            bool r = rightres.ObjectType != BoolType.Value ? rightres.RawValue != null : (rightres as FlBoolean).Value;
+            bool l = leftres.ObjectType != BoolType.Value ? leftres.RawValue != null : (leftres as FlBool).Value;
+            bool r = rightres.ObjectType != BoolType.Value ? rightres.RawValue != null : (rightres as FlBool).Value;
 
             switch (binary.Operator.Type)
             {
                 case TokenType.And:
-                    return new FlBoolean(l && r);
+                    return new FlBool(l && r);
                 case TokenType.Or:
-                    return new FlBoolean(l || r);
+                    return new FlBool(l || r);
             }
             throw new AstWalkerException($"Unhandled operator {binary.Operator.Type}");
         }

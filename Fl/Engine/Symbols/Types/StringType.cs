@@ -11,9 +11,8 @@ namespace Fl.Engine.Symbols.Types
 
         public static StringType Value => _Instance != null ? _Instance : (_Instance = new StringType());
 
-        public override string ToString()
-        {
-            return "string";
-        }
+        public override string Name => "string";
+
+        public override string ClassName => "string";
     }
 }

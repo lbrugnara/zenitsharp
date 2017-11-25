@@ -11,9 +11,8 @@ namespace Fl.Engine.Symbols.Types
 
         public static DecimalType Value => _Instance != null ? _Instance : (_Instance = new DecimalType());
 
-        public override string ToString()
-        {
-            return "decimal";
-        }
+        public override string Name => "decimal";
+
+        public override string ClassName => "decimal";
     }
 }

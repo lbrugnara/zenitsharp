@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    public class Func : FlCallable
+    public class Func : FlFunction
     {
         private static int UnboundLambda = 1;
         private AstEvaluator _Evaluator;
@@ -20,10 +20,12 @@ namespace Fl.Engine.Evaluators
         private List<AstNode> _Body;
         private Scope _Env;
         private string _Name;
+        protected override Func<FlObject, List<FlObject>, FlObject> Body { get; }
 
         public Func(AstEvaluator eval, Token name, AstParametersNode parameters, List<AstNode> body, Scope env = null)
-            : base ()
+            : base (name.Value.ToString(), null, null)
         {
+            Body = (self, args) => InternalInvoke(eval.Symtable, args);
             _Evaluator = eval;
             _Identifier = name;
             _Params = parameters;
@@ -43,19 +45,19 @@ namespace Fl.Engine.Evaluators
             return new Func(_Evaluator, _Identifier, _Params, _Body, _Env);
         }
 
-        public override FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
+        protected FlObject InternalInvoke(SymbolTable symboltable, List<FlObject> args)
         {
             if (args.Count != _Params.Parameters.Count)
                 throw new AstWalkerException($"Function {_Identifier.Value} expects {_Params.Parameters.Count} arguments but received {args.Count}");
 
-            symboltable.NewScope(ScopeType.Function, _Env);
+            //symboltable.NewScope(ScopeType.Function, _Env);
             
             for (int i=0; i < _Params.Parameters.Count; i++)
             {
                 symboltable.AddSymbol(
                     _Params.Parameters[i].Value.ToString(),
                     // by-value
-                    new Symbol(StorageType.Variable),
+                    new Symbol(SymbolType.Variable),
                     args[i].Clone()
                 );
             }
@@ -71,7 +73,7 @@ namespace Fl.Engine.Evaluators
             }
             finally
             {
-                symboltable.DestroyScope();
+                //symboltable.DestroyScope();
             }
             if (_Identifier.Type == TokenType.RightArrow && ret != null)
                 return ret;
@@ -94,7 +96,7 @@ namespace Fl.Engine.Evaluators
             }
             else
             {
-                evaluator.Symtable.AddSymbol(func.Name, new Symbol(StorageType.Variable), func);
+                evaluator.Symtable.AddSymbol(func.Name, new Symbol(SymbolType.Variable), func);
             }
             return func;
         }

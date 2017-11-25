@@ -22,7 +22,7 @@ namespace Fl.Engine.Evaluators
                 FlObject result = wnode.Condition.Exec(evaluator);
                 if (result.ObjectType != BoolType.Value)
                     throw new AstWalkerException($"Cannot convert type {result.ObjectType} to {BoolType.Value}");
-                var boolResult = (result as FlBoolean);
+                var boolResult = (result as FlBool);
                 while (boolResult.Value)
                 {
                     wnode.Body.Exec(evaluator);
@@ -30,7 +30,7 @@ namespace Fl.Engine.Evaluators
                         break;
                     if (evaluator.Symtable.MustContinue)
                         evaluator.Symtable.DoContinue();
-                    boolResult = wnode.Condition.Exec(evaluator) as FlBoolean;
+                    boolResult = wnode.Condition.Exec(evaluator) as FlBool;
                 }
             }
             finally

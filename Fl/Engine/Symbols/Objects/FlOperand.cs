@@ -16,21 +16,21 @@ namespace Fl.Engine.Symbols.Objects
         }
 
         #region Equality
-        public FlBoolean Equals(FlObject n)
+        public FlBool Equals(FlObject n)
         {
             if (_Ref.ObjectType == IntegerType.Value && n.ObjectType == IntegerType.Value)
             {
-                return new FlBoolean((int)_Ref.RawValue == (int)n.RawValue);
+                return new FlBool((int)_Ref.RawValue == (int)n.RawValue);
             }
             else if (_Ref.ObjectType == DoubleType.Value && n.ObjectType == DoubleType.Value)
             {
-                return new FlBoolean((double)_Ref.RawValue == (double)n.RawValue);
+                return new FlBool((double)_Ref.RawValue == (double)n.RawValue);
             }
             else if (_Ref.ObjectType == DecimalType.Value && n.ObjectType == DecimalType.Value)
             {
-                return new FlBoolean((decimal)_Ref.RawValue == (decimal)n.RawValue);
+                return new FlBool((decimal)_Ref.RawValue == (decimal)n.RawValue);
             }
-            return new FlBoolean(_Ref.RawValue.Equals(n.RawValue));
+            return new FlBool(_Ref.RawValue.Equals(n.RawValue));
         }
         #endregion
 
@@ -300,67 +300,67 @@ namespace Fl.Engine.Symbols.Objects
         #endregion
 
         #region Inequality
-        public FlBoolean GreatherThan(FlObject n)
+        public FlBool GreatherThan(FlObject n)
         {
             if (_Ref.ObjectType == DecimalType.Value || n.ObjectType == DecimalType.Value)
-                return new FlBoolean((decimal)_Ref.RawValue > (decimal)n.RawValue);
+                return new FlBool((decimal)_Ref.RawValue > (decimal)n.RawValue);
 
             if (_Ref.ObjectType == DoubleType.Value || n.ObjectType == DoubleType.Value)
-                return new FlBoolean((double)_Ref.RawValue > (double)n.RawValue);
+                return new FlBool((double)_Ref.RawValue > (double)n.RawValue);
 
             if ((_Ref.ObjectType == IntegerType.Value || n.ObjectType == IntegerType.Value))
-                return new FlBoolean((int)_Ref.RawValue > (int)n.RawValue);
+                return new FlBool((int)_Ref.RawValue > (int)n.RawValue);
 
             if (_Ref.ObjectType == StringType.Value && n.ObjectType == StringType.Value)
-                return new FlBoolean((_Ref as FlString).Value.CompareTo((n as FlString).Value) > 0);
+                return new FlBool((_Ref as FlString).Value.CompareTo((n as FlString).Value) > 0);
             throw new Exception($"Operator '>' cannot be applied to operands of type '{n.ObjectType}' and '{_Ref.ObjectType}'");
         }
 
-        public FlBoolean GreatherThanEquals(FlObject n)
+        public FlBool GreatherThanEquals(FlObject n)
         {
             if (_Ref.ObjectType == DecimalType.Value || n.ObjectType == DecimalType.Value)
-                return new FlBoolean((decimal)_Ref.RawValue >= (decimal)n.RawValue);
+                return new FlBool((decimal)_Ref.RawValue >= (decimal)n.RawValue);
 
             if (_Ref.ObjectType == DoubleType.Value || n.ObjectType == DoubleType.Value)
-                return new FlBoolean((double)_Ref.RawValue >= (double)n.RawValue);
+                return new FlBool((double)_Ref.RawValue >= (double)n.RawValue);
 
             if ((_Ref.ObjectType == IntegerType.Value || n.ObjectType == IntegerType.Value))
-                return new FlBoolean((int)_Ref.RawValue >= (int)n.RawValue);
+                return new FlBool((int)_Ref.RawValue >= (int)n.RawValue);
 
             if (_Ref.ObjectType == StringType.Value && n.ObjectType == StringType.Value)
-                return new FlBoolean((_Ref as FlString).Value.CompareTo((n as FlString).Value) >= 0);
+                return new FlBool((_Ref as FlString).Value.CompareTo((n as FlString).Value) >= 0);
             throw new Exception($"Operator '>' cannot be applied to operands of type '{n.ObjectType}' and '{_Ref.ObjectType}'");
         }
 
-        public FlBoolean LesserThan(FlObject n)
+        public FlBool LesserThan(FlObject n)
         {
             if (_Ref.ObjectType == DecimalType.Value || n.ObjectType == DecimalType.Value)
-                return new FlBoolean((decimal)_Ref.RawValue < (decimal)n.RawValue);
+                return new FlBool((decimal)_Ref.RawValue < (decimal)n.RawValue);
 
             if (_Ref.ObjectType == DoubleType.Value || n.ObjectType == DoubleType.Value)
-                return new FlBoolean((double)_Ref.RawValue < (double)n.RawValue);
+                return new FlBool((double)_Ref.RawValue < (double)n.RawValue);
 
             if ((_Ref.ObjectType == IntegerType.Value || n.ObjectType == IntegerType.Value))
-                return new FlBoolean((int)_Ref.RawValue < (int)n.RawValue);
+                return new FlBool((int)_Ref.RawValue < (int)n.RawValue);
 
             if (_Ref.ObjectType == StringType.Value && n.ObjectType == StringType.Value)
-                return new FlBoolean((_Ref as FlString).Value.CompareTo((n as FlString).Value) < 0);
+                return new FlBool((_Ref as FlString).Value.CompareTo((n as FlString).Value) < 0);
             throw new Exception($"Operator '>' cannot be applied to operands of type '{n.ObjectType}' and '{_Ref.ObjectType}'");
         }
 
-        public FlBoolean LesserThanEquals(FlObject n)
+        public FlBool LesserThanEquals(FlObject n)
         {
             if (_Ref.ObjectType == DecimalType.Value || n.ObjectType == DecimalType.Value)
-                return new FlBoolean((decimal)_Ref.RawValue <= (decimal)n.RawValue);
+                return new FlBool((decimal)_Ref.RawValue <= (decimal)n.RawValue);
 
             if (_Ref.ObjectType == DoubleType.Value || n.ObjectType == DoubleType.Value)
-                return new FlBoolean((double)_Ref.RawValue <= (double)n.RawValue);
+                return new FlBool((double)_Ref.RawValue <= (double)n.RawValue);
 
             if ((_Ref.ObjectType == IntegerType.Value || n.ObjectType == IntegerType.Value))
-                return new FlBoolean((int)_Ref.RawValue <= (int)n.RawValue);
+                return new FlBool((int)_Ref.RawValue <= (int)n.RawValue);
 
             if (_Ref.ObjectType == StringType.Value && n.ObjectType == StringType.Value)
-                return new FlBoolean((_Ref as FlString).Value.CompareTo((n as FlString).Value) <= 0);
+                return new FlBool((_Ref as FlString).Value.CompareTo((n as FlString).Value) <= 0);
             throw new Exception($"Operator '>' cannot be applied to operands of type '{n.ObjectType}' and '{_Ref.ObjectType}'");
         }
         #endregion

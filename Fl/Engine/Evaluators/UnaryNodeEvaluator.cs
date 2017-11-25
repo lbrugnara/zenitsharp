@@ -25,7 +25,7 @@ namespace Fl.Engine.Evaluators
                 case TokenType.Not:
                     if (result.ObjectType != BoolType.Value)
                         throw new AstWalkerException($"Operator '!' cannot be applied to operand of type {result.ObjectType}");
-                    result = new FlBoolean(!(result as FlBoolean).Value);
+                    result = new FlBool(!(result as FlBool).Value);
                     break;
                 case TokenType.Minus:
                     FlOperand operand = new FlOperand(result);

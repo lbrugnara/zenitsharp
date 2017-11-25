@@ -13,5 +13,10 @@ namespace Fl.Parser.Ast
         {
             Primary = t;
         }
+
+        public override string ToString()
+        {
+            return Primary.Value.ToString();
+        }
     }
 }

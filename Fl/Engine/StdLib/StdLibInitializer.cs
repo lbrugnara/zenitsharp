@@ -15,31 +15,31 @@ namespace Fl.Engine.StdLib
         public static void Import(Scope scope)
         {
             // Namespace: global (built-in)
-            scope.AddSymbol("import", new Symbol(StorageType.Constant), new BuiltIn.ImportFunction());
-            scope.AddSymbol("using", new Symbol(StorageType.Constant), new BuiltIn.UsingFunction());
-            scope.AddSymbol("int", new Symbol(StorageType.Constant), new BuiltIn.CastFunction("int", IntegerType.Value));
-            scope.AddSymbol("double", new Symbol(StorageType.Constant), new BuiltIn.CastFunction("double", DoubleType.Value));
-            scope.AddSymbol("decimal", new Symbol(StorageType.Constant), new BuiltIn.CastFunction("decimal", DecimalType.Value));
-            scope.AddSymbol("str", new Symbol(StorageType.Constant), new BuiltIn.CastFunction("str", StringType.Value));
+            scope.AddSymbol("import", new Symbol(SymbolType.Constant), new builtin.ImportFunction());
+            scope.AddSymbol("using", new Symbol(SymbolType.Constant), new builtin.UsingFunction());
+            scope.AddSymbol("int", new Symbol(SymbolType.Constant), builtin.types.IntegerClass.Build());
+            scope.AddSymbol("bool", new Symbol(SymbolType.Constant), builtin.types.BoolClass.Build());
+            scope.AddSymbol("Func", new Symbol(SymbolType.Constant), builtin.types.FuncClass.Build());
+
 
             // Namespace: std
             FlNamespace std = new FlNamespace("std");
-            scope.AddSymbol(std.Name, new Symbol(StorageType.Constant), std);
+            scope.AddSymbol(std.Name, new Symbol(SymbolType.Constant), std);
 
             // Namespace: std.lang
             FlNamespace lang = new FlNamespace("lang", std);
-            lang.AddSymbol("debug", new Symbol(StorageType.Constant), new std.lang.DebugFunction());
-            lang.AddSymbol("version", new Symbol(StorageType.Constant), new FlString("alpha 0.0.1"));
+            lang.AddSymbol("debug", new Symbol(SymbolType.Constant), new std.lang.DebugFunction());
+            lang.AddSymbol("version", new Symbol(SymbolType.Constant), new FlString("alpha 0.0.1"));
 
             // Namespace: std.io
             FlNamespace io = new FlNamespace("io", std);
-            io.AddSymbol("print", new Symbol(StorageType.Constant), new std.io.PrintFunction());
-            io.AddSymbol("println", new Symbol(StorageType.Constant), new std.io.PrintLnFunction());
+            io.AddSymbol("print", new Symbol(SymbolType.Constant), new std.io.PrintFunction());
+            io.AddSymbol("println", new Symbol(SymbolType.Constant), new std.io.PrintLnFunction());
 
             // Namespace: os
             FlNamespace os = new FlNamespace("os");
-            scope.AddSymbol(os.Name, new Symbol(StorageType.Constant), os);
-            os.AddSymbol("cwd", new Symbol(StorageType.Constant), new os.CwdFunction());
+            scope.AddSymbol(os.Name, new Symbol(SymbolType.Constant), os);
+            os.AddSymbol("cwd", new Symbol(SymbolType.Constant), new os.CwdFunction());
         }
     }
 }

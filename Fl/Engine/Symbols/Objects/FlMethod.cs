@@ -4,27 +4,27 @@
 using Fl.Engine.Evaluators;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Fl.Engine.Symbols.Types;
+using Fl.Engine.Symbols.Exceptions;
 
 namespace Fl.Engine.Symbols.Objects
 {
-    public class FlMethod: FlCallable
+    public class FlMethod: FlFunction
     {
-        private string _Name;
-        private FlObject _This;
-        private Func<FlObject, List<FlObject>, FlObject> _Body;
-
-        public FlMethod(string name, FlObject @this, Func<FlObject, List<FlObject>, FlObject> body)
+        public FlMethod(string name, Func<FlObject, List<FlObject>, FlObject> body)
+            : base(name, body)
         {
-            _Name = name;
-            _This = @this;
-            _Body = body;
         }
-
-        public override string Name => _Name;
 
         public override FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
         {
-            return _Body(_This, args);
+            return Body(This ?? throw new InvocationException($"Cannot invoke unbound method {Name}"), args);
+        }
+
+        public override FlObject Invoke(List<FlObject> args)
+        {
+            throw new InvocationException($"Cannot invoke unbound method {Name}");
         }
     }
 }

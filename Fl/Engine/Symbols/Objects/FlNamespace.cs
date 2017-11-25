@@ -29,7 +29,7 @@ namespace Fl.Engine.Symbols.Objects
             _Parent = parent;            
             if (_Parent != null)
             {
-                _Parent.AddSymbol(_Name, new Symbol(StorageType.Constant), this);
+                _Parent.AddSymbol(_Name, new Symbol(SymbolType.Constant), this);
             }
         }
 

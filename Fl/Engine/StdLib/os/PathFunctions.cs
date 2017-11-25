@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Fl.Engine.StdLib.os
 {
-    public class CwdFunction : FlCallable
+    public class CwdFunction : FlFunction
     {
         public override string Name => "cwd";
 

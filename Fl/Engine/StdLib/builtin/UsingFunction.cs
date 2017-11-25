@@ -8,9 +8,9 @@ using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System.Collections.Generic;
 
-namespace Fl.Engine.StdLib.BuiltIn
+namespace Fl.Engine.StdLib.builtin
 {
-    public class UsingFunction : FlCallable
+    public class UsingFunction : FlFunction
     {
         public override string Name => "using";
 

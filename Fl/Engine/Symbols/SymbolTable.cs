@@ -208,7 +208,7 @@ namespace Fl.Engine.Symbols
                 {
                     if (scp.ScopeType == ScopeType.Function)
                     {
-                        scp.AddSymbol(Scope.FlReturnKey, new Symbol(StorageType.Constant), value);
+                        scp.AddSymbol(Scope.FlReturnKey, new Symbol(SymbolType.Constant), value);
                         return;
                     }
                     scp = _Scopes.ElementAtOrDefault(--i);

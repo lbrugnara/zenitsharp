@@ -10,25 +10,19 @@ using System.Text;
 
 namespace Fl.Engine.StdLib.std.io
 {
-    public class PrintFunction : FlCallable
+    public class PrintFunction : FlFunction
     {
-        public override string Name => "print";
-
-        public override FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
+        public PrintFunction()
+            : base("print", (args) => { args.ForEach(a => System.Console.Write(a)); return FlNull.Value; })
         {
-            args.ForEach(a => System.Console.Write(a));
-            return null;
         }
     }
 
-    public class PrintLnFunction : FlCallable
+    public class PrintLnFunction : FlFunction
     {
-        public override string Name => "println";
-
-        public override FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
+        public PrintLnFunction()
+            : base("println", (args) => { args.ForEach(a => System.Console.WriteLine(a)); return FlNull.Value; })
         {
-            args.ForEach(a => System.Console.WriteLine(a));
-            return null;
         }
     }
 }

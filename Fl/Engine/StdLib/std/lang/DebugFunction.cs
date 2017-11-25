@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Fl.Engine.StdLib.std.lang
 {
-    public class DebugFunction : FlCallable
+    public class DebugFunction : FlFunction
     {
         public override string Name => "debug";
 

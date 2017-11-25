@@ -6,6 +6,12 @@ namespace Fl.Engine.Symbols
 {
     public enum StorageType
     {
+        Auto,
+        Static
+    }
+
+    public enum SymbolType
+    {
         Variable,
         Constant,
         Literal

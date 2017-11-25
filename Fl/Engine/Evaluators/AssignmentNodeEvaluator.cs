@@ -28,9 +28,9 @@ namespace Fl.Engine.Evaluators
                 symbol = walker.Symtable.GetSymbol(idname);
             }
 
-            if (symbol.Storage == StorageType.Constant)
+            if (symbol.SymbolType == SymbolType.Constant)
             {
-                if (symbol.Binding.ObjectType == FunctionType.Value)
+                if (symbol.Binding.ObjectType == FuncType.Value)
                     throw new AstWalkerException($"Left-hand side of an assignment must be a variable. '{idname}' is a function");
                 if (symbol.Binding.ObjectType == NamespaceType.Value)
                     throw new AstWalkerException($"Left-hand side of an assignment must be a variable. '{idname}' is a namespace");
