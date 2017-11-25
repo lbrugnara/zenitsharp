@@ -15,7 +15,7 @@ namespace Fl.Engine.Symbols.Objects
         private Action<FlObject, List<FlObject>> _Body;
 
         public FlConstructor(int paramsCount, Action<FlObject, List<FlObject>> body)
-            : base("constructor", (self, args) => { body(self, args); return FlNull.Value; })
+            : base("constructor", (self, args) => { body(self, args); return self; })
         {
             _Body = body;
             _ParamsCount = paramsCount;

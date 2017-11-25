@@ -50,13 +50,12 @@ namespace Fl.Engine.Evaluators
                 throw new AstWalkerException($"Operator '{binary.Operator.Type}' cannot be applied to operands of type '{leftres.ObjectType}' and '{rightres.ObjectType}'");
             }
 
-            FlOperand leftoperand = new FlOperand(leftres);
             switch (binary.Operator.Type)
             {
                 case TokenType.Multiplication:
-                    return leftoperand.Multiply(rightres);
+                    return leftres.Multiply(rightres);
                 case TokenType.Division:
-                    return leftoperand.Divide(rightres);
+                    return leftres.Divide(rightres);
             }
             throw new AstWalkerException($"Unhandled operator {binary.Operator.Type}");
         }
@@ -72,13 +71,12 @@ namespace Fl.Engine.Evaluators
                     throw new AstWalkerException($"Operator '{binary.Operator.Type}' cannot be applied to operands of type '{leftres.ObjectType}' and '{rightres.ObjectType}'");
             }
 
-            FlOperand leftoperand = new FlOperand(leftres);
             switch (binary.Operator.Type)
             {
                 case TokenType.Addition:
-                    return leftoperand.Add(rightres);
+                    return leftres.Add(rightres);
                 case TokenType.Minus:
-                    return leftoperand.Substract(rightres);
+                    return leftres.Substract(rightres);
             }
             throw new AstWalkerException($"Unhandled operator {binary.Operator.Type}");
         }
@@ -91,8 +89,7 @@ namespace Fl.Engine.Evaluators
             if (leftres.ObjectType == NullType.Value && rightres.ObjectType == NullType.Value)
                 return new FlBool(true);
 
-            FlOperand leftoperand = new FlOperand(leftres);
-            FlBool equals = leftoperand.Equals(rightres);
+            FlBool equals = leftres.Equals(rightres);
 
             switch (binary.Operator.Type)
             {
@@ -110,17 +107,16 @@ namespace Fl.Engine.Evaluators
             FlObject leftres = binary.Left.Exec(evaluator);
             FlObject rightres = binary.Right.Exec(evaluator);
 
-            FlOperand leftoperand = new FlOperand(leftres);
             switch (binary.Operator.Type)
             {
                 case TokenType.GreatThan:
-                    return leftoperand.GreatherThan(rightres);
+                    return leftres.GreatherThan(rightres);
                 case TokenType.GreatThanEqual:
-                    return leftoperand.GreatherThanEquals(rightres);
+                    return leftres.GreatherThanEquals(rightres);
                 case TokenType.LessThan:
-                    return leftoperand.LesserThan(rightres);
+                    return leftres.LesserThan(rightres);
                 case TokenType.LessThanEqual:
-                    return leftoperand.LesserThanEquals(rightres);
+                    return leftres.LesserThanEquals(rightres);
             }
             throw new AstWalkerException($"Operator '{binary.Operator.Type}' cannot be applied to operands of type '{leftres.ObjectType}' and '{rightres.ObjectType}'");
         }

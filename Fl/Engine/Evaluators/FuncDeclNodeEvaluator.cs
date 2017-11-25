@@ -19,11 +19,10 @@ namespace Fl.Engine.Evaluators
         private AstParametersNode _Params;
         private List<AstNode> _Body;
         private Scope _Env;
-        private string _Name;
         protected override Func<FlObject, List<FlObject>, FlObject> Body { get; }
 
         public Func(AstEvaluator eval, Token name, AstParametersNode parameters, List<AstNode> body, Scope env = null)
-            : base (name.Value.ToString(), null, null)
+            : base (name.Type == TokenType.RightArrow ? null : name.Value.ToString(), null, null)
         {
             Body = (self, args) => InternalInvoke(eval.Symtable, args);
             _Evaluator = eval;
@@ -31,10 +30,7 @@ namespace Fl.Engine.Evaluators
             _Params = parameters;
             _Body = body;
             _Env = env;
-            _Name = _Identifier.Type == TokenType.RightArrow ? $"<lambda@{{{UnboundLambda++}}}>" : _Identifier.Value.ToString();
         }
-
-        public override string Name => _Name;
 
         public bool IsLambda => _Identifier.Type == TokenType.RightArrow;
 
@@ -50,8 +46,6 @@ namespace Fl.Engine.Evaluators
             if (args.Count != _Params.Parameters.Count)
                 throw new AstWalkerException($"Function {_Identifier.Value} expects {_Params.Parameters.Count} arguments but received {args.Count}");
 
-            //symboltable.NewScope(ScopeType.Function, _Env);
-            
             for (int i=0; i < _Params.Parameters.Count; i++)
             {
                 symboltable.AddSymbol(
@@ -71,9 +65,9 @@ namespace Fl.Engine.Evaluators
                         return symboltable.ReturnValue;
                 }
             }
-            finally
+            catch
             {
-                //symboltable.DestroyScope();
+
             }
             if (_Identifier.Type == TokenType.RightArrow && ret != null)
                 return ret;

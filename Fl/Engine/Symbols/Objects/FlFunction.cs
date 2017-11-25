@@ -60,6 +60,13 @@ namespace Fl.Engine.Symbols.Objects
             _Body = body;
         }
 
+        public void CopyFrom(FlFunction f)
+        {
+            _Body = f.Body;
+            _This = f.This;
+            _Name = f.Name;
+        }
+
         protected virtual FlObject This => _This;
 
         protected virtual Func<FlObject, List<FlObject>, FlObject> Body => _Body;
@@ -95,6 +102,8 @@ namespace Fl.Engine.Symbols.Objects
             }
             throw new CastException($"Cannot convert type {ObjectType} to {type}");
         }
+
+        public static Func<FlFunction> Activator => () => new FlFunction();
 
         public virtual FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
         {

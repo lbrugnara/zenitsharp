@@ -21,7 +21,7 @@ namespace Fl.Engine.StdLib.builtin.types
             Func<FlObject> activator = () => new FlInteger(0);
 
             // Constructors
-            constructors.Add(new FlConstructor(1, (self, args) => new FlOperand(self).Assign(args[0])));
+            constructors.Add(new FlConstructor(1, (self, args) => self.Assign(args[0])));
 
 
             // Static Constructor

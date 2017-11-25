@@ -45,23 +45,21 @@ namespace Fl.Engine.Evaluators
                     throw new AstWalkerException($"Operator '{node.AssignmentOp.Value}' cannot be applied to operands of type '{symbol.ObjectType}' and '{assignmentResult.ObjectType}'");
             }
 
-            FlOperand leftoperand = new FlOperand(symbol.Binding);
-
             switch (node.AssignmentOp.Type)
             {                
                 case TokenType.IncrementAndAssign:
-                    leftoperand.AddAndAssign(assignmentResult);
+                    symbol.Binding.AddAndAssign(assignmentResult);
                     return symbol.Binding.Clone();
 
                 case TokenType.DecrementAndAssign:
-                    leftoperand.Substract(assignmentResult);
+                    symbol.Binding.SubstractAndAssign(assignmentResult);
                     return symbol.Binding.Clone();
 
                 case TokenType.MultAndAssign:
-                    leftoperand.MultiplyAndAssing(assignmentResult);
+                    symbol.Binding.MultiplyAndAssing(assignmentResult);
                     return symbol.Binding.Clone();
                 case TokenType.DivideAndAssign:
-                    leftoperand.DivideAndAssing(assignmentResult);
+                    symbol.Binding.DivideAndAssing(assignmentResult);
                     return symbol.Binding.Clone();
 
                 case TokenType.Assignment:

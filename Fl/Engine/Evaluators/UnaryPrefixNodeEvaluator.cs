@@ -22,13 +22,12 @@ namespace Fl.Engine.Evaluators
             if (symbol == null || symbol.SymbolType != SymbolType.Variable)
                 throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
 
-            FlOperand symboloperand = new FlOperand(symbolValue);
             switch (unary.Operator.Type)
             {
                 case TokenType.Increment:
-                    return symboloperand.PreIncrement();
+                    return symbolValue.PreIncrement();
                 case TokenType.Decrement:
-                    return symboloperand.PreDecrement();
+                    return symbolValue.PreDecrement();
             }
             throw new AstWalkerException("Unknown error");
         }

@@ -40,5 +40,24 @@ namespace Fl.Engine.Symbols.Objects
             }
             throw new CastException($"Cannot convert type {ObjectType} to {type}");
         }
+
+        #region Assignment Operators
+
+        public override void Assign(FlObject n)
+        {
+            if (n.ObjectType == BoolType.Value)
+            {
+                this.Value = (n as FlBool).Value;
+                return;
+            }
+            base.Assign(n);
+        }
+
+        #endregion
+
+        public override FlObject Not()
+        {
+            return new FlBool(!this.Value);
+        }
     }
 }

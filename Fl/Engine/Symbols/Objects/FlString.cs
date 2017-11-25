@@ -41,5 +41,72 @@ namespace Fl.Engine.Symbols.Objects
         {
             return $"\"{RawValue}\" ({ObjectType})";
         }
+
+        #region Assignment Operators
+
+        public override void Assign(FlObject n)
+        {
+            if (n.ObjectType == StringType.Value)
+            {
+                this.Value = (n as FlString).Value;
+                return;
+            }
+            base.Assign(n);
+        }
+
+        #endregion
+
+        #region Arithmetics Operators
+
+        public override FlObject Add(FlObject n)
+        {
+            if (n.ObjectType == StringType.Value)
+            {
+                return new FlString(this.RawValue.ToString() + n.RawValue.ToString());
+            }
+            return base.Add(n);
+        }
+        
+        public override void AddAndAssign(FlObject n)
+        {
+            if (n.ObjectType == StringType.Value)
+            {
+                this.Value += (n as FlString).Value;
+                return;
+            }
+            base.Add(n);
+        }
+        #endregion
+
+        #region Logical Operators
+        
+        public override FlBool GreatherThan(FlObject n)
+        {
+            if (n.ObjectType == StringType.Value)
+                return new FlBool(this.Value.CompareTo((n as FlString).Value) > 0);
+            return base.GreatherThan(n);
+        }
+
+        public override FlBool GreatherThanEquals(FlObject n)
+        {
+            if (n.ObjectType == StringType.Value)
+                return new FlBool(this.Value.CompareTo((n as FlString).Value) >= 0);
+            return base.GreatherThanEquals(n);
+        }
+
+        public override FlBool LesserThan(FlObject n)
+        {
+            if (n.ObjectType == StringType.Value)
+                return new FlBool(this.Value.CompareTo((n as FlString).Value) < 0);
+            return base.LesserThan(n);
+        }
+
+        public override FlBool LesserThanEquals(FlObject n)
+        {
+            if (n.ObjectType == StringType.Value)
+                return new FlBool(this.Value.CompareTo((n as FlString).Value) <= 0);
+            return base.LesserThanEquals(n);
+        }
+        #endregion
     }
 }

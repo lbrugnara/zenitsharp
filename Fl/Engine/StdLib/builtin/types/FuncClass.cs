@@ -17,7 +17,16 @@ namespace Fl.Engine.StdLib.builtin.types
             Dictionary<string, Symbol> staticMethods = new Dictionary<string, Symbol>();
             Dictionary<string, Symbol> staticProperties = new Dictionary<string, Symbol>();
 
-            Func<FlObject> activator = () => FlNull.Value;
+            // Activator
+            Func<FlObject> activator = () => FlFunction.Activator.Invoke() as FlObject;
+
+            // Constructors
+            constructors.Add(new FlConstructor(1, (self, args) =>
+            {
+                var f = (self as FlFunction);
+                var f2 = (args[0] as FlFunction);
+                f.CopyFrom(f2);
+            }));
 
             // Instance Methods
             var str = new Symbol(SymbolType.Constant);
