@@ -18,7 +18,10 @@ namespace Fl.Engine.StdLib
             scope.AddSymbol("import", new Symbol(SymbolType.Constant), new builtin.ImportFunction());
             scope.AddSymbol("using", new Symbol(SymbolType.Constant), new builtin.UsingFunction());
             scope.AddSymbol("int", new Symbol(SymbolType.Constant), builtin.types.IntegerClass.Build());
+            scope.AddSymbol("double", new Symbol(SymbolType.Constant), builtin.types.DoubleClass.Build());
+            scope.AddSymbol("decimal", new Symbol(SymbolType.Constant), builtin.types.DecimalClass.Build());
             scope.AddSymbol("bool", new Symbol(SymbolType.Constant), builtin.types.BoolClass.Build());
+            scope.AddSymbol("string", new Symbol(SymbolType.Constant), builtin.types.StringClass.Build());
             scope.AddSymbol("Func", new Symbol(SymbolType.Constant), builtin.types.FuncClass.Build());
 
 

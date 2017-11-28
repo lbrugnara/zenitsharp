@@ -9,13 +9,13 @@ namespace Fl.Parser.Ast
 {
     public class AstVariableNode : AstNode
     {
-        public AstVariableTypeNode Type { get; }
+        public AstVariableTypeNode VarType { get; }
         public Token Identifier { get; }
         public AstNode Initializer { get; }
 
         public AstVariableNode(AstVariableTypeNode variableType, Token identifier, AstNode initializer)
         {
-            Type = variableType;
+            VarType = variableType;
             Identifier = identifier;
             Initializer = initializer;
         }

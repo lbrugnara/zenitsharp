@@ -30,7 +30,6 @@ namespace Fl.Engine.StdLib.builtin
                 FlNamespace os = (ev.Symtable.GetSymbol("os").Binding as FlNamespace);
                 (os["cwd"].Binding as FlFunction).Invoke(symboltable, new List<FlObject>() { new FlString(System.IO.Directory.GetParent(flString.Value).FullName) });
                 ev.Process(ast);
-                symboltable.Import(ev.Symtable.GlobalScope);
             });
             return null;
         }

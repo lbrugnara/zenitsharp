@@ -23,13 +23,17 @@ namespace Fl.Engine.Symbols
         /// </summary>
         private List<Scope> _Scopes;
 
-        public SymbolTable()
+        private SymbolTable()
         {
             _Scopes = new List<Scope>();
             _Global = new Scope(ScopeType.Common);
             // Initialize the global scope with the standard lib
             StdLibInitializer.Import(CurrentScope);
         }
+
+        private static SymbolTable _Instance;
+
+        public static SymbolTable Instance => (_Instance == null ? (_Instance = new SymbolTable()) : _Instance);
 
         /// <summary>
         /// Returns the current scope in the chained scope list or the global scope
@@ -156,11 +160,6 @@ namespace Fl.Engine.Symbols
                 scp = _Scopes.ElementAtOrDefault(--i) ?? _Global;
             }
             return false;
-        }
-
-        public void Import(Scope s)
-        {
-            CurrentScope.Import(s);
         }
 
         public void Using(FlNamespace ns)

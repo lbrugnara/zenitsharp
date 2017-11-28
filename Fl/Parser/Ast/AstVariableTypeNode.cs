@@ -7,12 +7,12 @@ namespace Fl.Parser.Ast
 {
     public class AstVariableTypeNode : AstNode
     {
-        public Token Type { get; }
+        public Token TypeToken { get; }
         public List<Token> Dimensions { get; }
 
         public AstVariableTypeNode(Token type, List<Token> dimensions = null)
         {
-            Type = type;
+            TypeToken = type;
             Dimensions = dimensions;
         }
     }

@@ -1,4 +1,7 @@
-﻿using Fl.Engine.Symbols;
+﻿// Copyright (c) Leonardo Brugnara
+// Full copyright and license information in LICENSE file
+
+using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
 using System;
@@ -11,40 +14,37 @@ namespace Fl.Engine.StdLib.builtin.types
     {
         public static FlClass Build()
         {
-            List<FlConstructor> constructors = new List<FlConstructor>();
-            Dictionary<string, Symbol> methods = new Dictionary<string, Symbol>();
-            Dictionary<string, Symbol> properties = new Dictionary<string, Symbol>();
-            Dictionary<string, Symbol> staticMethods = new Dictionary<string, Symbol>();
-            Dictionary<string, Symbol> staticProperties = new Dictionary<string, Symbol>();
+            ClassDescriptor.Builder builder = new ClassDescriptor.Builder();
 
-            // Activator
-            Func<FlObject> activator = () => new FlBool(false);
+            builder
 
-            // Constructors
-            constructors.Add(new FlConstructor(1, (self, args) => (self as FlBool).Value = (args[0] as FlBool).Value));
+                // Class Name
+                .WithName("bool")
 
+                // Activator
+                .WithActivator(() => new FlBool(false))
 
-            // Static Constructor
-            FlFunction staticConstructor = new FlFunction("()", (args) => args[0].ConvertTo(BoolType.Value));
+                // Static constructor
+                .WithStaticConstructor((args) => args[0].ConvertTo(BoolType.Value))
 
-            // Static methods
-            var parse = new Symbol(SymbolType.Constant, StorageType.Static);
-            parse.DoBinding("bool", "Parse", new FlFunction("Parse", (args) =>
-            {
-                try { return args[0].ConvertTo(BoolType.Value); } catch { }
-                return FlNull.Value;
-            }));
-            staticMethods.Add(parse.Name, parse);
-            
-            // Static Properties
-             
-            // Instance Methods
-            var str = new Symbol(SymbolType.Constant);
-            str.DoBinding("bool", "Str", new FlMethod("Str", (self, args) => new FlString(self.RawValue.ToString())));
-            methods.Add(str.Name, str);
-            
+                // Constructors
+                // ...
+
+                // Static Methods
+                .WithStaticMethod("parse", (args) =>
+                {
+                    try { return args[0].ConvertTo(BoolType.Value); } catch { }
+                    return FlNull.Value;
+                })
+
+                // Static Properties
+                // ...
+
+                // Instance Methods
+                .WithMethod("str", (self, args) => new FlString(self.RawValue.ToString()));
+
             // Build
-            return new FlClass(new ClassDescriptor("bool", activator, constructors, methods, properties, staticConstructor, staticMethods, staticProperties));
+            return new FlClass(builder.Build());
         }
     }
 }

@@ -10,7 +10,7 @@ using System.Text;
 
 namespace Fl.Engine.StdLib.builtin.types
 {
-    public static class IntegerClass
+    public static class StringClass
     {
         public static FlClass Build()
         {
@@ -19,30 +19,26 @@ namespace Fl.Engine.StdLib.builtin.types
             builder
 
                 // Class Name
-                .WithName("int")
+                .WithName("string")
 
                 // Activator
-                .WithActivator(() => new FlInteger(0))
+                .WithActivator(() => new FlString(""))
 
                 // Static constructor
-                .WithStaticConstructor((args) => args[0].ConvertTo(IntegerType.Value))
+                .WithStaticConstructor((args) => args[0].ConvertTo(StringType.Value))
 
                 // Constructors
-                //...
+                .WithConstructor(new FlConstructor(1, (self, args) => self.Assign(args[0])))
 
                 // Static Methods
-                .WithStaticMethod("parse", (args) =>
-                {
-                    try { return args[0].ConvertTo(IntegerType.Value); } catch { }
-                    return FlNull.Value;
-                })
+                // ...
 
                 // Static Properties
-                .WithStaticProperty("MAX", SymbolType.Constant, new FlInteger(int.MaxValue))
-                .WithStaticProperty("MIN", SymbolType.Constant, new FlInteger(int.MinValue))
+                // ...
 
                 // Instance Methods
-                .WithMethod("str", (self, args) => new FlString(self.RawValue.ToString()));
+                .WithMethod("lower", (self, args) => new FlString(self.RawValue.ToString().ToLower()))
+                .WithMethod("upper", (self, args) => new FlString(self.RawValue.ToString().ToUpper()));
 
             // Build
             return new FlClass(builder.Build());

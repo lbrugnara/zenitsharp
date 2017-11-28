@@ -1,4 +1,7 @@
-﻿# Start
+﻿# Copyright (c) Leonardo Brugnara
+# Full copyright and license information in LICENSE file
+
+# Start
 
 program	-> declaration*
 
@@ -15,7 +18,7 @@ func_params -> IDENTIFIER ( "," IDENTIFIER )*
 
 variable_declaration -> variable_type IDENTIFIER ( "=" expression )? ";"
 
-variable_type -> VAR ( '[' ']' )?
+variable_type -> ( VAR | IDENTIFIER ( '[' ']' )* )
 
 constant_declaration -> CONST IDENTIFIER "=" expression ";"
 
@@ -52,7 +55,7 @@ for_statement -> "for" "(" for_initializer? ";" expression? ";" for_iterator? ")
 for_initializer -> for_declaration
 				| expression ( "," expression )*
 
-for_declaration -> VAR local_var_declaration ( "," local_var_declaration )*
+for_declaration -> variable_type local_var_declaration ( "," local_var_declaration )*
 
 local_var_declaration -> IDENTIFIER ( "=" expression )
 

@@ -12,7 +12,6 @@ namespace Fl.Engine.Evaluators
 {
     public class AstEvaluator : IAstWalker<FlObject>
     {
-        private SymbolTable _Symbols;
         private AstNodeEvaluator _AstNodeEvaluator;
         private UnaryNodeEvaluator _UnaryNodeEvaluator;
         private UnaryPrefixNodeEvaluator _UnaryPrefixNodeEvaluator;
@@ -37,7 +36,6 @@ namespace Fl.Engine.Evaluators
 
         public AstEvaluator()
         {
-            _Symbols = new SymbolTable();
             _AstNodeEvaluator = new AstNodeEvaluator();
             _UnaryNodeEvaluator = new UnaryNodeEvaluator();
             _UnaryPrefixNodeEvaluator = new UnaryPrefixNodeEvaluator();
@@ -61,7 +59,7 @@ namespace Fl.Engine.Evaluators
             _NullCoalescingNodeEvaluator = new NullCoalescingNodeEvaluator();
         }
 
-        public SymbolTable Symtable => _Symbols;
+        public SymbolTable Symtable => SymbolTable.Instance;
 
         public FlObject Process(AstNode node)
         {

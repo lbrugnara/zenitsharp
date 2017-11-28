@@ -92,10 +92,11 @@ namespace Fl.Engine.Symbols
 
         public void Import(Scope scope)
         {
-            var keys = scope._Map.Keys;
+            var map = new Dictionary<string, Symbol>(scope._Map);
+            var keys = map.Keys;
             foreach (var k in keys)
             {
-                var s = scope._Map[k];
+                var s = map[k];
                 if (s.Binding.ObjectType == FuncType.Value && s.SymbolType == SymbolType.Constant)
                     continue;
                 _Map[k] = s;

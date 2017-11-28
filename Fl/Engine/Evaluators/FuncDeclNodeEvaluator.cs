@@ -19,7 +19,7 @@ namespace Fl.Engine.Evaluators
         private AstParametersNode _Params;
         private List<AstNode> _Body;
         private Scope _Env;
-        protected override Func<FlObject, List<FlObject>, FlObject> Body { get; }
+        public override Func<FlObject, List<FlObject>, FlObject> Body { get; }
 
         public Func(AstEvaluator eval, Token name, AstParametersNode parameters, List<AstNode> body, Scope env = null)
             : base (name.Type == TokenType.RightArrow ? null : name.Value.ToString(), null, null)

@@ -27,7 +27,7 @@ namespace Fl.Engine.Symbols.Objects
         public FlFunction(string name, Func<List<FlObject>, FlObject> body)
         {
             _Name = name ?? "anonymous";
-            _This = null;
+            _This = FlNull.Value;
             _Body = (self, args) => body(args);
         }
 
@@ -41,7 +41,7 @@ namespace Fl.Engine.Symbols.Objects
         public FlFunction(string name, Func<FlObject, List<FlObject>, FlObject> body)
         {
             _Name = name ?? "anonymous";
-            _This = null;
+            _This = FlNull.Value;
             _Body = body;
         }
 
@@ -67,9 +67,9 @@ namespace Fl.Engine.Symbols.Objects
             _Name = f.Name;
         }
 
-        protected virtual FlObject This => _This;
+        public virtual FlObject This => _This;
 
-        protected virtual Func<FlObject, List<FlObject>, FlObject> Body => _Body;
+        public virtual Func<FlObject, List<FlObject>, FlObject> Body => _Body;
 
         public virtual string Name => _Name;
 

@@ -10,47 +10,41 @@ using System.Text;
 
 namespace Fl.Engine.StdLib.builtin.types
 {
-    public static class FuncClass
+    public static class DecimalClass
     {
+
+
         public static FlClass Build()
         {
             ClassDescriptor.Builder builder = new ClassDescriptor.Builder();
 
             builder
-
+                
                 // Class Name
-                .WithName("Func")
+                .WithName("decimal")
 
                 // Activator
-                .WithActivator(() => FlFunction.Activator.Invoke() as FlObject)
+                .WithActivator(() => new FlDecimal(0.0M))
 
                 // Static constructor
-                // ...
+                .WithStaticConstructor((args) => args[0].ConvertTo(DecimalType.Value))
 
                 // Constructors
-                .WithConstructor(new FlConstructor(1, (self, args) =>
-                {
-                    var f = (self as FlFunction);
-                    var f2 = (args[0] as FlFunction);
-                    f.CopyFrom(f2);
-                }))
-
+                // ...
 
                 // Static Methods
                 .WithStaticMethod("parse", (args) =>
                 {
-                    try { return args[0].ConvertTo(BoolType.Value); } catch { }
+                    try { return args[0].ConvertTo(DecimalType.Value); } catch { }
                     return FlNull.Value;
                 })
 
                 // Static Properties
-                // ...
-
+                .WithStaticProperty("MAX", SymbolType.Constant, new FlDecimal(decimal.MaxValue))
+                .WithStaticProperty("MIN", SymbolType.Constant, new FlDecimal(decimal.MinValue))
+                
                 // Instance Methods
-                .WithMethod("str", (self, args) => new FlString(self.RawValue.ToString()))
-                .WithMethod("invoke", (self, args) => (self as FlFunction).Invoke(args))
-                .WithMethod("bind", (self, args) => (self as FlFunction).Bind(args[0]))
-                .WithMethod("boundTo", (self, args) => (self as FlFunction).This);
+                .WithMethod("str", (self, args) => new FlString(self.RawValue.ToString()));
 
             // Build
             return new FlClass(builder.Build());

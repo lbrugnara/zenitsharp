@@ -165,6 +165,25 @@ namespace Fl.Parser
             return new AstDeclarationNode(statements);
         }
 
+        private bool IsVarDeclaration()
+        {
+            // 'var' identifier ( '=' expression )?
+            if (Match(TokenType.Variable))
+                return true;
+
+            if (Match(TokenType.Identifier))
+            {
+                // identifier identifier ( '=' expression )?
+                if (MatchFrom(1, TokenType.Identifier))
+                    return true;
+
+                // identifier ( '[' ']' )+ identifier ( '=' expression )?
+                int dimensions = CountRepeatedMatchesFrom(1, TokenType.LeftBracket, TokenType.RightBracket);
+                return dimensions > 0 && MatchFrom(dimensions + 1, TokenType.Identifier);
+            }
+            return false;
+        }
+
         // Rule:
         // declaration	-> func_declaration
         //               | variable_declaration
@@ -173,7 +192,7 @@ namespace Fl.Parser
         //
         private AstNode Declaration()
         {
-            if (Match(TokenType.Variable))
+            if (IsVarDeclaration())
             {
                 return VarDeclaration();
             }
@@ -189,7 +208,7 @@ namespace Fl.Parser
         }
 
         // Rule:
-        // func_declaration -> "func" IDENTIFIER "(" func_params? ")" "{" declaration* "}"
+        // func_declaration -> "fn" IDENTIFIER "(" func_params? ")" "{" declaration* "}"
         private AstFuncDeclNode FuncDeclaration()
         {
             Consume(TokenType.Function);
@@ -428,7 +447,7 @@ namespace Fl.Parser
         // 				    | expression ( "," expression )*
         private AstNode ForInitializer()
         {
-            if (Match(TokenType.Variable))
+            if (IsVarDeclaration())
             {
                 return ForDeclaration();
             }
@@ -445,7 +464,7 @@ namespace Fl.Parser
         }
 
         // Rule:
-        // for_declaration -> VAR local_var_declaration ( "," local_var_declaration )*
+        // for_declaration -> variable_type local_var_declaration ( "," local_var_declaration )*
         private AstNode ForDeclaration()
         {
             AstVariableTypeNode type = VariableType();
@@ -557,11 +576,11 @@ namespace Fl.Parser
         }
 
         // Rule:
-        // variable_type -> VAR ( '[' ']' )*
+        // variable_type -> ( VAR | IDENTIFIER ( '[' ']' )* )
         private AstVariableTypeNode VariableType()
         {
-            Token varType = Consume(TokenType.Variable);
-            if (Match(TokenType.LeftBracket))
+            Token varType = Match(TokenType.Variable) ? Consume(TokenType.Variable) : Consume(TokenType.Identifier);
+            if (varType.Type != TokenType.Variable && Match(TokenType.LeftBracket))
             {
                 List<Token> dimensions = new List<Token>();
                 while (Match(TokenType.LeftBracket))
@@ -942,7 +961,7 @@ namespace Fl.Parser
                 && !Match(TokenType.Decimal)
                 && !Match(TokenType.String)
                 && !Match(TokenType.Identifier))
-                throw new ParserException($"Expects primary but received {Peek().Type}");
+                throw new ParserException($"Expects primary but received {(HasInput() ? Peek().Type.ToString() : "end of input")}");
 
             return Match(TokenType.Identifier) ? (AstNode)new AstAccessorNode(Consume(), null) : new AstLiteralNode(Consume());
         }
