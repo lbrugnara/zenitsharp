@@ -113,7 +113,7 @@ namespace Fl.Engine.Symbols
         /// </summary>
         /// <param name="name">Symbol name to update</param>
         /// <param name="obj">New attributes or information for the target symbol</param>
-        public void UpdateSymbol(string name, FlObject obj)
+        /*public void UpdateSymbol(string name, FlObject obj)
         {
             int i = _Scopes.Count - 1;
             var scp = i >= 0 ? _Scopes[i] : _Global;
@@ -138,7 +138,7 @@ namespace Fl.Engine.Symbols
                 scp = _Scopes.ElementAtOrDefault(--i) ?? _Global;
             }
             throw new SymbolException($"Symbol '{name}' does not exist in the current context");
-        }
+        }*/
 
         public bool HasSymbol(string var)
         {

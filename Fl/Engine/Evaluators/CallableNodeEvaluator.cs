@@ -19,6 +19,16 @@ namespace Fl.Engine.Evaluators
         {
             FlObject target = node.Callable.Exec(evaluator);
 
+            if (node is AstIndexerNode)
+            {
+                Symbol clasz = evaluator.Symtable.GetSymbol(target.ObjectType.ClassName) ?? evaluator.Symtable.GetSymbol(target.ObjectType.Name);
+                var claszobj = (clasz.Binding as FlClass);
+                FlIndexer indexer = claszobj.GetIndexer(node.Arguments.Count);
+                if (indexer == null)
+                    throw new AstWalkerException($"{claszobj} does not contain an indexer that accepts {node.Arguments.Count} {(node.Arguments.Count == 1 ? "argument" : "arguments")}");
+                return indexer.Bind(target).Invoke(evaluator.Symtable, node.Arguments.Expressions.Select(e => e.Exec(evaluator)).ToList());
+            }
+
             if (target is FlClass)
             {
                 var clasz = (target as FlClass);
@@ -27,6 +37,8 @@ namespace Fl.Engine.Evaluators
                 {
                     var newInstance = clasz.Activator.Invoke();
                     target = clasz.GetConstructor(node.Arguments.Count);
+                    if (!clasz.HasConstructors && node.Arguments.Count == 0)
+                        return newInstance;
                     if (target == null)
                         throw new AstWalkerException($"{clasz} does not contain a constructor that accepts {node.Arguments.Count} {(node.Arguments.Count == 1 ? "argument" : "arguments")}");
                     return (target as FlConstructor).Bind(newInstance).Invoke(evaluator.Symtable, node.Arguments.Expressions.Select(a => a.Exec(evaluator)).ToList());

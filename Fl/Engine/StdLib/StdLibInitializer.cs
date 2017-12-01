@@ -22,7 +22,9 @@ namespace Fl.Engine.StdLib
             scope.AddSymbol("decimal", new Symbol(SymbolType.Constant), builtin.types.DecimalClass.Build());
             scope.AddSymbol("bool", new Symbol(SymbolType.Constant), builtin.types.BoolClass.Build());
             scope.AddSymbol("string", new Symbol(SymbolType.Constant), builtin.types.StringClass.Build());
+            scope.AddSymbol("Tuple", new Symbol(SymbolType.Constant), builtin.types.TupleClass.Build());
             scope.AddSymbol("Func", new Symbol(SymbolType.Constant), builtin.types.FuncClass.Build());
+            scope.AddSymbol("Error", new Symbol(SymbolType.Constant), builtin.types.ErrorClass.Build());
 
 
             // Namespace: std

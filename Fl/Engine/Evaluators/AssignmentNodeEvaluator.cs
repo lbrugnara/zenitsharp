@@ -39,11 +39,11 @@ namespace Fl.Engine.Evaluators
             }
 
             var assignmentResult = node.Expression.Exec(walker);
-            if (node.AssignmentOp.Type != TokenType.Assignment)
+            /*if (node.AssignmentOp.Type != TokenType.Assignment)
             {
                 if ((!(symbol.Binding.ObjectType is NumericType) || !(assignmentResult.ObjectType is NumericType)) && (symbol.ObjectType != assignmentResult.ObjectType || symbol.Binding.ObjectType != StringType.Value))
                     throw new AstWalkerException($"Operator '{node.AssignmentOp.Value}' cannot be applied to operands of type '{symbol.ObjectType}' and '{assignmentResult.ObjectType}'");
-            }
+            }*/
 
             switch (node.AssignmentOp.Type)
             {                
@@ -63,7 +63,15 @@ namespace Fl.Engine.Evaluators
                     return symbol.Binding.Clone();
 
                 case TokenType.Assignment:
-                    walker.Symtable.UpdateSymbol(idname, assignmentResult);
+                    //walker.Symtable.UpdateSymbol(idname, assignmentResult);
+                    if (symbol.Binding == FlNull.Value)
+                    {
+                        symbol.UpdateBinding(assignmentResult);
+                    }
+                    else
+                    {
+                        symbol.Binding.Assign(assignmentResult);
+                    }
                     return assignmentResult.Clone();
             }
             throw new AstWalkerException($"Unrecognized assignment token {node.AssignmentOp.Type}");

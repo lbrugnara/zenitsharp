@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace Fl.Parser.Ast
 {
-    public class AstArgumentsNode : AstNode
+    public class AstExpressionList : AstNode
     {
         public List<AstNode> Expressions { get; }
 
-        public AstArgumentsNode(List<AstNode> args)
+        public AstExpressionList(List<AstNode> args)
         {
             Expressions = args;
         }

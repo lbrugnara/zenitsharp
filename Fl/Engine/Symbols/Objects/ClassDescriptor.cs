@@ -15,24 +15,30 @@ namespace Fl.Engine.Symbols.Objects
         private List<FlConstructor> Constructors;
         private Dictionary<string, Symbol> Methods;
         private Dictionary<string, Symbol> Properties;
+        private List<FlIndexer> Indexers;
 
         public FlFunction StaticConstructor { get; private set; }
         private Dictionary<string, Symbol> StaticMethods;
         private Dictionary<string, Symbol> StaticProperties;
 
+        private ClassDescriptor FreshCopy { get; set; }
+
         public ClassDescriptor(string typeName, 
             Func<FlObject> activator,
             List<FlConstructor> constructors, 
-            Dictionary<string, Symbol> methods, Dictionary<string, Symbol> properties, 
+            Dictionary<string, Symbol> methods, 
+            Dictionary<string, Symbol> properties,
+            List<FlIndexer> indexers,
             FlFunction staticConstructor, 
             Dictionary<string, Symbol> staticMethods, 
             Dictionary<string, Symbol> staticProperties)
         {
             ClassName = typeName ?? throw new ArgumentNullException(nameof(typeName));
-            Activator = activator ?? throw new ArgumentNullException(nameof(activator)); ;
+            Activator = activator ?? (() => new FlInstance(new FlClass(this.GetFreshCopy())));
             Constructors = constructors ?? new List<FlConstructor>();            
             Methods = methods ?? new Dictionary<string, Symbol>();
             Properties = properties ?? new Dictionary<string, Symbol>();
+            Indexers = indexers ?? new List<FlIndexer>();
             StaticConstructor = staticConstructor;
             StaticMethods = staticMethods ?? new Dictionary<string, Symbol>();
             StaticProperties = staticProperties ?? new Dictionary<string, Symbol>();
@@ -41,8 +47,10 @@ namespace Fl.Engine.Symbols.Objects
         private ClassDescriptor()
         {
             Constructors = new List<FlConstructor>();
+            Activator = () => new FlInstance(new FlClass(this.GetFreshCopy()));
             Methods = new Dictionary<string, Symbol>();
             Properties = new Dictionary<string, Symbol>();
+            Indexers = new List<FlIndexer>();
             StaticMethods = new Dictionary<string, Symbol>();
             StaticProperties = new Dictionary<string, Symbol>();
         }
@@ -96,6 +104,12 @@ namespace Fl.Engine.Symbols.Objects
                 return this;
             }
 
+            public Builder WithIndexer(FlIndexer indexer)
+            {
+                _Class.Indexers.Add(indexer);
+                return this;
+            }
+
             public Builder WithStaticMethod(string methodName, Func<List<FlObject>, FlObject> body)
             {
                 var symbol = new Symbol(SymbolType.Constant, StorageType.Static);
@@ -114,15 +128,23 @@ namespace Fl.Engine.Symbols.Objects
 
             public ClassDescriptor Build()
             {
+                _Class.FreshCopy = _Class.Clone();
                 var tmp = _Class;
                 _Class = null;
                 return tmp;
             }
         }
 
+        public bool HasConstructors => Constructors.Any();
+
         public FlConstructor GetConstructor(int paramsCount)
         {
-            return Constructors.FirstOrDefault(c => c.Name == $"constructor@{paramsCount}");
+            return Constructors.FirstOrDefault(c => c.Name == $"constructor@{paramsCount}") ?? Constructors.FirstOrDefault(c => c.Name == $"constructor@params");
+        }
+
+        public FlIndexer GetIndexer(int paramsCount)
+        {
+            return Indexers.FirstOrDefault(c => c.Name == $"indexer@{paramsCount}");
         }
 
         public Symbol this[string n]
@@ -166,25 +188,19 @@ namespace Fl.Engine.Symbols.Objects
             List<FlConstructor> constructors = new List<FlConstructor>();
             Dictionary<string, Symbol> methods = new Dictionary<string, Symbol>();
             Dictionary<string, Symbol> properties = new Dictionary<string, Symbol>();
+            List<FlIndexer> indexers = new List<FlIndexer>();
 
             Constructors.ForEach(c => constructors.Add(c.Clone() as FlConstructor));
             foreach (var key in Methods.Keys) methods[key] = Methods[key].Clone(true);
             foreach (var key in Properties.Keys) properties[key] = Properties[key].Clone(true);
+            Indexers.ForEach(i => indexers.Add(i.Clone() as FlIndexer));
 
-            return new ClassDescriptor(ClassName, Activator, constructors, methods, properties, StaticConstructor, StaticMethods, StaticProperties);
+            return new ClassDescriptor(ClassName, Activator, constructors, methods, properties, indexers, StaticConstructor, StaticMethods, StaticProperties);
         }
 
-        public ClassDescriptor FreshCopy()
+        public ClassDescriptor GetFreshCopy()
         {
-            List<FlConstructor> constructors = new List<FlConstructor>();
-            Dictionary<string, Symbol> methods = new Dictionary<string, Symbol>();
-            Dictionary<string, Symbol> properties = new Dictionary<string, Symbol>();
-
-            Constructors.ForEach(c => constructors.Add(c.Clone() as FlConstructor));
-            foreach (var key in Methods.Keys) methods[key] = Methods[key].Clone(true);
-            foreach (var key in Properties.Keys) properties[key] = Properties[key].Clone(false);
-
-            return new ClassDescriptor(ClassName, Activator, constructors, methods, properties, StaticConstructor, StaticMethods, StaticProperties);
+            return this.FreshCopy.Clone();
         }
     }
 }

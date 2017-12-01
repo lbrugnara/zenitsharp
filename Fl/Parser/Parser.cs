@@ -444,23 +444,14 @@ namespace Fl.Parser
 
         // Rule:
         // for_initializer -> for_declaration
-        // 				    | expression ( "," expression )*
+        // 				    | expression_list
         private AstNode ForInitializer()
         {
             if (IsVarDeclaration())
             {
                 return ForDeclaration();
             }
-            List<AstNode> exprs = new List<AstNode> {
-                Expression()
-            };
-            while (Match(TokenType.Comma))
-            {
-                Consume();
-                exprs.Add(Expression());
-            }
-            // TODO: Check if DeclarationNode is correct
-            return new AstDeclarationNode(exprs);
+            return ExpressionList();
         }
 
         // Rule:
@@ -606,6 +597,22 @@ namespace Fl.Parser
         }
 
         // Rule:
+        // expression_list -> expression ( ',' expression )*
+        private AstNode ExpressionList()
+        {
+            List<AstNode> exprs = new List<AstNode> {
+                Expression()
+            };
+            while (Match(TokenType.Comma))
+            {
+                Consume();
+                exprs.Add(Expression());
+            }
+            // TODO: Check if DeclarationNode is correct
+            return new AstDeclarationNode(exprs);
+        }
+
+        // Rule:
         // expression -> expression_assignment
         private AstNode Expression()
         {
@@ -655,9 +662,7 @@ namespace Fl.Parser
                 {
                     if (Match(TokenType.LeftParen))
                     {
-                        Consume();
-                        AstArgumentsNode arguments = Arguments();
-                        Consume(TokenType.RightParen);
+                        AstExpressionList arguments = Arguments();
                         primary = new AstCallableNode(primary, arguments);
                     }
                     else if (Match(TokenType.Dot))
@@ -903,10 +908,12 @@ namespace Fl.Parser
                 {
                     if (TryGetAccessor(primary) == null && TryGetLiteral(primary)?.Primary?.Type != TokenType.Identifier)
                         throw new ParserException($"'{primary}' is not an invokable object");
-                    Consume();
-                    AstArgumentsNode arguments = Arguments();
-                    Consume(TokenType.RightParen);
+                    AstExpressionList arguments = Arguments();
                     primary = new AstCallableNode(primary, arguments, newt);
+                }
+                else if (Match(TokenType.LeftBracket))
+                {
+                    primary = new AstIndexerNode(primary, Indexer());
                 }
                 else if (Match(TokenType.Dot))
                 {
@@ -920,7 +927,7 @@ namespace Fl.Parser
                         && newt != null)
                         throw new ParserException($"Type expected");
                     if (_Pointer == checkpoint && (primary is AstAccessorNode) && newt != null)
-                        primary = new AstCallableNode(primary, new AstArgumentsNode(new List<AstNode>()), newt);
+                        primary = new AstCallableNode(primary, new AstExpressionList(new List<AstNode>()), newt);
                     break;
                 }
 
@@ -928,9 +935,31 @@ namespace Fl.Parser
             return primary;
         }
 
-        private AstArgumentsNode Arguments()
+        // Rule: (it is easier to check the expression_list manually here)
+        // indexer -> '[' expression_list ']'
+        private AstExpressionList Indexer()
         {
             List<AstNode> args = new List<AstNode>();
+            Consume(TokenType.LeftBracket);
+            do
+            {
+                args.Add(Expression());
+                while (Match(TokenType.Comma))
+                {
+                    Consume();
+                    args.Add(Expression());
+                }
+            } while ((!Match(TokenType.RightBracket)));
+            Consume(TokenType.RightBracket);
+            return new AstExpressionList(args);
+        }
+
+        // Rule: (it is easier to check the expression_list manually here)
+        // arguments -> '(' expression_list? ')'
+        private AstExpressionList Arguments()
+        {
+            List<AstNode> args = new List<AstNode>();
+            Consume(TokenType.LeftParen);
             if (!Match(TokenType.RightParen))
             {
                 args.Add(Expression());
@@ -940,7 +969,8 @@ namespace Fl.Parser
                     args.Add(Expression());
                 }
             }
-            return new AstArgumentsNode(args);
+            Consume(TokenType.RightParen);
+            return new AstExpressionList(args);
         }
 
         // Rule:

@@ -40,7 +40,23 @@ namespace Fl.Engine.Symbols.Objects
         {
             return $"instance {_Class}";
         }
+
+        public override string ToDebugStr()
+        {
+            return $"instance {_Class.ToDebugStr()}";
+        }
         #endregion
+
+        public override void Assign(FlObject n)
+        {
+            // TODO: Checking by ClassName is not enough (add namespace check)
+            if (n is FlInstance && (n as FlInstance)._Class.ClassName == _Class.ClassName)
+            {
+                _Class = (n as FlInstance)._Class;
+                return;
+            }
+            base.Assign(n);
+        }
 
         #region Public Properties
 

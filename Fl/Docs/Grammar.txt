@@ -12,15 +12,15 @@ declaration	-> func_declaration
 			| constant_declaration
 			| statement
 
-func_declaration -> "fn" IDENTIFIER "(" func_params? ")" "{" declaration* "}"
+func_declaration -> 'fn' IDENTIFIER '(' func_params? ')' '{' declaration* '}'
 
-func_params -> IDENTIFIER ( "," IDENTIFIER )*
+func_params -> IDENTIFIER ( ',' IDENTIFIER )*
 
-variable_declaration -> variable_type IDENTIFIER ( "=" expression )? ";"
+variable_declaration -> variable_type IDENTIFIER ( '=' expression )? ';'
 
 variable_type -> ( VAR | IDENTIFIER ( '[' ']' )* )
 
-constant_declaration -> CONST IDENTIFIER "=" expression ";"
+constant_declaration -> CONST IDENTIFIER '=' expression ';'
 
 # Statements
 
@@ -33,45 +33,47 @@ statement	-> expression_statement
 			| return_statement
 			| block
 
-parenthesized_expr -> "(" expression ")" ( statement | ";" )
+parenthesized_expr -> '(' expression ')' ( statement | ';' )
 
 braced_expr -> expression block
 
-expression_statement	-> expression ";"
+expression_statement	-> expression ';'
 
-block	-> "{" declaration* "}"
+block	-> '{' declaration* '}'
 
 ### Conditional Statements
 
-if_statement -> "if" ( parenthesized_expr | braced_expr ) ( "else" ( statement | ";" ) )?
+if_statement -> 'if' ( parenthesized_expr | braced_expr ) ( 'else' ( statement | ';' ) )?
 
 ### Loop statements
 
-while_statement -> "while" ( parenthesized_expr | braced_expr )
+while_statement -> 'while' ( parenthesized_expr | braced_expr )
 
-for_statement -> "for" "(" for_initializer? ";" expression? ";" for_iterator? ")" statement
-			   | "for" for_initializer? ";" expression? ";" for_iterator? block
+for_statement -> 'for' '(' for_initializer? ';' expression? ';' for_iterator? ')' statement
+			   | 'for' for_initializer? ';' expression? ';' for_iterator? block
 
 for_initializer -> for_declaration
-				| expression ( "," expression )*
+				| expression ( ',' expression )*
 
-for_declaration -> variable_type local_var_declaration ( "," local_var_declaration )*
+for_declaration -> variable_type local_var_declaration ( ',' local_var_declaration )*
 
-local_var_declaration -> IDENTIFIER ( "=" expression )
+local_var_declaration -> IDENTIFIER ( '=' expression )
 
-for_iterator -> expression ( "," expression )*
+for_iterator -> expression_list
 
-break_statement -> "break" INTEGER? ";"
+break_statement -> 'break' INTEGER? ';'
 
-continue_statement -> "continue" ";"
+continue_statement -> 'continue' ';'
 
-return_statement -> "return" expression? ";"
+return_statement -> 'return' expression? ( ',' expression )? ';'
 
 ### Expressions
 
+expression_list -> expression ( ',' expression )*
+
 expression	-> expression_assignment
 
-expression_assignment	-> IDENTIFIER ( "." IDENTIFIER | "(" arguments? ")" )* ( ( "=" | "+=" | "-=" | "/=" | "*=" )  expression_assignment )?
+expression_assignment	-> IDENTIFIER ( '.' IDENTIFIER | '(' arguments? ')' )* ( ( '=' | '+=' | '-=' | '/=' | '*=' )  expression_assignment )?
 						| lambda_expression
 						| conditional_expression
 
@@ -79,40 +81,42 @@ conditional_expression -> null_coalescing_expression ( '?' expression ':' expres
 
 null_coalescing_expression -> or_expression ( '??' null_coalescing_expression )?
 
-lambda_expression -> lambda_params "=>" lambda_body
+lambda_expression -> lambda_params '=>' lambda_body
 
-lambda_params -> "(" func_params ")"
+lambda_params -> '(' func_params ')'
 			  | func_params
 
 lambda_body -> block
 			| expression
 
-or_expression	-> and_expression ( "||" and_expression )*
+or_expression	-> and_expression ( '||' and_expression )*
 
-and_expression	-> equality_expression ( "&&" equality_expression )*
+and_expression	-> equality_expression ( '&&' equality_expression )*
 
-equality_expression	-> comparison_expression ( ( "!=" | "==" ) comparison_expression )*
+equality_expression	-> comparison_expression ( ( '!=' | '==' ) comparison_expression )*
 
-comparison_expression	-> addition_expression ( ( ">" | ">=" | "<" | "<=" ) addition_expression )*
+comparison_expression	-> addition_expression ( ( '>' | '>=' | '<' | '<=' ) addition_expression )*
 
-addition_expression	-> multiplication_expression ( ( "-" | "+" ) multiplication_expression )*
+addition_expression	-> multiplication_expression ( ( '-' | '+' ) multiplication_expression )*
 
-multiplication_expression	-> unary_expression ( ( "/" | "*" ) unary_expression )*
+multiplication_expression	-> unary_expression ( ( '/' | '*' ) unary_expression )*
 
-unary_expression	-> ( "!" | "-" ) unary_expression
-					| ( "++" | "--" ) primary_expression
-					| primary_expression ( "++" | "--" )?
+unary_expression	-> ( '!' | '-' ) unary_expression
+					| ( '++' | '--' ) primary_expression
+					| primary_expression ( '++' | '--' )?
 
-primary_expression -> primary ( "." IDENTIFIER | "(" arguments? ")" )*
+primary_expression -> primary ( '.' IDENTIFIER | indexer | arguments )*
 
-arguments -> expression ( "," expression )*
+indexer -> '[' expression_list ']'
 
-primary	-> "true" 
-		| "false" 
-		| "null" 
+arguments -> '(' expression_list? ')'
+
+primary	-> 'true' 
+		| 'false' 
+		| 'null' 
 		| INTEGER 
 		| DOUBLE 
 		| DECIMAL 
 		| STRING 
 		| IDENTIFIER
-		| "(" expression ")"
+		| '(' expression ')'

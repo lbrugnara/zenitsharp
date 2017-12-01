@@ -29,6 +29,11 @@ namespace Fl.Engine.Symbols.Objects
 
         public virtual void Assign(FlObject n) => throw new SymbolException($"Operator '=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
 
+        public virtual FlObject this[FlObject indexer] {
+            get => throw new SymbolException($"Cannot apply indexing to object of type '{ObjectType}'");
+            set => throw new SymbolException($"Cannot apply indexing to object of type '{ObjectType}'");
+        }
+
         #endregion
 
         #region Arithmetics Operators        

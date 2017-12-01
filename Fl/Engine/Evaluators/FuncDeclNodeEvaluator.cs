@@ -86,7 +86,7 @@ namespace Fl.Engine.Evaluators
 
             if (evaluator.Symtable.HasSymbol(func.Name))
             {
-                evaluator.Symtable.UpdateSymbol(func.Name, func);
+                evaluator.Symtable.GetSymbol(func.Name).UpdateBinding(func);
             }
             else
             {

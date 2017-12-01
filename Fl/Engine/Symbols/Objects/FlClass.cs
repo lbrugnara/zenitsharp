@@ -50,11 +50,17 @@ namespace Fl.Engine.Symbols.Objects
 
         #region Public properties
 
+        public string ClassName => _Descriptor.ClassName;
+
         public FlFunction StaticConstructor => _Descriptor.StaticConstructor;
+
+        public bool HasConstructors => _Descriptor.HasConstructors;
 
         public FlConstructor GetConstructor(int paramsCount) => _Descriptor.GetConstructor(paramsCount);
 
-        public Func<FlObject> Activator => _Descriptor.Activator ?? (() => new FlInstance(new FlClass(_Descriptor.FreshCopy())));
+        public FlIndexer GetIndexer(int paramsCount) => _Descriptor.GetIndexer(paramsCount);
+
+        public Func<FlObject> Activator => _Descriptor.Activator;
 
         public Symbol this[MemberType type, string name] => _Descriptor[type, name];
 
