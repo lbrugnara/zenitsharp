@@ -23,9 +23,9 @@ namespace Fl.Engine.Evaluators
                 // If there is a member, resolve it ...                
                 FlObject obj = invoke.Member.Exec(evaluator);
 
-                if (obj.IsPrimitive)
+                if (evaluator.Symtable.HasSymbol(obj.ObjectType.ClassName))
                 {
-                    Symbol clasz = evaluator.Symtable.GetSymbol(obj.ObjectType.ClassName) ?? evaluator.Symtable.GetSymbol(obj.ObjectType.Name);
+                    Symbol clasz = evaluator.Symtable.GetSymbol(obj.ObjectType.ClassName);
                     entry = (clasz.Binding as FlClass)[self];
 
                     if (entry.StorageType == StorageType.Static)

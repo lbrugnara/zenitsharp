@@ -17,34 +17,45 @@ namespace Fl.Engine.Evaluators
 
         public FlObject Evaluate(AstEvaluator walker, AstAssignmentNode node)
         {
-            string idname = node.Identifier?.Value.ToString() ?? node.Accessor?.Self.Value.ToString();
             Symbol symbol = null;
             if (node.Accessor != null)
             {
                 symbol = _AccessorEv.GetSymbol(walker, node.Accessor);
             }
+            else if (node.Lvalues != null)
+            {
+                var rvalue = node.Expression.Exec(walker) as FlTuple;
+                var rcount = rvalue.Value.Count;
+                var lvalue = node.Lvalues.Exec(walker) as FlTuple;
+                var lcount = lvalue.Value.Count;
+                for (int i=0; i < lcount; i++)
+                {
+                    var s = _AccessorEv.GetSymbol(walker, node.Lvalues.Items[i] as AstAccessorNode);
+                    if (i >= rcount)
+                        break;
+
+                    s.UpdateBinding(rvalue.Value[i]);
+                    lvalue.Value[i] = s.Binding;
+                }
+                return lvalue;
+            }
             else
-            {                
+            {
+                string idname = node.Accessor?.Self.Value.ToString();
                 symbol = walker.Symtable.GetSymbol(idname);
             }
 
             if (symbol.SymbolType == SymbolType.Constant)
             {
                 if (symbol.Binding.ObjectType == FuncType.Value)
-                    throw new AstWalkerException($"Left-hand side of an assignment must be a variable. '{idname}' is a function");
+                    throw new AstWalkerException($"Left-hand side of an assignment must be a variable. '{symbol.Name}' is a function");
                 if (symbol.Binding.ObjectType == NamespaceType.Value)
-                    throw new AstWalkerException($"Left-hand side of an assignment must be a variable. '{idname}' is a namespace");
+                    throw new AstWalkerException($"Left-hand side of an assignment must be a variable. '{symbol.Name}' is a namespace");
                 else
-                    throw new AstWalkerException($"Left-hand side of an assignment must be a variable. '{idname}' is a constant value");
+                    throw new AstWalkerException($"Left-hand side of an assignment must be a variable. '{symbol.Name}' is a constant value");
             }
 
             var assignmentResult = node.Expression.Exec(walker);
-            /*if (node.AssignmentOp.Type != TokenType.Assignment)
-            {
-                if ((!(symbol.Binding.ObjectType is NumericType) || !(assignmentResult.ObjectType is NumericType)) && (symbol.ObjectType != assignmentResult.ObjectType || symbol.Binding.ObjectType != StringType.Value))
-                    throw new AstWalkerException($"Operator '{node.AssignmentOp.Value}' cannot be applied to operands of type '{symbol.ObjectType}' and '{assignmentResult.ObjectType}'");
-            }*/
-
             switch (node.AssignmentOp.Type)
             {                
                 case TokenType.IncrementAndAssign:
@@ -52,7 +63,7 @@ namespace Fl.Engine.Evaluators
                     return symbol.Binding.Clone();
 
                 case TokenType.DecrementAndAssign:
-                    symbol.Binding.SubstractAndAssign(assignmentResult);
+                    symbol.Binding.SubtractAndAssign(assignmentResult);
                     return symbol.Binding.Clone();
 
                 case TokenType.MultAndAssign:
@@ -63,10 +74,9 @@ namespace Fl.Engine.Evaluators
                     return symbol.Binding.Clone();
 
                 case TokenType.Assignment:
-                    //walker.Symtable.UpdateSymbol(idname, assignmentResult);
                     if (symbol.Binding == FlNull.Value)
                     {
-                        symbol.UpdateBinding(assignmentResult);
+                        symbol.UpdateBinding(assignmentResult.IsPrimitive ? assignmentResult.Clone() : assignmentResult);
                     }
                     else
                     {

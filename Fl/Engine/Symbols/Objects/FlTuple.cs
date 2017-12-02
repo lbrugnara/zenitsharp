@@ -23,7 +23,7 @@ namespace Fl.Engine.Symbols.Objects
 
         public List<FlObject> Value { get => _RawValue; set => _RawValue = value; }
 
-        public override bool IsPrimitive => true;
+        public override bool IsPrimitive => false;
 
         public override FlObject Clone()
         {

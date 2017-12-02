@@ -113,7 +113,7 @@ namespace Fl.Engine.Symbols.Objects
             throw new SymbolException($"Operator '+' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
         }
 
-        public override FlObject Substract(FlObject n)
+        public override FlObject Subtract(FlObject n)
         {
             if (n.ObjectType == IntegerType.Value)
             {
@@ -150,7 +150,7 @@ namespace Fl.Engine.Symbols.Objects
             throw new SymbolException($"Operator '+=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
         }
 
-        public override void SubstractAndAssign(FlObject n)
+        public override void SubtractAndAssign(FlObject n)
         {
             if (n.ObjectType == IntegerType.Value)
             {

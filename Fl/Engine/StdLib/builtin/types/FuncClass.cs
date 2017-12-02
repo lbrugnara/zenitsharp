@@ -48,7 +48,7 @@ namespace Fl.Engine.StdLib.builtin.types
 
                 // Instance Methods
                 .WithMethod("str", (self, args) => new FlString(self.RawValue.ToString()))
-                .WithMethod("invoke", (self, args) => (self as FlFunction).Invoke(args))
+                .WithMethod("invoke", (self, args) => (self as FlFunction).Invoke(SymbolTable.Instance, args))
                 .WithMethod("bind", (self, args) => (self as FlFunction).Bind(args[0]))
                 .WithMethod("boundTo", (self, args) => (self as FlFunction).This);
 

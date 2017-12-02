@@ -17,26 +17,41 @@ namespace Fl.Engine.Evaluators
         {
             // Get the variable type
             var type = vardecl.VarType;
+
             // attributes
             bool isArray = type.Dimensions?.Count > 0; // By now allow 1-dimension arrays
-            // Get the variable name
-            string varname = vardecl.Identifier.Value.ToString();
-            // Build the Symbol information from an initializer or use null
-            FlObject init = FlNull.Value;
-            if (vardecl.Initializer != null)
+            Symbol varsymbol = null;
+
+            foreach (var tuple in vardecl.Variables)
             {
-                init = vardecl.Initializer.Exec(evaluator);
+                var id = tuple.Item1;
+                var initializer = tuple.Item2;
+
+                // Get the variable name                
+                string varname = id.Value.ToString();
+
+                // Build the Symbol information from an initializer or use null
+                varsymbol = new Symbol(SymbolType.Variable);
+                FlObject init = FlNull.Value;
+
+                // Initialize to null
+                evaluator.Symtable.AddSymbol(varname, varsymbol, FlNull.Value);
+
+                // If type is not null, get the default value of the type and update the binding
+                if (type != null && type.TypeToken.Type != TokenType.Variable)
+                {
+                    var clasz = evaluator.Symtable.GetSymbol(vardecl.VarType.TypeToken.Value.ToString()).Binding as FlClass;
+                    FlObject defaultVal = clasz.Activator.Invoke();
+                    varsymbol.UpdateBinding(defaultVal);
+                }
+
+                // If the declaration has a definition, update the binding. This will raise an exception if types do not match
+                if (initializer != null)
+                {
+                    varsymbol.UpdateBinding(initializer.Exec(evaluator));
+                }
             }
-            else if (vardecl.VarType.TypeToken.Type != TokenType.Variable)
-            {
-                // If it is a typed declaration, run the activator to get the default value
-                var clasz = evaluator.Symtable.GetSymbol(vardecl.VarType.TypeToken.Value.ToString())?.Binding as FlClass;
-                if (clasz == null)
-                    throw new Symbols.Exceptions.SymbolException($"The type {vardecl.VarType.TypeToken.Value} could not be found.");
-                init = clasz.Activator.Invoke();
-            }
-            evaluator.Symtable.AddSymbol(varname, new Symbol(SymbolType.Variable), init);
-            return init;
+            return varsymbol?.Binding ?? FlNull.Value;
         }
     }
 }

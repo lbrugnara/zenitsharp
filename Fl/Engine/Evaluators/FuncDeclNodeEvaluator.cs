@@ -56,18 +56,11 @@ namespace Fl.Engine.Evaluators
                 );
             }
             FlObject ret = null;
-            try
-            {                
-                foreach (var decl in _Body)
-                {
-                    ret = decl.Exec(_Evaluator);
-                    if (symboltable.MustReturn)
-                        return symboltable.ReturnValue;
-                }
-            }
-            catch
+            foreach (var decl in _Body)
             {
-
+                ret = decl.Exec(_Evaluator);
+                if (symboltable.MustReturn)
+                    return symboltable.ReturnValue;
             }
             if (_Identifier.Type == TokenType.RightArrow && ret != null)
                 return ret;

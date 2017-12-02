@@ -4,6 +4,7 @@
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Types;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Fl.Engine.Symbols.Objects
@@ -65,6 +66,18 @@ namespace Fl.Engine.Symbols.Objects
         public Symbol this[MemberType type, string name] => _Descriptor[type, name];
 
         public override Symbol this[string member] => _Descriptor[member];
+
+        public FlObject InvokeConstructor(List<FlObject> arguments = null)
+        {
+            arguments = arguments ?? new List<FlObject>();
+            var newInstance = this.Activator.Invoke();
+            var target = this.GetConstructor(arguments.Count);
+            if (!HasConstructors && arguments.Count == 0)
+                return newInstance;
+            if (target == null)
+                throw new SymbolException($"{this} does not contain a constructor that accepts {arguments.Count} {(arguments.Count == 1 ? "argument" : "arguments")}");
+            return (target as FlConstructor).Bind(newInstance).Invoke(SymbolTable.Instance, arguments);
+        }
 
         #endregion
     }

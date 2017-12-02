@@ -6,20 +6,20 @@ namespace Fl.Parser.Ast
     public class AstAssignmentNode : AstNode
     {
         public AstAccessorNode Accessor { get; }
-        public Token Identifier { get; }
+        public AstTupleNode Lvalues { get; }
         public Token AssignmentOp { get; }        
         public AstNode Expression { get; }
-
-        public AstAssignmentNode(Token identifier, Token assignmentOp, AstNode expression)
-        {
-            Identifier = identifier;
-            AssignmentOp = assignmentOp;
-            Expression = expression;
-        }
 
         public AstAssignmentNode(AstAccessorNode accessor, Token assignmentOp, AstNode expression)
         {
             Accessor = accessor;
+            AssignmentOp = assignmentOp;
+            Expression = expression;
+        }
+
+        public AstAssignmentNode(AstTupleNode lvalue, Token assignmentOp, AstNode expression)
+        {
+            Lvalues = lvalue;
             AssignmentOp = assignmentOp;
             Expression = expression;
         }

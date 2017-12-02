@@ -35,13 +35,7 @@ namespace Fl.Engine.Evaluators
 
                 if (node.New != null)
                 {
-                    var newInstance = clasz.Activator.Invoke();
-                    target = clasz.GetConstructor(node.Arguments.Count);
-                    if (!clasz.HasConstructors && node.Arguments.Count == 0)
-                        return newInstance;
-                    if (target == null)
-                        throw new AstWalkerException($"{clasz} does not contain a constructor that accepts {node.Arguments.Count} {(node.Arguments.Count == 1 ? "argument" : "arguments")}");
-                    return (target as FlConstructor).Bind(newInstance).Invoke(evaluator.Symtable, node.Arguments.Expressions.Select(a => a.Exec(evaluator)).ToList());
+                    return clasz.InvokeConstructor(node.Arguments.Expressions.Select(a => a.Exec(evaluator)).ToList());
                 }
                 else
                 { 

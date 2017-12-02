@@ -76,7 +76,7 @@ namespace Fl.Engine.Evaluators
                 case TokenType.Addition:
                     return leftres.Add(rightres);
                 case TokenType.Minus:
-                    return leftres.Substract(rightres);
+                    return leftres.Subtract(rightres);
             }
             throw new AstWalkerException($"Unhandled operator {binary.Operator.Type}");
         }

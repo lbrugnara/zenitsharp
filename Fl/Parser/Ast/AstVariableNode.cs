@@ -10,14 +10,18 @@ namespace Fl.Parser.Ast
     public class AstVariableNode : AstNode
     {
         public AstVariableTypeNode VarType { get; }
-        public Token Identifier { get; }
-        public AstNode Initializer { get; }
+        public List<Tuple<Token, AstNode>> Variables { get; }
 
         public AstVariableNode(AstVariableTypeNode variableType, Token identifier, AstNode initializer)
         {
             VarType = variableType;
-            Identifier = identifier;
-            Initializer = initializer;
+            Variables = new List<Tuple<Token, AstNode>>() { new Tuple<Token, AstNode>(identifier, initializer) };
+        }
+
+        public AstVariableNode(AstVariableTypeNode variableType, List<Tuple<Token, AstNode>> variables)
+        {
+            VarType = variableType;
+            Variables = variables;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Fl.Engine.Symbols.Objects
 
         public virtual FlObject Add(FlObject n) => throw new SymbolException($"Operator '+' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
 
-        public virtual FlObject Substract(FlObject n) => throw new SymbolException($"Operator '-' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
+        public virtual FlObject Subtract(FlObject n) => throw new SymbolException($"Operator '-' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
 
         public virtual FlObject Multiply(FlObject n) => throw new SymbolException($"Operator '*' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
 
@@ -56,7 +56,7 @@ namespace Fl.Engine.Symbols.Objects
 
         public virtual void AddAndAssign(FlObject n) => throw new SymbolException($"Operator '+=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
 
-        public virtual void SubstractAndAssign(FlObject n) => throw new SymbolException($"Operator '-=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
+        public virtual void SubtractAndAssign(FlObject n) => throw new SymbolException($"Operator '-=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
 
         public virtual void MultiplyAndAssing(FlObject n) => throw new SymbolException($"Operator '*=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
 

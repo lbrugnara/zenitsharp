@@ -8,12 +8,12 @@ namespace Fl.Parser.Ast
     public class AstReturnNode : AstNode
     {
         public Token Keyword { get; }
-        public AstNode Expression { get; }
+        public AstTupleNode ReturnTuple { get; }
 
-        public AstReturnNode(Token keyword, AstNode expr)
+        public AstReturnNode(Token keyword, AstTupleNode expr)
         {
             Keyword = keyword;
-            Expression = expr;
+            ReturnTuple = expr;
         }
     }
 }

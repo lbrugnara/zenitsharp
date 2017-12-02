@@ -8,6 +8,8 @@ namespace Fl
 {
     public class Lexer
     {
+        #region Private fields
+
         /// <summary>
         /// Input source
         /// </summary>
@@ -50,6 +52,10 @@ namespace Fl
             { "new", TokenType.New }
         };
 
+        #endregion
+
+        #region Constructor
+
         public Lexer(string source)
         {
             _Source = source;
@@ -58,7 +64,13 @@ namespace Fl
             _Col = 0;
         }
 
+        #endregion
+
         #region Scanning helpers
+
+        /// <summary>
+        /// Set the lexer back to the initial state
+        /// </summary>
         private void Reset()
         {
             _Pointer = 0;
@@ -68,15 +80,29 @@ namespace Fl
 
         private bool HasInput() => _Pointer < _Source.Length;
 
+        /// <summary>
+        /// Peek the next character if available, '\0' otherwise
+        /// </summary>
+        /// <returns></returns>
         private char Peek() => _Pointer < _Source.Length ? _Source[_Pointer] : '\0';
 
-        private string Peek(int amount)
+        /// <summary>
+        /// Peek a number of characters from the current position
+        /// </summary>
+        /// <param name="count">Number of characters to peek</param>
+        /// <returns></returns>
+        private string Peek(int count)
         {
-            if (amount <= 0)
+            if (count <= 0)
                 throw new ArgumentException("Amount must be greater than 0");
-            return _Pointer + amount <= _Source.Length ? _Source.Substring(_Pointer, amount) : null;
+            return _Pointer + count <= _Source.Length ? _Source.Substring(_Pointer, count) : null;
         }
 
+        /// <summary>
+        /// Peek a char applying a positive offset to the current position
+        /// </summary>
+        /// <param name="offset">Offset to apply to get the character</param>
+        /// <returns></returns>
         private char Lookahead(int offset)
         {
             if (offset <= 0)
@@ -84,6 +110,10 @@ namespace Fl
             return _Pointer + offset <= _Source.Length ? _Source[_Pointer + offset] : '\0';
         }
 
+        /// <summary>
+        /// Consume the next character
+        /// </summary>
+        /// <returns></returns>
         private char Consume()
         {
             char c = _Pointer < _Source.Length ? _Source[_Pointer] : '\0';
@@ -92,17 +122,26 @@ namespace Fl
             return c;
         }
 
-        private string Consume(int amount)
+        /// <summary>
+        /// Consume a number of characters from the current position
+        /// </summary>
+        /// <param name="count">Number of characters to consume</param>
+        /// <returns></returns>
+        private string Consume(int count)
         {
-            if (amount <= 0)
+            if (count <= 0)
                 throw new ArgumentException("Amount must be greater than 0");
-            string str = _Pointer + amount < _Source.Length ? _Source.Substring(_Pointer, amount) : null;
-            _Pointer += amount;
-            _Col += amount;
+            string str = _Pointer + count < _Source.Length ? _Source.Substring(_Pointer, count) : null;
+            _Pointer += count;
+            _Col += count;
             return str;
         }
+
         #endregion
 
+        /// <summary>
+        /// Try to consume the next Token in the stream
+        /// </summary>
         public Token NextToken()
         {
             char c = Peek();

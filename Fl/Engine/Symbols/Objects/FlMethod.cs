@@ -21,10 +21,5 @@ namespace Fl.Engine.Symbols.Objects
         {
             return Body(This ?? throw new InvocationException($"Cannot invoke unbound method {Name}"), args);
         }
-
-        public override FlObject Invoke(List<FlObject> args)
-        {
-            throw new InvocationException($"Cannot invoke unbound method {Name}");
-        }
     }
 }

@@ -8,10 +8,10 @@ namespace Fl.Parser.Ast
     public class AstCallableNode : AstNode
     {
         public AstNode Callable { get; }
-        public AstExpressionList Arguments { get; }
+        public AstExpressionListNode Arguments { get; }
         public Token New { get; }
 
-        public AstCallableNode(AstNode callable, AstExpressionList args, Token newt = null)
+        public AstCallableNode(AstNode callable, AstExpressionListNode args, Token newt = null)
         {
             Callable = callable;
             Arguments = args;
@@ -21,7 +21,7 @@ namespace Fl.Parser.Ast
 
     public class AstIndexerNode : AstCallableNode
     {
-        public AstIndexerNode(AstNode callable, AstExpressionList args, Token newt = null) : base(callable, args, newt)
+        public AstIndexerNode(AstNode callable, AstExpressionListNode args, Token newt = null) : base(callable, args, newt)
         {
         }
     }

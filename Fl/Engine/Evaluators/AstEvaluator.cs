@@ -32,6 +32,7 @@ namespace Fl.Engine.Evaluators
         private ReturnNodeEvaluator _ReturnNodeEvaluator;
         private CallableNodeEvaluator _CallNodeEvaluator;
         private FuncDeclNodeEvaluator _FuncDeclNodeEvaluator;
+        private TupleNodeEvaluator _TupleNodeEvaluator;
         private NullCoalescingNodeEvaluator _NullCoalescingNodeEvaluator;
 
         public AstEvaluator()
@@ -55,6 +56,7 @@ namespace Fl.Engine.Evaluators
             _ContinueNodeEvaluator = new ContinueNodeEvaluator();
             _CallNodeEvaluator = new CallableNodeEvaluator();
             _FuncDeclNodeEvaluator = new FuncDeclNodeEvaluator();
+            _TupleNodeEvaluator = new TupleNodeEvaluator();
             _ReturnNodeEvaluator = new ReturnNodeEvaluator();
             _NullCoalescingNodeEvaluator = new NullCoalescingNodeEvaluator();
         }
@@ -102,6 +104,8 @@ namespace Fl.Engine.Evaluators
                     return _CallNodeEvaluator.Evaluate(this, call);
                 case AstFuncDeclNode func:
                     return _FuncDeclNodeEvaluator.Evaluate(this, func);
+                case AstTupleNode t:
+                    return _TupleNodeEvaluator.Evaluate(this, t);
                 case AstReturnNode ret:
                     return _ReturnNodeEvaluator.Evaluate(this, ret);
                 case AstNullCoalescingNode nc:

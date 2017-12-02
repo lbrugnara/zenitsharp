@@ -75,7 +75,7 @@ namespace Fl.Engine.Symbols.Objects
 
         public override object RawValue => Body;
 
-        public override bool IsPrimitive => true;
+        public override bool IsPrimitive => false;
 
         public override ObjectType ObjectType => FuncType.Value;
 
@@ -118,12 +118,6 @@ namespace Fl.Engine.Symbols.Objects
             {
                 symboltable.DestroyScope();
             }
-        }
-
-        public virtual FlObject Invoke(List<FlObject> args)
-        {
-            // There is no way to get the pointer to "this", so this call is "unbound"
-            return Body(null, args);
         }
 
         public virtual FlFunction Bind(FlObject self)

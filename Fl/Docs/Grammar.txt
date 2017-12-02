@@ -16,11 +16,16 @@ func_declaration -> 'fn' IDENTIFIER '(' func_params? ')' '{' declaration* '}'
 
 func_params -> IDENTIFIER ( ',' IDENTIFIER )*
 
-variable_declaration -> variable_type IDENTIFIER ( '=' expression )? ';'
+variable_declaration -> implicit_var_declaration 
+					| typed_var_declaration
 
-variable_type -> ( VAR | IDENTIFIER ( '[' ']' )* )
+implicit_var_declaration -> VAR IDENTIFIER '=' expression ';'
 
-constant_declaration -> CONST IDENTIFIER '=' expression ';'
+typed_var_declaration -> IDENTIFIER ( '[' ']' )* typed_var_definition ';'
+
+typed_var_definition -> IDENTIFIER ( '=' expression ( ',' typed_var_definition )* )?
+
+constant_declaration -> CONST IDENTIFIER? IDENTIFIER '=' expression ';'
 
 # Statements
 
@@ -55,9 +60,7 @@ for_statement -> 'for' '(' for_initializer? ';' expression? ';' for_iterator? ')
 for_initializer -> for_declaration
 				| expression ( ',' expression )*
 
-for_declaration -> variable_type local_var_declaration ( ',' local_var_declaration )*
-
-local_var_declaration -> IDENTIFIER ( '=' expression )
+for_declaration -> ( implicit_var_declaration | typed_var_declaration )
 
 for_iterator -> expression_list
 
@@ -65,7 +68,7 @@ break_statement -> 'break' INTEGER? ';'
 
 continue_statement -> 'continue' ';'
 
-return_statement -> 'return' expression? ( ',' expression )? ';'
+return_statement -> 'return' ( expression ( ',' expression )* )? ';'
 
 ### Expressions
 
@@ -73,9 +76,14 @@ expression_list -> expression ( ',' expression )*
 
 expression	-> expression_assignment
 
-expression_assignment	-> IDENTIFIER ( '.' IDENTIFIER | '(' arguments? ')' )* ( ( '=' | '+=' | '-=' | '/=' | '*=' )  expression_assignment )?
+expression_assignment	-> ( left_hand_side_expr | destructuring ) ( ( '=' | '+=' | '-=' | '/=' | '*=' )  expression_assignment )?
 						| lambda_expression
+						| tuple_initializer
 						| conditional_expression
+
+left_hand_side_expr -> IDENTIFIER ( '.' IDENTIFIER | arguments )*
+
+destructuring -> '(' IDENTIFIER ( '.' IDENTIFIER )* ( ',' destructuring )* ')'
 
 conditional_expression -> null_coalescing_expression ( '?' expression ':' expression )?
 
@@ -88,6 +96,8 @@ lambda_params -> '(' func_params ')'
 
 lambda_body -> block
 			| expression
+
+tuple_initializer -> '(' expression_list? ')'
 
 or_expression	-> and_expression ( '||' and_expression )*
 
