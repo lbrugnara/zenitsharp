@@ -30,14 +30,18 @@ namespace Fl.Engine.Evaluators
                 var lcount = lvalue.Value.Count;
                 for (int i=0; i < lcount; i++)
                 {
-                    var s = _AccessorEv.GetSymbol(walker, node.Lvalues.Items[i] as AstAccessorNode);
+                    var accessor = node.Lvalues.Items[i] as AstAccessorNode;
+                    // If it is not an accessor node, ignore this element (it could be an assignment of type (a,,c) = (1,2,3)
+                    if (accessor == null)
+                        continue;
+                    var s = _AccessorEv.GetSymbol(walker, accessor);
                     if (i >= rcount)
                         break;
 
                     s.UpdateBinding(rvalue.Value[i]);
                     lvalue.Value[i] = s.Binding;
                 }
-                return lvalue;
+                return rvalue;
             }
             else
             {

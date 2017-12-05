@@ -242,6 +242,17 @@ namespace Fl.Parser
             if (Match(TokenType.Variable))
                 return true;
 
+            if (Match(TokenType.Identifier, TokenType.LeftParen))
+            {
+                // identifier (identifier, identifier, ..., identifier)
+                if (MatchAnyFrom(2, TokenType.Identifier, TokenType.Comma))
+                    return true;
+
+                /*// identifier ( '[' ']' )+ (identifier, identifier, ..., identifier)
+                int dimensions = CountRepeatedMatchesFrom(1, TokenType.LeftBracket, TokenType.RightBracket);
+                return dimensions > 0 && MatchFrom(dimensions + 1, TokenType.Identifier);*/
+            }
+
             if (Match(TokenType.Identifier))
             {
                 // identifier identifier ( '=' expression )?
@@ -252,6 +263,7 @@ namespace Fl.Parser
                 int dimensions = CountRepeatedMatchesFrom(1, TokenType.LeftBracket, TokenType.RightBracket);
                 return dimensions > 0 && MatchFrom(dimensions + 1, TokenType.Identifier);
             }
+
             return false;
         }
 
@@ -617,18 +629,25 @@ namespace Fl.Parser
         }
 
         // Rule:
-        // implicit_var_declaration -> VAR IDENTIFIER '=' expression
+        // implicit_var_declaration -> VAR ( IDENTIFIER '=' expression | var_destructuring )';'
         private AstVariableNode ImplicitVarDeclaration()
         {
             AstVariableTypeNode variableType = new AstVariableTypeNode(Consume(TokenType.Variable));
-            Token identifier = Consume(TokenType.Identifier);
-            Consume(TokenType.Assignment, "Implicitly typed variables must be initialized");
-            AstNode expression = Expression();
-            return new AstVariableNode(variableType, identifier, expression);
+            if (Match(TokenType.LeftParen))
+            {
+                return new AstVariableNode(variableType, VarDestructuring());
+            }
+            else
+            {
+                Token identifier = Consume(TokenType.Identifier);
+                Consume(TokenType.Assignment, "Implicitly typed variables must be initialized");
+                AstNode expression = Expression();
+                return new AstVariableNode(variableType, identifier, expression);
+            }
         }
 
         // Rule:
-        // typed_var_declaration -> IDENTIFIER ( '[' ']' )* typed_var_definition
+        // typed_var_declaration -> IDENTIFIER ( '[' ']' )* ( typed_var_definition | var_destructuring ) ';'
         private AstVariableNode TypedVarDeclaration()
         {
             Token varType = Consume(TokenType.Identifier);
@@ -645,6 +664,10 @@ namespace Fl.Parser
                 variableType = new AstVariableTypeNode(varType, dimensions);
             }
 
+            if (Match(TokenType.LeftParen))
+            {
+                return new AstVariableNode(variableType, VarDestructuring());
+            }
             return new AstVariableNode(variableType, TypedVarDefinition());
         }
 
@@ -667,6 +690,30 @@ namespace Fl.Parser
                 }
             } while (Match(TokenType.Comma) && Consume(TokenType.Comma) != null);
             return vars;
+        }
+
+        // Rule: 
+        // var_destructuring -> '(' IDENTIFIER ( ',' IDENTIFIER )* ')' '=' destructuring_initializer
+        private List<Tuple<Token, AstNode>> VarDestructuring()
+        {
+            List<Token> tokens = new List<Token>();
+            Consume(TokenType.LeftParen);
+            do
+            {
+                if (Match(TokenType.Comma))
+                {
+                    tokens.Add(null);
+                }
+                else if (Match(TokenType.Identifier))
+                {
+                    tokens.Add(Consume(TokenType.Identifier));
+                }
+            } while (Match(TokenType.Comma) && Consume(TokenType.Comma) != null);
+            Consume(TokenType.RightParen);
+
+            Consume(TokenType.Assignment);
+            AstTupleNode tuple = DestructuringInitializer();
+            return tokens.Select((t, i) => new Tuple<Token, AstNode>(t, tuple.Items[i])).ToList();
         }
 
         // Rule:
@@ -774,26 +821,46 @@ namespace Fl.Parser
             Consume(TokenType.LeftParen);
             do
             {
-                // Get the identifier token
-                Token identifier = Consume(TokenType.Identifier);
-
-                AstNode accessor = new AstAccessorNode(identifier, null);
+                AstNode accessor = null;
 
                 // Try to find member accessors or callable members
                 //  member.property.property2
-                while (true)
+                if (Match(TokenType.Identifier))
                 {
-                    if (Match(TokenType.Dot))
+                    do
                     {
-                        Consume();
                         accessor = new AstAccessorNode(Consume(TokenType.Identifier), accessor);
-                    }
-                    else break;
+                    } while (Match(TokenType.Dot) && Consume(TokenType.Dot) != null);
                 }
+
+                if (accessor == null)
+                    accessor = new AstNoOpNode(null);
+
                 exprs.Add(accessor);
+
             } while (Match(TokenType.Comma) && Consume(TokenType.Comma) != null);
+
             Consume(TokenType.RightParen);
             return new AstTupleNode(exprs);
+        }
+
+        // Rule:
+        // destructuring_initializer -> '(' expression_list? ')'
+        private AstTupleNode DestructuringInitializer()
+        {
+            List<AstNode> args = new List<AstNode>();
+            Consume(TokenType.LeftParen);
+            if (!Match(TokenType.RightParen))
+            {
+                args.Add(Expression());
+                while (Match(TokenType.Comma))
+                {
+                    Consume();
+                    args.Add(Expression());
+                }
+            }
+            Consume(TokenType.RightParen);
+            return new AstTupleNode(args);
         }
 
         /// <summary>
@@ -802,7 +869,8 @@ namespace Fl.Parser
         /// <returns></returns>
         private bool IsDestructuring()
         {
-            return Match(TokenType.LeftParen, TokenType.Identifier) && MatchAnyFrom(2, TokenType.Dot, TokenType.Comma, TokenType.RightParen);
+            return (Match(TokenType.LeftParen, TokenType.Identifier) && MatchAnyFrom(2, TokenType.Dot, TokenType.Comma, TokenType.RightParen))
+                || Match(TokenType.LeftParen, TokenType.Comma);
         }
 
         private bool IsAssignment()
@@ -814,7 +882,7 @@ namespace Fl.Parser
         // Rule:
         // expression_assignment	-> ( destructuring | left_hand_side_expr ) ( ( '=' | '+=' | '-=' | '/=' | '*=' )  expression_assignment )?
         // 						     | lambda_expression
-        //                           | tuple_initializer
+        //                           | destructuring_initializer
         // 						     | conditional_expression
         private AstNode ExpressionAssignment()
         {
@@ -868,20 +936,7 @@ namespace Fl.Parser
             }
             else if (Match(TokenType.LeftParen))
             {
-                int checkpoint = _Pointer;
-                List<AstNode> args = new List<AstNode>();
-                Consume(TokenType.LeftParen);
-                if (!Match(TokenType.RightParen))
-                {
-                    args.Add(Expression());
-                    while (Match(TokenType.Comma))
-                    {
-                        Consume();
-                        args.Add(Expression());
-                    }
-                }
-                Consume(TokenType.RightParen);
-                return new AstTupleNode(args);
+                return DestructuringInitializer();
             }
             return ConditionalExpression();
         }

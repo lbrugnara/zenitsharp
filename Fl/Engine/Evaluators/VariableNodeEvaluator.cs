@@ -7,6 +7,7 @@ using Fl.Engine.Symbols.Objects;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Fl.Engine.Evaluators
@@ -26,6 +27,10 @@ namespace Fl.Engine.Evaluators
             {
                 var id = tuple.Item1;
                 var initializer = tuple.Item2;
+
+                // Ignore empty items, it could be a declaration of type var (a,,c) = (1,2,3)
+                if (id == null)
+                    continue;
 
                 // Get the variable name                
                 string varname = id.Value.ToString();
@@ -51,7 +56,7 @@ namespace Fl.Engine.Evaluators
                     varsymbol.UpdateBinding(initializer.Exec(evaluator));
                 }
             }
-            return varsymbol?.Binding ?? FlNull.Value;
+            return FlNull.Value;
         }
     }
 }

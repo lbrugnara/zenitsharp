@@ -9,9 +9,9 @@ namespace Fl.Parser.Ast
     {
         public Token EmptyStatement { get; }
 
-        public AstNoOpNode(Token semicolon)
+        public AstNoOpNode(Token emptystmt)
         {
-            EmptyStatement = semicolon;
+            EmptyStatement = emptystmt;
         }
     }
 }

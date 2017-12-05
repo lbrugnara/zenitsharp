@@ -19,11 +19,13 @@ func_params -> IDENTIFIER ( ',' IDENTIFIER )*
 variable_declaration -> implicit_var_declaration 
 					| typed_var_declaration
 
-implicit_var_declaration -> VAR IDENTIFIER '=' expression ';'
+implicit_var_declaration -> VAR ( IDENTIFIER '=' expression | var_destructuring )';'
 
-typed_var_declaration -> IDENTIFIER ( '[' ']' )* typed_var_definition ';'
+typed_var_declaration -> IDENTIFIER ( '[' ']' )* ( typed_var_definition | var_destructuring ) ';'
 
 typed_var_definition -> IDENTIFIER ( '=' expression ( ',' typed_var_definition )* )?
+
+var_destructuring -> '(' IDENTIFIER ( ',' IDENTIFIER )* ')' '=' destructuring_initializer
 
 constant_declaration -> CONST IDENTIFIER? IDENTIFIER '=' expression ';'
 
@@ -78,7 +80,7 @@ expression	-> expression_assignment
 
 expression_assignment	-> ( left_hand_side_expr | destructuring ) ( ( '=' | '+=' | '-=' | '/=' | '*=' )  expression_assignment )?
 						| lambda_expression
-						| tuple_initializer
+						| destructuring_initializer
 						| conditional_expression
 
 left_hand_side_expr -> IDENTIFIER ( '.' IDENTIFIER | arguments )*
@@ -97,7 +99,7 @@ lambda_params -> '(' func_params ')'
 lambda_body -> block
 			| expression
 
-tuple_initializer -> '(' expression_list? ')'
+destructuring_initializer -> '(' expression_list? ')'
 
 or_expression	-> and_expression ( '||' and_expression )*
 
