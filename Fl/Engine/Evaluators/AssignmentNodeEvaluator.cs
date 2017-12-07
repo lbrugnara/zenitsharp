@@ -4,6 +4,7 @@
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
+using Fl.Parser;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,13 @@ namespace Fl.Engine.Evaluators
             }
             else if (node.Lvalues != null)
             {
-                var rvalue = node.Expression.Exec(walker) as FlTuple;
+                var rnode = node.Expression.Exec(walker);
+                if (!(rnode is FlTuple))
+                {
+                    // TODO: Here we can handle the destructuring for specific objects
+                    throw new ParserException($"Cannot destructure object of type '{rnode.ObjectType}'");
+                }
+                var rvalue = rnode as FlTuple;
                 var rcount = rvalue.Value.Count;
                 var lvalue = node.Lvalues.Exec(walker) as FlTuple;
                 var lcount = lvalue.Value.Count;

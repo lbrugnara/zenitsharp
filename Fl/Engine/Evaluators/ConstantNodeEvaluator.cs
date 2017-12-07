@@ -17,38 +17,41 @@ namespace Fl.Engine.Evaluators
     {
         public FlObject Evaluate(AstEvaluator evaluator, AstConstantNode constdec)
         {
-            // Get the constant name
-            string constname = constdec.Identifier.Value.ToString();
-
-            // Run the initializer of the constant 
-            FlObject init = constdec.Initializer.Exec(evaluator);
-
-            // If the constant initializer is not a primitive type, throw an exception
-            if (!init.IsPrimitive)
-                throw new SymbolException($"The expression being assigned to '{constname}' must be constant");
-
-            // If the constant declaration contains a type, enforce it
-            if (constdec.Type != null)
+            foreach (var constant in constdec.Constants)
             {
-                // Get the class of the type
-                var typeClass = evaluator.Symtable.GetSymbol(constdec.Type.Value).Binding as FlClass;
+                // Get the constant name
+                string constname = constant.Item1.Value.ToString();
 
-                // Get the default value of the primitive
-                FlObject defaultValue = typeClass.InvokeConstructor();
+                // Run the initializer of the constant 
+                FlObject init = constant.Item2.Exec(evaluator);
 
-                // Create a new symbol and bind the default value to it
-                var constsymbol = new Symbol(SymbolType.Constant);
-                evaluator.Symtable.AddSymbol(constname, constsymbol, defaultValue);
+                // If the constant initializer is not a primitive type, throw an exception
+                if (!init.IsPrimitive)
+                    throw new SymbolException($"The expression being assigned to '{constname}' must be constant");
 
-                // Try to update the value, if the type differs this call will raise an exception
-                constsymbol.UpdateBinding(init);
+                // If the constant declaration contains a type, enforce it
+                if (constdec.Type != null)
+                {
+                    // Get the class of the type
+                    var typeClass = evaluator.Symtable.GetSymbol(constdec.Type.Value).Binding as FlClass;
+
+                    // Get the default value of the primitive
+                    FlObject defaultValue = typeClass.InvokeConstructor();
+
+                    // Create a new symbol and bind the default value to it
+                    var constsymbol = new Symbol(SymbolType.Constant);
+                    evaluator.Symtable.AddSymbol(constname, constsymbol, defaultValue);
+
+                    // Try to update the value, if the type differs this call will raise an exception
+                    constsymbol.UpdateBinding(init);
+                }
+                else
+                {
+                    // If the constant declaration does not contain a type, is safe to directly initialize it
+                    evaluator.Symtable.AddSymbol(constname, new Symbol(SymbolType.Constant), init);
+                }
             }
-            else
-            {
-                // If the constant declaration does not contain a type, is safe to directly initialize it
-                evaluator.Symtable.AddSymbol(constname, new Symbol(SymbolType.Constant), init);
-            }
-            return init;
+            return FlNull.Value;
         }
     }
 }

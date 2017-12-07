@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Fl.Parser.Ast
@@ -9,14 +10,12 @@ namespace Fl.Parser.Ast
     public class AstConstantNode : AstNode
     {
         public Token Type { get; }
-        public Token Identifier { get; }
-        public AstNode Initializer { get; }
+        public List<Tuple<Token, AstNode>> Constants { get; }
 
-        public AstConstantNode(Token identifier, AstNode initializer, Token type = null)
+        public AstConstantNode(Token type, List<Tuple<Token, AstNode>> constdefs)
         {
             Type = type;
-            Identifier = identifier;
-            Initializer = initializer;
+            Constants = constdefs;
         }
     }
 }
