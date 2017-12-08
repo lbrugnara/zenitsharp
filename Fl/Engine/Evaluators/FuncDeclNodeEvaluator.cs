@@ -3,11 +3,10 @@
 
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
-using Fl.Engine.Symbols.Types;
+using Fl.Parser;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
@@ -18,10 +17,10 @@ namespace Fl.Engine.Evaluators
         private Token _Identifier;
         private AstParametersNode _Params;
         private List<AstNode> _Body;
-        private Scope _Env;
+        private List<Scope> _Env;
         public override Func<FlObject, List<FlObject>, FlObject> Body { get; }
 
-        public Func(AstEvaluator eval, Token name, AstParametersNode parameters, List<AstNode> body, Scope env = null)
+        public Func(AstEvaluator eval, Token name, AstParametersNode parameters, List<AstNode> body, List<Scope> env = null)
             : base (name.Type == TokenType.RightArrow ? null : name.Value.ToString(), null, null)
         {
             Body = (self, args) => InternalInvoke(eval.Symtable, args);
@@ -39,6 +38,11 @@ namespace Fl.Engine.Evaluators
         public override FlObject Clone()
         {
             return new Func(_Evaluator, _Identifier, _Params, _Body, _Env);
+        }
+
+        protected override void CreateFunctionScope(SymbolTable symboltable)
+        {
+            symboltable.NewScope(ScopeType.Function, _Env);
         }
 
         protected FlObject InternalInvoke(SymbolTable symboltable, List<FlObject> args)

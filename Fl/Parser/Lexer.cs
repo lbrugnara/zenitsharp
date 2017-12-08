@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Fl
+namespace Fl.Parser
 {
     public class Lexer
     {

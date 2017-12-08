@@ -8,13 +8,13 @@ namespace Fl.Parser.Ast
 {
     public class AstAccessorNode : AstNode
     {
-        public Token Self;
-        public AstNode Member;
+        public Token Identifier;
+        public AstNode Enclosing;
 
-        public AstAccessorNode(Token self, AstNode member)
+        public AstAccessorNode(Token identifier, AstNode enclosing)
         {
-            Self = self;
-            Member = member;
+            Identifier = identifier;
+            Enclosing = enclosing;
         }
     }
 }

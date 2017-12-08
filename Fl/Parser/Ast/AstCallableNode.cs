@@ -18,11 +18,4 @@ namespace Fl.Parser.Ast
             New = newt;
         }
     }
-
-    public class AstIndexerNode : AstCallableNode
-    {
-        public AstIndexerNode(AstNode callable, AstExpressionListNode args, Token newt = null) : base(callable, args, newt)
-        {
-        }
-    }
 }

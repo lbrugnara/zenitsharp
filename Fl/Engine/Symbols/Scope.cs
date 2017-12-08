@@ -8,6 +8,7 @@ using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Fl.Engine.Symbols
@@ -26,19 +27,19 @@ namespace Fl.Engine.Symbols
         private ScopeType _ScopeType;
         private Dictionary<string, Symbol> _Map;
         // Contains the environment of the binding time for closures
-        private Scope _Env;
+        private List<Scope> _Env;
         private string _Name;
         private bool _Break;
         private bool _Continue;
         #endregion
 
         #region Constructors
-        public Scope(ScopeType type, Scope env = null)
+        public Scope(ScopeType type, List<Scope> env = null)
         {
             _ScopeType = type;
             _Map = new Dictionary<string, Symbol>();
             _Env = env;
-            _Name = ScopeN == 1 ? "<global>" : $"<scope@{{{ScopeN++}}}>";
+            _Name = ScopeN++ == 1 ? "<global>" : $"<scope@{{{ScopeN-1}}}>";
         }
         #endregion
 
@@ -47,7 +48,7 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                return _Map.ContainsKey(var) ? _Map[var] : _Env != null && _Env._Map.ContainsKey(var) ? _Env._Map[var] : null;
+                return _Map.ContainsKey(var) ? _Map[var] : _Env != null && _Env.Any(s => s._Map.ContainsKey(var)) ? _Env.First(s => s._Map.ContainsKey(var))._Map[var] : null;
             }
         }
 
@@ -61,7 +62,7 @@ namespace Fl.Engine.Symbols
         #endregion
 
         #region Public Properties
-        public bool HasSymbol(string s) => _Map.ContainsKey(s) || _Env != null && _Env._Map.ContainsKey(s);
+        public bool HasSymbol(string s) => _Map.ContainsKey(s) || _Env != null && _Env.Any(scp => scp._Map.ContainsKey(s));
 
         public bool Break { get => _Break; set => _Break = value; }
 
@@ -83,9 +84,9 @@ namespace Fl.Engine.Symbols
             {
                 _Map[name].UpdateBinding(obj);
             }
-            else if (_Env != null && _Env._Map.ContainsKey(name))
+            else if (_Env != null && _Env.Any(s => s._Map.ContainsKey(name)))
             {
-                _Env._Map[name].UpdateBinding(obj);
+                _Env.First(s => s._Map.ContainsKey(name))._Map[name].UpdateBinding(obj);
             }
             else throw new SymbolException($"Symbol {name} does not exist in the current context");
         }

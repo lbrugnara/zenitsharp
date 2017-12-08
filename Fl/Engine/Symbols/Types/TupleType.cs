@@ -13,6 +13,6 @@ namespace Fl.Engine.Symbols.Types
 
         public override string Name => "tuple";
 
-        public override string ClassName => "Tuple";
+        public override string ClassName => "tuple";
     }
 }

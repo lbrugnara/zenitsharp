@@ -105,9 +105,14 @@ namespace Fl.Engine.Symbols.Objects
 
         public static Func<FlFunction> Activator => () => new FlFunction();
 
-        public virtual FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
+        protected virtual void CreateFunctionScope(SymbolTable symboltable)
         {
             symboltable.NewScope(ScopeType.Function);
+        }
+
+        public virtual FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
+        {
+            CreateFunctionScope(symboltable);
             try
             {
                 if (_This != null)

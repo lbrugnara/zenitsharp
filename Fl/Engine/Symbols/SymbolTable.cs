@@ -49,7 +49,7 @@ namespace Fl.Engine.Symbols
         /// Add a new scope to the scope's chain
         /// </summary>
         /// <param name="scopeType">Scope's type</param>
-        public void NewScope(ScopeType scopeType, Scope env = null)
+        public void NewScope(ScopeType scopeType, List<Scope> env = null)
         {
             _Scopes.Add(new Scope(scopeType, env));
         }
@@ -174,21 +174,25 @@ namespace Fl.Engine.Symbols
             return _Scopes.Count > 0 && _Scopes.Any(s => s.ScopeType == ScopeType.Function);
         }
 
-        public Scope GetCurrentFunctionEnv()
+        public List<Scope> GetCurrentFunctionEnv()
         {
+            List<Scope> chain = new List<Scope>();
             int i = _Scopes.Count - 1;
             var scp = i >= 0 ? _Scopes[i] : null;
             while (scp != null)
             {
+                chain.Add(scp);
                 if (scp.ScopeType == ScopeType.Function)
                 {
-                    var env = new Scope(ScopeType.Function);
-                    env.Import(scp);
-                    return env;
+                    break;
                 }
                 scp = _Scopes.ElementAtOrDefault(--i);
             }
-            return null;
+            return chain.Count > 0 ? chain.Select(s => {
+                var env = new Scope(s.ScopeType);
+                env.Import(s);
+                return env;
+            }).ToList() : null;
         }
         #endregion
 

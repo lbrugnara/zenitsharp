@@ -20,7 +20,7 @@ namespace Fl.Engine.StdLib.builtin.types
             builder
 
                 // Class Name
-                .WithName("Tuple")
+                .WithName("tuple")
 
                 // Activator
                 .WithActivator(() => new FlTuple())
@@ -39,6 +39,7 @@ namespace Fl.Engine.StdLib.builtin.types
 
                 // Instance Methods
                 .WithMethod("get", (self, args) => (self as FlTuple).Value.ElementAtOrDefault((args[0] as FlInteger).Value))
+                .WithMethod("count", (self, args) => new FlInteger((self as FlTuple).Value.Count))
 
                 // Indexers
                 .WithIndexer(new FlIndexer(1, (self, args) => self[args[0]]));

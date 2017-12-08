@@ -10,9 +10,9 @@ namespace Fl.Parser.Ast
         public Token Operator { get; }
         public AstNode Left { get; }
 
-        public AstUnaryNode(Token t, AstNode left)
+        public AstUnaryNode(Token opToken, AstNode left)
         {
-            Operator = t;
+            Operator = opToken;
             Left = left;
         }
     }

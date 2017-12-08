@@ -19,7 +19,7 @@ namespace Fl.Engine.StdLib.builtin.types
             builder
 
                 // Class Name
-                .WithName("Func")
+                .WithName("func")
 
                 // Activator
                 .WithActivator(() => FlFunction.Activator.Invoke() as FlObject)

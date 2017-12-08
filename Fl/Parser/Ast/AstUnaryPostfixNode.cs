@@ -6,8 +6,8 @@ namespace Fl.Parser.Ast
 {
     public class AstUnaryPostfixNode : AstUnaryNode
     {
-        public AstUnaryPostfixNode(Token t, AstNode left)
-            : base(t, left)
+        public AstUnaryPostfixNode(Token opToken, AstNode left)
+            : base(opToken, left)
         {
 
         }

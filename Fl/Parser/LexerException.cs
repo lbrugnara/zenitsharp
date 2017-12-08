@@ -4,7 +4,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Fl
+namespace Fl.Parser
 {
     class LexerException : Exception
     {

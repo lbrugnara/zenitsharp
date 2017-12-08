@@ -4,6 +4,7 @@
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
@@ -23,6 +24,7 @@ namespace Fl.Parser
         /// </summary>
         private int _Pointer;
 
+        private List<ParserException> _ParsingErrors;
         #endregion
 
         #region Constructor
@@ -31,10 +33,13 @@ namespace Fl.Parser
         {
             _Pointer = 0;
             _Tokens = tokens;
+            _ParsingErrors = new List<ParserException>();
             return Program();
         }
 
         #endregion
+
+        public ReadOnlyCollection<ParserException> ParsingErrors => new ReadOnlyCollection<ParserException>(_ParsingErrors);
 
         #region Parser state
 
@@ -98,7 +103,7 @@ namespace Fl.Parser
         /// <returns></returns>
         private bool MatchFrom(int offset, params TokenType[] types)
         {
-            //if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
 
             var l = types.Length;
             if (l + _Pointer + offset > _Tokens.Count || _Pointer + offset < 0)
@@ -131,7 +136,7 @@ namespace Fl.Parser
         /// <returns></returns>
         private bool MatchAnyFrom(int offset, params TokenType[] types)
         {
-            //if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
             var t = PeekFrom(offset);
             return t != null && types.Contains(t.Type);
         }
@@ -205,6 +210,18 @@ namespace Fl.Parser
             return _Tokens[_Pointer++];
         }
 
+        private string GetSourceContext()
+        {
+            // TODO: Retrieve context from Lexer
+            return "";
+        }
+
+        private string GetCurrentLineAndCol()
+        {
+            Token t = _Tokens.ElementAtOrDefault(_Pointer - 1);
+            return t != null ? $"[Line {t.Line}:{t.Col}]" : "[Line 0:0]";
+        }
+
         /// <summary>
         /// Consume the next token making sure its type matches the provided type. If the next token does not match with the type
         /// throw an exception. If message is not null use it as the exception's message
@@ -228,16 +245,13 @@ namespace Fl.Parser
                         Value = ";"
                     };
                 }
-                Token t = _Tokens.ElementAtOrDefault(_Pointer - 1);
-                if (t != null)
-                    throw new ParserException(message ?? $"Expects {type} at line {t.Line}:{t.Col}");
-                throw new ParserException(message ?? $"Expects {type} the end of the input");
+                
+                throw new ParserException(message ?? $"{GetCurrentLineAndCol()} Expects {type} but received the end of the input: {GetSourceContext()}");
             }
 
             if (!Match(type))
             {
-                Token t = _Tokens.ElementAtOrDefault(_Pointer - 1);
-                throw new ParserException(message ?? $"Expects {type} but received {Peek().Type} at line {t.Line}:{t.Col}");
+                throw new ParserException(message ?? $"{GetCurrentLineAndCol()} Expects {type} but received {Peek().Type}: {GetSourceContext()}");
             }
 
             return _Tokens[_Pointer++];
@@ -263,12 +277,21 @@ namespace Fl.Parser
             List<AstNode> statements = new List<AstNode>();
             while (HasInput())
             {
-                if (Match(TokenType.Semicolon))
+                try
                 {
-                    Consume();
-                    continue;
+                    if (Match(TokenType.Semicolon))
+                    {
+                        Consume();
+                        continue;
+                    }
+                    statements.Add(Declaration());
                 }
-                statements.Add(Declaration());
+                catch (ParserException pe)
+                {
+                    _ParsingErrors.Add(pe);
+                    while (HasInput() && !Match(TokenType.Semicolon))
+                        Consume();
+                }
             }
             return new AstDeclarationNode(statements);
         }
@@ -298,9 +321,9 @@ namespace Fl.Parser
 
         // Rule:
         // variable_declaration -> ( implicit_var_declaration | typed_var_declaration ) ';'
-        private AstNode VarDeclaration()
+        private AstVariableNode VarDeclaration()
         {
-            AstNode variable = null;
+            AstVariableNode variable = null;
             if (Match(TokenType.Variable))
             {
                 variable = ImplicitVarDeclaration();
@@ -386,7 +409,11 @@ namespace Fl.Parser
             List<Token> tokens = new List<Token>();
 
             // Consume the left hand side: (x,y,z) or (,y,) or (x,,) etc.
-            Consume(TokenType.LeftParen);
+            bool hasParenthesis = false;
+
+            if (Match(TokenType.LeftParen) && Consume(TokenType.LeftParen) != null)
+                hasParenthesis = true;
+
             do
             {
                 if (Match(TokenType.Comma))
@@ -398,7 +425,9 @@ namespace Fl.Parser
                     tokens.Add(Consume(TokenType.Identifier));
                 }
             } while (Match(TokenType.Comma) && Consume(TokenType.Comma) != null);
-            Consume(TokenType.RightParen);
+
+            if (hasParenthesis)
+                Consume(TokenType.RightParen);
 
             // Destructuring just work with assignment, it is a must
             Consume(TokenType.Assignment);
@@ -409,7 +438,7 @@ namespace Fl.Parser
 
         // Rule:
         // constant_declaration -> CONST IDENTIFIER IDENTIFIER '=' expression ( ',' IDENTIFIER '=' expression )* ) ';'
-        private AstNode ConstDeclaration()
+        private AstConstantNode ConstDeclaration()
         {
             // Consume the keyword
             Consume(TokenType.Constant);
@@ -546,18 +575,24 @@ namespace Fl.Parser
 
         // Rule:
         // parenthesized_expr -> "(" expression ")" ( statement | ";" )
-        private (AstNode, AstNode) ParenthesizedExpression()
+        private (AstNode, AstNode) ParenthesizedStatement()
         {
-            Consume(TokenType.LeftParen);
-            AstNode expression = Expression();
-            Consume(TokenType.RightParen);
+            AstNode expression = ParenthesizedExpression();
             AstNode stmt = Match(TokenType.Semicolon) ? new AstNoOpNode(Consume(TokenType.Semicolon)) : Statement();
             return (expression, stmt);
         }
 
+        private AstNode ParenthesizedExpression()
+        {
+            Consume(TokenType.LeftParen);
+            AstNode expression = Expression();
+            Consume(TokenType.RightParen);
+            return expression;
+        }
+
         // Rule:
         // braced_expr -> expression block
-        private (AstNode, AstNode) BracedExpression()
+        private (AstNode, AstNode) BracedStatement()
         {
             AstNode expression = Expression();
             AstNode block = Block();
@@ -572,7 +607,7 @@ namespace Fl.Parser
 
             AstNode condition = null;
             AstNode body = null;
-            (condition, body) = Match(TokenType.LeftParen) ? ParenthesizedExpression() : BracedExpression();
+            (condition, body) = Match(TokenType.LeftParen) ? ParenthesizedStatement() : BracedStatement();
             return new AstWhileNode(kw, condition, body);
         }
 
@@ -581,7 +616,7 @@ namespace Fl.Parser
         // Rule:
         // for_statement -> "for" "(" for_initializer? ";" expression? ";" for_iterator? ")" statement
         // 			      | "for" for_initializer? ";" expression? ";" for_iterator? block
-        private AstNode ForStatement()
+        private AstForNode ForStatement()
         {
             if (Match(TokenType.For, TokenType.LeftParen))
                 return ParenthesizedForStatemet();
@@ -630,7 +665,7 @@ namespace Fl.Parser
 
         // Rule: (continuation)
         // for_statement -> "for" "(" for_initializer? ";" expression? ";" for_iterator? ")" statement
-        private AstNode ParenthesizedForStatemet()
+        private AstForNode ParenthesizedForStatemet()
         {
             Token kw = Consume(TokenType.For);
             Consume(TokenType.LeftParen);
@@ -692,7 +727,7 @@ namespace Fl.Parser
 
         // Rule:
         // for_declaration -> ( implicit_var_declaration | typed_var_declaration )
-        private AstNode ForDeclaration()
+        private AstDeclarationNode ForDeclaration()
         {
             AstNode variable = null;
             if (Match(TokenType.Variable))
@@ -708,7 +743,7 @@ namespace Fl.Parser
 
         // Rule:
         // for_iterator -> expression ( "," expression )*
-        private AstNode ForIterator()
+        private AstDeclarationNode ForIterator()
         {
             List<AstNode> exprs = new List<AstNode> {
                 Expression()
@@ -727,14 +762,14 @@ namespace Fl.Parser
         // if_statement -> "if" (parenthesized_expr | braced_expr ) ( "else" (statement | ";" ) )?
         // parenthesized_expr -> "(" expression ")" ( statement | ";" )
         // braced_expr -> expression block
-        private AstNode IfStatement()
+        private AstIfNode IfStatement()
         {
             Token kw = Consume(TokenType.If);
             AstNode condition = null;
             AstNode thenbranch = null;
             AstNode elsebranch = null;
 
-            (condition, thenbranch) = Match(TokenType.LeftParen) ? ParenthesizedExpression() : BracedExpression();
+            (condition, thenbranch) = Match(TokenType.LeftParen) ? ParenthesizedStatement() : BracedStatement();
 
             // Parse the else branch if present
             if (Match(TokenType.Else))
@@ -792,7 +827,7 @@ namespace Fl.Parser
 
         // Rule:
         // lambda_expression -> lambda_params '=>' ( block | expression )
-        private AstNode LambdaExpression()
+        private AstFuncDeclNode LambdaExpression()
         {
             AstParametersNode lambdaParams = LambdaParams();
             var arrow = Consume(TokenType.RightArrow);
@@ -865,7 +900,10 @@ namespace Fl.Parser
         {
             List<AstNode> exprs = new List<AstNode>();
 
-            Consume(TokenType.LeftParen);
+            bool hasParenthesis = false;
+
+            if (Match(TokenType.LeftParen) && Consume(TokenType.LeftParen) != null)
+                hasParenthesis = true;
             do
             {
                 AstNode accessor = null;
@@ -887,7 +925,8 @@ namespace Fl.Parser
 
             } while (Match(TokenType.Comma) && Consume(TokenType.Comma) != null);
 
-            Consume(TokenType.RightParen);
+            if (hasParenthesis)
+                Consume(TokenType.RightParen);
 
             return new AstTupleNode(exprs);
         }
@@ -897,22 +936,23 @@ namespace Fl.Parser
         private AstTupleNode TupleInitializer()
         {
             List<AstNode> args = new List<AstNode>();
+            bool isValidTuple = false;
 
             Consume(TokenType.LeftParen);
 
-            if (!Match(TokenType.RightParen))
+            while (!Match(TokenType.RightParen))
             {
                 args.Add(Expression());
                 while (Match(TokenType.Comma))
                 {
+                    isValidTuple = true;
                     Consume();
-                    args.Add(Expression());
                 }
             }
 
             Consume(TokenType.RightParen);
 
-            return new AstTupleNode(args);
+            return isValidTuple ? new AstTupleNode(args) : null;
         }
 
         // Rule:
@@ -938,9 +978,9 @@ namespace Fl.Parser
                     AstNode expression = Expression();
 
                     if (lvalue is AstCallableNode)
-                        throw new ParserException($"Left-hand side of an assignment must be a variable.");
+                        throw new ParserException($"{GetCurrentLineAndCol()} Left-hand side of an assignment must be a variable.");
 
-                    return new AstAssignmentNode(lvalue as AstAccessorNode, assignmentop, expression);
+                    return new AstVariableAssignmentNode(lvalue as AstAccessorNode, assignmentop, expression);
                 }
 
                 // If we are not seeing an assignment operator, then try again with ConditionalExpression
@@ -952,32 +992,27 @@ namespace Fl.Parser
             if (MatchLambda())
                 return LambdaExpression();
 
-            // If we reached this point and we find a left parenthesis, try a destructuring or a tuple initializer
-            if (Match(TokenType.LeftParen))
-            {                
+            if (IsDestructuring())
+            {
                 ParserCheckpoint checkpoint = SaveCheckpoint();
-                
-                if (IsDestructuring())
+                // First try if it is a left-hand side expression
+                try
                 {
-                    // First try if it is a left-hand side expression
-                    try
-                    {
-                        AstTupleNode lvalue = Destructuring();
+                    AstTupleNode lvalue = Destructuring();
 
-                        // If we now match an assignment of any type, create an assignment node
-                        if (MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
-                        {
-                            Token assignmentop = Consume();
-                            AstNode expression = Expression();
-                            return new AstAssignmentNode(lvalue, assignmentop, expression);
-                        }
-                    }
-                    catch
+                    // If we now match an assignment of any type, create an assignment node
+                    if (MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
                     {
+                        Token assignmentop = Consume();
+                        AstNode expression = Expression();
+                        return new AstDestructuringAssignmentNode(lvalue, assignmentop, expression);
                     }
-                    // If we reach this point, we restore the checkpoint
-                    RestoreCheckpoint(checkpoint);
                 }
+                catch
+                {
+                }
+                // If we reach this point, we restore the checkpoint
+                RestoreCheckpoint(checkpoint);
             }
 
             // Finally try with a conditional expression
@@ -1105,7 +1140,7 @@ namespace Fl.Parser
         // unary_expression	-> ( "!" | "-" ) unary_expression
         // 					| ( "++" | "--" ) primary_expression
         // 					| primary_expression ( "++" | "--" )?
-        private AstNode UnaryExpression()
+        private AstUnaryNode UnaryExpression()
         {
             if (Match(TokenType.Not) || Match(TokenType.Minus))
             {
@@ -1138,8 +1173,8 @@ namespace Fl.Parser
             {
                 if (Match(TokenType.LeftParen))
                 {
-                    if (TryGetAccessor(primary) == null && TryGetLiteral(primary)?.Primary?.Type != TokenType.Identifier)
-                        throw new ParserException($"'{primary}' is not an invokable object");
+                    if (TryGetAccessor(primary) == null && TryGetLiteral(primary)?.Literal?.Type != TokenType.Identifier)
+                        throw new ParserException($"{GetCurrentLineAndCol()} '{primary}' is not an invokable object");
                     AstExpressionListNode arguments = Arguments();
                     primary = new AstCallableNode(primary, arguments, newt);
                 }
@@ -1155,9 +1190,9 @@ namespace Fl.Parser
                 else
                 {
                     if (_Pointer == checkpoint.Pointer
-                        && (primary is AstLiteralNode && (primary as AstLiteralNode).Primary.Type != TokenType.Identifier)
+                        && (primary is AstLiteralNode && (primary as AstLiteralNode).Literal.Type != TokenType.Identifier)
                         && newt != null)
-                        throw new ParserException($"Type expected");
+                        throw new ParserException($"{GetCurrentLineAndCol()} Type expected");
                     if (_Pointer == checkpoint.Pointer && (primary is AstAccessorNode) && newt != null)
                         primary = new AstCallableNode(primary, new AstExpressionListNode(new List<AstNode>()), newt);
                     break;
@@ -1215,25 +1250,24 @@ namespace Fl.Parser
                 // Now we can try if it is a literal tuple initializer
                 try
                 {
+                    // This call will return null if it is not a valid tuple initializer
                     var node = TupleInitializer();
 
                     // If we match a dot, it could be a primary expression followed by a member access,
                     // it is not a literal tuple initializer
-                    if (!MatchAny(TokenType.Dot))
+                    if (node != null && !MatchAny(TokenType.Dot))
                         return node;
                 }
                 catch
                 {
                 }
 
-                // If we didn't match destructuring or tuple initializer, restore and try another thing
+                // If we didn't match destructuring or tuple initializer, restore and try
+                // a parenthesized expression
                 RestoreCheckpoint(checkpoint);
-
-                Consume();
-                AstNode expression = Expression();
-                Consume(TokenType.RightParen);
-                return expression;
+                return ParenthesizedExpression();
             }
+
             if (!Match(TokenType.Boolean)
                 && !Match(TokenType.Null)
                 && !Match(TokenType.Integer)
@@ -1241,7 +1275,7 @@ namespace Fl.Parser
                 && !Match(TokenType.Decimal)
                 && !Match(TokenType.String)
                 && !Match(TokenType.Identifier))
-                throw new ParserException($"Expects primary but received {(HasInput() ? Peek().Type.ToString() : "end of input")}");
+                throw new ParserException($"{GetCurrentLineAndCol()} Expects primary but received {(HasInput() ? Peek().Type.ToString() : "end of input")}");
 
             return Match(TokenType.Identifier) ? (AstNode)new AstAccessorNode(Consume(), null) : new AstLiteralNode(Consume());
         }
@@ -1255,10 +1289,10 @@ namespace Fl.Parser
             if (Match(TokenType.Variable))
                 return true;
 
-            if (Match(TokenType.Identifier, TokenType.LeftParen))
+            if (Match(TokenType.Identifier, TokenType.LeftParen, TokenType.Identifier))
             {
                 // identifier (identifier, identifier, ..., identifier)
-                if (MatchAnyFrom(2, TokenType.Identifier, TokenType.Comma))
+                if (MatchAnyFrom(3, TokenType.Identifier, TokenType.Comma))
                     return true;
 
                 /*// identifier ( '[' ']' )+ (identifier, identifier, ..., identifier)
@@ -1286,6 +1320,20 @@ namespace Fl.Parser
         /// <returns></returns>
         private bool IsDestructuring()
         {
+            // Check for a left-hand side expression containing a Comma
+            if (!Match(TokenType.LeftParen))
+            {
+                for (int i=0; i < _Tokens.Count; i++)
+                {
+                    var t = PeekFrom(i);
+                    if (t == null || t.Type == TokenType.Assignment)
+                        break;
+                    if (t.Type == TokenType.Comma)
+                        return true;
+                }
+            }
+
+            // Check for parenthesized list of identifiers
             return (Match(TokenType.LeftParen, TokenType.Identifier) && MatchAnyFrom(2, TokenType.Dot, TokenType.Comma, TokenType.RightParen))
                 || Match(TokenType.LeftParen, TokenType.Comma);
         }
@@ -1341,7 +1389,7 @@ namespace Fl.Parser
 
                 if (tmp is AstAccessorNode)
                 {
-                    tmp = (tmp as AstAccessorNode).Member;
+                    tmp = (tmp as AstAccessorNode).Enclosing;
                     continue;
                 }
                 else if (tmp is AstCallableNode)

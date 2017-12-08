@@ -7,16 +7,16 @@ namespace Fl.Parser.Ast
 {
     public class AstLiteralNode : AstNode
     {
-        public Token Primary { get; }
+        public Token Literal { get; }
 
         public AstLiteralNode(Token t)
         {
-            Primary = t;
+            Literal = t;
         }
 
         public override string ToString()
         {
-            return Primary.Value.ToString();
+            return Literal.Value.ToString();
         }
     }
 }

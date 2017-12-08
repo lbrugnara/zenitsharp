@@ -6,16 +6,6 @@ using System.Collections.Generic;
 
 namespace Fl.Parser.Ast
 {
-    public class AstParametersNode : AstNode
-    {
-        public List<Token> Parameters { get; }
-
-        public AstParametersNode(List<Token> parameters)
-        {
-            Parameters = parameters;
-        }
-    }
-
     public class AstFuncDeclNode : AstNode
     {
         public Token Identifier { get; }

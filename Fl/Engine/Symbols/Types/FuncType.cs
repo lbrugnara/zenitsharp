@@ -13,6 +13,6 @@ namespace Fl.Engine.Symbols.Types
 
         public override string Name => "func";
 
-        public override string ClassName => "Func";
+        public override string ClassName => "func";
     }
 }

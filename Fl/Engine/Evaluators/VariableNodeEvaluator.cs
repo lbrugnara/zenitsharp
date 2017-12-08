@@ -1,16 +1,14 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.StdLib;
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
+using Fl.Parser;
 using Fl.Parser.Ast;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
@@ -33,6 +31,15 @@ namespace Fl.Engine.Evaluators
         {
             // Get the variable type
             var type = vardecl.VarType;
+            Func<FlObject> typeActivator = null;
+
+            // If type is not null, get the activator for the type
+            if (type != null && type.TypeToken.Type != TokenType.Variable)
+            {
+                // This will raise an exception if the type is not registered
+                var clasz = evaluator.Symtable.GetSymbol(vardecl.VarType.TypeToken.Value.ToString()).Binding as FlClass;
+                typeActivator = clasz.Activator;
+            }
 
             // attributes
             bool isArray = type.Dimensions?.Count > 0; // By now allow 1-dimension arrays
@@ -53,16 +60,9 @@ namespace Fl.Engine.Evaluators
                 // Build the Symbol information from an initializer or use null
                 varsymbol = new Symbol(SymbolType.Variable);
 
-                // Initialize to null
-                evaluator.Symtable.AddSymbol(varname, varsymbol, FlNull.Value);
-
-                // If type is not null, get the default value of the type and update the binding
-                if (type != null && type.TypeToken.Type != TokenType.Variable)
-                {
-                    var clasz = evaluator.Symtable.GetSymbol(vardecl.VarType.TypeToken.Value.ToString()).Binding as FlClass;
-                    FlObject defaultVal = clasz.Activator.Invoke();
-                    varsymbol.UpdateBinding(defaultVal);
-                }
+                // If the activator is present (it is a typed declaration) initialize to the default value
+                // If it is an implicit declaration, let it null
+                evaluator.Symtable.AddSymbol(varname, varsymbol, typeActivator?.Invoke() ?? FlNull.Value);
 
                 // If the declaration has a definition, update the binding. This will raise an exception if types do not match
                 if (initializer != null)

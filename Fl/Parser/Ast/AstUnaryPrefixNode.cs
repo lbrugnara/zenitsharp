@@ -6,8 +6,8 @@ namespace Fl.Parser.Ast
 {
     public class AstUnaryPrefixNode : AstUnaryNode
     {
-        public AstUnaryPrefixNode(Token t, AstNode left)
-            : base (t, left)
+        public AstUnaryPrefixNode(Token opToken, AstNode left)
+            : base (opToken, left)
         {
 
         }
