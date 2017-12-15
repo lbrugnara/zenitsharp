@@ -16,7 +16,7 @@ namespace Fl.Engine.Evaluators
     {
         public FlObject Evaluate(AstEvaluator evaluator, AstForNode fornode)
         {
-            evaluator.Symtable.NewScope(ScopeType.Loop);
+            evaluator.Symtable.EnterScope(ScopeType.Loop);
             try
             {
                 fornode.Init.Exec(evaluator);
@@ -34,7 +34,7 @@ namespace Fl.Engine.Evaluators
             }
             finally
             {
-                evaluator.Symtable.DestroyScope();
+                evaluator.Symtable.LeaveScope();
             }
             return null;
         }

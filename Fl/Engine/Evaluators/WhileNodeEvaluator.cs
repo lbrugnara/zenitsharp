@@ -16,7 +16,7 @@ namespace Fl.Engine.Evaluators
     {
         public FlObject Evaluate(AstEvaluator evaluator, AstWhileNode wnode)
         {
-            evaluator.Symtable.NewScope(ScopeType.Loop);
+            evaluator.Symtable.EnterScope(ScopeType.Loop);
             try
             {
                 FlObject result = wnode.Condition.Exec(evaluator);
@@ -35,7 +35,7 @@ namespace Fl.Engine.Evaluators
             }
             finally
             {
-                evaluator.Symtable.DestroyScope();
+                evaluator.Symtable.LeaveScope();
             }
             return null;
         }

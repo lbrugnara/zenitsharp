@@ -107,7 +107,7 @@ namespace Fl.Engine.Symbols.Objects
 
         protected virtual void CreateFunctionScope(SymbolTable symboltable)
         {
-            symboltable.NewScope(ScopeType.Function);
+            symboltable.EnterScope(ScopeType.Function);
         }
 
         public virtual FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
@@ -121,7 +121,7 @@ namespace Fl.Engine.Symbols.Objects
             }
             finally
             {
-                symboltable.DestroyScope();
+                symboltable.LeaveScope();
             }
         }
 

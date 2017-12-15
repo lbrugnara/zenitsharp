@@ -21,12 +21,13 @@ namespace Fl.Engine.Symbols
         /// <summary>
         /// List of chained scopes
         /// </summary>
-        private List<Scope> _Scopes;
+        private ScopeChain _Scopes;
 
         private SymbolTable()
         {
-            _Scopes = new List<Scope>();
+            _Scopes = new ScopeChain();
             _Global = new Scope(ScopeType.Common);
+            
             // Initialize the global scope with the standard lib
             StdLibInitializer.Import(CurrentScope);
         }
@@ -38,7 +39,7 @@ namespace Fl.Engine.Symbols
         /// <summary>
         /// Returns the current scope in the chained scope list or the global scope
         /// </summary>
-        public Scope CurrentScope => _Scopes.LastOrDefault() ?? _Global;
+        public Scope CurrentScope => _Scopes.CurrentScope ?? _Global;
 
         /// <summary>
         /// Returns the global scope
@@ -49,17 +50,17 @@ namespace Fl.Engine.Symbols
         /// Add a new scope to the scope's chain
         /// </summary>
         /// <param name="scopeType">Scope's type</param>
-        public void NewScope(ScopeType scopeType, List<Scope> env = null)
+        public void EnterScope(ScopeType scopeType, List<Scope> env = null)
         {
-            _Scopes.Add(new Scope(scopeType, env));
+            _Scopes.EnterScope(scopeType, env);
         }
 
         /// <summary>
         /// Destroys the current scope
         /// </summary>
-        public void DestroyScope()
+        public void LeaveScope()
         {
-            _Scopes.RemoveAt(_Scopes.Count-1);
+            _Scopes.LeaveScope();
         }
 
         #region Symbols handling        
@@ -71,22 +72,10 @@ namespace Fl.Engine.Symbols
         /// <returns>FlObject containing information about symbol "name"</returns>
         public Symbol GetSymbol(string name)
         {
-            int i = _Scopes.Count-1;
-            var scp = i >= 0 ? _Scopes[i] : _Global;
-            while (scp != null)
-            {
-                if (scp.HasSymbol(name))
-                    return scp[name];
-
-                if (scp == _Global)
-                    break;
-
-                if (scp.ScopeType == ScopeType.Function)
-                    return _Global.HasSymbol(name) ? _Global[name] : null;
-
-                scp = _Scopes.ElementAtOrDefault(--i) ?? _Global;
-            }
-            throw new SymbolException($"Symbol '{name}' does not exist in the current context");
+            return 
+                _Scopes?.GetSymbol(name) 
+                ?? (_Global.HasSymbol(name) ? _Global[name] : null) 
+                ?? throw new SymbolException($"Symbol '{name}' does not exist in the current context");
         }
 
         public Symbol GetSymbol(object name)
@@ -101,65 +90,18 @@ namespace Fl.Engine.Symbols
         /// <param name="symbol">Contains attributes and information about the symbol</param>
         public void AddSymbol(string name, Symbol symbol, FlObject binding)
         {
-            Scope current = CurrentScope;
+            Scope current = _Scopes.CurrentScope ?? _Global;
             if (current.HasSymbol(name))
                 throw new SymbolException($"Symbol '{name}' is already defined in this scope");
             
             current.AddSymbol(name, symbol, binding);
         }
 
-        /// <summary>
-        /// Updates a symbol with new information
-        /// </summary>
-        /// <param name="name">Symbol name to update</param>
-        /// <param name="obj">New attributes or information for the target symbol</param>
-        /*public void UpdateSymbol(string name, FlObject obj)
-        {
-            int i = _Scopes.Count - 1;
-            var scp = i >= 0 ? _Scopes[i] : _Global;
-            while (scp != null)
-            {
-                if (scp.HasSymbol(name))
-                {
-                    scp.UpdateSymbol(name, obj);
-                    return;
-                }
-
-                if (scp == _Global)
-                    break;
-
-                if (scp.ScopeType == ScopeType.Function)
-                {
-                    if (!_Global.HasSymbol(name))
-                        break;
-                    _Global.UpdateSymbol(name, obj);
-                    return;
-                }
-                scp = _Scopes.ElementAtOrDefault(--i) ?? _Global;
-            }
-            throw new SymbolException($"Symbol '{name}' does not exist in the current context");
-        }*/
-
         public bool HasSymbol(string var)
         {
-            int i = _Scopes.Count - 1;
-            var scp = i >= 0 ? _Scopes[i] : _Global;
-            while (scp != null)
-            {
-                if (scp.HasSymbol(var))
-                    return true;
-
-                if (scp == _Global)
-                    break;
-
-                if (scp.ScopeType == ScopeType.Function)
-                {
-                    return _Global.HasSymbol(var);
-                }
-
-                scp = _Scopes.ElementAtOrDefault(--i) ?? _Global;
-            }
-            return false;
+            if (_Scopes.CurrentScope != null && _Scopes.CurrentScope.HasSymbol(var))
+                return true;
+            return _Global.HasSymbol(var);
         }
 
         public void Using(FlNamespace ns)
@@ -171,28 +113,12 @@ namespace Fl.Engine.Symbols
         #region Environments and binding
         public bool IsFunctionEnv()
         {
-            return _Scopes.Count > 0 && _Scopes.Any(s => s.ScopeType == ScopeType.Function);
+            return _Scopes.IsFunctionEnv();
         }
 
         public List<Scope> GetCurrentFunctionEnv()
         {
-            List<Scope> chain = new List<Scope>();
-            int i = _Scopes.Count - 1;
-            var scp = i >= 0 ? _Scopes[i] : null;
-            while (scp != null)
-            {
-                chain.Add(scp);
-                if (scp.ScopeType == ScopeType.Function)
-                {
-                    break;
-                }
-                scp = _Scopes.ElementAtOrDefault(--i);
-            }
-            return chain.Count > 0 ? chain.Select(s => {
-                var env = new Scope(s.ScopeType);
-                env.Import(s);
-                return env;
-            }).ToList() : null;
+            return _Scopes.GetCurrentFunctionEnv();
         }
         #endregion
 
@@ -201,22 +127,11 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                return CurrentScope[Scope.FlReturnKey].Binding;
+                return _Scopes.ReturnValue;
             }
             set
             {
-                int i = _Scopes.Count - 1;
-                var scp = i >= 0 ? _Scopes[i] : null;
-                while (scp != null)
-                {
-                    if (scp.ScopeType == ScopeType.Function)
-                    {
-                        scp.AddSymbol(Scope.FlReturnKey, new Symbol(SymbolType.Constant), value);
-                        return;
-                    }
-                    scp = _Scopes.ElementAtOrDefault(--i);
-                }
-                throw new ScopeOperationException("Cannot return a value from a non-function scope");
+                _Scopes.ReturnValue = value;
             }
         }
 
@@ -224,15 +139,7 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                int i = _Scopes.Count - 1;
-                var scp = i >= 0 ? _Scopes[i] : null;
-                while (scp != null)
-                {
-                    if (scp.ScopeType == ScopeType.Function && scp.HasSymbol(Scope.FlReturnKey))
-                        return true;
-                    scp = _Scopes.ElementAtOrDefault(--i);
-                }
-                return false;
+                return _Scopes.MustReturn;
             }
         }
 
@@ -240,15 +147,7 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                int i = _Scopes.Count - 1;
-                var scp = i >= 0 ? _Scopes[i] : null;
-                while (scp != null)
-                {
-                    if (scp.ScopeType == ScopeType.Loop && scp.Break)
-                        return true;
-                    scp = _Scopes.ElementAtOrDefault(--i);
-                }
-                return false;
+                return _Scopes.MustBreak;
             }
         }
 
@@ -256,60 +155,23 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                int i = _Scopes.Count - 1;
-                var scp = i >= 0 ? _Scopes[i] : null;
-                while (scp != null)
-                {
-                    if (scp.ScopeType == ScopeType.Loop && scp.Continue)
-                        return true;
-                    scp = _Scopes.ElementAtOrDefault(--i);
-                }
-                return false;
+                return _Scopes.MustBreak;
             }
         }
 
         public void SetBreak(FlInteger intobj)
         {
-            int nbreaks = intobj.Value;
-            int orignbreaks = nbreaks;
-            int i = _Scopes.Count - 1;
-            var scp = i >= 0 ? _Scopes[i] : throw new ScopeOperationException("Cannot break in a non-loop scope");
-            while (scp != null)
-            {
-                if (scp.ScopeType == ScopeType.Loop)
-                {
-                    scp.Break = true;
-                    if (--nbreaks == 0)
-                        break;
-                }
-                scp = _Scopes.ElementAtOrDefault(--i);
-                if (scp == null && nbreaks >= 0)
-                    throw new ScopeOperationException(nbreaks > 0 ? $"Cannot break more than {orignbreaks - nbreaks} loops" : "Cannot break in a non-loop scope");
-            }
+            _Scopes.SetBreak(intobj);
         }
 
         public void SetContinue()
         {
-            int i = _Scopes.Count - 1;
-            var scp = i >= 0 ? _Scopes[i] : throw new ScopeOperationException("Cannot continue in a non-loop scope");
-            while (scp != null)
-            {
-                if (scp.ScopeType == ScopeType.Loop)
-                {
-                    scp.Continue = true;
-                    break;
-                }
-                scp = _Scopes.ElementAtOrDefault(--i);
-                if (scp == null)
-                    throw new ScopeOperationException("Cannot continue in a non-loop scope");
-            }
+            _Scopes.SetContinue();
         }
 
         public void DoContinue()
         {
-            if (CurrentScope.ScopeType != ScopeType.Loop)
-                throw new ScopeOperationException("Cannot continue in a non-loop scope");
-            CurrentScope.Continue = false;
+            _Scopes.DoContinue();
         }
         #endregion
     }

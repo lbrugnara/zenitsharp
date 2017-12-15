@@ -75,7 +75,10 @@ namespace Fl.Engine.Evaluators
                     else
                     {
                         // If the FlObject already has a value (is not FlNull), let the Assign method handle each object's specific operator =
-                        symbol.Binding.Assign(assignmentResult);
+                        if (symbol.Binding.IsPrimitive)
+                            symbol.UpdateBinding(assignmentResult.IsPrimitive ? assignmentResult.Clone() : assignmentResult);
+                        else
+                            symbol.Binding.Assign(assignmentResult);
                     }
                     return assignmentResult.Clone();
             }

@@ -22,6 +22,11 @@ namespace Fl.Engine.Symbols.Objects
 
         public override ObjectType ObjectType => NullType.Value;
 
+        public override string ToString()
+        {
+            return "null";
+        }
+
         public override string ToDebugStr()
         {
             return "(null)";

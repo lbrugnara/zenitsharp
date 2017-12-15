@@ -16,7 +16,7 @@ namespace Fl.Engine.Evaluators
     {
         public FlObject Evaluate(AstEvaluator evaluator, AstIfNode ifnode)
         {
-            evaluator.Symtable.NewScope(ScopeType.Common);
+            evaluator.Symtable.EnterScope(ScopeType.Common);
             try
             {
                 FlObject result = ifnode.Condition.Exec(evaluator);
@@ -29,7 +29,7 @@ namespace Fl.Engine.Evaluators
             }
             finally
             {
-                evaluator.Symtable.DestroyScope();
+                evaluator.Symtable.LeaveScope();
             }
             return null;
         }

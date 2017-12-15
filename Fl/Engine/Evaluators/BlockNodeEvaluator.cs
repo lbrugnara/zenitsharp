@@ -15,7 +15,7 @@ namespace Fl.Engine.Evaluators
     {
         public FlObject Evaluate(AstEvaluator evaluator, AstBlockNode node)
         {            
-            evaluator.Symtable.NewScope(ScopeType.Common);
+            evaluator.Symtable.EnterScope(ScopeType.Common);
             FlObject tmp = null;
             try
             {
@@ -28,7 +28,7 @@ namespace Fl.Engine.Evaluators
             }
             finally
             {
-                evaluator.Symtable.DestroyScope();
+                evaluator.Symtable.LeaveScope();
             }
             return tmp;
         }

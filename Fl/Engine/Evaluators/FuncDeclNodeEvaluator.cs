@@ -42,7 +42,7 @@ namespace Fl.Engine.Evaluators
 
         protected override void CreateFunctionScope(SymbolTable symboltable)
         {
-            symboltable.NewScope(ScopeType.Function, _Env);
+            symboltable.EnterScope(ScopeType.Function, _Env);
         }
 
         protected FlObject InternalInvoke(SymbolTable symboltable, List<FlObject> args)
