@@ -13,9 +13,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class ConstantNodeEvaluator : INodeEvaluator<AstEvaluator, AstConstantNode, FlObject>
+    class ConstantNodeEvaluator : INodeVisitor<AstEvaluator, AstConstantNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstConstantNode constdec)
+        public FlObject Visit(AstEvaluator evaluator, AstConstantNode constdec)
         {
             foreach (var constant in constdec.Constants)
             {

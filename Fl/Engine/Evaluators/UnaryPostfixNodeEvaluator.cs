@@ -13,9 +13,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class UnaryPostfixNodeEvaluator : OperandUnaryNode, INodeEvaluator<AstEvaluator, AstUnaryPostfixNode, FlObject>
+    class UnaryPostfixNodeEvaluator : OperandUnaryNode, INodeVisitor<AstEvaluator, AstUnaryPostfixNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstUnaryPostfixNode unary)
+        public FlObject Visit(AstEvaluator evaluator, AstUnaryPostfixNode unary)
         {
             FlObject symbolValue = unary.Left.Exec(evaluator);
 

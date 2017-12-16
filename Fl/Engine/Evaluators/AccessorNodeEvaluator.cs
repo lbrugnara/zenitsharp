@@ -11,9 +11,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class AccessorNodeEvaluator : INodeEvaluator<AstEvaluator, AstAccessorNode, FlObject>
+    class AccessorNodeEvaluator : INodeVisitor<AstEvaluator, AstAccessorNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstAccessorNode accessor)
+        public FlObject Visit(AstEvaluator evaluator, AstAccessorNode accessor)
         {
             Symbol entry = null;
             var identifier = accessor.Identifier.Value.ToString();

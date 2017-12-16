@@ -12,9 +12,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class NullCoalescingNodeEvaluator : INodeEvaluator<AstEvaluator, AstNullCoalescingNode, FlObject>
+    class NullCoalescingNodeEvaluator : INodeVisitor<AstEvaluator, AstNullCoalescingNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstNullCoalescingNode nullc)
+        public FlObject Visit(AstEvaluator evaluator, AstNullCoalescingNode nullc)
         {
             FlObject leftResult = nullc.Left.Exec(evaluator);
             if (leftResult.ObjectType == NullType.Value)

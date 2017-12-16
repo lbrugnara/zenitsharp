@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace Fl.Engine.Evaluators
 {
-    class BinaryNodeEvaluator : INodeEvaluator<AstEvaluator, AstBinaryNode, FlObject>
+    class BinaryNodeEvaluator : INodeVisitor<AstEvaluator, AstBinaryNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstBinaryNode binary)
+        public FlObject Visit(AstEvaluator evaluator, AstBinaryNode binary)
         {
             Token token = binary.Operator;
             switch (token.Type)

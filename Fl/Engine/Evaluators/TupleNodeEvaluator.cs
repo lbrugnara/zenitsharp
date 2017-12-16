@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace Fl.Engine.Evaluators
 {
-    class TupleNodeEvaluator : INodeEvaluator<AstEvaluator, AstTupleNode, FlObject>
+    class TupleNodeEvaluator : INodeVisitor<AstEvaluator, AstTupleNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstTupleNode node)
+        public FlObject Visit(AstEvaluator evaluator, AstTupleNode node)
         {
             FlClass clasz = evaluator.Symtable.GetSymbol(TupleType.Value.ClassName).Binding as FlClass;
             FlTuple tuple = clasz.Activator.Invoke() as FlTuple;

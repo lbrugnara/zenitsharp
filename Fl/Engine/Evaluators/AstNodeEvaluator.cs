@@ -10,9 +10,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    public class AstNodeEvaluator : INodeEvaluator<AstEvaluator, AstNode, FlObject>
+    public class AstNodeEvaluator : INodeVisitor<AstEvaluator, AstNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstNode node)
+        public FlObject Visit(AstEvaluator evaluator, AstNode node)
         {
             return node.Exec(evaluator);
         }

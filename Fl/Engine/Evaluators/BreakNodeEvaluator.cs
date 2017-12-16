@@ -9,9 +9,9 @@ using Fl.Parser.Ast;
 
 namespace Fl.Engine.Evaluators
 {
-    class BreakNodeEvaluator : INodeEvaluator<AstEvaluator, AstBreakNode, FlObject>
+    class BreakNodeEvaluator : INodeVisitor<AstEvaluator, AstBreakNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstBreakNode wnode)
+        public FlObject Visit(AstEvaluator evaluator, AstBreakNode wnode)
         {
             FlObject breakval = wnode.Number?.Exec(evaluator) ?? new FlInteger(1);
             if (breakval.ObjectType != IntegerType.Value)

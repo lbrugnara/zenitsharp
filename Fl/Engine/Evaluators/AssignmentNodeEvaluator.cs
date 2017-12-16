@@ -12,11 +12,11 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class AssignmentNodeEvaluator : INodeEvaluator<AstEvaluator, AstAssignmentNode, FlObject>
+    class AssignmentNodeEvaluator : INodeVisitor<AstEvaluator, AstAssignmentNode, FlObject>
     {
         private static AccessorNodeEvaluator _AccessorEv = new AccessorNodeEvaluator();
 
-        public FlObject Evaluate(AstEvaluator walker, AstAssignmentNode node)
+        public FlObject Visit(AstEvaluator walker, AstAssignmentNode node)
         {
             if (node is AstDestructuringAssignmentNode)
                 return MakeDestructuringAssignment(node as AstDestructuringAssignmentNode, walker);

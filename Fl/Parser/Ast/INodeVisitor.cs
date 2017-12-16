@@ -8,11 +8,11 @@ using System.Text;
 
 namespace Fl.Parser.Ast
 {
-    public interface INodeEvaluator<W, N, R> 
+    public interface INodeVisitor<W, N, R> 
         where N : AstNode 
         where R : class 
         where W : IAstWalker<R>
     {
-        R Evaluate(W walker, N node);
+        R Visit(W walker, N node);
     }
 }

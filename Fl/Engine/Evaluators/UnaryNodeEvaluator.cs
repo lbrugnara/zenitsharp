@@ -9,9 +9,9 @@ using System;
 
 namespace Fl.Engine.Evaluators
 {
-    class UnaryNodeEvaluator : INodeEvaluator<AstEvaluator, AstUnaryNode, FlObject>
+    class UnaryNodeEvaluator : INodeVisitor<AstEvaluator, AstUnaryNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstUnaryNode unary)
+        public FlObject Visit(AstEvaluator evaluator, AstUnaryNode unary)
         {
             FlObject result = unary.Left.Exec(evaluator);
             // If unary token is null, we just need the "Left" expression (primary)

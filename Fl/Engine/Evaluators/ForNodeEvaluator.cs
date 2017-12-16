@@ -12,9 +12,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class ForNodeEvaluator : INodeEvaluator<AstEvaluator, AstForNode, FlObject>
+    class ForNodeEvaluator : INodeVisitor<AstEvaluator, AstForNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstForNode fornode)
+        public FlObject Visit(AstEvaluator evaluator, AstForNode fornode)
         {
             evaluator.Symtable.EnterScope(ScopeType.Loop);
             try

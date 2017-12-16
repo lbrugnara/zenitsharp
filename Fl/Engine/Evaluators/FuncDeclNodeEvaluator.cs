@@ -72,9 +72,9 @@ namespace Fl.Engine.Evaluators
         }
     }
 
-    class FuncDeclNodeEvaluator : INodeEvaluator<AstEvaluator, AstFuncDeclNode, FlObject>
+    class FuncDeclNodeEvaluator : INodeVisitor<AstEvaluator, AstFuncDeclNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstFuncDeclNode funcdecl)
+        public FlObject Visit(AstEvaluator evaluator, AstFuncDeclNode funcdecl)
         {
             var func = new Func(evaluator, funcdecl.Identifier, funcdecl.Parameters, funcdecl.Body, evaluator.Symtable.IsFunctionEnv() ? evaluator.Symtable.GetCurrentFunctionEnv() : null);
 

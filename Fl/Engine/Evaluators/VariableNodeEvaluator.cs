@@ -12,9 +12,9 @@ using System.Linq;
 
 namespace Fl.Engine.Evaluators
 {
-    class VariableNodeEvaluator : INodeEvaluator<AstEvaluator, AstVariableNode, FlObject>
+    class VariableNodeEvaluator : INodeVisitor<AstEvaluator, AstVariableNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstVariableNode vardecl)
+        public FlObject Visit(AstEvaluator evaluator, AstVariableNode vardecl)
         {
             switch (vardecl)
             {

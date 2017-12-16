@@ -11,9 +11,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class BlockNodeEvaluator : INodeEvaluator<AstEvaluator, AstBlockNode, FlObject>
+    class BlockNodeEvaluator : INodeVisitor<AstEvaluator, AstBlockNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstBlockNode node)
+        public FlObject Visit(AstEvaluator evaluator, AstBlockNode node)
         {            
             evaluator.Symtable.EnterScope(ScopeType.Common);
             FlObject tmp = null;

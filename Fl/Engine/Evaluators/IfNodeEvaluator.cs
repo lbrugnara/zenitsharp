@@ -12,9 +12,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class IfNodeEvaluator : INodeEvaluator<AstEvaluator, AstIfNode, FlObject>
+    class IfNodeEvaluator : INodeVisitor<AstEvaluator, AstIfNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstIfNode ifnode)
+        public FlObject Visit(AstEvaluator evaluator, AstIfNode ifnode)
         {
             evaluator.Symtable.EnterScope(ScopeType.Common);
             try

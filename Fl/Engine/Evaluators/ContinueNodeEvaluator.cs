@@ -8,9 +8,9 @@ using Fl.Parser.Ast;
 
 namespace Fl.Engine.Evaluators
 {
-    class ContinueNodeEvaluator : INodeEvaluator<AstEvaluator, AstContinueNode, FlObject>
+    class ContinueNodeEvaluator : INodeVisitor<AstEvaluator, AstContinueNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstContinueNode cnode)
+        public FlObject Visit(AstEvaluator evaluator, AstContinueNode cnode)
         {
             evaluator.Symtable.SetContinue();
             return null;

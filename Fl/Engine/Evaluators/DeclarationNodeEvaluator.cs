@@ -11,9 +11,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class DeclarationNodeEvaluator : INodeEvaluator<AstEvaluator, AstDeclarationNode, FlObject>
+    class DeclarationNodeEvaluator : INodeVisitor<AstEvaluator, AstDeclarationNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstDeclarationNode decls)
+        public FlObject Visit(AstEvaluator evaluator, AstDeclarationNode decls)
         {
             FlObject tmp = null;
             foreach (AstNode statement in decls.Statements)

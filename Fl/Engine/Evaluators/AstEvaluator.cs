@@ -69,47 +69,47 @@ namespace Fl.Engine.Evaluators
             switch (n)
             {
                 case AstUnaryPrefixNode uprefix:
-                    return _UnaryPrefixNodeEvaluator.Evaluate(this, uprefix);
+                    return _UnaryPrefixNodeEvaluator.Visit(this, uprefix);
                 case AstUnaryPostfixNode upostfix:
-                    return _UnaryPostfixNodeEvaluator.Evaluate(this, upostfix);
+                    return _UnaryPostfixNodeEvaluator.Visit(this, upostfix);
                 case AstUnaryNode u:
-                    return _UnaryNodeEvaluator.Evaluate(this, u);                
+                    return _UnaryNodeEvaluator.Visit(this, u);                
                 case AstBinaryNode b:
-                    return _BinaryNodeEvaluator.Evaluate(this, b);
+                    return _BinaryNodeEvaluator.Visit(this, b);
                 case AstAssignmentNode a:
-                    return _AssignmentNodeEvaluator.Evaluate(this, a);
+                    return _AssignmentNodeEvaluator.Visit(this, a);
                 case AstConstantNode c:
-                    return _ConstantNodeEvaluator.Evaluate(this, c);
+                    return _ConstantNodeEvaluator.Visit(this, c);
                 case AstVariableNode v:
-                    return _VariableNodeEvaluator.Evaluate(this, v);
+                    return _VariableNodeEvaluator.Visit(this, v);
                 case AstBlockNode bl:
-                    return _BlockNodeEvaluator.Evaluate(this, bl);
+                    return _BlockNodeEvaluator.Visit(this, bl);
                 case AstDeclarationNode d:
-                    return _DeclarationNodeEvaluator.Evaluate(this, d);
+                    return _DeclarationNodeEvaluator.Visit(this, d);
                 case AstLiteralNode l:
-                    return _LiteralNodeEvaluator.Evaluate(this, l);
+                    return _LiteralNodeEvaluator.Visit(this, l);
                 case AstAccessorNode ivk:
-                    return _AccessorNodeEvaluator.Evaluate(this, ivk);
+                    return _AccessorNodeEvaluator.Visit(this, ivk);
                 case AstIfNode i:
-                    return _IfNodeEvaluator.Evaluate(this, i);
+                    return _IfNodeEvaluator.Visit(this, i);
                 case AstWhileNode w:
-                    return _WhileNodeEvaluator.Evaluate(this, w);
+                    return _WhileNodeEvaluator.Visit(this, w);
                 case AstForNode f:
-                    return _ForNodeEvaluator.Evaluate(this, f);
+                    return _ForNodeEvaluator.Visit(this, f);
                 case AstBreakNode brk:
-                    return _BreakNodeEvaluator.Evaluate(this, brk);
+                    return _BreakNodeEvaluator.Visit(this, brk);
                 case AstContinueNode cont:
-                    return _ContinueNodeEvaluator.Evaluate(this, cont);
+                    return _ContinueNodeEvaluator.Visit(this, cont);
                 case AstCallableNode call:
-                    return _CallNodeEvaluator.Evaluate(this, call);
+                    return _CallNodeEvaluator.Visit(this, call);
                 case AstFuncDeclNode func:
-                    return _FuncDeclNodeEvaluator.Evaluate(this, func);
+                    return _FuncDeclNodeEvaluator.Visit(this, func);
                 case AstTupleNode t:
-                    return _TupleNodeEvaluator.Evaluate(this, t);
+                    return _TupleNodeEvaluator.Visit(this, t);
                 case AstReturnNode ret:
-                    return _ReturnNodeEvaluator.Evaluate(this, ret);
+                    return _ReturnNodeEvaluator.Visit(this, ret);
                 case AstNullCoalescingNode nc:
-                    return _NullCoalescingNodeEvaluator.Evaluate(this, nc);
+                    return _NullCoalescingNodeEvaluator.Visit(this, nc);
                 case AstNoOpNode np:
                     return null;
             }

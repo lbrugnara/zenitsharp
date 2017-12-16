@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace Fl.Engine.Evaluators
 {
-    class ReturnNodeEvaluator : INodeEvaluator<AstEvaluator, AstReturnNode, FlObject>
+    class ReturnNodeEvaluator : INodeVisitor<AstEvaluator, AstReturnNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstReturnNode wnode)
+        public FlObject Visit(AstEvaluator evaluator, AstReturnNode wnode)
         {
             FlObject retval = wnode.ReturnTuple?.Exec(evaluator) ?? FlNull.Value;
             if (retval.ObjectType == TupleType.Value && (retval as FlTuple).Value.Count == 1)

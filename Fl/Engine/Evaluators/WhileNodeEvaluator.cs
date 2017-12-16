@@ -12,9 +12,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    class WhileNodeEvaluator : INodeEvaluator<AstEvaluator, AstWhileNode, FlObject>
+    class WhileNodeEvaluator : INodeVisitor<AstEvaluator, AstWhileNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstWhileNode wnode)
+        public FlObject Visit(AstEvaluator evaluator, AstWhileNode wnode)
         {
             evaluator.Symtable.EnterScope(ScopeType.Loop);
             try

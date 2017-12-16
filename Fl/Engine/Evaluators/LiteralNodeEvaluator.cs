@@ -8,9 +8,9 @@ using System;
 
 namespace Fl.Engine.Evaluators
 {
-    class LiteralNodeEvaluator : INodeEvaluator<AstEvaluator, AstLiteralNode, FlObject>
+    class LiteralNodeEvaluator : INodeVisitor<AstEvaluator, AstLiteralNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstLiteralNode literal)
+        public FlObject Visit(AstEvaluator evaluator, AstLiteralNode literal)
         {
             switch (literal.Literal.Type)
             {

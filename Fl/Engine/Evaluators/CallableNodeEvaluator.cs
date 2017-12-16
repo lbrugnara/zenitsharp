@@ -13,9 +13,9 @@ using System.Text;
 
 namespace Fl.Engine.Evaluators
 {
-    public class CallableNodeEvaluator : INodeEvaluator<AstEvaluator, AstCallableNode, FlObject>
+    public class CallableNodeEvaluator : INodeVisitor<AstEvaluator, AstCallableNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstCallableNode node)
+        public FlObject Visit(AstEvaluator evaluator, AstCallableNode node)
         {
             FlObject target = node.Callable.Exec(evaluator);
 

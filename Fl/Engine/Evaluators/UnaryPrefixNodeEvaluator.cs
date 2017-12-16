@@ -9,9 +9,9 @@ using System;
 
 namespace Fl.Engine.Evaluators
 {
-    class UnaryPrefixNodeEvaluator : OperandUnaryNode, INodeEvaluator<AstEvaluator, AstUnaryPrefixNode, FlObject>
+    class UnaryPrefixNodeEvaluator : OperandUnaryNode, INodeVisitor<AstEvaluator, AstUnaryPrefixNode, FlObject>
     {
-        public FlObject Evaluate(AstEvaluator evaluator, AstUnaryPrefixNode unary)
+        public FlObject Visit(AstEvaluator evaluator, AstUnaryPrefixNode unary)
         {
             FlObject symbolValue = unary.Left.Exec(evaluator);
 
