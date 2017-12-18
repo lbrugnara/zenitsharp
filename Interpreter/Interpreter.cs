@@ -4,6 +4,9 @@
 using Fl;
 using Fl.Engine;
 using Fl.Engine.Evaluators;
+using Fl.Engine.IL.EValuators;
+using Fl.Engine.IL.Generators;
+using Fl.Engine.IL.Instructions;
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Objects;
@@ -11,6 +14,7 @@ using Fl.Parser;
 using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FlInterpreter
 {
@@ -36,9 +40,29 @@ namespace FlInterpreter
 
                     Parser p = new Parser();
                     AstNode ast = p.Parse(tokens);
-                    FlObject result = eval.Process(ast);
+
+                    var errors = p.ParsingErrors;
+                    if (errors.Count > 0)
+                    {
+                        var list = errors.ToList();
+                        var tmp = Console.ForegroundColor;
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Errors:");
+                        list.ForEach(e => Console.WriteLine($"{e.Message}"));
+                        Console.ForegroundColor = tmp;
+                        continue;
+                    }
+
+                    var g = new AstILGenerator();
+                    g.Visit(ast);
+                    Console.WriteLine(g.GetILRepresentation());
+
+                    ILProgram ip = new ILProgram(g.SymbolTable, g.Instructions.ToList());
+                    ip.Run();
+
+                    /*FlObject result = eval.Visit(ast);
                     if (result != null)
-                        Console.WriteLine($"<= {result.ToDebugStr()}");
+                        Console.WriteLine($"<= {result.ToDebugStr()}");*/
                 }
                 catch (Exception e)
                 {

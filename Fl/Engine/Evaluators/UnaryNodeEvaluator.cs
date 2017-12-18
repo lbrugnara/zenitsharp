@@ -27,7 +27,7 @@ namespace Fl.Engine.Evaluators
                     result = result.Not();
                     break;
                 case TokenType.Minus:                    
-                    result = result.Negative();
+                    result = result.Negate();
                     break;
             }
             return result;

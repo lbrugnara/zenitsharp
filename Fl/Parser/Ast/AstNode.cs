@@ -7,7 +7,7 @@ namespace Fl.Parser.Ast
     {
         public T Exec<T>(IAstWalker<T> walker) where T : class
         {
-            return walker.Process(this);
+            return walker.Visit(this);
         }
     }
 }

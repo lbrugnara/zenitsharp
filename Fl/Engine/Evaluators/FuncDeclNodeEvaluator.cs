@@ -17,10 +17,10 @@ namespace Fl.Engine.Evaluators
         private Token _Identifier;
         private AstParametersNode _Params;
         private List<AstNode> _Body;
-        private List<Scope> _Env;
+        private ScopeChain _Env;
         public override Func<FlObject, List<FlObject>, FlObject> Body { get; }
 
-        public Func(AstEvaluator eval, Token name, AstParametersNode parameters, List<AstNode> body, List<Scope> env = null)
+        public Func(AstEvaluator eval, Token name, AstParametersNode parameters, List<AstNode> body, ScopeChain env = null)
             : base (name.Type == TokenType.RightArrow ? null : name.Value.ToString(), null, null)
         {
             Body = (self, args) => InternalInvoke(eval.Symtable, args);
@@ -42,7 +42,7 @@ namespace Fl.Engine.Evaluators
 
         protected override void CreateFunctionScope(SymbolTable symboltable)
         {
-            symboltable.EnterScope(ScopeType.Function, _Env);
+            symboltable.EnterScope(ScopeType.Function, null, _Env);
         }
 
         protected FlObject InternalInvoke(SymbolTable symboltable, List<FlObject> args)

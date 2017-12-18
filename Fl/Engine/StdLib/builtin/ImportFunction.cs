@@ -45,7 +45,7 @@ namespace Fl.Engine.StdLib.builtin
                 AstEvaluator ev = new AstEvaluator();
                 FlNamespace os = (ev.Symtable.GetSymbol("os").Binding as FlNamespace);
                 (os["cwd"].Binding as FlFunction).Invoke(symboltable, new List<FlObject>() { new FlString(System.IO.Directory.GetParent(flString.Value).FullName) });
-                ev.Process(ast);
+                ev.Visit(ast);
             });
             return null;
         }

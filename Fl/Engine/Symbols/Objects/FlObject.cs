@@ -62,7 +62,7 @@ namespace Fl.Engine.Symbols.Objects
 
         public virtual void DivideAndAssing(FlObject n) => throw new SymbolException($"Operator '/=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
 
-        public virtual FlObject Negative() => throw new SymbolException($"Operator '-' cannot be applied to operand of type '{this.ObjectType}'");
+        public virtual FlObject Negate() => throw new SymbolException($"Operator '-' cannot be applied to operand of type '{this.ObjectType}'");
 
         #endregion
 

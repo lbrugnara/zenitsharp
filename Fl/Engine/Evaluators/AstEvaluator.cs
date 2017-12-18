@@ -63,7 +63,7 @@ namespace Fl.Engine.Evaluators
 
         public SymbolTable Symtable => SymbolTable.Instance;
 
-        public FlObject Process(AstNode node)
+        public FlObject Visit(AstNode node)
         {
             object n = node;
             switch (n)

@@ -26,6 +26,12 @@ namespace Fl.Engine.Symbols
             _Pointer = -1;
         }
 
+        private ScopeChain(List<Scope> scopes)
+        {
+            _Scopes = scopes;
+            _Pointer = -1;
+        }
+
         /// <summary>
         /// Returns the current scope in the chained scope list or the global scope
         /// </summary>
@@ -35,11 +41,11 @@ namespace Fl.Engine.Symbols
         /// Add a new scope to the scope's chain
         /// </summary>
         /// <param name="scopeType">Scope's type</param>
-        public void EnterScope(ScopeType scopeType, List<Scope> env = null)
+        public void EnterScope(ScopeType scopeType, string label = null, ScopeChain env = null)
         {
             if (_Scopes.Count == _Pointer + 1)
             {
-                _Scopes.Add(new Scope(scopeType, env));
+                _Scopes.Add(new Scope(scopeType, label, env));
             }
             _Pointer++;
         }
@@ -125,7 +131,7 @@ namespace Fl.Engine.Symbols
             return _Scopes.Count > 0 && _Scopes.Any(s => s.ScopeType == ScopeType.Function);
         }
 
-        public List<Scope> GetCurrentFunctionEnv()
+        public ScopeChain GetCurrentFunctionEnv()
         {
             List<Scope> chain = new List<Scope>();
             int i = _Scopes.Count - 1;
@@ -139,11 +145,11 @@ namespace Fl.Engine.Symbols
                 }
                 scp = _Scopes.ElementAtOrDefault(--i);
             }
-            return chain.Count > 0 ? chain.Select(s => {
-                var env = new Scope(s.ScopeType);
+            return new ScopeChain(chain.Select(s => {
+                var env = new Scope(s.ScopeType, s.Name);
                 env.Import(s);
                 return env;
-            }).ToList() : null;
+            }).ToList());
         }
         #endregion
 

@@ -26,7 +26,7 @@ namespace Fl.Engine.Symbols
         private SymbolTable()
         {
             _Scopes = new ScopeChain();
-            _Global = new Scope(ScopeType.Common);
+            _Global = new Scope(ScopeType.Common, "<global>");
             
             // Initialize the global scope with the standard lib
             StdLibInitializer.Import(CurrentScope);
@@ -35,6 +35,8 @@ namespace Fl.Engine.Symbols
         private static SymbolTable _Instance;
 
         public static SymbolTable Instance => (_Instance == null ? (_Instance = new SymbolTable()) : _Instance);
+
+        public static SymbolTable NewInstance => new SymbolTable();
 
         /// <summary>
         /// Returns the current scope in the chained scope list or the global scope
@@ -50,9 +52,9 @@ namespace Fl.Engine.Symbols
         /// Add a new scope to the scope's chain
         /// </summary>
         /// <param name="scopeType">Scope's type</param>
-        public void EnterScope(ScopeType scopeType, List<Scope> env = null)
+        public void EnterScope(ScopeType scopeType, string name = null, ScopeChain env = null)
         {
-            _Scopes.EnterScope(scopeType, env);
+            _Scopes.EnterScope(scopeType, name, env);
         }
 
         /// <summary>
@@ -116,7 +118,7 @@ namespace Fl.Engine.Symbols
             return _Scopes.IsFunctionEnv();
         }
 
-        public List<Scope> GetCurrentFunctionEnv()
+        public ScopeChain GetCurrentFunctionEnv()
         {
             return _Scopes.GetCurrentFunctionEnv();
         }

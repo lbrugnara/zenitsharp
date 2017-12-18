@@ -166,7 +166,7 @@ namespace Fl.Engine.Symbols.Objects
             throw new SymbolException($"Operator '/=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
         }
 
-        public override FlObject Negative()
+        public override FlObject Negate()
         {
             return new FlDouble(this.Value * -1.0);
         }

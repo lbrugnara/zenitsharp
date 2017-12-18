@@ -9,6 +9,6 @@ namespace Fl.Parser.Ast
 {
     public interface IAstWalker<T> where T : class
     {
-        T Process(AstNode node);
+        T Visit(AstNode node);
     }
 }

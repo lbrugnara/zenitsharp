@@ -27,28 +27,30 @@ namespace Fl.Engine.Symbols
         private ScopeType _ScopeType;
         private Dictionary<string, Symbol> _Map;
         // Contains the environment of the binding time for closures
-        private List<Scope> _Env;
+        private ScopeChain _Env;
         private string _Name;
         private bool _Break;
         private bool _Continue;
         #endregion
 
         #region Constructors
-        public Scope(ScopeType type, List<Scope> env = null)
+        public Scope(ScopeType type, string label, ScopeChain env = null)
         {
             _ScopeType = type;
             _Map = new Dictionary<string, Symbol>();
             _Env = env;
-            _Name = ScopeN++ == 1 ? "<global>" : $"<scope@{{{ScopeN-1}}}>";
+            _Name = label;
         }
         #endregion
+
+        public string Name => _Name;
 
         #region Indexers
         public Symbol this[string var]
         {
             get
             {
-                return _Map.ContainsKey(var) ? _Map[var] : _Env != null && _Env.Any(s => s._Map.ContainsKey(var)) ? _Env.First(s => s._Map.ContainsKey(var))._Map[var] : null;
+                return _Map.ContainsKey(var) ? _Map[var] : _Env != null && _Env.HasSymbol(var) ? _Env.GetSymbol(var) : null;
             }
         }
 
@@ -62,7 +64,7 @@ namespace Fl.Engine.Symbols
         #endregion
 
         #region Public Properties
-        public bool HasSymbol(string s) => _Map.ContainsKey(s) || _Env != null && _Env.Any(scp => scp._Map.ContainsKey(s));
+        public bool HasSymbol(string s) => _Map.ContainsKey(s) || _Env != null && _Env.HasSymbol(s);
 
         public bool Break { get => _Break; set => _Break = value; }
 
@@ -84,9 +86,9 @@ namespace Fl.Engine.Symbols
             {
                 _Map[name].UpdateBinding(obj);
             }
-            else if (_Env != null && _Env.Any(s => s._Map.ContainsKey(name)))
+            else if (_Env != null && _Env.HasSymbol(name))
             {
-                _Env.First(s => s._Map.ContainsKey(name))._Map[name].UpdateBinding(obj);
+                _Env.GetSymbol(name).UpdateBinding(obj);
             }
             else throw new SymbolException($"Symbol {name} does not exist in the current context");
         }

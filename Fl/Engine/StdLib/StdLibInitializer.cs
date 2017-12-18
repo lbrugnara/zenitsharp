@@ -17,6 +17,7 @@ namespace Fl.Engine.StdLib
             // Namespace: global (built-in)
             scope.AddSymbol("import", new Symbol(SymbolType.Constant), new builtin.ImportFunction());
             scope.AddSymbol("using", new Symbol(SymbolType.Constant), new builtin.UsingFunction());
+            scope.AddSymbol("exit", new Symbol(SymbolType.Constant), new builtin.ExitFunction());
             scope.AddSymbol("int", new Symbol(SymbolType.Constant), builtin.types.IntegerClass.Build());
             scope.AddSymbol("double", new Symbol(SymbolType.Constant), builtin.types.DoubleClass.Build());
             scope.AddSymbol("decimal", new Symbol(SymbolType.Constant), builtin.types.DecimalClass.Build());
