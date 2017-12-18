@@ -7,7 +7,9 @@ namespace Fl.Parser
     {
         Unknown,
         // Types
+        Char,
         Integer,
+        Float,
         Double,
         Decimal,
         Boolean,

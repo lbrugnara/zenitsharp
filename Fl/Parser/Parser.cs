@@ -1270,7 +1270,9 @@ namespace Fl.Parser
 
             if (!Match(TokenType.Boolean)
                 && !Match(TokenType.Null)
+                && !Match(TokenType.Char)
                 && !Match(TokenType.Integer)
+                && !Match(TokenType.Float)
                 && !Match(TokenType.Double)
                 && !Match(TokenType.Decimal)
                 && !Match(TokenType.String)

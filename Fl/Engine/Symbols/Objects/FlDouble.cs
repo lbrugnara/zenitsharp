@@ -38,6 +38,10 @@ namespace Fl.Engine.Symbols.Objects
             {
                 return new FlInteger((int)_RawValue);
             }
+            else if (type == FloatType.Value)
+            {
+                return new FlFloat((float)_RawValue);
+            }
             else if (type == DecimalType.Value)
             {
                 return new FlDecimal((decimal)_RawValue);

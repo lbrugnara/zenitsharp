@@ -206,7 +206,16 @@ namespace Fl.Engine.IL.EValuators
         public void VisitVar(VarInstruction vi)
         {
             FlObject value = this.GetFlObjectFromOperand(vi.Value);
-            SymbolTable.AddSymbol(vi.DestSymbol.Name, new Symbol(SymbolType.Variable), value);
+            if (vi.Type != null)
+            {
+                ObjectType type = ObjectType.GetFromTypeName(vi.Type);
+                SymbolTable.AddSymbol(vi.DestSymbol.Name, new Symbol(SymbolType.Variable), type.DefaultValue());
+                SymbolTable.GetSymbol(vi.DestSymbol.Name).UpdateBinding(value);
+            }
+            else
+            {
+                SymbolTable.AddSymbol(vi.DestSymbol.Name, new Symbol(SymbolType.Variable), value);
+            }
         }
 
         public void VisitConst(ConstInstruction ci)

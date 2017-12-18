@@ -6,31 +6,31 @@ using Fl.Engine.Symbols.Types;
 
 namespace Fl.Engine.Symbols.Objects
 {
-    public class FlDecimal : FlObject
+    public class FlFloat : FlObject
     {
-        private decimal _RawValue;
+        private float _RawValue;
 
-        public FlDecimal(decimal value)
+        public FlFloat(float value)
         {
             _RawValue = value;
         }
 
-        public override ObjectType ObjectType => DecimalType.Value;
+        public override ObjectType ObjectType => FloatType.Value;
 
         public override object RawValue => _RawValue;
 
-        public decimal Value { get => _RawValue; set => _RawValue = value; }
+        public float Value { get => _RawValue; set => _RawValue = value; }
 
         public override bool IsPrimitive => true;
 
         public override FlObject Clone()
         {
-            return new FlDecimal(_RawValue);
+            return new FlFloat(_RawValue);
         }
 
         public override FlObject ConvertTo(ObjectType type)
         {
-            if (type == DecimalType.Value)
+            if (type == FloatType.Value) 
             {
                 return this.Clone();
             }
@@ -38,13 +38,13 @@ namespace Fl.Engine.Symbols.Objects
             {
                 return new FlInteger((int)_RawValue);
             }
-            else if (type == FloatType.Value)
-            {
-                return new FlFloat((float)_RawValue);
-            }
-            else if (type == DoubleType.Value) 
+            if (type == DoubleType.Value)
             {
                 return new FlDouble((double)_RawValue);
+            }
+            else if (type == DecimalType.Value)
+            {
+                return new FlDecimal((decimal)_RawValue);
             }
             else if (type == StringType.Value)
             {
@@ -57,9 +57,9 @@ namespace Fl.Engine.Symbols.Objects
 
         public override void Assign(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
+            if (n.ObjectType == FloatType.Value)
             {
-                this.Value = (n as FlDecimal).Value;
+                this.Value = (n as FlFloat).Value;
                 return;
             }
             throw new SymbolException($"Operator '=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
@@ -70,71 +70,71 @@ namespace Fl.Engine.Symbols.Objects
         #region Arithmetics Operators
         public override FlObject PreIncrement()
         {
-            this.Value += 1.0M;
+            this.Value += 1.0f;
             return this;
         }
 
         public override FlObject PostIncrement()
         {
             var res = this.Clone();
-            this.Value += 1.0M;
+            this.Value += 1.0f;
             return res;
         }
 
         public override FlObject PreDecrement()
         {
-            this.Value -= 1.0M;
+            this.Value -= 1.0f;
             return this;
         }
 
         public override FlObject PostDecrement()
         {
             var res = this.Clone();
-            this.Value -= 1.0M;
+            this.Value -= 1.0f;
             return res;
         }
 
         public override FlObject Add(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
+            if (n.ObjectType == FloatType.Value)
             {
-                return new FlDecimal(this.Value + (decimal)n.RawValue);
+                return new FlFloat(this.Value + (float)n.RawValue);
             }
             throw new SymbolException($"Operator '+' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
         }
 
         public override FlObject Subtract(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
+            if (n.ObjectType == FloatType.Value)
             {
-                return new FlDecimal(this.Value - (decimal)n.RawValue);
+                return new FlFloat(this.Value - (float)n.RawValue);
             }
             throw new SymbolException($"Operator '-' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
         }
 
         public override FlObject Multiply(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
+            if (n.ObjectType == FloatType.Value)
             {
-                return new FlDecimal(this.Value * (decimal)n.RawValue);
+                return new FlFloat(this.Value * (float)n.RawValue);
             }
             throw new SymbolException($"Operator '*' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
         }
 
         public override FlObject Divide(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
+            if (n.ObjectType == FloatType.Value)
             {
-                return new FlDecimal(this.Value / (decimal)n.RawValue);
+                return new FlFloat(this.Value / (float)n.RawValue);
             }
             throw new SymbolException($"Operator '/' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
         }
 
         public override void AddAndAssign(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
+            if (n.ObjectType == FloatType.Value)
             {
-                this.Value += (n as FlDecimal).Value;
+                this.Value += (n as FlFloat).Value;
                 return;
             }
             throw new SymbolException($"Operator '+=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
@@ -142,9 +142,9 @@ namespace Fl.Engine.Symbols.Objects
 
         public override void SubtractAndAssign(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
+            if (n.ObjectType == FloatType.Value)
             {
-                this.Value -= (n as FlDecimal).Value;
+                this.Value -= (n as FlFloat).Value;
                 return;
             }
             throw new SymbolException($"Operator '-=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
@@ -152,9 +152,9 @@ namespace Fl.Engine.Symbols.Objects
 
         public override void MultiplyAndAssing(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
+            if (n.ObjectType == FloatType.Value)
             {
-                this.Value *= (n as FlDecimal).Value;
+                this.Value *= (n as FlFloat).Value;
                 return;
             }
             throw new SymbolException($"Operator '*=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
@@ -162,9 +162,9 @@ namespace Fl.Engine.Symbols.Objects
 
         public override void DivideAndAssing(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
+            if (n.ObjectType == FloatType.Value)
             {
-                this.Value /= (n as FlDecimal).Value;
+                this.Value /= (n as FlFloat).Value;
                 return;
             }
             throw new SymbolException($"Operator '/=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
@@ -172,7 +172,7 @@ namespace Fl.Engine.Symbols.Objects
 
         public override FlObject Negate()
         {
-            return new FlDecimal(this.Value * -1.0M);
+            return new FlFloat(this.Value * -1.0f);
         }
         #endregion
 
@@ -180,36 +180,36 @@ namespace Fl.Engine.Symbols.Objects
 
         public override FlBool Equals(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
-                return new FlBool(this.Value == (decimal)n.RawValue);
+            if (n.ObjectType == FloatType.Value)
+                return new FlBool(this.Value == (float)n.RawValue);
             return base.Equals(n);
         }
 
         public override FlBool GreatherThan(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
-                return new FlBool(this.Value > (decimal)n.RawValue);
+            if (n.ObjectType == FloatType.Value)
+                return new FlBool(this.Value > (float)n.RawValue);
             return base.GreatherThan(n);
         }
 
         public override FlBool GreatherThanEquals(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
-                return new FlBool(this.Value >= (decimal)n.RawValue);
+            if (n.ObjectType == FloatType.Value)
+                return new FlBool(this.Value >= (float)n.RawValue);
             return base.GreatherThanEquals(n);
         }
 
         public override FlBool LesserThan(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
-                return new FlBool(this.Value < (decimal)n.RawValue);
+            if (n.ObjectType == FloatType.Value)
+                return new FlBool(this.Value < (float)n.RawValue);
             return base.LesserThan(n);
         }
 
         public override FlBool LesserThanEquals(FlObject n)
         {
-            if (n.ObjectType == DecimalType.Value)
-                return new FlBool(this.Value <= (decimal)n.RawValue);
+            if (n.ObjectType == FloatType.Value)
+                return new FlBool(this.Value <= (float)n.RawValue);
             return base.LesserThanEquals(n);
         }
         #endregion

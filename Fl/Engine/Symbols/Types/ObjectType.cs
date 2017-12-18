@@ -34,8 +34,14 @@ namespace Fl.Engine.Symbols.Types
                 case TokenType.Boolean:
                     dtype = BoolType.Value;
                     break;
+                case TokenType.Char:
+                    dtype = CharType.Value;
+                    break;
                 case TokenType.Integer:
                     dtype = IntegerType.Value;
+                    break;
+                case TokenType.Float:
+                    dtype = FloatType.Value;
                     break;
                 case TokenType.Double:
                     dtype = DoubleType.Value;
@@ -58,8 +64,14 @@ namespace Fl.Engine.Symbols.Types
             if (typename == BoolType.Value.ClassName)
                 return BoolType.Value;
 
+            if (typename == CharType.Value.ClassName)
+                return CharType.Value;
+
             if (typename == IntegerType.Value.ClassName)
                 return IntegerType.Value;
+
+            if (typename == FloatType.Value.ClassName)
+                return FloatType.Value;
 
             if (typename == DoubleType.Value.ClassName)
                 return DoubleType.Value;

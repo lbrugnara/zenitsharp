@@ -165,6 +165,7 @@ namespace Fl.Parser
                     ?? CheckParen()
                     ?? CheckBrace()
                     ?? CheckBracket()
+                    ?? CheckChar()
                     ?? CheckNumber()
                     ?? CheckLogicalOperator()
                     ?? CheckArithmeticOperators()
@@ -281,10 +282,18 @@ namespace Fl.Parser
                     val += Consume();
                     type = TokenType.Double;
                 }
-                else if (c == 'M')
+                else if (c == 'F' || c == 'f')
                 {
                     if (type != TokenType.Double)
-                        throw new Exception("Invalid character 'M'");
+                        throw new Exception($"Invalid character '{c}'");
+                    // Do not add the F now, just Consume and let's try what happens
+                    Consume();
+                    type = TokenType.Float;
+                }
+                else if (c == 'M' ||c == 'm')
+                {
+                    if (type != TokenType.Double)
+                        throw new Exception($"Invalid character '{c}'");
                     // Do not add the M now, just Consume and let's try what happens
                     Consume();
                     type = TokenType.Decimal;
@@ -456,6 +465,51 @@ namespace Fl.Parser
             return BuildToken(_Keywords.ContainsKey(val) ? _Keywords[val] : TokenType.Identifier, val, line, col);
         }
 
+        private Token CheckChar()
+        {
+            char c = Peek();
+
+            if (c != '\'')
+                return null;
+
+            int line = _Line;
+            int col = _Col;
+            Consume(); // First '
+            string val = "";
+            // Escaped char
+            if (Peek() == '\\')
+            {
+                Consume(); // Consume the backslash
+                var ec = Consume(); // Consume the escaped char
+                switch (ec)
+                {
+                    case 'n':
+                        val += '\n';
+                        break;
+                    case 't':
+                        val += '\t';
+                        break;
+                    case '0':
+                        val += '\0';
+                        break;
+                    default:
+                        throw new LexerException($"Invalid escaped char \\{ec}");
+                }
+            }
+            else
+            {
+                // Consume char
+                val += Consume();
+            }
+
+            if (c != '\'')
+                throw new LexerException("Bad char literal");
+
+            Consume(); // Last '
+
+            return BuildToken(TokenType.Char, val, line, col);
+        }
+
         private Token CheckString()
         {
             char c = Peek();
@@ -465,7 +519,7 @@ namespace Fl.Parser
 
             int line = _Line;
             int col = _Col;
-            Consume(); // first "
+            Consume(); // First "
             string val = "";
             c = '\0';
             while (HasInput())
@@ -477,7 +531,7 @@ namespace Fl.Parser
             }
 
             if (c != '"')
-                throw new Exception("Bad string");
+                throw new LexerException("Bad string literal");
 
             Consume(); // Last "
 

@@ -7,25 +7,25 @@ using System.Collections.Generic;
 
 namespace Fl.Engine.Symbols.Objects
 {
-    public class FlInteger : FlObject
+    public class FlChar : FlObject
     {
         #region Private Fields
-        private int _RawValue;
+        private char _RawValue;
         #endregion
 
         #region Constructor
-        public FlInteger(int value)
+        public FlChar(char value)
         {
             _RawValue = value;
         }
         #endregion
 
         #region Public Properties
-        public int Value { get => _RawValue; set => _RawValue = value; }
+        public char Value { get => _RawValue; set => _RawValue = value; }
         #endregion
 
         #region FlObject implementation
-        public override ObjectType ObjectType => IntegerType.Value;
+        public override ObjectType ObjectType => CharType.Value;
 
         public override object RawValue => _RawValue;
 
@@ -33,30 +33,18 @@ namespace Fl.Engine.Symbols.Objects
 
         public override FlObject Clone()
         {
-            return new FlInteger(_RawValue);
+            return new FlChar(_RawValue);
         }
 
         public override FlObject ConvertTo(ObjectType type)
         {
-            if (type == IntegerType.Value)
+            if (type == CharType.Value)
             {
                 return this.Clone();
             }
-            if (type == CharType.Value)
+            else if (type == IntegerType.Value)
             {
-                return new FlChar((char)_RawValue);
-            }
-            else if (type == FloatType.Value)
-            {
-                return new FlFloat((float)_RawValue);
-            }
-            else if (type == DoubleType.Value)
-            {
-                return new FlDouble((double)_RawValue);
-            }
-            else if (type == DecimalType.Value)
-            {
-                return new FlDecimal((decimal)_RawValue);
+                return new FlInteger((int)_RawValue);
             }
             else if (type == StringType.Value)
             {
@@ -71,9 +59,9 @@ namespace Fl.Engine.Symbols.Objects
 
         public override void Assign(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
+            if (n.ObjectType == CharType.Value)
             {
-                this.Value = (n as FlInteger).Value;
+                this.Value = (n as FlChar).Value;
                 return;
             }
             throw new SymbolException($"Operator '=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
@@ -84,35 +72,35 @@ namespace Fl.Engine.Symbols.Objects
         #region Arithmetics Operators
         public override FlObject PreIncrement()
         {
-            this.Value += 1;
+            this.Value += (char)1;
             return this;
         }
 
         public override FlObject PostIncrement()
         {
             var res = this.Clone();
-            this.Value += 1;
+            this.Value += (char)1;
             return res;
         }
 
         public override FlObject PreDecrement()
         {
-            this.Value -= 1;
+            this.Value -= (char)1;
             return this;
         }
 
         public override FlObject PostDecrement()
         {
             var res = this.Clone();
-            this.Value -= 1;
+            this.Value -= (char)1;
             return res;
         }
 
         public override FlObject Add(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
+            if (n.ObjectType == CharType.Value)
             {
-                return new FlInteger(this.Value + (int)n.RawValue);
+                return new FlInteger(this.Value + (char)n.RawValue);
             }
             else if (n.ObjectType == StringType.Value)
             {
@@ -123,36 +111,18 @@ namespace Fl.Engine.Symbols.Objects
 
         public override FlObject Subtract(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
+            if (n.ObjectType == CharType.Value)
             {
-                return new FlInteger(this.Value - (int)n.RawValue);
+                return new FlInteger(this.Value - (char)n.RawValue);
             }
             throw new SymbolException($"Operator '-' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
         }
 
-        public override FlObject Multiply(FlObject n)
-        {
-            if (n.ObjectType == IntegerType.Value)
-            {
-                return new FlInteger(this.Value * (int)n.RawValue);
-            }
-            throw new SymbolException($"Operator '*' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-        }
-
-        public override FlObject Divide(FlObject n)
-        {
-            if (n.ObjectType == IntegerType.Value)
-            {
-                return new FlInteger(this.Value / (int)n.RawValue);
-            }
-            throw new SymbolException($"Operator '/' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-        }
-
         public override void AddAndAssign(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
+            if (n.ObjectType == CharType.Value)
             {
-                this.Value += (n as FlInteger).Value;
+                this.Value += (n as FlChar).Value;
                 return;
             }
             throw new SymbolException($"Operator '+=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
@@ -160,32 +130,12 @@ namespace Fl.Engine.Symbols.Objects
 
         public override void SubtractAndAssign(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
+            if (n.ObjectType == CharType.Value)
             {
-                this.Value -= (n as FlInteger).Value;
+                this.Value -= (n as FlChar).Value;
                 return;
             }
             throw new SymbolException($"Operator '-=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-        }
-
-        public override void MultiplyAndAssing(FlObject n)
-        {
-            if (n.ObjectType == IntegerType.Value)
-            {
-                this.Value *= (n as FlInteger).Value;
-                return;
-            }
-            throw new SymbolException($"Operator '*=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-        }
-
-        public override void DivideAndAssing(FlObject n)
-        {
-            if (n.ObjectType == IntegerType.Value)
-            {
-                this.Value /= (n as FlInteger).Value;
-                return;
-            }
-            throw new SymbolException($"Operator '/=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
         }
 
         public override FlObject Negate()
@@ -198,36 +148,36 @@ namespace Fl.Engine.Symbols.Objects
 
         public override FlBool Equals(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
-                return new FlBool(this.Value == (int)n.RawValue);
+            if (n.ObjectType == CharType.Value)
+                return new FlBool(this.Value == (char)n.RawValue);
             return base.Equals(n);
         }
 
         public override FlBool GreatherThan(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
-                return new FlBool(this.Value > (int)n.RawValue);
+            if (n.ObjectType == CharType.Value)
+                return new FlBool(this.Value > (char)n.RawValue);
             return base.GreatherThan(n);
         }
 
         public override FlBool GreatherThanEquals(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
-                return new FlBool(this.Value >= (int)n.RawValue);
+            if (n.ObjectType == CharType.Value)
+                return new FlBool(this.Value >= (char)n.RawValue);
             return base.GreatherThanEquals(n);
         }
 
         public override FlBool LesserThan(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
-                return new FlBool(this.Value < (int)n.RawValue);
+            if (n.ObjectType == CharType.Value)
+                return new FlBool(this.Value < (char)n.RawValue);
             return base.LesserThan(n);
         }
 
         public override FlBool LesserThanEquals(FlObject n)
         {
-            if (n.ObjectType == IntegerType.Value)
-                return new FlBool(this.Value <= (int)n.RawValue);
+            if (n.ObjectType == CharType.Value)
+                return new FlBool(this.Value <= (char)n.RawValue);
             return base.LesserThanEquals(n);
         }
         #endregion

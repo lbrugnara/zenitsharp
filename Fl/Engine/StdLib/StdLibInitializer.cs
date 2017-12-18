@@ -18,10 +18,14 @@ namespace Fl.Engine.StdLib
             scope.AddSymbol("import", new Symbol(SymbolType.Constant), new builtin.ImportFunction());
             scope.AddSymbol("using", new Symbol(SymbolType.Constant), new builtin.UsingFunction());
             scope.AddSymbol("exit", new Symbol(SymbolType.Constant), new builtin.ExitFunction());
-            scope.AddSymbol("int", new Symbol(SymbolType.Constant), builtin.types.IntegerClass.Build());
-            scope.AddSymbol("double", new Symbol(SymbolType.Constant), builtin.types.DoubleClass.Build());
-            scope.AddSymbol("decimal", new Symbol(SymbolType.Constant), builtin.types.DecimalClass.Build());
+
+            // Basic types
             scope.AddSymbol("bool", new Symbol(SymbolType.Constant), builtin.types.BoolClass.Build());
+            scope.AddSymbol("char", new Symbol(SymbolType.Constant), builtin.types.CharClass.Build());
+            scope.AddSymbol("int", new Symbol(SymbolType.Constant), builtin.types.IntegerClass.Build());
+            scope.AddSymbol("float", new Symbol(SymbolType.Constant), builtin.types.FloatClass.Build());
+            scope.AddSymbol("double", new Symbol(SymbolType.Constant), builtin.types.DoubleClass.Build());
+            scope.AddSymbol("decimal", new Symbol(SymbolType.Constant), builtin.types.DecimalClass.Build());            
             scope.AddSymbol("string", new Symbol(SymbolType.Constant), builtin.types.StringClass.Build());
             scope.AddSymbol("tuple", new Symbol(SymbolType.Constant), builtin.types.TupleClass.Build());
             scope.AddSymbol("func", new Symbol(SymbolType.Constant), builtin.types.FuncClass.Build());

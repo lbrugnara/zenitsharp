@@ -32,7 +32,7 @@ namespace Fl.Engine.IL.Generators
         protected Operand VarDefinitionNode(AstILGenerator generator, AstVarDefinitionNode vardecl)
         {
             // Get the variable type
-            ObjectType t = ObjectType.GetFromTokenType(vardecl.VarType.TypeToken.Type);
+            ObjectType t = ObjectType.GetFromTokenType(vardecl.VarType.TypeToken.Type) ?? ObjectType.GetFromTypeName(vardecl.VarType.TypeToken.Value.ToString());
 
             foreach (var declaration in vardecl.VarDefinitions)
             {
