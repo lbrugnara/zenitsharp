@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.Evaluators;
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
 using System;

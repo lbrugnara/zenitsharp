@@ -20,7 +20,7 @@ namespace Fl.Engine.IL.Generators
         public Operand Visit(AstILGenerator generator, AstConstantNode constdec)
         {
             // Get the variable type
-            ObjectType t = ObjectType.GetFromTokenType(constdec.Type.Type);
+            TypeResolver typeres = TypeResolver.GetTypeResolverFromToken(constdec.Type);
 
             foreach (var declaration in constdec.Constants)
             {
@@ -31,7 +31,7 @@ namespace Fl.Engine.IL.Generators
 
                 // const <identifier> = <operand>
                 var symbol = new SymbolOperand(identifierToken.Value.ToString());
-                generator.Emmit(new ConstInstruction(symbol, t?.ClassName ?? operand?.TypeName, operand));
+                generator.Emmit(new ConstInstruction(symbol, typeres, operand));
             }
             return null;
         }

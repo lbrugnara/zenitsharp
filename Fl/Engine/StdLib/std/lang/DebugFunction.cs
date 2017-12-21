@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.Evaluators;
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
@@ -17,7 +16,7 @@ namespace Fl.Engine.StdLib.std.lang
 
         public override FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
         {
-            args.ForEach(a => System.Console.WriteLine(a.ObjectType == NamespaceType.Value ? (a as FlNamespace).ToDebugStr() : a.ToDebugStr()));
+            args.ForEach(a => System.Console.WriteLine(a.ToDebugStr()));
             return null;
         }
     }

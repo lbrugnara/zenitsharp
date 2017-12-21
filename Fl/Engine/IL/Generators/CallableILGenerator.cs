@@ -19,7 +19,7 @@ namespace Fl.Engine.IL.Generators
     {
         public Operand Visit(AstILGenerator generator, AstCallableNode node)
         {
-            SymbolOperand op = node.Callable.Exec(generator) as SymbolOperand;
+            Operand op = node.Callable.Exec(generator);
 
             List<ParamInstruction> parameters = node.Arguments.Expressions.Select(a => new ParamInstruction(a.Exec(generator))).ToList();
             parameters.Reverse();

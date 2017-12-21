@@ -15,81 +15,18 @@ namespace Fl.Engine.Symbols.Objects
     {
         public abstract object RawValue { get; }
 
-        public abstract bool IsPrimitive { get; }
-
-        public abstract ObjectType ObjectType { get; }
+        public abstract FlType Type { get; }
 
         public abstract FlObject Clone();
 
-        public abstract FlObject ConvertTo(ObjectType type);
-
-        public virtual Symbol this[string membername] => throw new SymbolException($"{ObjectType} does not contain a definition of '{membername}'");
-
-        #region Assignment Operators
-
-        public virtual void Assign(FlObject n) => throw new SymbolException($"Operator '=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual FlObject this[FlObject indexer] {
-            get => throw new SymbolException($"Cannot apply indexing to object of type '{ObjectType}'");
-            set => throw new SymbolException($"Cannot apply indexing to object of type '{ObjectType}'");
-        }
-
-        #endregion
-
-        #region Arithmetics Operators        
-
-        public virtual FlObject PreIncrement() => throw new SymbolException($"Operator '++' cannot be applied to operand of type '{this.ObjectType}'");
-
-        public virtual FlObject PostIncrement() => throw new SymbolException($"Operator '++' cannot be applied to operand of type '{this.ObjectType}'");
-
-        public virtual FlObject PreDecrement() => throw new SymbolException($"Operator '--' cannot be applied to operand of type '{this.ObjectType}'");
-
-        public virtual FlObject PostDecrement() => throw new SymbolException($"Operator '--' cannot be applied to operand of type '{this.ObjectType}'");
-
-        public virtual FlObject Add(FlObject n) => throw new SymbolException($"Operator '+' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual FlObject Subtract(FlObject n) => throw new SymbolException($"Operator '-' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual FlObject Multiply(FlObject n) => throw new SymbolException($"Operator '*' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual FlObject Divide(FlObject n) => throw new SymbolException($"Operator '/' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual void AddAndAssign(FlObject n) => throw new SymbolException($"Operator '+=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual void SubtractAndAssign(FlObject n) => throw new SymbolException($"Operator '-=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual void MultiplyAndAssing(FlObject n) => throw new SymbolException($"Operator '*=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual void DivideAndAssing(FlObject n) => throw new SymbolException($"Operator '/=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual FlObject Negate() => throw new SymbolException($"Operator '-' cannot be applied to operand of type '{this.ObjectType}'");
-
-        #endregion
-
-        #region Logical Operators
-
-        public virtual FlBool Equals(FlObject n) => new FlBool(this.RawValue.Equals(n.RawValue));
-
-        public virtual FlObject Not() => throw new SymbolException($"Operator '!' cannot be applied to operand of type '{this.ObjectType}'");
-
-        public virtual FlBool GreatherThan(FlObject n) => throw new SymbolException($"Operator '>' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual FlBool GreatherThanEquals(FlObject n) => throw new SymbolException($"Operator '>=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual FlBool LesserThan(FlObject n) => throw new SymbolException($"Operator '<' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        public virtual FlBool LesserThanEquals(FlObject n) => throw new SymbolException($"Operator '<=' cannot be applied to operands of type '{n.ObjectType}' and '{this.ObjectType}'");
-
-        #endregion
-
         public override string ToString()
         {
-            return RawValue.ToString();
+            return this.RawValue.ToString();
         }
 
         public virtual string ToDebugStr()
         {
-            return $"{RawValue} ({ObjectType})";
+            return $"{this.RawValue} ({this.Type})";
         }
     }
 }

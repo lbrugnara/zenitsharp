@@ -11,7 +11,7 @@ namespace Fl.Engine.Symbols.Objects
         private int _ParamsCount;
         private string _Name;
 
-        public FlIndexer(int paramsCount, Func<FlObject, List<FlObject>, FlObject> body)
+        public FlIndexer(int paramsCount, FlFunction.BoundFunction body)
             : base("indexer", body)
         {
             _ParamsCount = paramsCount;

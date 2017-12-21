@@ -18,7 +18,7 @@ namespace Fl.Engine.IL.Generators
             if (accessor.Enclosing == null)
                 return member;
 
-            SymbolOperand parent = accessor.Enclosing.Exec(generator) as SymbolOperand;
+            Operand parent = accessor.Enclosing.Exec(generator);
             parent.AddMember(member);
             return parent;
         }

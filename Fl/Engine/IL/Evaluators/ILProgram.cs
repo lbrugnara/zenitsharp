@@ -73,7 +73,7 @@ namespace Fl.Engine.IL.EValuators
         {
             FlObject value = FlNull.Value;
 
-            if (o == null)
+            if (o == null || o.TypeResolver?.TypeName == FlNullType.Instance.Name)
                 return value;
 
             if (o is SymbolOperand)
@@ -82,27 +82,39 @@ namespace Fl.Engine.IL.EValuators
 
                 // Get the root value
                 value = SymbolTable.GetSymbol(so.Name).Binding;
-
-                if (so.Member != null)
-                {
-                    FlObject tmpval = value;
-                    SymbolOperand tmpmember = (o as SymbolOperand).Member;
-                    while (tmpmember != null)
-                    {
-                        if (tmpval.ObjectType == NamespaceType.Value)
-                        {
-                            tmpval = (tmpval as FlNamespace)[tmpmember.Name].Binding;
-                        }
-                        tmpmember = tmpmember.Member;
-                    }
-                    value = tmpval;
-                }
             }
             else
             {
                 var io = (o as ImmediateOperand);
-                value = ObjectType.GetFromTypeName(io.TypeName).NewValue(io.Value);
+                FlType operandType = io.TypeResolver.Resolve(SymbolTable);                
+                value = operandType.Activator(io.Value);
             }
+
+            if (o.Member != null)
+            {
+                FlObject curval = value;
+                FlObject ancestor = value;
+                SymbolOperand tmpmember = o.Member;
+                while (tmpmember != null)
+                {
+                    if (curval.Type == FlNamespaceType.Instance)
+                    {
+                        curval = (curval as FlNamespace)[tmpmember.Name].Binding;
+                    }
+                    else if (curval is FlType)
+                    {
+                        curval = (curval as FlType)[tmpmember.Name].Binding;
+                    }
+                    if (curval is FlMethod)
+                    {
+                        curval = (curval as FlMethod).Bind(ancestor);
+                    }
+                    ancestor = curval;
+                    tmpmember = tmpmember.Member;
+                }
+                value = curval;
+            }
+
             return value;
         }
 
@@ -115,23 +127,23 @@ namespace Fl.Engine.IL.EValuators
             switch (bi.OpCode)
             {
                 case OpCode.Add:
-                    result = left.Add(right);
+                    result = left.Type.GetStaticMethod(FlType.OperatorAdd).Invoke(SymbolTable, left, right);
                     break;
                 case OpCode.Sub:
-                    result = left.Subtract(right);
+                    result = left.Type.GetStaticMethod(FlType.OperatorSub).Invoke(SymbolTable, left, right);
                     break;
                 case OpCode.Mult:
-                    result = left.Multiply(right);
+                    result = left.Type.GetStaticMethod(FlType.OperatorMult).Invoke(SymbolTable, left, right);
                     break;
                 case OpCode.Div:
-                    result = left.Divide(right);
+                    result = left.Type.GetStaticMethod(FlType.OperatorDiv).Invoke(SymbolTable, left, right);
                     break;
 
                 case OpCode.And:
                 case OpCode.Or:
                     {
-                        bool l = left.ObjectType != BoolType.Value ? left.RawValue != null : (left as FlBool).Value;
-                        bool r = right.ObjectType != BoolType.Value ? right.RawValue != null : (right as FlBool).Value;
+                        bool l = left.Type != FlBoolType.Instance ? left.RawValue != null : (left as FlBool).Value;
+                        bool r = right.Type != FlBoolType.Instance ? right.RawValue != null : (right as FlBool).Value;
 
                         switch (bi.OpCode)
                         {
@@ -146,19 +158,19 @@ namespace Fl.Engine.IL.EValuators
                     }
 
                 case OpCode.Ceq:
-                    result = left.Equals(right);
+                    result = left.Type.GetStaticMethod(FlType.OperatorEquals).Invoke(SymbolTable, left, right);
                     break;
                 case OpCode.Cgt:
-                    result = left.GreatherThan(right);
+                    result = left.Type.GetStaticMethod(FlType.OperatorGt).Invoke(SymbolTable, left, right);
                     break;
                 case OpCode.Cgte:
-                    result = left.GreatherThanEquals(right);
+                    result = left.Type.GetStaticMethod(FlType.OperatorGte).Invoke(SymbolTable, left, right);
                     break;
                 case OpCode.Clt:
-                    result = left.LesserThan(right);
+                    result = left.Type.GetStaticMethod(FlType.OperatorLt).Invoke(SymbolTable, left, right);
                     break;
                 case OpCode.Clte:
-                    result = left.LesserThanEquals(right);
+                    result = left.Type.GetStaticMethod(FlType.OperatorLte).Invoke(SymbolTable, left, right);
                     break;
                 default:
                     throw new System.Exception($"Unhandled binary operator");
@@ -174,22 +186,22 @@ namespace Fl.Engine.IL.EValuators
             switch (ui.OpCode)
             {
                 case OpCode.Not:
-                    result = left.Not();
+                    result = left.Type.GetStaticMethod(FlType.OperatorNot).Invoke(SymbolTable, left);
                     break;
                 case OpCode.Neg:
-                    result = left.Negate();
+                    result = left.Type.GetStaticMethod(FlType.OperatorSub).Invoke(SymbolTable, left);
                     break;
                 case OpCode.PreInc:
-                    result = left.PreIncrement();
+                    result = left.Type.GetStaticMethod(FlType.OperatorPreIncr).Invoke(SymbolTable, left);
                     break;
                 case OpCode.PreDec:
-                    result = left.PreDecrement();
+                    result = left.Type.GetStaticMethod(FlType.OperatorPreDecr).Invoke(SymbolTable, left);
                     break;
                 case OpCode.PostInc:
-                    result = left.PostIncrement();
+                    result = left.Type.GetStaticMethod(FlType.OperatorPostIncr).Invoke(SymbolTable, left);
                     break;
                 case OpCode.PostDec:
-                    result = left.PostDecrement();
+                    result = left.Type.GetStaticMethod(FlType.OperatorPostDecr).Invoke(SymbolTable, left);
                     break;
                 default:
                     throw new System.Exception($"Unhandled unary operator");
@@ -206,11 +218,21 @@ namespace Fl.Engine.IL.EValuators
         public void VisitVar(VarInstruction vi)
         {
             FlObject value = this.GetFlObjectFromOperand(vi.Value);
-            if (vi.Type != null)
+            if (vi.TypeResolver != null)
             {
-                ObjectType type = ObjectType.GetFromTypeName(vi.Type);
-                SymbolTable.AddSymbol(vi.DestSymbol.Name, new Symbol(SymbolType.Variable), type.DefaultValue());
-                SymbolTable.GetSymbol(vi.DestSymbol.Name).UpdateBinding(value);
+                FlType type = vi.TypeResolver.Resolve(SymbolTable);
+                Symbol symbol = new Symbol(SymbolType.Variable);
+                SymbolTable.AddSymbol(vi.DestSymbol.Name, symbol, FlNull.Value);
+                var defaultValue = type.Activator(null);
+                if (value == null)
+                {
+                    if (defaultValue != null && defaultValue != FlNull.Value)
+                        symbol.UpdateBinding(defaultValue);
+                }
+                else
+                {
+                    symbol.UpdateBinding(value);
+                }                
             }
             else
             {
@@ -227,12 +249,13 @@ namespace Fl.Engine.IL.EValuators
         public void VisitCall(CallInstruction ci)
         {
             FlObject target = GetFlObjectFromOperand(ci.Func);
+
             List<FlObject> parameters = new List<FlObject>(Params);
             parameters.Reverse();
 
             /*if (node is AstIndexerNode)
             {
-                Symbol clasz = evaluator.Symtable.GetSymbol(target.ObjectType.ClassName) ?? evaluator.Symtable.GetSymbol(target.ObjectType.Name);
+                Symbol clasz = evaluator.Symtable.GetSymbol(target.ObjectType.Name) ?? evaluator.Symtable.GetSymbol(target.ObjectType.Name);
                 var claszobj = (clasz.Binding as FlClass);
                 FlIndexer indexer = claszobj.GetIndexer(node.Arguments.Count);
                 if (indexer == null)

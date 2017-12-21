@@ -6,7 +6,7 @@ using Fl.Engine.Symbols.Types;
 
 namespace Fl.Engine.Symbols.Objects
 {
-    public class FlBool : FlObject
+    public class FlBool : FlInstance
     {
         private bool _RawValue;
 
@@ -15,49 +15,15 @@ namespace Fl.Engine.Symbols.Objects
             _RawValue = value;
         }
 
-        public override ObjectType ObjectType => BoolType.Value;
+        public override FlType Type => FlBoolType.Instance;
 
         public override object RawValue => _RawValue;
 
         public bool Value { get => _RawValue; set => _RawValue = value; }
 
-        public override bool IsPrimitive => true;
-
         public override FlObject Clone()
         {
             return new FlBool(_RawValue);
-        }
-
-        public override FlObject ConvertTo(ObjectType type)
-        {
-            if (type == BoolType.Value)
-            {
-                return this.Clone();
-            }
-            else if (type == StringType.Value)
-            {
-                return new FlString(_RawValue.ToString());
-            }
-            throw new CastException($"Cannot convert type {ObjectType} to {type}");
-        }
-
-        #region Assignment Operators
-
-        public override void Assign(FlObject n)
-        {
-            if (n.ObjectType == BoolType.Value)
-            {
-                this.Value = (n as FlBool).Value;
-                return;
-            }
-            base.Assign(n);
-        }
-
-        #endregion
-
-        public override FlObject Not()
-        {
-            return new FlBool(!this.Value);
         }
     }
 }

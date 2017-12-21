@@ -32,7 +32,7 @@ namespace Fl.Engine.IL.Generators
         protected Operand VarDefinitionNode(AstILGenerator generator, AstVarDefinitionNode vardecl)
         {
             // Get the variable type
-            ObjectType t = ObjectType.GetFromTokenType(vardecl.VarType.TypeToken.Type) ?? ObjectType.GetFromTypeName(vardecl.VarType.TypeToken.Value.ToString());
+            TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardecl.VarType.TypeToken);
 
             foreach (var declaration in vardecl.VarDefinitions)
             {
@@ -43,7 +43,7 @@ namespace Fl.Engine.IL.Generators
 
                 // var <identifier> = <operand>
                 var symbol = new SymbolOperand(identifierToken.Value.ToString());
-                generator.Emmit(new VarInstruction(symbol, t?.ClassName ?? operand?.TypeName, operand));
+                generator.Emmit(new VarInstruction(symbol, typeresolver, operand));
             }
             return null;
         }
@@ -51,7 +51,7 @@ namespace Fl.Engine.IL.Generators
         protected Operand VarDestructuringNode(AstILGenerator generator, AstVarDestructuringNode vardestnode)
         {
             // Get the variable type
-            ObjectType dataType = ObjectType.GetFromTokenType(vardestnode.VarType.TypeToken.Type);
+            TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);
 
             /*vardestnode.DestructInit.Exec()
 

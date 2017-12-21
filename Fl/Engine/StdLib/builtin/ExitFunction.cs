@@ -14,7 +14,7 @@ namespace Fl.Engine.StdLib.builtin
 
         public override FlObject Invoke(SymbolTable symboltable, List<FlObject> args)
         {
-            var exitval = args.ElementAtOrDefault(0) ?? new FlInteger(0);
+            var exitval = args.ElementAtOrDefault(0) ?? new FlInt(0);
             symboltable.GlobalScope.AddSymbol("@flexit", new Symbol(SymbolType.Constant), exitval);
             return null;
         }

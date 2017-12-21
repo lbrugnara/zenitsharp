@@ -225,7 +225,7 @@ namespace Fl.Engine.Symbols
             }
         }
 
-        public void SetBreak(FlInteger intobj)
+        public void SetBreak(FlInt intobj)
         {
             int nbreaks = intobj.Value;
             int orignbreaks = nbreaks;

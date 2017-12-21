@@ -7,10 +7,10 @@ namespace Fl.Engine.IL.Instructions
 {
     public class CallInstruction : Instruction
     {
-        public SymbolOperand Func { get; }
+        public Operand Func { get; }
         public int NumberOfParams { get; }
 
-        public CallInstruction(SymbolOperand fn, int nparams)
+        public CallInstruction(Operand fn, int nparams)
             : base (OpCode.Call)
         {
             this.Func = fn;

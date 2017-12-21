@@ -161,7 +161,7 @@ namespace Fl.Engine.Symbols
             }
         }
 
-        public void SetBreak(FlInteger intobj)
+        public void SetBreak(FlInt intobj)
         {
             _Scopes.SetBreak(intobj);
         }

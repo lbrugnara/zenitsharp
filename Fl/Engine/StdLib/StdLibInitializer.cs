@@ -20,16 +20,18 @@ namespace Fl.Engine.StdLib
             scope.AddSymbol("exit", new Symbol(SymbolType.Constant), new builtin.ExitFunction());
 
             // Basic types
-            scope.AddSymbol("bool", new Symbol(SymbolType.Constant), builtin.types.BoolClass.Build());
-            scope.AddSymbol("char", new Symbol(SymbolType.Constant), builtin.types.CharClass.Build());
-            scope.AddSymbol("int", new Symbol(SymbolType.Constant), builtin.types.IntegerClass.Build());
-            scope.AddSymbol("float", new Symbol(SymbolType.Constant), builtin.types.FloatClass.Build());
-            scope.AddSymbol("double", new Symbol(SymbolType.Constant), builtin.types.DoubleClass.Build());
-            scope.AddSymbol("decimal", new Symbol(SymbolType.Constant), builtin.types.DecimalClass.Build());            
-            scope.AddSymbol("string", new Symbol(SymbolType.Constant), builtin.types.StringClass.Build());
-            scope.AddSymbol("tuple", new Symbol(SymbolType.Constant), builtin.types.TupleClass.Build());
-            scope.AddSymbol("func", new Symbol(SymbolType.Constant), builtin.types.FuncClass.Build());
-            scope.AddSymbol("Error", new Symbol(SymbolType.Constant), builtin.types.ErrorClass.Build());
+            scope.AddSymbol("object", new Symbol(SymbolType.Constant), FlObjectType.Instance);
+            scope.AddSymbol("type", new Symbol(SymbolType.Constant), FlTypeType.Instance);
+            scope.AddSymbol("bool", new Symbol(SymbolType.Constant), FlBoolType.Instance);
+            scope.AddSymbol("char", new Symbol(SymbolType.Constant), FlCharType.Instance);
+            scope.AddSymbol("int", new Symbol(SymbolType.Constant), FlIntType.Instance);
+            scope.AddSymbol("float", new Symbol(SymbolType.Constant), FlFloatType.Instance);
+            scope.AddSymbol("double", new Symbol(SymbolType.Constant), FlDoubleType.Instance);
+            scope.AddSymbol("decimal", new Symbol(SymbolType.Constant), FlDecimalType.Instance);            
+            scope.AddSymbol("string", new Symbol(SymbolType.Constant), FlStringType.Instance);
+            scope.AddSymbol("tuple", new Symbol(SymbolType.Constant), FlTupleType.Instance);
+            scope.AddSymbol("func", new Symbol(SymbolType.Constant), FlFuncType.Instance);
+            scope.AddSymbol("Error", new Symbol(SymbolType.Constant), FlErrorType.Instance);
 
 
             // Namespace: std

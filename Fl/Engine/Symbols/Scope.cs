@@ -100,7 +100,7 @@ namespace Fl.Engine.Symbols
             foreach (var k in keys)
             {
                 var s = map[k];
-                if (s.Binding.ObjectType == FuncType.Value && s.SymbolType == SymbolType.Constant)
+                if (s.Binding.Type == FlFuncType.Instance && s.SymbolType == SymbolType.Constant)
                     continue;
                 _Map[k] = s;
             }

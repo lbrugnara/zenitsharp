@@ -11,75 +11,36 @@ namespace Fl.Engine.Symbols.Objects
 {
     public class FlInstance : FlObject
     {
-        private FlClass _Class;
+        private FlType _Type;
 
-        public FlInstance(FlClass clasz)
+        protected FlInstance()
         {
-            _Class = clasz;
+        }
+
+        public FlInstance(FlType type)
+        {
+            _Type = type;
         }
 
         #region FlObject implementation
 
-        public override object RawValue => _Class;
+        public override object RawValue => Type;
 
-        public override bool IsPrimitive => false;
-
-        public override ObjectType ObjectType => _Class.ObjectType;
+        public override FlType Type => _Type.Type;
 
         public override FlObject Clone()
         {
-            return new FlInstance(_Class.Clone() as FlClass);
-        }
-
-        public override FlObject ConvertTo(ObjectType type)
-        {
-            return _Class.ConvertTo(type);
+            return new FlInstance(Type.Clone() as FlType);
         }
 
         public override string ToString()
         {
-            return $"instance {_Class}";
+            return $"{RawValue} ({Type.ToString()})";
         }
 
         public override string ToDebugStr()
         {
-            return $"instance {_Class.ToDebugStr()}";
-        }
-        #endregion
-
-        public override void Assign(FlObject n)
-        {
-            // TODO: Checking by ClassName is not enough (add namespace check)
-            if (n is FlInstance && (n as FlInstance)._Class.ClassName == _Class.ClassName)
-            {
-                _Class = (n as FlInstance)._Class;
-                return;
-            }
-            base.Assign(n);
-        }
-
-        #region Public Properties
-
-        public FlObject this[MemberType type, string name]
-        {
-            get
-            {
-                Symbol s = _Class[type, name];
-                return s.Binding;
-            }
-            set
-            {
-                Symbol s = _Class[type, name];
-                s.UpdateBinding(value);
-            }
-        }
-
-        public override Symbol this[string name]
-        {
-            get
-            {
-                return _Class[name];
-            }
+            return $"{RawValue} ({Type.ToDebugStr()})";
         }
 
         #endregion

@@ -18,9 +18,7 @@ namespace Fl.Engine.Symbols.Objects
 
         public override object RawValue => FullName; // TODO:
 
-        public override bool IsPrimitive => false;
-
-        public override ObjectType ObjectType => NamespaceType.Value;
+        public override FlType Type => FlNamespaceType.Instance;
 
         public FlNamespace(string name, FlNamespace parent = null)
         {
@@ -38,7 +36,7 @@ namespace Fl.Engine.Symbols.Objects
         public string FullName => (_Parent != null ? $"{_Parent.FullName}." : "") + $"{_Name}";
 
         #region Indexers
-        public override Symbol this[string var]
+        public Symbol this[string var]
         {
             get
             {
@@ -66,11 +64,6 @@ namespace Fl.Engine.Symbols.Objects
         public override FlObject Clone()
         {
             return new FlNamespace(_Name, _Parent);
-        }
-
-        public override FlObject ConvertTo(ObjectType type)
-        {
-            throw new CastException($"Cannot convert type {ObjectType} to {type}");
         }
     }
 }

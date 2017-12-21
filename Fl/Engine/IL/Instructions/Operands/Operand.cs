@@ -2,15 +2,26 @@
 // Full copyright and license information in LICENSE file
 
 
+using Fl.Engine.Symbols.Types;
+
 namespace Fl.Engine.IL.Instructions.Operands
 {
     public abstract class Operand
     {
-        public string TypeName { get; }
+        public TypeResolver TypeResolver { get; }
+        public SymbolOperand Member { get; private set; }
 
-        public Operand(string type)
+        public Operand(TypeResolver type)
         {
-            this.TypeName = type;
+            this.TypeResolver = type;
+        }
+
+        public void AddMember(SymbolOperand member)
+        {
+            if (this.Member == null)
+                this.Member = member;
+            else
+                this.Member.AddMember(member);
         }
     }
 }

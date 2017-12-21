@@ -2,18 +2,19 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.IL.Instructions.Operands;
+using Fl.Engine.Symbols.Types;
 
 namespace Fl.Engine.IL.Instructions
 {
     public class ConstInstruction : Instruction
     {
-        public string Type { get; }
+        public TypeResolver TypeResolver { get; }
         public Operand Value { get; }
 
-        public ConstInstruction(SymbolOperand name, string type, Operand value)
+        public ConstInstruction(SymbolOperand name, TypeResolver typeres, Operand value)
             : base(OpCode.Const, name)
         {
-            this.Type = type;
+            this.TypeResolver = typeres;
             this.Value = value;
         }
 

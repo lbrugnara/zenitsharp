@@ -3,7 +3,6 @@
 
 using Fl;
 using Fl.Engine;
-using Fl.Engine.Evaluators;
 using Fl.Engine.IL.EValuators;
 using Fl.Engine.IL.Generators;
 using Fl.Engine.IL.Instructions;
@@ -23,7 +22,6 @@ namespace FlInterpreter
 
         public void Run()
         {
-            AstEvaluator eval = new AstEvaluator();
             while (true)
             {
                 Console.Write(">>> ");

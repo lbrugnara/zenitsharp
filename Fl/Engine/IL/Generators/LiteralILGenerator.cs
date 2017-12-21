@@ -3,6 +3,7 @@
 
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
+using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
 using Fl.Parser;
@@ -16,13 +17,13 @@ namespace Fl.Engine.IL.Generators
         public Operand Visit(AstILGenerator generator, AstLiteralNode literal)
         {
             // Get the literal's object type
-            ObjectType type = ObjectType.GetFromTokenType(literal.Literal.Type);
+            TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(literal.Literal);
 
             // Take the raw value
             var value = literal.Literal.Value;
 
             // Return an immediate operand
-            return new ImmediateOperand(type.ClassName, value);
+            return new ImmediateOperand(typeresolver, value);
         }
     }
 }

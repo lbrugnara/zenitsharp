@@ -18,9 +18,7 @@ namespace Fl.Engine.Symbols.Objects
 
         public override object RawValue => null;
 
-        public override bool IsPrimitive => true;
-
-        public override ObjectType ObjectType => NullType.Value;
+        public override FlType Type => FlNullType.Instance;
 
         public override string ToString()
         {
@@ -35,12 +33,6 @@ namespace Fl.Engine.Symbols.Objects
         public override FlObject Clone()
         {
             return _Instance;
-        }
-
-        public override FlObject ConvertTo(ObjectType type)
-        {
-            return _Instance;
-            //throw new CastException($"Cannot convert type {ObjectType} to {type}");
         }
     }
 }

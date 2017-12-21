@@ -25,7 +25,7 @@ namespace Fl.Engine.Symbols
             _Binding = FlNull.Value;
         }
 
-        public ObjectType ObjectType => _Binding?.ObjectType;
+        public FlType ObjectType => _Binding?.Type;
         public SymbolType SymbolType => _SymbolType;
         public StorageType StorageType => _StorageType;
         public FlObject Binding => _Binding;
@@ -61,8 +61,8 @@ namespace Fl.Engine.Symbols
 
         public void UpdateBinding(FlObject newval)
         {
-            if (_Binding != FlNull.Value && _Binding.ObjectType != newval.ObjectType)
-                throw new SymbolException($"Cannot implicitly convert type '{newval.ObjectType}' to '{_Binding.ObjectType}'");
+            if (_Binding != FlNull.Value && _Binding.Type != newval.Type)
+                throw new SymbolException($"Cannot implicitly convert type '{newval.Type}' to '{_Binding.Type}'");
             _Binding = newval;
         }
     }
