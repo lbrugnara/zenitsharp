@@ -76,7 +76,7 @@ namespace Fl.Engine.Symbols.Objects
 
         public FlIndexer GetIndexer(int paramsCount) => _Descriptor.GetIndexer(paramsCount);
 
-        public FlFunction GetStaticMethod(string name) => _Descriptor.GetStaticMethod(name);
+        public FlStaticMethod GetStaticMethod(string name) => _Descriptor.GetStaticMethod(name);
 
         public Func<object, FlObject> Activator => _Descriptor.Activator;
 

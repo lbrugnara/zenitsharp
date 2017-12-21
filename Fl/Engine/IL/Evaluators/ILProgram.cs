@@ -253,8 +253,8 @@ namespace Fl.Engine.IL.EValuators
 
         public void VisitCall(CallInstruction ci)
         {
+            FlObject result = null;
             FlObject target = GetFlObjectFromOperand(ci.Func);
-
             List<FlObject> parameters = new List<FlObject>(Params);
             parameters.Reverse();
 
@@ -271,8 +271,14 @@ namespace Fl.Engine.IL.EValuators
 
             if (target is FlFunction)
             {
-                (target as FlFunction).Invoke(SymbolTable, Params);
-            }/*
+                result = (target as FlFunction).Invoke(SymbolTable, Params);
+            }
+            else if (target is FlType)
+            {
+                var opcall = (target as FlType).GetStaticMethod(FlType.OperatorCall);
+                result = opcall.Invoke(SymbolTable, Params);
+            }
+            /*
             else if (target is FlClass)
             {
                 var clasz = (target as FlClass);
@@ -289,6 +295,8 @@ namespace Fl.Engine.IL.EValuators
             //throw new AstWalkerException($"{target} is not a callable object");
 
             Params.Clear();
+
+            this.SymbolTable.GetSymbol(ci.DestSymbol).UpdateBinding(result);
         }
 
         public void VisitParam(ParamInstruction pi)

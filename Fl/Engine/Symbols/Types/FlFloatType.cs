@@ -70,30 +70,30 @@ namespace Fl.Engine.Symbols.Types
             throw new UnsupportedOperandException($"Operator '/' cannot be applied to operands of type '{arg.Type}' and '{self.Type}'");
         }
 
-        private static FlObject OperatorCallImpl(List<FlObject> args)
+        private static FlFloat OperatorCallImpl(List<FlObject> args)
         {
-            FlFloat self = args[0] as FlFloat;
-            FlType type = args[1] as FlType;
+            FlObject arg = args[0];
+            FlType type = arg.Type;
 
             if (type == _Instance)
-                return self.Clone();
+                return arg.Clone() as FlFloat;
 
             if (type == FlCharType.Instance)
-                return new FlChar((char)self.RawValue);
+                return new FlFloat((arg as FlChar).Value);
 
             if (type == FlIntType.Instance)
-                return new FlInt((int)self.RawValue);
+                return new FlFloat((arg as FlInt).Value);
 
             if (type == FlDoubleType.Instance)
-                return new FlDouble((double)self.RawValue);
+                return new FlFloat((float)(arg as FlDouble).Value);
 
             if (type == FlDecimalType.Instance)
-                return new FlDecimal((decimal)self.RawValue);
+                return new FlFloat((float)(arg as FlDecimal).Value);
 
             if (type == FlStringType.Instance)
-                return new FlString(self.RawValue.ToString());
+                return new FlFloat(float.Parse(arg.RawValue.ToString()));
 
-            throw new CastException($"Cannot convert type {self.Type} to {type}");
+            throw new CastException($"Cannot convert type {arg.Type} to {type}");
         }
 
         private static FlObject OperatorPreIncrImpl(List<FlObject> args)

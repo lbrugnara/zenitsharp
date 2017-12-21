@@ -10,8 +10,8 @@ namespace Fl.Engine.IL.Instructions
         public Operand Func { get; }
         public int NumberOfParams { get; }
 
-        public CallInstruction(Operand fn, int nparams)
-            : base (OpCode.Call)
+        public CallInstruction(SymbolOperand destination, Operand fn, int nparams)
+            : base (OpCode.Call, destination)
         {
             this.Func = fn;
             this.NumberOfParams = nparams;
@@ -19,7 +19,7 @@ namespace Fl.Engine.IL.Instructions
 
         public override string ToString()
         {
-            return $"{this.OpCode.InstructionName()} {this.Func} {this.NumberOfParams}";
+            return $"{this.DestSymbol} = {this.OpCode.InstructionName()} {this.Func} {this.NumberOfParams}";
         }
     }
 }

@@ -94,9 +94,9 @@ namespace Fl.Engine.Symbols.Objects
             return Base != null ? Base.GetIndexer(paramsCount) : null;
         }
 
-        public FlFunction GetStaticMethod(string name)
+        public FlStaticMethod GetStaticMethod(string name)
         {
-            return StaticMethods.ContainsKey(name) ? StaticMethods[name].Binding as FlFunction : (Base != null ? Base.GetStaticMethod(name) : null);
+            return StaticMethods.ContainsKey(name) ? StaticMethods[name].Binding as FlStaticMethod : (Base != null ? Base.GetStaticMethod(name) : null);
         }
 
         public Symbol this[string n]

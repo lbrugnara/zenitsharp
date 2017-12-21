@@ -58,9 +58,15 @@ namespace FlInterpreter
                     ILProgram ip = new ILProgram(g.SymbolTable, g.Instructions.ToList());
                     ip.Run();
 
-                    /*FlObject result = eval.Visit(ast);
-                    if (result != null)
-                        Console.WriteLine($"<= {result.ToDebugStr()}");*/
+                    Instruction instr = ip.Instructions.LastOrDefault();
+                    if (instr == null || instr.DestSymbol == null || !ip.SymbolTable.HasSymbol(instr.DestSymbol.ToString()))
+                        continue;
+
+                    FlObject result = ip.SymbolTable.GetSymbol(instr.DestSymbol).Binding;
+                    if (result == null)
+                        continue;
+
+                    Console.WriteLine($"<= {result.ToDebugStr()}");
                 }
                 catch (Exception e)
                 {

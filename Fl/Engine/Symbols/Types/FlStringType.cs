@@ -33,15 +33,10 @@ namespace Fl.Engine.Symbols.Types
             throw new UnsupportedOperandException($"Operator '+' cannot be applied to operands of type '{arg.Type}' and '{self.Type}'");
         }
 
-        private static FlObject OperatorCallImpl(List<FlObject> args)
+        private static FlString OperatorCallImpl(List<FlObject> args)
         {
-            FlString self = args[0] as FlString;
-            FlType type = args[1] as FlType;
-
-            if (type == _Instance)
-                return self.Clone();
-
-            throw new CastException($"Cannot convert type {self.Type} to {type}");
+            FlObject arg = args[0];
+            return new FlString(arg.RawValue.ToString());
         }
 
         private static FlObject OperatorAssignImpl(List<FlObject> args)

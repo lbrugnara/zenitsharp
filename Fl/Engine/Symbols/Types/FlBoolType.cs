@@ -18,18 +18,18 @@ namespace Fl.Engine.Symbols.Types
 
         public static FlType Instance => _Instance == null ? (_Instance = Initialize()) : _Instance;
 
-        private static FlObject OperatorCallImpl(List<FlObject> args)
+        private static FlBool OperatorCallImpl(List<FlObject> args)
         {
-            FlBool self = args[0] as FlBool;
-            FlType type = args[1] as FlType;
+            FlObject arg = args[0];
+            FlType type = arg.Type;
 
-            if (type == FlBoolType.Instance)
-                return self.Clone();
+            if (type == _Instance)
+                return arg.Clone() as FlBool;
 
             if (type == FlStringType.Instance)
-                return new FlString(self.RawValue.ToString());
+                return new FlBool(bool.Parse(arg.RawValue.ToString()));
 
-            throw new CastException($"Cannot convert type {self.Type} to {type}");
+            throw new CastException($"Cannot convert type {arg.Type} to {type}");
         }
         
         private static FlObject OperatorAssignImpl(List<FlObject> args)

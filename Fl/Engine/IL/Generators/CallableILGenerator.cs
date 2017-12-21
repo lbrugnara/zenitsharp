@@ -21,13 +21,19 @@ namespace Fl.Engine.IL.Generators
         {
             Operand op = node.Callable.Exec(generator);
 
+            // Declare the var to keep the result (if needed)
+            var dest = generator.GenerateTemporalName();
+            generator.Emmit(new VarInstruction(dest, null, null));
+
+            // Generate the "param" instructions
             List<ParamInstruction> parameters = node.Arguments.Expressions.Select(a => new ParamInstruction(a.Exec(generator))).ToList();
             parameters.Reverse();
 
             parameters.ForEach(p => generator.Emmit(p));
 
-            generator.Emmit(new CallInstruction(op, parameters.Count));
-            return op;
+            // Generate the call instruction
+            generator.Emmit(new CallInstruction(dest, op, parameters.Count));
+            return dest;
         }
     }
 }

@@ -23,8 +23,8 @@ namespace Fl.Engine.IL.Instructions
         public override string ToString()
         {
             if (this.Value != null)
-                return $"{this.OpCode.InstructionName()} {this.DestSymbol} {this.Value}";
-            return $"{this.OpCode.InstructionName()} {this.DestSymbol} {FlNull.Value}";
+                return $"{this.OpCode.InstructionName()} {this.DestSymbol} = {this.Value}";
+            return $"{this.OpCode.InstructionName()} {this.DestSymbol} = {FlNull.Value}";
         }
     }
 }

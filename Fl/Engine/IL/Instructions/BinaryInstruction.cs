@@ -21,7 +21,7 @@ namespace Fl.Engine.IL.Instructions
 
         public override string ToString()
         {
-            return $"{this.OpCode.InstructionName()} {this.DestSymbol} {this.Left} {this.Right}";
+            return $"{this.DestSymbol} = {this.OpCode.InstructionName()} {this.Left} {this.Right}";
         }
     }
 }
