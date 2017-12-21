@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Fl.Engine.Symbols.Objects
 {
-    public class FlIndexer : FlMethod
+    public class FlIndexer : FlInstanceMethod
     {
         private int _ParamsCount;
         private string _Name;

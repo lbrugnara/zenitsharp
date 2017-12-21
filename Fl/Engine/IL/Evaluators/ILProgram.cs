@@ -105,6 +105,11 @@ namespace Fl.Engine.IL.EValuators
                     {
                         curval = (curval as FlType)[tmpmember.Name].Binding;
                     }
+                    else
+                    {
+                        curval = curval.Type[tmpmember.Name].Binding;
+                    }
+
                     if (curval is FlMethod)
                     {
                         curval = (curval as FlMethod).Bind(ancestor);

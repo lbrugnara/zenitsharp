@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Fl.Engine.Symbols.Objects
 {
-    public class FlConstructor: FlMethod
+    public class FlConstructor: FlInstanceMethod
     {
         private int _ParamsCount;
         private Action<FlObject, List<FlObject>> _Body;

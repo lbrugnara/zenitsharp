@@ -297,6 +297,12 @@ namespace Fl.Engine.Symbols.Types
                 .WithStaticMethod(FlType.OperatorLt, OperatorLtImpl)
                 .WithStaticMethod(FlType.OperatorLte, OperatorLteImpl)
 
+                .WithStaticMethod("parse", (args) =>
+                {
+                    FlString s = args[0] as FlString;
+                    return new FlInt(int.Parse(s.Value));
+                })
+
                 // Static Properties
                 .WithStaticProperty("MAX", SymbolType.Constant, new FlInt(int.MaxValue))
                 .WithStaticProperty("MIN", SymbolType.Constant, new FlInt(int.MinValue))

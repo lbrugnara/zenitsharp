@@ -70,7 +70,7 @@ namespace Fl.Engine.Symbols.Objects
         private string _Name;
         private FlObject _This;
         private BoundFunction _Body;
-        private Contract _Contract;
+        protected Contract _Contract;
 
         protected FlFunction() { }
 

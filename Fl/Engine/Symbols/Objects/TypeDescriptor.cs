@@ -192,7 +192,7 @@ namespace Fl.Engine.Symbols.Objects
             public Builder WithMethod(string methodName, FlFunction.BoundFunction body, FlFunction.Contract contract = null)
             {
                 var symbol = new Symbol(SymbolType.Constant);
-                symbol.DoBinding(_TypeDescriptor.Name, methodName, new FlMethod(methodName, body, contract));
+                symbol.DoBinding(_TypeDescriptor.Name, methodName, new FlInstanceMethod(methodName, body, contract));
                 _TypeDescriptor.Methods.Add(symbol.Name, symbol);
                 return this;
             }
@@ -214,7 +214,7 @@ namespace Fl.Engine.Symbols.Objects
             public Builder WithStaticMethod(string methodName, FlFunction.UnboundFunction body)
             {
                 var symbol = new Symbol(SymbolType.Constant, StorageType.Static);
-                symbol.DoBinding(_TypeDescriptor.Name, methodName, new FlFunction(methodName, body));
+                symbol.DoBinding(_TypeDescriptor.Name, methodName, new FlStaticMethod(methodName, body));
                 _TypeDescriptor.StaticMethods.Add(symbol.Name, symbol);
                 return this;
             }
