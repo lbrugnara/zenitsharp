@@ -3,6 +3,7 @@
 
 using Fl;
 using Fl.Engine;
+using Fl.Engine.IL;
 using Fl.Engine.IL.EValuators;
 using Fl.Engine.IL.Generators;
 using Fl.Engine.IL.Instructions;
@@ -51,14 +52,14 @@ namespace FlInterpreter
                         continue;
                     }
 
-                    var g = new AstILGenerator();
-                    g.Visit(ast);
-                    Console.WriteLine(g.GetILRepresentation());
+                    var g = new ILGenerator();
+                    g.Visit(ast);                    
 
-                    ILProgram ip = new ILProgram(g.SymbolTable, g.Instructions.ToList());
+                    ILProgram ip = g.Program.Build();
+                    Console.WriteLine(ip.ToString());
                     ip.Run();
 
-                    Instruction instr = ip.Instructions.LastOrDefault();
+                    Instruction instr = ip.Fragments[".global"].Instructions.LastOrDefault();
                     if (instr == null || instr.DestSymbol == null || !ip.SymbolTable.HasSymbol(instr.DestSymbol.ToString()))
                         continue;
 

@@ -15,14 +15,14 @@ using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {
-    public class CallableILGenerator : INodeVisitor<AstILGenerator, AstCallableNode, Operand>
+    public class CallableILGenerator : INodeVisitor<ILGenerator, AstCallableNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstCallableNode node)
+        public Operand Visit(ILGenerator generator, AstCallableNode node)
         {
-            Operand op = node.Callable.Exec(generator);
+            Operand target = node.Callable.Exec(generator);
 
             // Declare the var to keep the result (if needed)
-            var dest = generator.GenerateTemporalName();
+            var dest = generator.SymbolTable.NewTempSymbol();
             generator.Emmit(new VarInstruction(dest, null, null));
 
             // Generate the "param" instructions
@@ -32,7 +32,7 @@ namespace Fl.Engine.IL.Generators
             parameters.ForEach(p => generator.Emmit(p));
 
             // Generate the call instruction
-            generator.Emmit(new CallInstruction(dest, op, parameters.Count));
+            generator.Emmit(new CallInstruction(dest, target, parameters.Count));
             return dest;
         }
     }

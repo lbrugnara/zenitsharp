@@ -12,9 +12,9 @@ using System;
 
 namespace Fl.Engine.IL.Generators
 {
-    class LiteralILGenerator : INodeVisitor<AstILGenerator, AstLiteralNode, Operand>
+    class LiteralILGenerator : INodeVisitor<ILGenerator, AstLiteralNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstLiteralNode literal)
+        public Operand Visit(ILGenerator generator, AstLiteralNode literal)
         {
             // Get the literal's object type
             TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(literal.Literal);

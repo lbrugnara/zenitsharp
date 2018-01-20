@@ -13,15 +13,14 @@ using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {
-    class DeclarationILGenerator : INodeVisitor<AstILGenerator, AstDeclarationNode, Operand>
+    class DeclarationILGenerator : INodeVisitor<ILGenerator, AstDeclarationNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstDeclarationNode decls)
+        public Operand Visit(ILGenerator generator, AstDeclarationNode decls)
         {
             foreach (AstNode statement in decls.Statements)
             {
                 statement.Exec(generator);
             }
-            // no-op
             return null;
         }
     }

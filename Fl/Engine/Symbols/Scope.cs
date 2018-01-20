@@ -15,10 +15,6 @@ namespace Fl.Engine.Symbols
 {
     public class Scope
     {
-        #region Static fields
-        private static int ScopeN = 1;
-        #endregion
-
         #region Constants
         public const string FlReturnKey = "@flreturn";
         #endregion

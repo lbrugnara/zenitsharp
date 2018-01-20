@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.IL.Instructions;
+using Fl.Engine.IL.Instructions.Exceptions;
 using Fl.Engine.IL.Instructions.Operands;
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
@@ -14,9 +15,9 @@ using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {
-    class AssignmentILGenerator : INodeVisitor<AstILGenerator, AstAssignmentNode, Operand>
+    class AssignmentILGenerator : INodeVisitor<ILGenerator, AstAssignmentNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstAssignmentNode node)
+        public Operand Visit(ILGenerator generator, AstAssignmentNode node)
         {
             if (node is AstVariableAssignmentNode)
                 return MakeVariableAssignment(node as AstVariableAssignmentNode, generator);
@@ -24,7 +25,7 @@ namespace Fl.Engine.IL.Generators
             return null;
         }
 
-        private Operand MakeVariableAssignment(AstVariableAssignmentNode node, AstILGenerator generator)
+        private Operand MakeVariableAssignment(AstVariableAssignmentNode node, ILGenerator generator)
         {
             SymbolOperand leftHandSide = node.Accessor.Exec(generator) as SymbolOperand;
             Operand rightHandSide = node.Expression.Exec(generator);
@@ -51,6 +52,8 @@ namespace Fl.Engine.IL.Generators
                 case TokenType.DivideAndAssign:
                     opcode = OpCode.Div;
                     break;
+                default:
+                    throw new InvalidInstructionException($"Unsupported operation: {node.AssignmentOp.Value} ({node.AssignmentOp.Type})");
             }
 
             generator.Emmit(new BinaryInstruction(opcode, leftHandSide, leftHandSide, rightHandSide));

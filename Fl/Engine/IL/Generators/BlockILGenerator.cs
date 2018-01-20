@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
 using Fl.Engine.StdLib;
 using Fl.Engine.Symbols;
@@ -12,24 +13,16 @@ using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {
-    class BlockILGenerator : INodeVisitor<AstILGenerator, AstBlockNode, Operand>
+    class BlockILGenerator : INodeVisitor<ILGenerator, AstBlockNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstBlockNode node)
+        public Operand Visit(ILGenerator generator, AstBlockNode node)
         {
-            //string scopeName = generator.GenerateCommonScopeName();
-            try
+            generator.EnterBlock(BlockType.Common);
+            foreach (AstNode statement in node.Statements)
             {
-                //generator.SymbolTable.EnterScope(ScopeType.Common, scopeName);
-                foreach (AstNode statement in node.Statements)
-                {
-                    statement.Exec(generator);
-                }
+                statement.Exec(generator);
             }
-            finally
-            {
-                //generator.SymbolTable.LeaveScope();
-            }
-            // no-op
+            generator.LeaveBlock();
             return null;
         }
     }

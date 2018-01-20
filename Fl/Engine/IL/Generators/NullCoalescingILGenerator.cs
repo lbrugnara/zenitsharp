@@ -13,9 +13,9 @@ using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {
-    class NullCoalescingILGenerator : INodeVisitor<AstILGenerator, AstNullCoalescingNode, Operand>
+    class NullCoalescingILGenerator : INodeVisitor<ILGenerator, AstNullCoalescingNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstNullCoalescingNode nullc)
+        public Operand Visit(ILGenerator generator, AstNullCoalescingNode nullc)
         {
             return null;
         }

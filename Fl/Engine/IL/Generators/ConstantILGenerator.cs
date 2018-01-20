@@ -15,9 +15,9 @@ using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {
-    class ConstantILGenerator : INodeVisitor<AstILGenerator, AstConstantNode, Operand>
+    class ConstantILGenerator : INodeVisitor<ILGenerator, AstConstantNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstConstantNode constdec)
+        public Operand Visit(ILGenerator generator, AstConstantNode constdec)
         {
             // Get the variable type
             TypeResolver typeres = TypeResolver.GetTypeResolverFromToken(constdec.Type);
@@ -30,7 +30,7 @@ namespace Fl.Engine.IL.Generators
                 var operand = declaration.Item2.Exec(generator);
 
                 // const <identifier> = <operand>
-                var symbol = new SymbolOperand(identifierToken.Value.ToString());
+                var symbol = generator.SymbolTable.NewSymbol(identifierToken.Value.ToString(), typeres); //new SymbolOperand(generator.SymbolTable.GetMangledName(identifierToken.Value.ToString()));
                 generator.Emmit(new ConstInstruction(symbol, typeres, operand));
             }
             return null;

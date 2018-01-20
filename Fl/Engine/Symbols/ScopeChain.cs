@@ -56,7 +56,10 @@ namespace Fl.Engine.Symbols
         public void LeaveScope()
         {
             if (_Pointer > -1)
+            {
+                _Scopes.RemoveAt(_Pointer);
                 _Pointer--;
+            }
         }
 
         #region Symbols handling        
@@ -68,7 +71,7 @@ namespace Fl.Engine.Symbols
         /// <returns>FlObject containing information about symbol "name"</returns>
         public Symbol GetSymbol(string name)
         {
-            int i = _Scopes.Count-1;
+            int i = _Pointer;
             var scp = _Scopes.ElementAtOrDefault(i);
             while (scp != null)
             {
@@ -104,7 +107,7 @@ namespace Fl.Engine.Symbols
 
         public bool HasSymbol(string var)
         {
-            int i = _Scopes.Count - 1;
+            int i = _Pointer;
             var scp = _Scopes.ElementAtOrDefault(i);
             while (scp != null)
             {
@@ -134,7 +137,7 @@ namespace Fl.Engine.Symbols
         public ScopeChain GetCurrentFunctionEnv()
         {
             List<Scope> chain = new List<Scope>();
-            int i = _Scopes.Count - 1;
+            int i = _Pointer;
             var scp = i >= 0 ? _Scopes[i] : null;
             while (scp != null)
             {
@@ -162,7 +165,7 @@ namespace Fl.Engine.Symbols
             }
             set
             {
-                int i = _Scopes.Count - 1;
+                int i = _Pointer;
                 var scp = i >= 0 ? _Scopes[i] : null;
                 while (scp != null)
                 {
@@ -181,7 +184,7 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                int i = _Scopes.Count - 1;
+                int i = _Pointer;
                 var scp = i >= 0 ? _Scopes[i] : null;
                 while (scp != null)
                 {
@@ -197,7 +200,7 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                int i = _Scopes.Count - 1;
+                int i = _Pointer;
                 var scp = i >= 0 ? _Scopes[i] : null;
                 while (scp != null)
                 {
@@ -213,7 +216,7 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                int i = _Scopes.Count - 1;
+                int i = _Pointer;
                 var scp = i >= 0 ? _Scopes[i] : null;
                 while (scp != null)
                 {
@@ -229,7 +232,7 @@ namespace Fl.Engine.Symbols
         {
             int nbreaks = intobj.Value;
             int orignbreaks = nbreaks;
-            int i = _Scopes.Count - 1;
+            int i = _Pointer;
             var scp = i >= 0 ? _Scopes[i] : throw new ScopeOperationException("Cannot break in a non-loop scope");
             while (scp != null)
             {
@@ -247,7 +250,7 @@ namespace Fl.Engine.Symbols
 
         public void SetContinue()
         {
-            int i = _Scopes.Count - 1;
+            int i = _Pointer;
             var scp = i >= 0 ? _Scopes[i] : throw new ScopeOperationException("Cannot continue in a non-loop scope");
             while (scp != null)
             {

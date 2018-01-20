@@ -10,16 +10,17 @@ using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {
-    class AccessorILGenerator : INodeVisitor<AstILGenerator, AstAccessorNode, Operand>
+    class AccessorILGenerator : INodeVisitor<ILGenerator, AstAccessorNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstAccessorNode accessor)
+        public Operand Visit(ILGenerator generator, AstAccessorNode accessor)
         {
-            var member = new SymbolOperand(accessor.Identifier.Value.ToString());
+            // If it is the root member (or the only accessed one) return the symbol
             if (accessor.Enclosing == null)
-                return member;
+                return generator.SymbolTable.GetSymbol(accessor.Identifier.Value.ToString());
 
+            // Resolve the parent member and add current as a child
             Operand parent = accessor.Enclosing.Exec(generator);
-            parent.AddMember(member);
+            parent.AddMember(new SymbolOperand(accessor.Identifier.Value.ToString(), null));
             return parent;
         }
     }

@@ -12,9 +12,9 @@ using System.Linq;
 
 namespace Fl.Engine.IL.Generators
 {
-    class BinaryILGenerator : INodeVisitor<AstILGenerator, AstBinaryNode, Operand>
+    class BinaryILGenerator : INodeVisitor<ILGenerator, AstBinaryNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstBinaryNode binary)
+        public Operand Visit(ILGenerator generator, AstBinaryNode binary)
         {
             Operand left = binary.Left.Exec(generator);
             Operand right = binary.Right.Exec(generator);
@@ -68,13 +68,13 @@ namespace Fl.Engine.IL.Generators
                     break;
             }
 
-            SymbolOperand tmpname = generator.GenerateTemporalName();
+            SymbolOperand tmpname = generator.SymbolTable.NewTempSymbol();
             generator.Emmit(new VarInstruction(tmpname, null, null));
             generator.Emmit(new BinaryInstruction(opcode, tmpname, left, right));
 
             if (binary.Operator.Type == TokenType.NotEqual)
             {
-                SymbolOperand notname = generator.GenerateTemporalName();
+                SymbolOperand notname = generator.SymbolTable.NewTempSymbol();
                 generator.Emmit(new VarInstruction(notname, null, null));
                 generator.Emmit(new UnaryInstruction(OpCode.Not, notname, tmpname));
                 return notname;

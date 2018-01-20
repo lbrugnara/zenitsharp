@@ -1,23 +1,15 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.IL.Instructions;
-using Fl.Engine.Symbols;
-using Fl.Engine.Symbols.Objects;
 using Fl.Parser.Ast;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System;
 using Fl.Engine.IL.Instructions.Operands;
-using System.Collections.ObjectModel;
+using Fl.Engine.IL.Generators;
 
-namespace Fl.Engine.IL.Generators
+namespace Fl.Engine.IL
 {
-    public class AstILGenerator : IAstWalker<Operand>
+    public class AstVisitor
     {
-        private SymbolTable _SymbolTable;
-        private List<Instruction> _Instructions;
+        private ILGenerator _Generator;
         private UnaryILGenerator _UnaryILGenerator;
         private BinaryILGenerator _BinaryILGenerator;
         private AssignmentILGenerator _AssignmentILGenerator;
@@ -38,15 +30,9 @@ namespace Fl.Engine.IL.Generators
         private TupleILGenerator _TupleILGenerator;
         private NullCoalescingILGenerator _NullCoalescingILGenerator;
 
-        private int TemporalVarCounter = 0;
-        private int CommonScopeCounter = 0;
-        
-
-        public AstILGenerator()
+        public AstVisitor(ILGenerator generator)
         {
-            _Instructions = new List<Instruction>();
-            _SymbolTable = SymbolTable.NewInstance;
-
+            _Generator = generator;
             _UnaryILGenerator = new UnaryILGenerator();
             _BinaryILGenerator = new BinaryILGenerator();
             _AssignmentILGenerator = new AssignmentILGenerator();
@@ -68,93 +54,49 @@ namespace Fl.Engine.IL.Generators
             _NullCoalescingILGenerator = new NullCoalescingILGenerator();
         }
 
-        public SymbolTable SymbolTable => _SymbolTable;
-
-        public ReadOnlyCollection<Instruction> Instructions => new ReadOnlyCollection<Instruction>(_Instructions);
-
-        public SymbolOperand GenerateTemporalName() => new SymbolOperand($"@t{(TemporalVarCounter++)}");
-
-        public string GenerateCommonScopeName() => $"<scope:{(CommonScopeCounter++)}>";
-
-        public Instruction Emmit(Instruction i)
-        {
-            _Instructions.Add(i);
-            return i;
-        }
-
-        public string GetILRepresentation()
-        {
-            return string.Join('\n', Instructions.Select(i => i.ToString()));
-        }
-
-        //public Instruction Process(AstNode node)
-        //{
-        //    /*
-        //     * int i=2;
-        //     * int j=3;
-        //     * int k = i * j
-        //     */
-        //    ILProgram p = new ILProgram();
-        //    // int i=2;
-        //    string tmpName = p.EmmitLiteral(new FlInteger(2));
-        //    p.EmmitLocalVar("i", tmpName);
-
-        //    // int i=2;
-        //    string tmpName2 = p.EmmitLiteral(new FlInteger(3));
-        //    p.EmmitLocalVar("j", tmpName2);
-
-        //    // int k = i * j;
-        //    string tmpName3 = p.EmmitMult("i", "j");
-        //    p.EmmitLocalVar("k", tmpName3);
-
-        //    p.Run();
-
-        //    return null;
-        //}
-
         public Operand Visit(AstNode node)
         {
             object n = node;
             switch (n)
             {
                 case AstUnaryNode u:
-                    return _UnaryILGenerator.Visit(this, u);                
+                    return _UnaryILGenerator.Visit(_Generator, u);
                 case AstBinaryNode b:
-                    return _BinaryILGenerator.Visit(this, b);
+                    return _BinaryILGenerator.Visit(_Generator, b);
                 case AstAssignmentNode a:
-                    return _AssignmentILGenerator.Visit(this, a);
+                    return _AssignmentILGenerator.Visit(_Generator, a);
                 case AstConstantNode c:
-                    return _ConstantILGenerator.Visit(this, c);
+                    return _ConstantILGenerator.Visit(_Generator, c);
                 case AstVariableNode v:
-                    return _VariableILGenerator.Visit(this, v);
+                    return _VariableILGenerator.Visit(_Generator, v);
                 case AstBlockNode bl:
-                    return _BlockILGenerator.Visit(this, bl);
+                    return _BlockILGenerator.Visit(_Generator, bl);
                 case AstDeclarationNode d:
-                    return _DeclarationILGenerator.Visit(this, d);
+                    return _DeclarationILGenerator.Visit(_Generator, d);
                 case AstLiteralNode l:
-                    return _LiteralILGenerator.Visit(this, l);
+                    return _LiteralILGenerator.Visit(_Generator, l);
                 case AstAccessorNode ivk:
-                    return _AccessorILGenerator.Visit(this, ivk);
+                    return _AccessorILGenerator.Visit(_Generator, ivk);
                 case AstIfNode i:
-                    return _IfILGenerator.Visit(this, i);
+                    return _IfILGenerator.Visit(_Generator, i);
                 case AstWhileNode w:
-                    return _WhileILGenerator.Visit(this, w);
+                    return _WhileILGenerator.Visit(_Generator, w);
                 case AstForNode f:
-                    return _ForILGenerator.Visit(this, f);
+                    return _ForILGenerator.Visit(_Generator, f);
                 case AstBreakNode brk:
-                    return _BreakILGenerator.Visit(this, brk);
+                    return _BreakILGenerator.Visit(_Generator, brk);
                 case AstContinueNode cont:
-                    return _ContinueILGenerator.Visit(this, cont);
+                    return _ContinueILGenerator.Visit(_Generator, cont);
                 case AstCallableNode call:
-                    return _CallILGenerator.Visit(this, call);
+                    return _CallILGenerator.Visit(_Generator, call);
                 case AstFuncDeclNode func:
-                    return _FuncDeclILGenerator.Visit(this, func);
+                    return _FuncDeclILGenerator.Visit(_Generator, func);
                 case AstTupleNode t:
-                    return _TupleILGenerator.Visit(this, t);
+                    return _TupleILGenerator.Visit(_Generator, t);
                 case AstReturnNode ret:
-                    return _ReturnILGenerator.Visit(this, ret);
+                    return _ReturnILGenerator.Visit(_Generator, ret);
                 case AstNullCoalescingNode nc:
-                    return _NullCoalescingILGenerator.Visit(this, nc);
+                    return _NullCoalescingILGenerator.Visit(_Generator, nc);
                 case AstNoOpNode np:
                     return null;
             }

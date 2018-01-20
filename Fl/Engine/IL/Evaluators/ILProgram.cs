@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Engine.IL.Generators;
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
 using Fl.Engine.Symbols;
@@ -8,6 +9,7 @@ using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Fl.Engine.IL.EValuators
 {
@@ -15,24 +17,44 @@ namespace Fl.Engine.IL.EValuators
     {
         public List<FlObject> Params { get; } = new List<FlObject>();
         public SymbolTable SymbolTable { get; }
-        public List<Instruction> Instructions { get; }
-        
+        public Dictionary<string, Fragment> Fragments;
 
-        public ILProgram(SymbolTable symtable, List<Instruction> instructions)
+        public ILProgram(SymbolTable symtable, List<Fragment> fragments)
         {
             this.SymbolTable = SymbolTable.NewInstance;
-            this.Instructions = instructions;
+            this.Fragments = fragments.ToDictionary(fragment => fragment.Name, fragment => fragment);
         }
         
         public override string ToString()
         {
-            return string.Join('\n', Instructions.Select(i => i.ToString()));
+            StringBuilder sb = new StringBuilder();
+            foreach (var fragment in Fragments.Values)
+            {
+                if (fragment.Type == FragmentType.Global)
+                    sb.AppendLine($"{fragment.Name}:");
+                else
+                    sb.AppendLine($"{fragment.Type.ToString().ToLower()} {fragment.Name}:");
+                var instructions = fragment.Instructions;
+                for (int i=0; i < instructions.Count; i++)
+                {
+                    var instruction = instructions[i];
+                    sb.AppendLine($"{i.ToString().PadLeft(6, ' ')}: {instruction.ToString()}");
+                }
+            }
+            return sb.ToString();
         }
 
         public void Run()
         {
-            foreach (var inst in Instructions)
+            var global = Fragments[".global"];
+            Run(global);
+        }
+
+        private void Run(Fragment fragment)
+        {
+            for (int i = 0; i < fragment.Instructions.Count;)
             {
+                Instruction inst = fragment.Instructions[i];
                 switch (inst)
                 {
                     case NopInstruction ni:
@@ -65,7 +87,25 @@ namespace Fl.Engine.IL.EValuators
                     case UnaryInstruction ui:
                         VisitUnary(ui);
                         break;
+
+                    case IfFalseInstruction fi:
+                        FlBool cond = GetFlObjectFromOperand(fi.Condition) as FlBool;
+                        if (!cond.Value)
+                        {
+                            i = fi.Goto.Address;
+                            continue;
+                        }
+                        break;
+
+                    case GotoInstruction gi:
+                        i = gi.Goto.Address;
+                        continue;
+
+                    case ReturnInstruction ri:
+                        break;
                 }
+
+                i++;
             }
         }
 
@@ -217,7 +257,21 @@ namespace Fl.Engine.IL.EValuators
         public void VisitLoad(StoreInstruction li)
         {
             FlObject value = this.GetFlObjectFromOperand(li.Value);
-            SymbolTable.GetSymbol(li.DestSymbol.Name).UpdateBinding(value);
+            var symbol = SymbolTable.GetSymbol(li.DestSymbol.Name);
+
+            // Check the SymbolType to see if it's a valid lvalue
+            if (symbol.SymbolType == SymbolType.Constant)
+            {
+                if (symbol.Binding.Type == FlFuncType.Instance)
+                    throw new System.Exception($"Left-hand side of an assignment must be a variable. '{symbol.Name}' is a function");
+
+                if (symbol.Binding.Type == FlNamespaceType.Instance)
+                    throw new System.Exception($"Left-hand side of an assignment must be a variable. '{symbol.Name}' is a namespace");
+
+                throw new System.Exception($"Left-hand side of an assignment must be a variable. '{symbol.Name}' is a constant value");
+            }
+
+            symbol.UpdateBinding(value);
         }
 
         public void VisitVar(VarInstruction vi)
@@ -271,12 +325,12 @@ namespace Fl.Engine.IL.EValuators
 
             if (target is FlFunction)
             {
-                result = (target as FlFunction).Invoke(SymbolTable, Params);
+                result = (target as FlFunction).Invoke(SymbolTable, parameters);
             }
             else if (target is FlType)
             {
                 var opcall = (target as FlType).GetStaticMethod(FlType.OperatorCall);
-                result = opcall.Invoke(SymbolTable, Params);
+                result = opcall.Invoke(SymbolTable, parameters);
             }
             /*
             else if (target is FlClass)
@@ -296,7 +350,7 @@ namespace Fl.Engine.IL.EValuators
 
             Params.Clear();
 
-            this.SymbolTable.GetSymbol(ci.DestSymbol).UpdateBinding(result);
+            this.SymbolTable.GetSymbol(ci.DestSymbol.Name).UpdateBinding(result);
         }
 
         public void VisitParam(ParamInstruction pi)

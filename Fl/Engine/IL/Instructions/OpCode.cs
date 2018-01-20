@@ -99,7 +99,19 @@ namespace Fl.Engine.IL.Instructions
 
         // Compare if <b> is lesser than or equals <c> and save the result into <a>:
         //  clte <a> <b> <c>
-        Clte
+        Clte,
+
+        // Return from the current function:
+        //  ret
+        Return,
+
+        // Unconditional jump to <addr>:
+        //  goto <addr>
+        Goto,
+
+        // If <condition> is false, goto to <addr>
+        //  if_false <condition> goto <addr>
+        IfFalse
     }
 
     public static class OpCodeExtensions
@@ -176,6 +188,15 @@ namespace Fl.Engine.IL.Instructions
 
                 case OpCode.Clte:
                     return "clte";
+
+                case OpCode.Return:
+                    return "ret";
+
+                case OpCode.Goto:
+                    return "goto";
+
+                case OpCode.IfFalse:
+                    return "if_false";
             }
             return "-";
         }

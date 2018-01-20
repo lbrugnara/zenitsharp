@@ -11,9 +11,9 @@ using System.Linq;
 
 namespace Fl.Engine.IL.Generators
 {
-    class TupleILGenerator : INodeVisitor<AstILGenerator, AstTupleNode, Operand>
+    class TupleILGenerator : INodeVisitor<ILGenerator, AstTupleNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstTupleNode node)
+        public Operand Visit(ILGenerator generator, AstTupleNode node)
         {
             return null;
         }

@@ -93,8 +93,8 @@ namespace Fl.Engine.Symbols
         public void AddSymbol(string name, Symbol symbol, FlObject binding)
         {
             Scope current = _Scopes.CurrentScope ?? _Global;
-            if (current.HasSymbol(name))
-                throw new SymbolException($"Symbol '{name}' is already defined in this scope");
+            /*if (current.HasSymbol(name))
+                throw new SymbolException($"Symbol '{name}' is already defined in this scope");*/
             
             current.AddSymbol(name, symbol, binding);
         }

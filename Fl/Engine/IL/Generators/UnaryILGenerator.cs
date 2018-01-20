@@ -11,9 +11,9 @@ using System;
 
 namespace Fl.Engine.IL.Generators
 {
-    class UnaryILGenerator : INodeVisitor<AstILGenerator, AstUnaryNode, Operand>
+    class UnaryILGenerator : INodeVisitor<ILGenerator, AstUnaryNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstUnaryNode unary)
+        public Operand Visit(ILGenerator generator, AstUnaryNode unary)
         {
             // Generate the operand from the child
             var operand = unary.Left.Exec(generator);
@@ -32,12 +32,12 @@ namespace Fl.Engine.IL.Generators
                     opcode = OpCode.Neg;
                     break;
                 case TokenType.Increment:
-                    if (!(operand is SymbolOperand))
+                    if (!(operand is SymbolOperand) || !(unary.Left is AstAccessorNode))
                         throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
                     opcode = unary is AstUnaryPostfixNode ? OpCode.PostInc : OpCode.PreInc;
                     break;
                 case TokenType.Decrement:
-                    if (!(operand is SymbolOperand))
+                    if (!(operand is SymbolOperand) || !(unary.Left is AstAccessorNode))
                         throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
                     opcode = unary is AstUnaryPostfixNode ? OpCode.PostDec : OpCode.PreDec;
                     break;
@@ -47,7 +47,7 @@ namespace Fl.Engine.IL.Generators
 
             // var @tX null
             // <unary> @tX <operand>
-            var tmpsymbol = generator.GenerateTemporalName();
+            var tmpsymbol = generator.SymbolTable.NewTempSymbol();
             generator.Emmit(new VarInstruction(tmpsymbol, null, null));
             generator.Emmit(new UnaryInstruction(opcode, tmpsymbol, operand));
             return tmpsymbol;

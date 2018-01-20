@@ -14,9 +14,9 @@ using System.Linq;
 
 namespace Fl.Engine.IL.Generators
 {
-    class VariableILGenerator : INodeVisitor<AstILGenerator, AstVariableNode, Operand>
+    class VariableILGenerator : INodeVisitor<ILGenerator, AstVariableNode, Operand>
     {
-        public Operand Visit(AstILGenerator generator, AstVariableNode vardecl)
+        public Operand Visit(ILGenerator generator, AstVariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -29,7 +29,7 @@ namespace Fl.Engine.IL.Generators
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected Operand VarDefinitionNode(AstILGenerator generator, AstVarDefinitionNode vardecl)
+        protected Operand VarDefinitionNode(ILGenerator generator, AstVarDefinitionNode vardecl)
         {
             // Get the variable type
             TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardecl.VarType.TypeToken);
@@ -38,17 +38,21 @@ namespace Fl.Engine.IL.Generators
             {
                 // Get the identifier name
                 var identifierToken = declaration.Item1;
+
+                if (generator.SymbolTable.SymbolIsDefinedInBlock(identifierToken.Value.ToString()))
+                    throw new SymbolException($"Symbol {identifierToken.Value} is already defined.");
+
                 // Get the right-hand side operand
                 var operand = declaration.Item2?.Exec(generator);
 
                 // var <identifier> = <operand>
-                var symbol = new SymbolOperand(identifierToken.Value.ToString());
+                var symbol = generator.SymbolTable.NewSymbol(identifierToken.Value.ToString(), typeresolver);
                 generator.Emmit(new VarInstruction(symbol, typeresolver, operand));
             }
             return null;
         }
 
-        protected Operand VarDestructuringNode(AstILGenerator generator, AstVarDestructuringNode vardestnode)
+        protected Operand VarDestructuringNode(ILGenerator generator, AstVarDestructuringNode vardestnode)
         {
             // Get the variable type
             TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);
