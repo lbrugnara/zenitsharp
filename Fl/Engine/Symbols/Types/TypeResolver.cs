@@ -72,6 +72,7 @@ namespace Fl.Engine.Symbols.Types
                     case TokenType.String:
                         typeName = FlStringType.Instance.Name;
                         break;
+                    case TokenType.Variable:
                     case TokenType.Null:
                         typeName = FlNullType.Instance.Name;
                         break;

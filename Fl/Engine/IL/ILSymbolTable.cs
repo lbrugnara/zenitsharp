@@ -54,7 +54,7 @@ namespace Fl.Engine.IL
             return symbol;
         }
 
-        public SymbolOperand NewTempSymbol() => NewSymbol($"@t{(TemporalVarCounter++)}");
+        public SymbolOperand NewTempSymbol(string suggestedName = null) => NewSymbol($"@{suggestedName ?? "t"}{(TemporalVarCounter++)}");
 
         public SymbolOperand GetSymbol(string name)
         {

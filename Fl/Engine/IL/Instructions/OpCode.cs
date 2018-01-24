@@ -32,6 +32,9 @@ namespace Fl.Engine.IL.Instructions
         //  param <a>
         Param,
 
+        // Declare local variable <a> in a function
+        //  local <a>
+        Local,
 
         // Add b and c and save it into <a>:
         //  add <a> <b> <c>
@@ -137,6 +140,9 @@ namespace Fl.Engine.IL.Instructions
 
                 case OpCode.Param:
                     return "param";
+
+                case OpCode.Local:
+                    return "local";
 
                 case OpCode.Add:
                     return "add";

@@ -4,6 +4,7 @@
 using Fl.Engine.IL.Instructions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 
 namespace Fl.Engine.IL
 {
@@ -27,6 +28,24 @@ namespace Fl.Engine.IL
         public void AddInstruction(Instruction i)
         {
             _instructions.Add(i);
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (Type == FragmentType.Global)
+                sb.AppendLine($"{Name}:");
+            else
+                sb.AppendLine($"{Type.ToString().ToLower()} {Name}:");
+
+            var instructions = Instructions;
+            for (int i = 0; i < instructions.Count; i++)
+            {
+                var instruction = instructions[i];
+                sb.AppendLine($"{i.ToString().PadLeft(6, ' ')}: {instruction.ToString()}");
+            }
+            return sb.ToString();
         }
     }
 }

@@ -3,6 +3,7 @@
 
 using Fl.Engine.IL.Generators;
 using Fl.Engine.IL.Instructions;
+using Fl.Engine.IL.Instructions.Exceptions;
 using Fl.Engine.IL.Instructions.Operands;
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
@@ -15,7 +16,8 @@ namespace Fl.Engine.IL.EValuators
 {
     public class ILProgram
     {
-        public List<FlObject> Params { get; } = new List<FlObject>();
+        public Stack<FlObject> Params { get; } = new Stack<FlObject>();
+        public FlObject ReturnVal { get; set; }
         public SymbolTable SymbolTable { get; }
         public Dictionary<string, Fragment> Fragments;
 
@@ -31,23 +33,37 @@ namespace Fl.Engine.IL.EValuators
             foreach (var fragment in Fragments.Values)
             {
                 if (fragment.Type == FragmentType.Global)
-                    sb.AppendLine($"{fragment.Name}:");
-                else
-                    sb.AppendLine($"{fragment.Type.ToString().ToLower()} {fragment.Name}:");
-                var instructions = fragment.Instructions;
-                for (int i=0; i < instructions.Count; i++)
-                {
-                    var instruction = instructions[i];
-                    sb.AppendLine($"{i.ToString().PadLeft(6, ' ')}: {instruction.ToString()}");
-                }
+                    continue;
+                sb.AppendLine(fragment.ToString());
             }
+
+            if (Fragments.ContainsKey(".global"))
+                sb.AppendLine(Fragments[".global"].ToString());
+            else
+                sb.AppendLine(".global:");
+
             return sb.ToString();
         }
 
         public void Run()
         {
             var global = Fragments[".global"];
+            RegisterFunctions();
             Run(global);
+        }
+
+        private void RegisterFunctions()
+        {
+            foreach (var fragment in Fragments.Values)
+            {
+                if (fragment.Type != FragmentType.Function)
+                    continue;
+                SymbolTable.AddSymbol(fragment.Name, new Symbol(SymbolType.Constant, StorageType.Static), new FlFunction(fragment.Name, (args) =>
+                {
+                    Run(fragment);
+                    return ReturnVal;
+                }));
+            }
         }
 
         private void Run(Fragment fragment)
@@ -80,6 +96,12 @@ namespace Fl.Engine.IL.EValuators
                         VisitParam(pi);
                         break;
 
+                    case LocalInstruction li:
+                        if (fragment.Type != FragmentType.Function)
+                            throw new InvalidInstructionException("Cannot declare local variable in a non-function fragment");
+                        VisitLocal(li);
+                        break;
+
                     case BinaryInstruction bi:
                         VisitBinary(bi);
                         break;
@@ -102,6 +124,7 @@ namespace Fl.Engine.IL.EValuators
                         continue;
 
                     case ReturnInstruction ri:
+                        ReturnVal = GetFlObjectFromOperand(ri.DestSymbol);
                         break;
                 }
 
@@ -355,7 +378,12 @@ namespace Fl.Engine.IL.EValuators
 
         public void VisitParam(ParamInstruction pi)
         {
-            Params.Add(GetFlObjectFromOperand(pi.Parameter));
+            Params.Push(GetFlObjectFromOperand(pi.Parameter));
+        }
+
+        public void VisitLocal(LocalInstruction li)
+        {
+            SymbolTable.AddSymbol(li.DestSymbol.Name, new Symbol(SymbolType.Variable), Params.Pop());
         }
     }
 }

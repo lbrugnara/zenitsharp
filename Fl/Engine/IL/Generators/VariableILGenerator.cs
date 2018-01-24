@@ -45,6 +45,9 @@ namespace Fl.Engine.IL.Generators
                 // Get the right-hand side operand
                 var operand = declaration.Item2?.Exec(generator);
 
+                if (typeresolver.TypeName == FlNullType.Instance.Name && operand != null && operand.TypeResolver.TypeName != FlNullType.Instance.Name)
+                    typeresolver = operand.TypeResolver;
+
                 // var <identifier> = <operand>
                 var symbol = generator.SymbolTable.NewSymbol(identifierToken.Value.ToString(), typeresolver);
                 generator.Emmit(new VarInstruction(symbol, typeresolver, operand));

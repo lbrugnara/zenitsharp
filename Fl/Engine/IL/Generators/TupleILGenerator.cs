@@ -15,6 +15,14 @@ namespace Fl.Engine.IL.Generators
     {
         public Operand Visit(ILGenerator generator, AstTupleNode node)
         {
+            if (node.Items.Count > 0)
+            {
+                foreach (var item in node.Items)
+                {
+                    return item.Exec(generator);
+                }
+            }
+
             return null;
         }
     }
