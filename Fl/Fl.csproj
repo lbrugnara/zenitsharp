@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Engine\IL\Evaluators\Exceptions\" />
+    <Folder Include="Engine\IL\VM\Exceptions\" />
   </ItemGroup>
 
 </Project>

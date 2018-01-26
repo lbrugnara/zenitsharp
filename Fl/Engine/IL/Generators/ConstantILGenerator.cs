@@ -3,15 +3,8 @@
 
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
-using Fl.Engine.StdLib;
-using Fl.Engine.Symbols;
-using Fl.Engine.Symbols.Exceptions;
-using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {

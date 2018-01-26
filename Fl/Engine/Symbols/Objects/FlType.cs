@@ -5,7 +5,6 @@ using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Fl.Engine.Symbols.Objects
 {

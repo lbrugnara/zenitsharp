@@ -2,18 +2,16 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.IL.Instructions.Operands;
-using Fl.Engine.Symbols;
-using Fl.Engine.Symbols.Objects;
 
 namespace Fl.Engine.IL.Instructions
 {
-    public class BinaryInstruction : Instruction
+    public class CgtInstruction : Instruction
     {
         public Operand Left { get; }
         public Operand Right { get; }
 
-        public BinaryInstruction(OpCode opcode, SymbolOperand tempName, Operand left, Operand right)
-            : base(opcode, tempName)
+        public CgtInstruction(SymbolOperand tempName, Operand left, Operand right)
+            : base(OpCode.Cgt, tempName)
         {
             this.Left = left;
             this.Right = right;

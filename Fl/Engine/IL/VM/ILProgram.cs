@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.IL.Generators;
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Exceptions;
 using Fl.Engine.IL.Instructions.Operands;
@@ -9,24 +8,43 @@ using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
-namespace Fl.Engine.IL.EValuators
+namespace Fl.Engine.IL.VM
 {
+    public class Frame
+    {
+        public Stack<FlObject> Parameters { get; }
+        public FlObject ReturnValue { get; set; }
+
+        public Frame()
+        {
+            Parameters = new Stack<FlObject>();
+        }
+
+        public Frame(Stack<FlObject> parameters)
+        {
+            Parameters = parameters;
+        }
+    }
+
     public class ILProgram
     {
-        public Stack<FlObject> Params { get; } = new Stack<FlObject>();
-        public FlObject ReturnVal { get; set; }
         public SymbolTable SymbolTable { get; }
-        public Dictionary<string, Fragment> Fragments;
+        public ReadOnlyDictionary<string, Fragment> Fragments { get; }
+        public Stack<Frame> Frames { get; }
 
         public ILProgram(SymbolTable symtable, List<Fragment> fragments)
         {
             this.SymbolTable = SymbolTable.NewInstance;
-            this.Fragments = fragments.ToDictionary(fragment => fragment.Name, fragment => fragment);
+            this.Fragments = new ReadOnlyDictionary<string, Fragment>(fragments.ToDictionary(fragment => fragment.Name, fragment => fragment));
+            this.Frames = new Stack<Frame>();
         }
-        
+
+        public Frame Frame => Frames.Peek();
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -49,6 +67,7 @@ namespace Fl.Engine.IL.EValuators
         {
             var global = Fragments[".global"];
             RegisterFunctions();
+            Frames.Push(new Frame());
             Run(global);
         }
 
@@ -61,7 +80,7 @@ namespace Fl.Engine.IL.EValuators
                 SymbolTable.AddSymbol(fragment.Name, new Symbol(SymbolType.Constant, StorageType.Static), new FlFunction(fragment.Name, (args) =>
                 {
                     Run(fragment);
-                    return ReturnVal;
+                    return Frame.ReturnValue;   
                 }));
             }
         }
@@ -102,12 +121,72 @@ namespace Fl.Engine.IL.EValuators
                         VisitLocal(li);
                         break;
 
-                    case BinaryInstruction bi:
-                        VisitBinary(bi);
+                    case AddInstruction instr:
+                        VisitAdd(instr);
                         break;
 
-                    case UnaryInstruction ui:
-                        VisitUnary(ui);
+                    case SubInstruction instr:
+                        VisitSub(instr);
+                        break;
+
+                    case MultInstruction instr:
+                        VisitMult(instr);
+                        break;
+
+                    case DivInstruction instr:
+                        VisitDiv(instr);
+                        break;
+
+                    case CeqInstruction instr:
+                        VisitCeq(instr);
+                        break;
+
+                    case CgtInstruction instr:
+                        VisitCgt(instr);
+                        break;
+
+                    case CgteInstruction instr:
+                        VisitCgte(instr);
+                        break;
+
+                    case CltInstruction instr:
+                        VisitClt(instr);
+                        break;
+
+                    case ClteInstruction instr:
+                        VisitClte(instr);
+                        break;
+
+                    case AndInstruction instr:
+                        VisitAnd(instr);
+                        break;
+
+                    case OrInstruction instr:
+                        VisitOr(instr);
+                        break;
+
+                    case NotInstruction ins:
+                        VisitNot(ins);
+                        break;
+
+                    case NegInstruction ins:
+                        VisitNeg(ins);
+                        break;
+
+                    case PreIncInstruction ins:
+                        VisitPreInc(ins);
+                        break;
+
+                    case PreDecInstruction ins:
+                        VisitPreDec(ins);
+                        break;
+
+                    case PostIncInstruction ins:
+                        VisitPostInc(ins);
+                        break;
+
+                    case PostDecInstruction ins:
+                        VisitPostDec(ins);
                         break;
 
                     case IfFalseInstruction fi:
@@ -124,7 +203,8 @@ namespace Fl.Engine.IL.EValuators
                         continue;
 
                     case ReturnInstruction ri:
-                        ReturnVal = GetFlObjectFromOperand(ri.DestSymbol);
+                        Frame.ReturnValue = GetFlObjectFromOperand(ri.DestSymbol);
+                        i = fragment.Instructions.Count;
                         break;
                 }
 
@@ -186,94 +266,138 @@ namespace Fl.Engine.IL.EValuators
             return value;
         }
 
-        protected void VisitBinary(BinaryInstruction bi)
+
+        protected void VisitAdd(AddInstruction bi)
         {
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
-
-            FlObject result = null; 
-            switch (bi.OpCode)
-            {
-                case OpCode.Add:
-                    result = left.Type.GetStaticMethod(FlType.OperatorAdd).Invoke(SymbolTable, left, right);
-                    break;
-                case OpCode.Sub:
-                    result = left.Type.GetStaticMethod(FlType.OperatorSub).Invoke(SymbolTable, left, right);
-                    break;
-                case OpCode.Mult:
-                    result = left.Type.GetStaticMethod(FlType.OperatorMult).Invoke(SymbolTable, left, right);
-                    break;
-                case OpCode.Div:
-                    result = left.Type.GetStaticMethod(FlType.OperatorDiv).Invoke(SymbolTable, left, right);
-                    break;
-
-                case OpCode.And:
-                case OpCode.Or:
-                    {
-                        bool l = left.Type != FlBoolType.Instance ? left.RawValue != null : (left as FlBool).Value;
-                        bool r = right.Type != FlBoolType.Instance ? right.RawValue != null : (right as FlBool).Value;
-
-                        switch (bi.OpCode)
-                        {
-                            case OpCode.And:
-                                result = new FlBool(l && r);
-                                break;
-                            case OpCode.Or:
-                                result = new FlBool(l || r);
-                                break;
-                        }
-                        break;
-                    }
-
-                case OpCode.Ceq:
-                    result = left.Type.GetStaticMethod(FlType.OperatorEquals).Invoke(SymbolTable, left, right);
-                    break;
-                case OpCode.Cgt:
-                    result = left.Type.GetStaticMethod(FlType.OperatorGt).Invoke(SymbolTable, left, right);
-                    break;
-                case OpCode.Cgte:
-                    result = left.Type.GetStaticMethod(FlType.OperatorGte).Invoke(SymbolTable, left, right);
-                    break;
-                case OpCode.Clt:
-                    result = left.Type.GetStaticMethod(FlType.OperatorLt).Invoke(SymbolTable, left, right);
-                    break;
-                case OpCode.Clte:
-                    result = left.Type.GetStaticMethod(FlType.OperatorLte).Invoke(SymbolTable, left, right);
-                    break;
-                default:
-                    throw new System.Exception($"Unhandled binary operator");
-            }
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorAdd).Invoke(SymbolTable, left, right);
             SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
         }
 
-        public void VisitUnary(UnaryInstruction ui)
+        protected void VisitSub(SubInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorSub).Invoke(SymbolTable, left, right);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        protected void VisitMult(MultInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorMult).Invoke(SymbolTable, left, right);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        protected void VisitDiv(DivInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorDiv).Invoke(SymbolTable, left, right);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        protected void VisitCeq(CeqInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorEquals).Invoke(SymbolTable, left, right);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        protected void VisitCgt(CgtInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorGt).Invoke(SymbolTable, left, right);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        protected void VisitCgte(CgteInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorGte).Invoke(SymbolTable, left, right);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        protected void VisitClt(CltInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorLt).Invoke(SymbolTable, left, right);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        protected void VisitClte(ClteInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorLte).Invoke(SymbolTable, left, right);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        protected void VisitAnd(AndInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            bool l = left.Type != FlBoolType.Instance ? left.RawValue != null : (left as FlBool).Value;
+            bool r = right.Type != FlBoolType.Instance ? right.RawValue != null : (right as FlBool).Value;
+            FlObject result = new FlBool(l && r);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        protected void VisitOr(OrInstruction bi)
+        {
+            FlObject left = this.GetFlObjectFromOperand(bi.Left);
+            FlObject right = this.GetFlObjectFromOperand(bi.Right);
+            bool l = left.Type != FlBoolType.Instance ? left.RawValue != null : (left as FlBool).Value;
+            bool r = right.Type != FlBoolType.Instance ? right.RawValue != null : (right as FlBool).Value;
+            FlObject result = new FlBool(l || r);
+            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        public void VisitNot(NotInstruction ui)
         {
             FlObject left = this.GetFlObjectFromOperand(ui.Left);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorNot).Invoke(SymbolTable, left);
+            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+        }
 
-            FlObject result = null; 
-            switch (ui.OpCode)
-            {
-                case OpCode.Not:
-                    result = left.Type.GetStaticMethod(FlType.OperatorNot).Invoke(SymbolTable, left);
-                    break;
-                case OpCode.Neg:
-                    result = left.Type.GetStaticMethod(FlType.OperatorSub).Invoke(SymbolTable, left);
-                    break;
-                case OpCode.PreInc:
-                    result = left.Type.GetStaticMethod(FlType.OperatorPreIncr).Invoke(SymbolTable, left);
-                    break;
-                case OpCode.PreDec:
-                    result = left.Type.GetStaticMethod(FlType.OperatorPreDecr).Invoke(SymbolTable, left);
-                    break;
-                case OpCode.PostInc:
-                    result = left.Type.GetStaticMethod(FlType.OperatorPostIncr).Invoke(SymbolTable, left);
-                    break;
-                case OpCode.PostDec:
-                    result = left.Type.GetStaticMethod(FlType.OperatorPostDecr).Invoke(SymbolTable, left);
-                    break;
-                default:
-                    throw new System.Exception($"Unhandled unary operator");
-            }
+        public void VisitNeg(NegInstruction ui)
+        {
+            FlObject left = this.GetFlObjectFromOperand(ui.Left);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorSub).Invoke(SymbolTable, left);
+            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        public void VisitPreInc(PreIncInstruction ui)
+        {
+            FlObject left = this.GetFlObjectFromOperand(ui.DestSymbol);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorPreIncr).Invoke(SymbolTable, left);
+            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        public void VisitPreDec(PreDecInstruction ui)
+        {
+            FlObject left = this.GetFlObjectFromOperand(ui.DestSymbol);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorPreDecr).Invoke(SymbolTable, left);
+            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        public void VisitPostInc(PostIncInstruction ui)
+        {
+            FlObject left = this.GetFlObjectFromOperand(ui.DestSymbol);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorPostIncr).Invoke(SymbolTable, left);
+            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+        }
+
+        public void VisitPostDec(PostDecInstruction ui)
+        {
+            FlObject left = this.GetFlObjectFromOperand(ui.DestSymbol);
+            FlObject result = left.Type.GetStaticMethod(FlType.OperatorPostDecr).Invoke(SymbolTable, left);
             SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
         }
 
@@ -332,8 +456,9 @@ namespace Fl.Engine.IL.EValuators
         {
             FlObject result = null;
             FlObject target = GetFlObjectFromOperand(ci.Func);
-            List<FlObject> parameters = new List<FlObject>(Params);
-            parameters.Reverse();
+
+            Frame functionFrame = new Frame(Frame.Parameters);
+            Frames.Push(functionFrame);
 
             /*if (node is AstIndexerNode)
             {
@@ -348,11 +473,15 @@ namespace Fl.Engine.IL.EValuators
 
             if (target is FlFunction)
             {
+                var parameters = new List<FlObject>(functionFrame.Parameters);
+                //parameters.Reverse();
                 result = (target as FlFunction).Invoke(SymbolTable, parameters);
             }
             else if (target is FlType)
             {
                 var opcall = (target as FlType).GetStaticMethod(FlType.OperatorCall);
+                var parameters = new List<FlObject>(functionFrame.Parameters);
+                //parameters.Reverse();
                 result = opcall.Invoke(SymbolTable, parameters);
             }
             /*
@@ -371,19 +500,20 @@ namespace Fl.Engine.IL.EValuators
             }*/
             //throw new AstWalkerException($"{target} is not a callable object");
 
-            Params.Clear();
+            Frame.Parameters.Clear();
 
             this.SymbolTable.GetSymbol(ci.DestSymbol.Name).UpdateBinding(result);
+            Frames.Pop();
         }
 
         public void VisitParam(ParamInstruction pi)
         {
-            Params.Push(GetFlObjectFromOperand(pi.Parameter));
+            Frame.Parameters.Push(GetFlObjectFromOperand(pi.Parameter));
         }
 
         public void VisitLocal(LocalInstruction li)
         {
-            SymbolTable.AddSymbol(li.DestSymbol.Name, new Symbol(SymbolType.Variable), Params.Pop());
+            SymbolTable.AddSymbol(li.DestSymbol.Name, new Symbol(SymbolType.Variable), Frame.Parameters.Pop());
         }
     }
 }

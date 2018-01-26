@@ -2,8 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.IL.Instructions.Operands;
-using Fl.Engine.Symbols;
-using Fl.Engine.Symbols.Objects;
 
 namespace Fl.Engine.IL.Instructions
 {

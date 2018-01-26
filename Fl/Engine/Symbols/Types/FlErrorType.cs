@@ -1,13 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
-using Fl.Engine.Symbols.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Fl.Engine.Symbols.Types
 {

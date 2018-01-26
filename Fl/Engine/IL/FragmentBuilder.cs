@@ -2,26 +2,24 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.IL.Instructions;
+using Fl.Engine.IL.VM;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Text;
 
 namespace Fl.Engine.IL
 {
-    public class Fragment
+    public class FragmentBuilder
     {
         public string Name { get; }
         public FragmentType Type { get; }
         public List<Instruction> _instructions;
 
-        public Fragment(string name, FragmentType type)
+        public FragmentBuilder(string name, FragmentType type)
         {
             this.Name = name;
             this.Type = type;
             _instructions = new List<Instruction>();
         }
-
-        public ReadOnlyCollection<Instruction> Instructions => new ReadOnlyCollection<Instruction>(_instructions);
 
         public int NextAddress => _instructions.Count;
 
@@ -29,6 +27,8 @@ namespace Fl.Engine.IL
         {
             _instructions.Add(i);
         }
+
+        public Fragment Build() => new Fragment(Name, Type, _instructions);
 
         public override string ToString()
         {
@@ -39,10 +39,9 @@ namespace Fl.Engine.IL
             else
                 sb.AppendLine($"{Type.ToString().ToLower()} {Name}:");
 
-            var instructions = Instructions;
-            for (int i = 0; i < instructions.Count; i++)
+            for (int i = 0; i < _instructions.Count; i++)
             {
-                var instruction = instructions[i];
+                var instruction = _instructions[i];
                 sb.AppendLine($"{i.ToString().PadLeft(6, ' ')}: {instruction.ToString()}");
             }
             return sb.ToString();

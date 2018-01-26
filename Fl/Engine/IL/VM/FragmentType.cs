@@ -2,7 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 
-namespace Fl.Engine.IL
+namespace Fl.Engine.IL.VM
 {
     public enum FragmentType
     {

@@ -3,14 +3,8 @@
 
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
-using Fl.Engine.StdLib;
-using Fl.Engine.Symbols;
-using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {
@@ -29,8 +23,8 @@ namespace Fl.Engine.IL.Generators
             var left = nullc.Left.Exec(generator);
             SymbolOperand tmp = generator.SymbolTable.NewTempSymbol("check");
             generator.Emmit(new VarInstruction(tmp, null));
-            generator.Emmit(new BinaryInstruction(OpCode.Ceq, tmp, left, new ImmediateOperand(new TypeResolver("null"), null)));
-            generator.Emmit(new UnaryInstruction(OpCode.Not, tmp, tmp));
+            generator.Emmit(new CeqInstruction(tmp, left, new ImmediateOperand(new TypeResolver("null"), null)));
+            generator.Emmit(new NotInstruction(tmp, tmp));
             generator.Emmit(new IfFalseInstruction(tmp, leftExitPoint));
 
             generator.Emmit(new StoreInstruction(retval, left));

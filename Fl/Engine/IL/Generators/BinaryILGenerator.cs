@@ -3,12 +3,8 @@
 
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
-using Fl.Engine.Symbols.Objects;
-using Fl.Engine.Symbols.Types;
 using Fl.Parser;
 using Fl.Parser.Ast;
-using System;
-using System.Linq;
 
 namespace Fl.Engine.IL.Generators
 {
@@ -19,64 +15,65 @@ namespace Fl.Engine.IL.Generators
             Operand left = binary.Left.Exec(generator);
             Operand right = binary.Right.Exec(generator);
 
-            OpCode opcode = OpCode.Nop;
+            SymbolOperand tmpname = generator.SymbolTable.NewTempSymbol();
+            Instruction instr = null;
+            
             switch (binary.Operator.Type)
             {
                 case TokenType.Addition:
-                    opcode = OpCode.Add;
+                    instr = new AddInstruction(tmpname, left, right);
                     break;
                 case TokenType.Minus:
-                    opcode = OpCode.Sub;
+                    instr = new SubInstruction(tmpname, left, right);
                     break;
                 case TokenType.Multiplication:
-                    opcode = OpCode.Mult;
+                    instr = new MultInstruction(tmpname, left, right);
                     break;
                 case TokenType.Division:
-                    opcode = OpCode.Div;
+                    instr = new DivInstruction(tmpname, left, right);
                     break;
 
 
                 case TokenType.Or:
-                    opcode = OpCode.Or;
+                    instr = new OrInstruction(tmpname, left, right);
                     break;
 
                 case TokenType.And:
-                    opcode = OpCode.And;
+                    instr = new AndInstruction(tmpname, left, right);
                     break;
 
 
                 case TokenType.GreatThan:
-                    opcode = OpCode.Cgt;
+                    instr = new CgtInstruction(tmpname, left, right);
                     break;
 
                 case TokenType.GreatThanEqual:
-                    opcode = OpCode.Cgte;
+                    instr = new CgteInstruction(tmpname, left, right);
                     break;
 
                 case TokenType.LessThan:
-                    opcode = OpCode.Clt;
+                    instr = new CltInstruction(tmpname, left, right);
                     break;
 
                 case TokenType.LessThanEqual:
-                    opcode = OpCode.Clte;
+                    instr = new ClteInstruction(tmpname, left, right);
                     break;
-                
+
 
                 case TokenType.Equal:
                 case TokenType.NotEqual: // Use NOT instruction
-                    opcode = OpCode.Ceq;
+                    instr = new CeqInstruction(tmpname, left, right);
                     break;
             }
 
-            SymbolOperand tmpname = generator.SymbolTable.NewTempSymbol();
             generator.Emmit(new VarInstruction(tmpname, null, null));
-            generator.Emmit(new BinaryInstruction(opcode, tmpname, left, right));
+            generator.Emmit(instr);
 
             if (binary.Operator.Type == TokenType.NotEqual)
             {
                 SymbolOperand notname = generator.SymbolTable.NewTempSymbol();
                 generator.Emmit(new VarInstruction(notname, null, null));
-                generator.Emmit(new UnaryInstruction(OpCode.Not, notname, tmpname));
+                generator.Emmit(new NotInstruction(notname, tmpname));
                 return notname;
             }
 

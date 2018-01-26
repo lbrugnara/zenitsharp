@@ -2,7 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using System;
-using System.Runtime.Serialization;
 
 namespace Fl.Parser
 {

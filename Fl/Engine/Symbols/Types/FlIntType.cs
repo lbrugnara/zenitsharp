@@ -198,12 +198,6 @@ namespace Fl.Engine.Symbols.Types
             return new FlBool(self.RawValue.Equals(arg.RawValue));
         }
 
-        private static FlObject OperatorNotImpl(List<FlObject> args)
-        {
-            FlInt self = args[0] as FlInt;
-            return new FlInt(self.Value * -1);
-        }
-
         private static FlBool OperatorGtImpl(List<FlObject> args)
         {
             FlInt self = args[0] as FlInt;
@@ -291,7 +285,6 @@ namespace Fl.Engine.Symbols.Types
                 .WithStaticMethod(FlType.OperatorDivAndAssing, OperatorDivAndAssingImpl)
 
                 .WithStaticMethod(FlType.OperatorEquals, OperatorEqualsImpl)
-                .WithStaticMethod(FlType.OperatorNot, OperatorNotImpl)
                 .WithStaticMethod(FlType.OperatorGt, OperatorGtImpl)
                 .WithStaticMethod(FlType.OperatorGte, OperatorGteImpl)
                 .WithStaticMethod(FlType.OperatorLt, OperatorLtImpl)

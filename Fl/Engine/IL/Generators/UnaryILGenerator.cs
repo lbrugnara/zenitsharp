@@ -3,11 +3,8 @@
 
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
-using Fl.Engine.Symbols.Objects;
-using Fl.Engine.Symbols.Types;
 using Fl.Parser;
 using Fl.Parser.Ast;
-using System;
 
 namespace Fl.Engine.IL.Generators
 {
@@ -22,24 +19,34 @@ namespace Fl.Engine.IL.Generators
             if (unary.Operator == null)
                 return operand;
 
-            OpCode opcode;
+            var tmpsymbol = generator.SymbolTable.NewTempSymbol();
+            Instruction unaryInstruction = null;
+            bool isIncOrDec = false;
             switch (unary.Operator.Type)
             {
                 case TokenType.Not:
-                    opcode = OpCode.Not;
+                    unaryInstruction = new NotInstruction(tmpsymbol, operand);
                     break;
                 case TokenType.Minus:
-                    opcode = OpCode.Neg;
+                    unaryInstruction = new NegInstruction(tmpsymbol, operand);
                     break;
                 case TokenType.Increment:
                     if (!(operand is SymbolOperand) || !(unary.Left is AstAccessorNode))
                         throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
-                    opcode = unary is AstUnaryPostfixNode ? OpCode.PostInc : OpCode.PreInc;
+                    isIncOrDec = true;
+                    if (unary is AstUnaryPostfixNode)
+                        unaryInstruction = new PostIncInstruction(operand as SymbolOperand);
+                    else
+                        unaryInstruction = new PreIncInstruction(operand as SymbolOperand);
                     break;
                 case TokenType.Decrement:
                     if (!(operand is SymbolOperand) || !(unary.Left is AstAccessorNode))
                         throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
-                    opcode = unary is AstUnaryPostfixNode ? OpCode.PostDec : OpCode.PreDec;
+                    isIncOrDec = true;
+                    if (unary is AstUnaryPostfixNode)
+                        unaryInstruction = new PostDecInstruction(operand as SymbolOperand);
+                    else
+                        unaryInstruction = new PreDecInstruction(operand as SymbolOperand);
                     break;
                 default:
                     throw new AstWalkerException($"Unknown operator '{unary.Operator.Type}'");
@@ -47,10 +54,14 @@ namespace Fl.Engine.IL.Generators
 
             // var @tX null
             // <unary> @tX <operand>
-            var tmpsymbol = generator.SymbolTable.NewTempSymbol();
-            generator.Emmit(new VarInstruction(tmpsymbol, null, null));
-            generator.Emmit(new UnaryInstruction(opcode, tmpsymbol, operand));
-            return tmpsymbol;
+            if (!isIncOrDec)
+            {
+                generator.Emmit(new VarInstruction(tmpsymbol, null, null));
+                generator.Emmit(unaryInstruction);
+                return tmpsymbol;
+            }
+            generator.Emmit(unaryInstruction);
+            return operand;
         }
     }
 }

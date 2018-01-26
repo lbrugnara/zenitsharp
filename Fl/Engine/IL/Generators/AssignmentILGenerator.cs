@@ -4,14 +4,8 @@
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Exceptions;
 using Fl.Engine.IL.Instructions.Operands;
-using Fl.Engine.Symbols;
-using Fl.Engine.Symbols.Objects;
-using Fl.Engine.Symbols.Types;
 using Fl.Parser;
 using Fl.Parser.Ast;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Fl.Engine.IL.Generators
 {
@@ -37,26 +31,26 @@ namespace Fl.Engine.IL.Generators
             }
 
 
-            OpCode opcode = OpCode.Nop;
+            Instruction instr = null;
             switch (node.AssignmentOp.Type)
             {
                 case TokenType.IncrementAndAssign:
-                    opcode = OpCode.Add;
+                    instr = new AddInstruction(leftHandSide, leftHandSide, rightHandSide);
                     break;
                 case TokenType.DecrementAndAssign:
-                    opcode = OpCode.Sub;
+                    instr = new SubInstruction(leftHandSide, leftHandSide, rightHandSide);
                     break;
                 case TokenType.MultAndAssign:
-                    opcode = OpCode.Mult;
+                    instr = new MultInstruction(leftHandSide, leftHandSide, rightHandSide);
                     break;
                 case TokenType.DivideAndAssign:
-                    opcode = OpCode.Div;
+                    instr = new DivInstruction(leftHandSide, leftHandSide, rightHandSide);
                     break;
                 default:
                     throw new InvalidInstructionException($"Unsupported operation: {node.AssignmentOp.Value} ({node.AssignmentOp.Type})");
             }
 
-            generator.Emmit(new BinaryInstruction(opcode, leftHandSide, leftHandSide, rightHandSide));
+            generator.Emmit(instr);
             return leftHandSide;
         }
     }

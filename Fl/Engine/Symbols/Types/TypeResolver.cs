@@ -1,10 +1,7 @@
 ﻿using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Objects;
 using Fl.Parser;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Fl.Engine.Symbols.Types
 {

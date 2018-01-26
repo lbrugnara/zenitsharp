@@ -1,13 +1,9 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl;
-using Fl.Engine;
 using Fl.Engine.IL;
-using Fl.Engine.IL.EValuators;
-using Fl.Engine.IL.Generators;
+using Fl.Engine.IL.VM;
 using Fl.Engine.IL.Instructions;
-using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Objects;
 using Fl.Parser;

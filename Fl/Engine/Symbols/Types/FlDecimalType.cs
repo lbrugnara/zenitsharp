@@ -1,13 +1,9 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Objects;
-using Fl.Engine.Symbols.Types;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Fl.Engine.Symbols.Types
 {
@@ -202,12 +198,6 @@ namespace Fl.Engine.Symbols.Types
             return new FlBool(self.RawValue.Equals(arg.RawValue));
         }
 
-        private static FlObject OperatorNotImpl(List<FlObject> args)
-        {
-            FlDecimal self = args[0] as FlDecimal;
-            return new FlDecimal(self.Value * -1.0M);
-        }
-
         private static FlBool OperatorGtImpl(List<FlObject> args)
         {
             FlDecimal self = args[0] as FlDecimal;
@@ -290,7 +280,6 @@ namespace Fl.Engine.Symbols.Types
                 .WithStaticMethod(FlType.OperatorDivAndAssing, OperatorDivAndAssingImpl)
 
                 .WithStaticMethod(FlType.OperatorEquals, OperatorEqualsImpl)
-                .WithStaticMethod(FlType.OperatorNot, OperatorNotImpl)
                 .WithStaticMethod(FlType.OperatorGt, OperatorGtImpl)
                 .WithStaticMethod(FlType.OperatorGte, OperatorGteImpl)
                 .WithStaticMethod(FlType.OperatorLt, OperatorLtImpl)

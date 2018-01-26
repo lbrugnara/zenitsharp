@@ -2,9 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.Symbols.Objects;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Fl.Engine.StdLib.std.io
 {
