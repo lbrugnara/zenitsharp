@@ -5,7 +5,7 @@ using Fl.Engine.IL.Instructions.Operands;
 
 namespace Fl.Engine.IL.Instructions
 {
-    public class OrInstruction : Instruction
+    public class OrInstruction : AssignInstruction
     {
         public Operand Left { get; }
         public Operand Right { get; }
@@ -19,7 +19,7 @@ namespace Fl.Engine.IL.Instructions
 
         public override string ToString()
         {
-            return $"{this.DestSymbol} = {this.OpCode.InstructionName()} {this.Left} {this.Right}";
+            return $"{this.Destination} = {this.OpCode.InstructionName()} {this.Left} {this.Right}";
         }
     }
 }

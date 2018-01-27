@@ -2,15 +2,20 @@
 // Full copyright and license information in LICENSE file
 
 
-namespace Fl.Engine.IL
+namespace Fl.Engine.IL.Instructions
 {
     public class Label
     {
-        public int Address { get; set; }
+        public string Name { get; }
+
+        public Label(string name)
+        {
+            this.Name = name;
+        }
 
         public override string ToString()
         {
-            return Address == -1 ? "<unknown>" : Address.ToString();
+            return $"{this.Name}:";
         }
     }
 }

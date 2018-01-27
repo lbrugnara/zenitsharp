@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.VM;
 
 namespace Fl.Engine.IL
@@ -11,6 +12,8 @@ namespace Fl.Engine.IL
     {
         private List<FragmentBuilder> _ResolvedFragments;
         private Stack<FragmentBuilder> _Fragments;
+
+        private int _labelCount = 1;
 
         public ILProgramBuilder()
         {
@@ -36,20 +39,17 @@ namespace Fl.Engine.IL
             _ResolvedFragments.Add(_Fragments.Pop());
         }
 
-        public Label NewLabel(bool withDestination = false)
+        public Label NewLabel()
         {
-            return new Label()
-            {
-                Address = withDestination ? CurrentFragment.NextAddress : -1
-            };
+            return new Label($"L{(_labelCount++)}");
         }
-
+        /*
         public void BackpatchLabel(Label label)
         {
             if (label.Address != -1)
                 throw new System.Exception($"Label already has a destination address: {label.Address}");
 
             label.Address = CurrentFragment.NextAddress;
-        }
+        }*/
     }
 }

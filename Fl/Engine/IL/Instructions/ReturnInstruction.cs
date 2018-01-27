@@ -6,7 +6,7 @@ using Fl.Engine.IL.Instructions.Operands;
 
 namespace Fl.Engine.IL.Instructions
 {
-    public class ReturnInstruction : Instruction
+    public class ReturnInstruction : AssignInstruction
     {
         public ReturnInstruction(SymbolOperand destination)
             : base(OpCode.Return, destination)
@@ -15,9 +15,9 @@ namespace Fl.Engine.IL.Instructions
 
         public override string ToString()
         {
-            if (DestSymbol == null)
+            if (Destination == null)
                 return this.OpCode.InstructionName();
-            return $"{this.OpCode.InstructionName()} {DestSymbol}";
+            return $"{this.OpCode.InstructionName()} {Destination}";
         }
     }
 }

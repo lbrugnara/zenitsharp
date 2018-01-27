@@ -49,17 +49,16 @@ namespace FlInterpreter
                     }
 
                     var g = new ILGenerator();
-                    g.Visit(ast);                    
 
-                    ILProgram ip = g.Program.Build();
+                    ILProgram ip = g.Build(ast);
                     Console.WriteLine(ip.ToString());
                     ip.Run();
 
-                    Instruction instr = ip.Fragments[".global"].Instructions.LastOrDefault();
-                    if (instr == null || instr.DestSymbol == null || !ip.SymbolTable.HasSymbol(instr.DestSymbol.ToString()))
+                    AssignInstruction instr = ip.Fragments[".global"].Instructions.LastOrDefault() as AssignInstruction;
+                    if (instr == null || instr.Destination == null || !ip.SymbolTable.HasSymbol(instr.Destination.ToString()))
                         continue;
 
-                    FlObject result = ip.SymbolTable.GetSymbol(instr.DestSymbol).Binding;
+                    FlObject result = ip.SymbolTable.GetSymbol(instr.Destination).Binding;
                     if (result == null)
                         continue;
 

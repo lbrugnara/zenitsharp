@@ -21,7 +21,8 @@ namespace Fl.Engine.IL.Generators
             fornode.Init.Exec(generator);
 
             // Generate the goto to re-test the condition (the destination is the next instruction: eblock)
-            Label entryPoint = generator.Program.NewLabel(true);
+            Label entryPoint = generator.Program.NewLabel();
+            generator.Labels.Push(entryPoint);
 
             // Generate an eblock instruction for the rest of the for-block
             generator.EnterBlock(BlockType.Loop, entryPoint, exitPoint);
@@ -45,7 +46,7 @@ namespace Fl.Engine.IL.Generators
             generator.Emmit(new GotoInstruction(entryPoint));
 
             // Backpatch the exit label for the for-block
-            generator.Program.BackpatchLabel(exitPoint);
+            generator.Labels.Push(exitPoint);
 
             // Leave the for-block
             generator.LeaveBlock();

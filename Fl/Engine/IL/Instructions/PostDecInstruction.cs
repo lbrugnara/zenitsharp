@@ -5,7 +5,7 @@ using Fl.Engine.IL.Instructions.Operands;
 
 namespace Fl.Engine.IL.Instructions
 {
-    public class PostDecInstruction : Instruction
+    public class PostDecInstruction : AssignInstruction
     {
         public PostDecInstruction(SymbolOperand tempName)
             : base(OpCode.PostDec, tempName)
@@ -14,7 +14,7 @@ namespace Fl.Engine.IL.Instructions
 
         public override string ToString()
         {
-            return $"{this.OpCode.InstructionName()} {this.DestSymbol}";
+            return $"{this.OpCode.InstructionName()} {this.Destination}";
         }
     }
 }

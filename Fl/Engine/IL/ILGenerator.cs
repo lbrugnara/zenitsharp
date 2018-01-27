@@ -5,6 +5,8 @@ using Fl.Engine.IL.Instructions;
 using Fl.Parser.Ast;
 using Fl.Engine.IL.Instructions.Operands;
 using Fl.Engine.IL.VM;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Fl.Engine.IL
 {
@@ -19,11 +21,14 @@ namespace Fl.Engine.IL
         // All the visitor logic is moved to the AstVisitor
         private AstVisitor _AstVisitor;
 
+        public Stack<Label> Labels { get; }
+
         public ILGenerator()
         {
             _IlSymbolTable = new ILSymbolTable();
             _IlProgramBuilder = new ILProgramBuilder();
             _AstVisitor = new AstVisitor(this);
+            Labels = new Stack<Label>();
         }
 
         // Reference to the SymbolTable
@@ -65,8 +70,18 @@ namespace Fl.Engine.IL
         // Adds a new instruction to the current fragment
         public Instruction Emmit(Instruction i)
         {
+            if (Labels.Any())
+                i.Label = Labels.Pop();
             _IlProgramBuilder.CurrentFragment.AddInstruction(i);
             return i;
+        }
+
+        public ILProgram Build(AstNode node)
+        {
+            this.Visit(node);
+            while (this.Labels.Any())
+                this.Emmit(new NopInstruction());
+            return this._IlProgramBuilder.Build();
         }
 
         public Operand Visit(AstNode node)

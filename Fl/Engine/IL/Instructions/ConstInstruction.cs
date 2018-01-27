@@ -6,7 +6,7 @@ using Fl.Engine.Symbols.Types;
 
 namespace Fl.Engine.IL.Instructions
 {
-    public class ConstInstruction : Instruction
+    public class ConstInstruction : AssignInstruction
     {
         public TypeResolver TypeResolver { get; }
         public Operand Value { get; }
@@ -20,7 +20,7 @@ namespace Fl.Engine.IL.Instructions
 
         public override string ToString()
         {
-            return $"{this.OpCode.InstructionName()} {this.DestSymbol} = {this.Value}";
+            return $"{this.OpCode.InstructionName()} {this.Destination} = {this.Value}";
         }
     }
 }

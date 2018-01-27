@@ -21,8 +21,6 @@ namespace Fl.Engine.IL
             _instructions = new List<Instruction>();
         }
 
-        public int NextAddress => _instructions.Count;
-
         public void AddInstruction(Instruction i)
         {
             _instructions.Add(i);
@@ -42,6 +40,8 @@ namespace Fl.Engine.IL
             for (int i = 0; i < _instructions.Count; i++)
             {
                 var instruction = _instructions[i];
+                if (instruction.Label != null)
+                    sb.AppendLine($"{instruction.Label}");
                 sb.AppendLine($"{i.ToString().PadLeft(6, ' ')}: {instruction.ToString()}");
             }
             return sb.ToString();

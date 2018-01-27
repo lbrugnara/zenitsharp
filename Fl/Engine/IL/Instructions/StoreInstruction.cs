@@ -5,7 +5,7 @@ using Fl.Engine.IL.Instructions.Operands;
 
 namespace Fl.Engine.IL.Instructions
 {
-    public class StoreInstruction : Instruction
+    public class StoreInstruction : AssignInstruction
     {
         public Operand Value { get; }
 
@@ -17,7 +17,7 @@ namespace Fl.Engine.IL.Instructions
 
         public override string ToString()
         {
-            return $"{this.OpCode.InstructionName()} {this.DestSymbol} = {this.Value}";
+            return $"{this.OpCode.InstructionName()} {this.Destination} = {this.Value}";
         }
     }
 }

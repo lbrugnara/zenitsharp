@@ -193,17 +193,17 @@ namespace Fl.Engine.IL.VM
                         FlBool cond = GetFlObjectFromOperand(fi.Condition) as FlBool;
                         if (!cond.Value)
                         {
-                            i = fi.Goto.Address;
+                            i = fragment.Labels[fi.Goto.Name];
                             continue;
                         }
                         break;
 
                     case GotoInstruction gi:
-                        i = gi.Goto.Address;
+                        i = fragment.Labels[gi.Goto.Name];
                         continue;
 
                     case ReturnInstruction ri:
-                        Frame.ReturnValue = GetFlObjectFromOperand(ri.DestSymbol);
+                        Frame.ReturnValue = GetFlObjectFromOperand(ri.Destination);
                         i = fragment.Instructions.Count;
                         break;
                 }
@@ -272,7 +272,7 @@ namespace Fl.Engine.IL.VM
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorAdd).Invoke(SymbolTable, left, right);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitSub(SubInstruction bi)
@@ -280,7 +280,7 @@ namespace Fl.Engine.IL.VM
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorSub).Invoke(SymbolTable, left, right);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitMult(MultInstruction bi)
@@ -288,7 +288,7 @@ namespace Fl.Engine.IL.VM
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorMult).Invoke(SymbolTable, left, right);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitDiv(DivInstruction bi)
@@ -296,7 +296,7 @@ namespace Fl.Engine.IL.VM
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorDiv).Invoke(SymbolTable, left, right);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitCeq(CeqInstruction bi)
@@ -304,7 +304,7 @@ namespace Fl.Engine.IL.VM
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorEquals).Invoke(SymbolTable, left, right);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitCgt(CgtInstruction bi)
@@ -312,7 +312,7 @@ namespace Fl.Engine.IL.VM
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorGt).Invoke(SymbolTable, left, right);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitCgte(CgteInstruction bi)
@@ -320,7 +320,7 @@ namespace Fl.Engine.IL.VM
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorGte).Invoke(SymbolTable, left, right);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitClt(CltInstruction bi)
@@ -328,7 +328,7 @@ namespace Fl.Engine.IL.VM
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorLt).Invoke(SymbolTable, left, right);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitClte(ClteInstruction bi)
@@ -336,7 +336,7 @@ namespace Fl.Engine.IL.VM
             FlObject left = this.GetFlObjectFromOperand(bi.Left);
             FlObject right = this.GetFlObjectFromOperand(bi.Right);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorLte).Invoke(SymbolTable, left, right);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitAnd(AndInstruction bi)
@@ -346,7 +346,7 @@ namespace Fl.Engine.IL.VM
             bool l = left.Type != FlBoolType.Instance ? left.RawValue != null : (left as FlBool).Value;
             bool r = right.Type != FlBoolType.Instance ? right.RawValue != null : (right as FlBool).Value;
             FlObject result = new FlBool(l && r);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         protected void VisitOr(OrInstruction bi)
@@ -356,55 +356,55 @@ namespace Fl.Engine.IL.VM
             bool l = left.Type != FlBoolType.Instance ? left.RawValue != null : (left as FlBool).Value;
             bool r = right.Type != FlBoolType.Instance ? right.RawValue != null : (right as FlBool).Value;
             FlObject result = new FlBool(l || r);
-            SymbolTable.GetSymbol(bi.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(bi.Destination.Name).UpdateBinding(result);
         }
 
         public void VisitNot(NotInstruction ui)
         {
             FlObject left = this.GetFlObjectFromOperand(ui.Left);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorNot).Invoke(SymbolTable, left);
-            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
 
         public void VisitNeg(NegInstruction ui)
         {
             FlObject left = this.GetFlObjectFromOperand(ui.Left);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorSub).Invoke(SymbolTable, left);
-            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
 
         public void VisitPreInc(PreIncInstruction ui)
         {
-            FlObject left = this.GetFlObjectFromOperand(ui.DestSymbol);
+            FlObject left = this.GetFlObjectFromOperand(ui.Destination);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorPreIncr).Invoke(SymbolTable, left);
-            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
 
         public void VisitPreDec(PreDecInstruction ui)
         {
-            FlObject left = this.GetFlObjectFromOperand(ui.DestSymbol);
+            FlObject left = this.GetFlObjectFromOperand(ui.Destination);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorPreDecr).Invoke(SymbolTable, left);
-            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
 
         public void VisitPostInc(PostIncInstruction ui)
         {
-            FlObject left = this.GetFlObjectFromOperand(ui.DestSymbol);
+            FlObject left = this.GetFlObjectFromOperand(ui.Destination);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorPostIncr).Invoke(SymbolTable, left);
-            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
 
         public void VisitPostDec(PostDecInstruction ui)
         {
-            FlObject left = this.GetFlObjectFromOperand(ui.DestSymbol);
+            FlObject left = this.GetFlObjectFromOperand(ui.Destination);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorPostDecr).Invoke(SymbolTable, left);
-            SymbolTable.GetSymbol(ui.DestSymbol.Name).UpdateBinding(result);
+            SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
 
         public void VisitLoad(StoreInstruction li)
         {
             FlObject value = this.GetFlObjectFromOperand(li.Value);
-            var symbol = SymbolTable.GetSymbol(li.DestSymbol.Name);
+            var symbol = SymbolTable.GetSymbol(li.Destination.Name);
 
             // Check the SymbolType to see if it's a valid lvalue
             if (symbol.SymbolType == SymbolType.Constant)
@@ -428,7 +428,7 @@ namespace Fl.Engine.IL.VM
             {
                 FlType type = vi.TypeResolver.Resolve(SymbolTable);
                 Symbol symbol = new Symbol(SymbolType.Variable);
-                SymbolTable.AddSymbol(vi.DestSymbol.Name, symbol, FlNull.Value);
+                SymbolTable.AddSymbol(vi.Destination.Name, symbol, FlNull.Value);
                 var defaultValue = type.Activator(null);
                 if (value == null)
                 {
@@ -442,14 +442,14 @@ namespace Fl.Engine.IL.VM
             }
             else
             {
-                SymbolTable.AddSymbol(vi.DestSymbol.Name, new Symbol(SymbolType.Variable), value);
+                SymbolTable.AddSymbol(vi.Destination.Name, new Symbol(SymbolType.Variable), value);
             }
         }
 
         public void VisitConst(ConstInstruction ci)
         {
             FlObject value = this.GetFlObjectFromOperand(ci.Value);
-            SymbolTable.AddSymbol(ci.DestSymbol.Name, new Symbol(SymbolType.Constant), value);
+            SymbolTable.AddSymbol(ci.Destination.Name, new Symbol(SymbolType.Constant), value);
         }
 
         public void VisitCall(CallInstruction ci)
@@ -502,7 +502,7 @@ namespace Fl.Engine.IL.VM
 
             Frame.Parameters.Clear();
 
-            this.SymbolTable.GetSymbol(ci.DestSymbol.Name).UpdateBinding(result);
+            this.SymbolTable.GetSymbol(ci.Destination.Name).UpdateBinding(result);
             Frames.Pop();
         }
 
@@ -513,7 +513,7 @@ namespace Fl.Engine.IL.VM
 
         public void VisitLocal(LocalInstruction li)
         {
-            SymbolTable.AddSymbol(li.DestSymbol.Name, new Symbol(SymbolType.Variable), Frame.Parameters.Pop());
+            SymbolTable.AddSymbol(li.Destination.Name, new Symbol(SymbolType.Variable), Frame.Parameters.Pop());
         }
     }
 }

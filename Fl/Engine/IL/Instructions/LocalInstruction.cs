@@ -5,7 +5,7 @@ using Fl.Engine.IL.Instructions.Operands;
 
 namespace Fl.Engine.IL.Instructions
 {
-    public class LocalInstruction : Instruction
+    public class LocalInstruction : AssignInstruction
     {
         public LocalInstruction(SymbolOperand local)
             : base(OpCode.Local, local)
@@ -14,7 +14,7 @@ namespace Fl.Engine.IL.Instructions
 
         public override string ToString()
         {
-            return $"local {this.DestSymbol}";
+            return $"local {this.Destination}";
         }
     }
 }

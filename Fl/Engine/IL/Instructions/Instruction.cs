@@ -1,19 +1,17 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.IL.Instructions.Operands;
 
 namespace Fl.Engine.IL.Instructions
 {
     public abstract class Instruction
     {
-        public SymbolOperand DestSymbol { get; }
         public OpCode OpCode { get; }
+        public Label Label { get; set; }
 
-        public Instruction(OpCode opCode, SymbolOperand destName = null)
+        public Instruction(OpCode opCode)
         {
             this.OpCode = opCode;
-            this.DestSymbol = destName;
         }
     }
 }

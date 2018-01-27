@@ -4,6 +4,7 @@
 using Fl.Engine.IL.Instructions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 
 namespace Fl.Engine.IL.VM
@@ -13,12 +14,21 @@ namespace Fl.Engine.IL.VM
         public string Name { get; }
         public FragmentType Type { get; }
         public ReadOnlyCollection<Instruction> Instructions { get; }
+        public Dictionary<string, int> Labels { get; }
 
         public Fragment(string name, FragmentType type, List<Instruction> instructions)
         {
             this.Name = name;
             this.Type = type;
             this.Instructions = new ReadOnlyCollection<Instruction>(instructions);
+            this.Labels = new Dictionary<string, int>();
+
+            for (int i=0; i < instructions.Count; i++)
+            {
+                if (instructions[i].Label == null)
+                    continue;
+                this.Labels[instructions[i].Label.Name] = i;
+            }
         }
 
         public override string ToString()
@@ -33,6 +43,8 @@ namespace Fl.Engine.IL.VM
             for (int i = 0; i < Instructions.Count; i++)
             {
                 var instruction = Instructions[i];
+                if (instruction.Label != null)
+                    sb.AppendLine($"{instruction.Label}");
                 sb.AppendLine($"{i.ToString().PadLeft(6, ' ')}: {instruction.ToString()}");
             }
             return sb.ToString();
