@@ -6,18 +6,21 @@ using Fl.Engine.IL.Instructions.Operands;
 
 namespace Fl.Engine.IL.Instructions
 {
-    public class ReturnInstruction : AssignInstruction
+    public class ReturnInstruction : Instruction
     {
-        public ReturnInstruction(SymbolOperand destination)
-            : base(OpCode.Return, destination)
+        public Operand Value { get; }
+
+        public ReturnInstruction(Operand value = null)
+            : base(OpCode.Return)
         {
+            this.Value = value;
         }
 
         public override string ToString()
         {
-            if (Destination == null)
+            if (this.Value == null)
                 return this.OpCode.InstructionName();
-            return $"{this.OpCode.InstructionName()} {Destination}";
+            return $"{this.OpCode.InstructionName()} {this.Value}";
         }
     }
 }

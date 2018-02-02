@@ -21,6 +21,7 @@ namespace Fl.Engine.IL
         // Once a block is finished it is moved to this list
         private List<Block> _ResolvedBlocks;
 
+        public SymbolOperand ReturnSymbol { get; } = new SymbolOperand("@return", null, null);
 
         private int TemporalVarCounter = 0;
 

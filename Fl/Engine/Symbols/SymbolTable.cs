@@ -23,7 +23,8 @@ namespace Fl.Engine.Symbols
         {
             _Scopes = new ScopeChain();
             _Global = new Scope(ScopeType.Common, "<global>");
-            
+            _Global.AddSymbol("@return", new Symbol(SymbolType.Variable, StorageType.Auto), null);
+
             // Initialize the global scope with the standard lib
             StdLibInitializer.Import(CurrentScope);
         }
@@ -125,11 +126,13 @@ namespace Fl.Engine.Symbols
         {
             get
             {
-                return _Scopes.ReturnValue;
+                //return _Scopes.ReturnValue;
+                return _Global["@return"]?.Binding;
             }
             set
             {
-                _Scopes.ReturnValue = value;
+                //_Scopes.ReturnValue = value;
+                _Global["@return"].UpdateBinding(value);
             }
         }
 

@@ -3,6 +3,7 @@
 
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +16,6 @@ namespace Fl.Engine.IL.Generators
         {
             Operand target = node.Callable.Exec(generator);
 
-            // Declare the var to keep the result (if needed)
-            var dest = generator.SymbolTable.NewTempSymbol();
-            generator.Emmit(new VarInstruction(dest, null, null));
-
             // Generate the "param" instructions
             List<ParamInstruction> parameters = node.Arguments.Expressions.Select(a => new ParamInstruction(a.Exec(generator))).ToList();
             parameters.Reverse();
@@ -26,7 +23,10 @@ namespace Fl.Engine.IL.Generators
             parameters.ForEach(p => generator.Emmit(p));
 
             // Generate the call instruction
-            generator.Emmit(new CallInstruction(dest, target, parameters.Count));
+            generator.Emmit(new CallInstruction(target, parameters.Count));
+
+            SymbolOperand dest = generator.SymbolTable.NewTempSymbol();
+            generator.Emmit(new VarInstruction(dest, target.TypeResolver, generator.SymbolTable.ReturnSymbol));
             return dest;
         }
     }

@@ -5,13 +5,13 @@ using Fl.Engine.IL.Instructions.Operands;
 
 namespace Fl.Engine.IL.Instructions
 {
-    public class CallInstruction : AssignInstruction
+    public class CallInstruction : Instruction
     {
         public Operand Func { get; }
         public int NumberOfParams { get; }
 
-        public CallInstruction(SymbolOperand destination, Operand fn, int nparams)
-            : base (OpCode.Call, destination)
+        public CallInstruction(Operand fn, int nparams)
+            : base (OpCode.Call)
         {
             this.Func = fn;
             this.NumberOfParams = nparams;
@@ -19,7 +19,7 @@ namespace Fl.Engine.IL.Instructions
 
         public override string ToString()
         {
-            return $"{this.Destination} = {this.OpCode.InstructionName()} {this.Func} {this.NumberOfParams}";
+            return $"{this.OpCode.InstructionName()} {this.Func} {this.NumberOfParams}";
         }
     }
 }

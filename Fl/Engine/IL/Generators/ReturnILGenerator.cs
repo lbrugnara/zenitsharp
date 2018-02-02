@@ -15,18 +15,8 @@ namespace Fl.Engine.IL.Generators
             if (!generator.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            Operand expr = rnode.ReturnTuple.Exec(generator);
-            SymbolOperand ret = null;
-            if (expr is ImmediateOperand)
-            {
-                ret = generator.SymbolTable.NewTempSymbol();
-                generator.Emmit(new VarInstruction(ret, expr.TypeResolver, expr));
-            }
-            else
-            {
-                ret = expr as SymbolOperand;
-            }
-            generator.Emmit(new ReturnInstruction(ret));
+            Operand expr = rnode.ReturnTuple?.Exec(generator);
+            generator.Emmit(new ReturnInstruction(expr));
             return null;
         }
     }
