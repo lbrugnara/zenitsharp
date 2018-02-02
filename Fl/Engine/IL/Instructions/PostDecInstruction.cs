@@ -7,14 +7,17 @@ namespace Fl.Engine.IL.Instructions
 {
     public class PostDecInstruction : AssignInstruction
     {
-        public PostDecInstruction(SymbolOperand tempName)
+        public Operand Left { get; }
+
+        public PostDecInstruction(SymbolOperand tempName, SymbolOperand left)
             : base(OpCode.PostDec, tempName)
         {
+            this.Left = left;
         }
 
         public override string ToString()
         {
-            return $"{this.OpCode.InstructionName()} {this.Destination}";
+            return $"{this.Destination} = {this.OpCode.InstructionName()} {this.Left}";
         }
     }
 }

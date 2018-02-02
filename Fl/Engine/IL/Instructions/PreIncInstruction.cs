@@ -7,14 +7,17 @@ namespace Fl.Engine.IL.Instructions
 {
     public class PreIncInstruction : AssignInstruction
     {
-        public PreIncInstruction(SymbolOperand tempName)
+        public Operand Left { get; }
+
+        public PreIncInstruction(SymbolOperand tempName, SymbolOperand left)
             : base(OpCode.PreInc, tempName)
         {
+            this.Left = left;
         }
 
         public override string ToString()
         {
-            return $"{this.OpCode.InstructionName()} {this.Destination}";
+            return $"{this.Destination} = {this.OpCode.InstructionName()} {this.Left}";
         }
     }
 }

@@ -21,7 +21,6 @@ namespace Fl.Engine.IL.Generators
 
             var tmpsymbol = generator.SymbolTable.NewTempSymbol();
             Instruction unaryInstruction = null;
-            bool isIncOrDec = false;
             switch (unary.Operator.Type)
             {
                 case TokenType.Not:
@@ -33,20 +32,20 @@ namespace Fl.Engine.IL.Generators
                 case TokenType.Increment:
                     if (!(operand is SymbolOperand) || !(unary.Left is AstAccessorNode))
                         throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
-                    isIncOrDec = true;
+
                     if (unary is AstUnaryPostfixNode)
-                        unaryInstruction = new PostIncInstruction(operand as SymbolOperand);
+                        unaryInstruction = new PostIncInstruction(tmpsymbol, operand as SymbolOperand);
                     else
-                        unaryInstruction = new PreIncInstruction(operand as SymbolOperand);
+                        unaryInstruction = new PreIncInstruction(tmpsymbol, operand as SymbolOperand);
                     break;
                 case TokenType.Decrement:
                     if (!(operand is SymbolOperand) || !(unary.Left is AstAccessorNode))
                         throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
-                    isIncOrDec = true;
+
                     if (unary is AstUnaryPostfixNode)
-                        unaryInstruction = new PostDecInstruction(operand as SymbolOperand);
+                        unaryInstruction = new PostDecInstruction(tmpsymbol, operand as SymbolOperand);
                     else
-                        unaryInstruction = new PreDecInstruction(operand as SymbolOperand);
+                        unaryInstruction = new PreDecInstruction(tmpsymbol, operand as SymbolOperand);
                     break;
                 default:
                     throw new AstWalkerException($"Unknown operator '{unary.Operator.Type}'");
@@ -54,14 +53,9 @@ namespace Fl.Engine.IL.Generators
 
             // var @tX null
             // <unary> @tX <operand>
-            if (!isIncOrDec)
-            {
-                generator.Emmit(new VarInstruction(tmpsymbol, null, null));
-                generator.Emmit(unaryInstruction);
-                return tmpsymbol;
-            }
+            generator.Emmit(new VarInstruction(tmpsymbol, null, null));
             generator.Emmit(unaryInstruction);
-            return operand;
+            return tmpsymbol;
         }
     }
 }

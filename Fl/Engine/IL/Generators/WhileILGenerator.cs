@@ -13,7 +13,7 @@ namespace Fl.Engine.IL.Generators
         {
             // Generate the goto to re-test the condition (the destination is the next instruction: eblock)
             Label entryPoint = generator.Program.NewLabel();
-            generator.Labels.Push(entryPoint);
+            generator.BindLabel(entryPoint);
 
             // Generate a destination Label to leave the while-block (to be backpatched at the end)
             Label exitPoint = generator.Program.NewLabel();
@@ -37,7 +37,7 @@ namespace Fl.Engine.IL.Generators
             generator.Emmit(new GotoInstruction(entryPoint));
 
             // Backpatch the exit label for the while-block
-            generator.Labels.Push(exitPoint);
+            generator.BindLabel(exitPoint);
 
             return null;
         }

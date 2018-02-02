@@ -41,7 +41,7 @@ namespace Fl.Engine.IL.Generators
             Label elseEntryPoint = leftExitPoint;
 
             // Backpatch the elseEntryPoint (thenExitPoint) here
-            generator.Labels.Push(elseEntryPoint);
+            generator.BindLabel(elseEntryPoint);
 
             // Generate the label for the (pending) goto instruction
             var elseExitPoint = generator.Program.NewLabel();
@@ -52,7 +52,7 @@ namespace Fl.Engine.IL.Generators
 
             // Finally, backpatch the goto to jump from the then's body to avoid
             // fall through the else's body
-            generator.Labels.Push(elseExitPoint);
+            generator.BindLabel(elseExitPoint);
 
             return retval;
         }

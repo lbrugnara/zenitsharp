@@ -12,35 +12,38 @@ namespace Fl.Engine.IL
 {
     public class ILGenerator : IAstWalker<Operand>
     {
-        // Tracks variables per blocks
-        private ILSymbolTable _IlSymbolTable;
+        /// <summary>
+        /// Tracks variables per blocks
+        /// </summary>
+        public ILSymbolTable SymbolTable { get; }
 
-        // Contains program fragments and instructions
-        private ILProgramBuilder _IlProgramBuilder;
+        /// <summary>
+        /// Contains program fragments and instructions
+        /// </summary>
+        public ILProgramBuilder Program { get; }
 
-        // All the visitor logic is moved to the AstVisitor
-        private AstVisitor _AstVisitor;
+        /// <summary>
+        /// Set of labels to be "resolved" on the next instructions emission
+        /// </summary>
+        private Stack<Label> labels { get; }
 
-        public Stack<Label> Labels { get; }
+        /// <summary>
+        /// All the visitor logic is moved to the AstVisitor
+        /// </summary>
+        private AstVisitor astVisitor;
 
         public ILGenerator()
         {
-            _IlSymbolTable = new ILSymbolTable();
-            _IlProgramBuilder = new ILProgramBuilder();
-            _AstVisitor = new AstVisitor(this);
-            Labels = new Stack<Label>();
+            this.SymbolTable = new ILSymbolTable();
+            this.Program = new ILProgramBuilder();
+            labels = new Stack<Label>();
+            astVisitor = new AstVisitor(this);            
         }
-
-        // Reference to the SymbolTable
-        public ILSymbolTable SymbolTable => _IlSymbolTable;
-
-        // Reference to the program being built
-        public ILProgramBuilder Program => _IlProgramBuilder;
 
         // Adds a new block to the SymbolTable, it represents a new scope
         public void EnterBlock(BlockType type, Label entryPoint = null, Label exitPoint = null)
         {
-            this._IlSymbolTable.EnterBlock(type, entryPoint, exitPoint);
+            this.SymbolTable.EnterBlock(type, entryPoint, exitPoint);
         }
 
         // Leave the current block in the SymbolTable
@@ -53,40 +56,45 @@ namespace Fl.Engine.IL
         // in the symbol table
         public void PushFragment(string name, FragmentType type)
         {
-            _IlProgramBuilder.PushFragment(name, type);
-            EnterBlock(BlockType.Common);
+            this.Program.PushFragment(name, type);
+            this.EnterBlock(BlockType.Common);
         }
 
         // Returns true if the current fragment is a function fragment
-        public bool InFunction => _IlProgramBuilder.IsFunctionFragment();
+        public bool InFunction => Program.IsFunctionFragment();
 
         // Removes the current fragment and leaves the current symbol table block
         public void PopFragment()
         {
-            LeaveBlock();
-            _IlProgramBuilder.PopFragment();            
+            this.LeaveBlock();
+            this.Program.PopFragment();            
+        }
+
+        public void BindLabel(Label l)
+        {
+            labels.Push(l);
         }
 
         // Adds a new instruction to the current fragment
         public Instruction Emmit(Instruction i)
         {
-            if (Labels.Any())
-                i.Label = Labels.Pop();
-            _IlProgramBuilder.CurrentFragment.AddInstruction(i);
+            if (labels.Any())
+                i.Label = labels.Pop();
+            this.Program.CurrentFragment.AddInstruction(i);
             return i;
         }
 
         public ILProgram Build(AstNode node)
         {
             this.Visit(node);
-            while (this.Labels.Any())
+            while (labels.Any())
                 this.Emmit(new NopInstruction());
-            return this._IlProgramBuilder.Build();
+            return this.Program.Build();
         }
 
         public Operand Visit(AstNode node)
         {
-            return _AstVisitor.Visit(node);
+            return astVisitor.Visit(node);
         }
     }
 }

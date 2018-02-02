@@ -31,7 +31,7 @@ namespace Fl.Engine.IL.Generators
             if (ifnode.Else == null)
             {
                 // Add a label to be patched on the next generated instruction
-                generator.Labels.Push(thenExitPoint);
+                generator.BindLabel(thenExitPoint);
             }
             else
             {
@@ -47,7 +47,7 @@ namespace Fl.Engine.IL.Generators
                 generator.Emmit(@goto);
 
                 // Backpatch the elseEntryPoint (thenExitPoint) here
-                generator.Labels.Push(elseEntryPoint);
+                generator.BindLabel(elseEntryPoint);
 
                 // Generate the label for the (pending) goto instruction
                 var elseExitPoint = generator.Program.NewLabel();
@@ -60,7 +60,7 @@ namespace Fl.Engine.IL.Generators
 
                 // Finally, backpatch the goto to jump from the then's body to avoid
                 // fall through the else's body
-                generator.Labels.Push(elseExitPoint);
+                generator.BindLabel(elseExitPoint);
             }
             return null;
         }

@@ -282,7 +282,7 @@ namespace Fl.Engine.IL.VM
         public void OpCodePreInc()
         {
             PreIncInstruction ui = this.FetchCurrentInstruction<PreIncInstruction>();
-            FlObject left = this.GetFlObjectFromOperand(ui.Destination);
+            FlObject left = this.GetFlObjectFromOperand(ui.Left);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorPreIncr).Invoke(this.SymbolTable, left);
             this.SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
@@ -290,7 +290,7 @@ namespace Fl.Engine.IL.VM
         public void OpCodePreDec()
         {
             PreDecInstruction ui = this.FetchCurrentInstruction<PreDecInstruction>();
-            FlObject left = this.GetFlObjectFromOperand(ui.Destination);
+            FlObject left = this.GetFlObjectFromOperand(ui.Left);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorPreDecr).Invoke(this.SymbolTable, left);
             this.SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
@@ -298,7 +298,7 @@ namespace Fl.Engine.IL.VM
         public void OpCodePostInc()
         {
             PostIncInstruction ui = this.FetchCurrentInstruction<PostIncInstruction>();
-            FlObject left = this.GetFlObjectFromOperand(ui.Destination);
+            FlObject left = this.GetFlObjectFromOperand(ui.Left);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorPostIncr).Invoke(this.SymbolTable, left);
             this.SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
@@ -306,7 +306,7 @@ namespace Fl.Engine.IL.VM
         public void OpCodePostDec()
         {
             PostDecInstruction ui = this.FetchCurrentInstruction<PostDecInstruction>();
-            FlObject left = this.GetFlObjectFromOperand(ui.Destination);
+            FlObject left = this.GetFlObjectFromOperand(ui.Left);
             FlObject result = left.Type.GetStaticMethod(FlType.OperatorPostDecr).Invoke(this.SymbolTable, left);
             this.SymbolTable.GetSymbol(ui.Destination.Name).UpdateBinding(result);
         }
@@ -390,7 +390,7 @@ namespace Fl.Engine.IL.VM
                 this.HandleNativeCall();
                 return;
             }
-            this.Frames.Push(new Frame(ci.Func.ToString(), this.Frame.Parameters));
+            this.Frames.Push(new Frame(ci.Func.ToString(), new Stack<FlObject>(this.Frame.Parameters)));
         }
 
         private void HandleNativeCall()

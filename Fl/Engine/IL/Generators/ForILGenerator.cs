@@ -22,7 +22,7 @@ namespace Fl.Engine.IL.Generators
 
             // Generate the goto to re-test the condition (the destination is the next instruction: eblock)
             Label entryPoint = generator.Program.NewLabel();
-            generator.Labels.Push(entryPoint);
+            generator.BindLabel(entryPoint);
 
             // Generate an eblock instruction for the rest of the for-block
             generator.EnterBlock(BlockType.Loop, entryPoint, exitPoint);
@@ -46,7 +46,7 @@ namespace Fl.Engine.IL.Generators
             generator.Emmit(new GotoInstruction(entryPoint));
 
             // Backpatch the exit label for the for-block
-            generator.Labels.Push(exitPoint);
+            generator.BindLabel(exitPoint);
 
             // Leave the for-block
             generator.LeaveBlock();
