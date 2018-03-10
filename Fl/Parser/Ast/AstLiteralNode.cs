@@ -10,12 +10,12 @@ namespace Fl.Parser.Ast
 
         public AstLiteralNode(Token t)
         {
-            Literal = t;
+            this.Literal = t;
         }
 
         public override string ToString()
         {
-            return Literal.Value.ToString();
+            return this.Literal.Value.ToString();
         }
     }
 }

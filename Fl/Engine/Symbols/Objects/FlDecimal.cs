@@ -7,22 +7,22 @@ namespace Fl.Engine.Symbols.Objects
 {
     public class FlDecimal : FlInstance
     {
-        private decimal _RawValue;
+        private decimal rawValue;
 
         public FlDecimal(decimal value)
         {
-            _RawValue = value;
+            this.rawValue = value;
         }
 
         public override FlType Type => FlDecimalType.Instance;
 
-        public override object RawValue => _RawValue;
+        public override object RawValue => this.rawValue;
 
-        public decimal Value { get => _RawValue; set => _RawValue = value; }
+        public decimal Value { get => this.rawValue; set => this.rawValue = value; }
 
         public override FlObject Clone()
         {
-            return new FlDecimal(_RawValue);
+            return new FlDecimal(this.rawValue);
         }
     }
 }

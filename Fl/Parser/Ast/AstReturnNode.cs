@@ -11,8 +11,8 @@ namespace Fl.Parser.Ast
 
         public AstReturnNode(Token keyword, AstTupleNode expr)
         {
-            Keyword = keyword;
-            ReturnTuple = expr;
+            this.Keyword = keyword;
+            this.ReturnTuple = expr;
         }
     }
 }

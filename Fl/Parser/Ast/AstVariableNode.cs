@@ -11,7 +11,7 @@ namespace Fl.Parser.Ast
 
         public AstVariableNode(AstVariableTypeNode variableType)
         {
-            VarType = variableType;
+            this.VarType = variableType;
         }
     }
 }

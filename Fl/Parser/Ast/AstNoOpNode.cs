@@ -10,7 +10,7 @@ namespace Fl.Parser.Ast
 
         public AstNoOpNode(Token emptystmt)
         {
-            EmptyStatement = emptystmt;
+            this.EmptyStatement = emptystmt;
         }
     }
 }

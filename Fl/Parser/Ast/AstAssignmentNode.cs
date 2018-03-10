@@ -10,8 +10,8 @@ namespace Fl.Parser.Ast
 
         public AstAssignmentNode(Token assignmentOp, AstNode expression)
         {
-            AssignmentOp = assignmentOp;
-            Expression = expression;
+            this.AssignmentOp = assignmentOp;
+            this.Expression = expression;
         }
     }
 }

@@ -12,10 +12,10 @@ namespace Fl.Parser.Ast
 
         public AstIfNode(Token keyword, AstNode condition, AstNode thenbranch, AstNode elsebranch)
         {
-            Keyword = keyword;
-            Condition = condition;
-            Then = thenbranch;
-            Else = elsebranch;
+            this.Keyword = keyword;
+            this.Condition = condition;
+            this.Then = thenbranch;
+            this.Else = elsebranch;
         }
     }
 }

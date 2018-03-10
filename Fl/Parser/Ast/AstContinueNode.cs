@@ -10,7 +10,7 @@ namespace Fl.Parser.Ast
 
         public AstContinueNode(Token keyword)
         {
-            Keyword = keyword;
+            this.Keyword = keyword;
         }
     }
 }

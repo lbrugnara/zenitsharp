@@ -11,8 +11,8 @@ namespace Fl.Parser.Ast
 
         public AstAccessorNode(Token identifier, AstNode enclosing)
         {
-            Identifier = identifier;
-            Enclosing = enclosing;
+            this.Identifier = identifier;
+            this.Enclosing = enclosing;
         }
     }
 }

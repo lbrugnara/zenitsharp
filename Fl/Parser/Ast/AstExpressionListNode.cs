@@ -11,9 +11,9 @@ namespace Fl.Parser.Ast
 
         public AstExpressionListNode(List<AstNode> args)
         {
-            Expressions = args;
+            this.Expressions = args;
         }
 
-        public int Count => Expressions?.Count ?? 0;
+        public int Count => this.Expressions?.Count ?? 0;
     }
 }

@@ -11,9 +11,9 @@ namespace Fl.Parser.Ast
 
         public AstNullCoalescingNode(Token keyword, AstNode left, AstNode right)
         {
-            Keyword = keyword;
-            Left = left;
-            Right = right;
+            this.Keyword = keyword;
+            this.Left = left;
+            this.Right = right;
         }
     }
 }

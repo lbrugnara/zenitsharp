@@ -11,7 +11,7 @@ namespace Fl.Parser.Ast
 
         public AstParametersNode(List<Token> parameters)
         {
-            Parameters = parameters;
+            this.Parameters = parameters;
         }
     }
 }

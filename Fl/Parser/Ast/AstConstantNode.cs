@@ -13,8 +13,8 @@ namespace Fl.Parser.Ast
 
         public AstConstantNode(Token type, List<Tuple<Token, AstNode>> constdefs)
         {
-            Type = type;
-            Constants = constdefs;
+            this.Type = type;
+            this.Constants = constdefs;
         }
     }
 }

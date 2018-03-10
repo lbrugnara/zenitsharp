@@ -13,9 +13,9 @@ namespace Fl.Parser.Ast
 
         public AstFuncDeclNode(Token name, AstParametersNode parameters, List<AstNode> body)
         {
-            Identifier = name;
-            Parameters = parameters;
-            Body = body;
+            this.Identifier = name;
+            this.Parameters = parameters;
+            this.Body = body;
         }
     }
 }

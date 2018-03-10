@@ -12,9 +12,9 @@ namespace Fl.Parser.Ast
 
         public AstCallableNode(AstNode callable, AstExpressionListNode args, Token newt = null)
         {
-            Callable = callable;
-            Arguments = args;
-            New = newt;
+            this.Callable = callable;
+            this.Arguments = args;
+            this.New = newt;
         }
     }
 }

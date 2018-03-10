@@ -10,7 +10,7 @@ namespace Fl.Parser.Ast
         public AstVariableAssignmentNode(AstAccessorNode accessor, Token assignmentOp, AstNode expression)
             : base(assignmentOp, expression)
         {
-            Accessor = accessor;
+            this.Accessor = accessor;
         }
     }
 }

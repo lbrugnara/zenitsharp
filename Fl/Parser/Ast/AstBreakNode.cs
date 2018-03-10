@@ -11,8 +11,8 @@ namespace Fl.Parser.Ast
 
         public AstBreakNode(Token keyword, AstNode number)
         {
-            Keyword = keyword;
-            Number = number;
+            this.Keyword = keyword;
+            this.Number = number;
         }
     }
 }

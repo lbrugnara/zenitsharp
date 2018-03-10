@@ -11,9 +11,9 @@ namespace Fl.Parser.Ast
 
         public AstBinaryNode(Token opToken, AstNode left, AstNode right)
         {
-            Operator = opToken;
-            Left = left;
-            Right = right;
+            this.Operator = opToken;
+            this.Left = left;
+            this.Right = right;
         }
     }
 }

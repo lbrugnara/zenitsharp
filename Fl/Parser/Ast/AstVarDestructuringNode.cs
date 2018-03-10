@@ -13,8 +13,8 @@ namespace Fl.Parser.Ast
         public AstVarDestructuringNode(AstVariableTypeNode variableType, List<Token> variables, AstNode destructInit)
             : base(variableType)
         {
-            Variables = variables;
-            DestructInit = destructInit;
+            this.Variables = variables;
+            this.DestructInit = destructInit;
         }
     }
 }

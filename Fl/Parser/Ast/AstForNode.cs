@@ -14,11 +14,11 @@ namespace Fl.Parser.Ast
 
         public AstForNode(Token keyword, AstNode init, AstNode condition, AstNode increment, AstNode body)
         {
-            Keyword = keyword;
-            Init = init;
-            Condition = condition;
-            Increment = increment;
-            Body = body;
+            this.Keyword = keyword;
+            this.Init = init;
+            this.Condition = condition;
+            this.Increment = increment;
+            this.Body = body;
         }
     }
 }

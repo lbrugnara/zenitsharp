@@ -13,27 +13,27 @@ namespace Fl.Parser
         /// <summary>
         /// Input source
         /// </summary>
-        private string _Source;
+        private string source;
         
         /// <summary>
         /// Keep track of the current char of source that is being pointed
         /// </summary>
-        private int _Pointer;
+        private int pointer;
         
         /// <summary>
         /// Track lines numbers
         /// </summary>
-        private int _Line;
+        private int line;
 
         /// <summary>
         /// Track column numbers
         /// </summary>
-        private int _Col;
+        private int col;
 
         /// <summary>
         /// Set of Fl's reserved words
         /// </summary>
-        private static readonly Dictionary<string, TokenType> _Keywords = new Dictionary<string, TokenType>()
+        private static readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>()
         {
             { "null", TokenType.Null },
             { "true", TokenType.Boolean },
@@ -58,10 +58,10 @@ namespace Fl.Parser
 
         public Lexer(string source)
         {
-            _Source = source;
-            _Pointer = 0;
-            _Line = 1;
-            _Col = 0;
+            this.source = source;
+            this.pointer = 0;
+            this.line = 1;
+            this.col = 0;
         }
 
         #endregion
@@ -73,18 +73,18 @@ namespace Fl.Parser
         /// </summary>
         private void Reset()
         {
-            _Pointer = 0;
-            _Line = 1;
-            _Col = 0;
+            this.pointer = 0;
+            this.line = 1;
+            this.col = 0;
         }
 
-        private bool HasInput() => _Pointer < _Source.Length;
+        private bool HasInput() => this.pointer < this.source.Length;
 
         /// <summary>
         /// Peek the next character if available, '\0' otherwise
         /// </summary>
         /// <returns></returns>
-        private char Peek() => _Pointer < _Source.Length ? _Source[_Pointer] : '\0';
+        private char Peek() => this.pointer < this.source.Length ? this.source[this.pointer] : '\0';
 
         /// <summary>
         /// Peek a number of characters from the current position
@@ -95,7 +95,7 @@ namespace Fl.Parser
         {
             if (count <= 0)
                 throw new ArgumentException("Amount must be greater than 0");
-            return _Pointer + count <= _Source.Length ? _Source.Substring(_Pointer, count) : null;
+            return this.pointer + count <= this.source.Length ? this.source.Substring(this.pointer, count) : null;
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace Fl.Parser
         {
             if (offset <= 0)
                 throw new ArgumentException("Amount must be greater than 0");
-            return _Pointer + offset <= _Source.Length ? _Source[_Pointer + offset] : '\0';
+            return this.pointer + offset <= this.source.Length ? this.source[this.pointer + offset] : '\0';
         }
 
         /// <summary>
@@ -116,9 +116,9 @@ namespace Fl.Parser
         /// <returns></returns>
         private char Consume()
         {
-            char c = _Pointer < _Source.Length ? _Source[_Pointer] : '\0';
-            _Pointer++;
-            _Col++;
+            char c = this.pointer < this.source.Length ? this.source[this.pointer] : '\0';
+            this.pointer++;
+            this.col++;
             return c;
         }
 
@@ -131,9 +131,9 @@ namespace Fl.Parser
         {
             if (count <= 0)
                 throw new ArgumentException("Amount must be greater than 0");
-            string str = _Pointer + count < _Source.Length ? _Source.Substring(_Pointer, count) : null;
-            _Pointer += count;
-            _Col += count;
+            string str = this.pointer + count < this.source.Length ? this.source.Substring(this.pointer, count) : null;
+            this.pointer += count;
+            this.col += count;
             return str;
         }
 
@@ -144,36 +144,36 @@ namespace Fl.Parser
         /// </summary>
         public Token NextToken()
         {
-            char c = Peek();
+            char c = this.Peek();
 
             // Consume new line and update line and col number
             if (c == '\n')
             {
-                Consume();
-                _Line++;
-                _Col = 0;
+                this.Consume();
+                this.line++;
+                this.col = 0;
             }
 
             // Consume Whitespaces and Comments
-            while (HasInput() && (char.IsWhiteSpace(Peek()) && Consume() != '\0' || RemoveComment()));
+            while (this.HasInput() && (char.IsWhiteSpace(Peek()) && this.Consume() != '\0' || this.RemoveComment()));
 
-            if (!HasInput())
+            if (!this.HasInput())
                 return null;
 
             // Check tokens
-            Token t = CheckPunctuation()
-                    ?? CheckParen()
-                    ?? CheckBrace()
-                    ?? CheckBracket()
-                    ?? CheckChar()
-                    ?? CheckNumber()
-                    ?? CheckLogicalOperator()
-                    ?? CheckArithmeticOperators()
-                    ?? CheckString()
-                    ?? CheckIdentifier();
+            Token t = this.CheckPunctuation()
+                    ?? this.CheckParen()
+                    ?? this.CheckBrace()
+                    ?? this.CheckBracket()
+                    ?? this.CheckChar()
+                    ?? this.CheckNumber()
+                    ?? this.CheckLogicalOperator()
+                    ?? this.CheckArithmeticOperators()
+                    ?? this.CheckString()
+                    ?? this.CheckIdentifier();
 
-            if (t == null && HasInput())
-                throw new LexerException($"Unrecognized symbol '{_Source[_Pointer]}'");
+            if (t == null && this.HasInput())
+                throw new LexerException($"Unrecognized symbol '{this.source[this.pointer]}'");
             return t;
         }
 
@@ -190,18 +190,18 @@ namespace Fl.Parser
 
         private bool RemoveComment()
         {
-            string s = Peek(2);
+            string s = this.Peek(2);
             char c = '\n';
             if (s == "//")
             {
-                while (HasInput() && (c = Peek()) != '\n') Consume();
-                Consume();
+                while (this.HasInput() && (c = this.Peek()) != '\n') this.Consume();
+                this.Consume();
                 return true;
             }
             else if (s == "/*")
             {
-                while (HasInput() && (s = Peek(2)) != "*/") Consume();
-                Consume(2);
+                while (this.HasInput() && (s = this.Peek(2)) != "*/") this.Consume();
+                this.Consume(2);
                 return true;
             }
             return false;
@@ -209,77 +209,77 @@ namespace Fl.Parser
 
         private Token CheckPunctuation()
         {
-            char c = Peek();
-            int line = _Line;
-            int col = _Col;
+            char c = this.Peek();
+            int line = this.line;
+            int col = this.col;
             switch (c)
             {
                 case ';':
-                    return BuildToken(TokenType.Semicolon, Consume(), line, col);
+                    return this.BuildToken(TokenType.Semicolon, this.Consume(), line, col);
                 case ',':
-                    return BuildToken(TokenType.Comma, Consume(), line, col);
+                    return this.BuildToken(TokenType.Comma, this.Consume(), line, col);
                 case '.':
-                    return BuildToken(TokenType.Dot, Consume(), line, col);
+                    return this.BuildToken(TokenType.Dot, this.Consume(), line, col);
                 case '?':
-                    if (Peek(2) == "??")
-                        return BuildToken(TokenType.QuestionQuestion, Consume(2), line, col);
-                    return BuildToken(TokenType.Question, Consume(), line, col);
+                    if (this.Peek(2) == "??")
+                        return this.BuildToken(TokenType.QuestionQuestion, this.Consume(2), line, col);
+                    return this.BuildToken(TokenType.Question, this.Consume(), line, col);
                 case ':':
-                    return BuildToken(TokenType.Colon, Consume(), line, col);
+                    return this.BuildToken(TokenType.Colon, this.Consume(), line, col);
             }
             return null;
         }
 
         private Token CheckParen()
         {
-            char c = Peek();
+            char c = this.Peek();
             if (c != '(' && c != ')')
                 return null;
-            int line = _Line;
-            int col = _Col;
-            return BuildToken(c == '(' ? TokenType.LeftParen : TokenType.RightParen, Consume(), line, col);
+            int line = this.line;
+            int col = this.col;
+            return this.BuildToken(c == '(' ? TokenType.LeftParen : TokenType.RightParen, this.Consume(), line, col);
         }
 
         private Token CheckBrace()
         {
-            char c = Peek();
+            char c = this.Peek();
             if (c != '{' && c != '}')
                 return null;
-            int line = _Line;
-            int col = _Col;
-            return BuildToken(c == '{' ? TokenType.LeftBrace : TokenType.RightBrace, Consume(), line, col);
+            int line = this.line;
+            int col = this.col;
+            return this.BuildToken(c == '{' ? TokenType.LeftBrace : TokenType.RightBrace, this.Consume(), line, col);
         }
 
         private Token CheckBracket()
         {
-            char c = Peek();
+            char c = this.Peek();
             if (c != '[' && c != ']')
                 return null;
-            int line = _Line;
-            int col = _Col;
-            return BuildToken(c == '[' ? TokenType.LeftBracket : TokenType.RightBracket, Consume(), line, col);
+            int line = this.line;
+            int col = this.col;
+            return this.BuildToken(c == '[' ? TokenType.LeftBracket : TokenType.RightBracket, this.Consume(), line, col);
         }
 
         private Token CheckNumber()
         {
-            char c = Peek();
+            char c = this.Peek();
             if (!char.IsDigit(c))
                 return null;
 
-            int col = _Col;
-            int line = _Line;
+            int col = this.col;
+            int line = this.line;
             TokenType type = TokenType.Integer;
-            string val = Consume().ToString();
-            while (HasInput())
+            string val = this.Consume().ToString();
+            while (this.HasInput())
             {
-                c = Peek();
+                c = this.Peek();
                 if (char.IsDigit(c))
                 {
-                    val += Consume();
+                    val += this.Consume();
                 }
-                else if (c == '.' && char.IsDigit(Lookahead(1)))
+                else if (c == '.' && char.IsDigit(this.Lookahead(1)))
                 {
-                    val += Consume();
+                    val += this.Consume();
                     type = TokenType.Double;
                 }
                 else if (c == 'F' || c == 'f')
@@ -287,7 +287,7 @@ namespace Fl.Parser
                     if (type != TokenType.Double)
                         throw new Exception($"Invalid character '{c}'");
                     // Do not add the F now, just Consume and let's try what happens
-                    Consume();
+                    this.Consume();
                     type = TokenType.Float;
                 }
                 else if (c == 'M' ||c == 'm')
@@ -295,7 +295,7 @@ namespace Fl.Parser
                     if (type != TokenType.Double)
                         throw new Exception($"Invalid character '{c}'");
                     // Do not add the M now, just Consume and let's try what happens
-                    Consume();
+                    this.Consume();
                     type = TokenType.Decimal;
                 }
                 else
@@ -304,72 +304,72 @@ namespace Fl.Parser
                 }
             }
 
-            return BuildToken(type, val, line, col);
+            return this.BuildToken(type, val, line, col);
         }
 
         private Token CheckLogicalOperator()
         {
-            int col = _Col;
-            int line = _Line;
+            int col = this.col;
+            int line = this.line;
             TokenType? type = null;
             string val = null;
             
-            char c = Peek();
+            char c = this.Peek();
             switch (c)
             {
                 case '>':
                     type = TokenType.GreatThan;
-                    val = Consume().ToString();
-                    if (Peek() == '=')
+                    val = this.Consume().ToString();
+                    if (this.Peek() == '=')
                     {
                         type = TokenType.GreatThanEqual;
-                        val += Consume();
+                        val += this.Consume();
                     }
                     break;
                 case '<':
                     type = TokenType.LessThan;
-                    val = Consume().ToString();
-                    if (Peek() == '=')
+                    val = this.Consume().ToString();
+                    if (this.Peek() == '=')
                     {
                         type = TokenType.LessThanEqual;
-                        val += Consume().ToString();
+                        val += this.Consume().ToString();
                     }
                     break;
                 case '!':
                     type = TokenType.Not;
-                    val = Consume().ToString();                    
-                    if (Peek() == '=')
+                    val = this.Consume().ToString();                    
+                    if (this.Peek() == '=')
                     {
                         type = TokenType.NotEqual;
-                        val += Consume();
+                        val += this.Consume();
                     }
                     break;
                 case '=':
                     type = TokenType.Assignment;
-                    val = Consume().ToString();
-                    if (Peek() == '=')
+                    val = this.Consume().ToString();
+                    if (this.Peek() == '=')
                     {
                         type = TokenType.Equal;
-                        val += Consume();
+                        val += this.Consume();
                     }
-                    else if (Peek() == '>')
+                    else if (this.Peek() == '>')
                     {
                         type = TokenType.RightArrow;
-                        val += Consume();
+                        val += this.Consume();
                     }
                     break;
                 case '&':
-                    if (Peek(2) == "&&")
+                    if (this.Peek(2) == "&&")
                     {
                         type = TokenType.And;
-                        val = Consume(2);
+                        val = this.Consume(2);
                     }
                     break;
                 case '|':
-                    if (Peek(2) == "||")
+                    if (this.Peek(2) == "||")
                     {
                         type = TokenType.Or;
-                        val = Consume(2);
+                        val = this.Consume(2);
                     }
                     break;
                 default:
@@ -379,108 +379,108 @@ namespace Fl.Parser
             if (!type.HasValue)
                 return null;
 
-            return BuildToken(type.Value, val, line, col);
+            return this.BuildToken(type.Value, val, line, col);
         }
 
         private Token CheckArithmeticOperators()
         {
-            char c = Peek();
+            char c = this.Peek();
 
-            int col = _Col;
-            int line = _Line;
+            int col = this.col;
+            int line = this.line;
             string val = null;
             TokenType? type = null;
             switch (c)
             {
                 case '+':
                     type = TokenType.Addition;
-                    val = Consume().ToString();
-                    if (Peek() == '+')
+                    val = this.Consume().ToString();
+                    if (this.Peek() == '+')
                     {
                         type = TokenType.Increment;
-                        val += Consume().ToString();
+                        val += this.Consume().ToString();
                     }
-                    else if (Peek() == '=')
+                    else if (this.Peek() == '=')
                     {
                         type = TokenType.IncrementAndAssign;
-                        val += Consume().ToString();
+                        val += this.Consume().ToString();
                     }
                     break;
                 case '-':
                     type = TokenType.Minus;
-                    val = Consume().ToString();
-                    if (Peek() == '-')
+                    val = this.Consume().ToString();
+                    if (this.Peek() == '-')
                     {
                         type = TokenType.Decrement;
-                        val += Consume().ToString();
+                        val += this.Consume().ToString();
                     }
-                    else if (Peek() == '=')
+                    else if (this.Peek() == '=')
                     {
                         type = TokenType.DecrementAndAssign;
-                        val += Consume().ToString();
+                        val += this.Consume().ToString();
                     }
                     break;
                 case '*':
                     type = TokenType.Multiplication;
-                    val = Consume().ToString();
-                    if (Peek() == '=')
+                    val = this.Consume().ToString();
+                    if (this.Peek() == '=')
                     {
                         type = TokenType.MultAndAssign;
-                        val += Consume().ToString();
+                        val += this.Consume().ToString();
                     }
                     break;
                 case '/':
                     type = TokenType.Division;
-                    val = Consume().ToString();
-                    if (Peek() == '=')
+                    val = this.Consume().ToString();
+                    if (this.Peek() == '=')
                     {
                         type = TokenType.DivideAndAssign;
-                        val += Consume().ToString();
+                        val += this.Consume().ToString();
                     }
                     break;
                 default:
                     return null;
             }
-            return BuildToken(type.Value, val, line, col);
+            return this.BuildToken(type.Value, val, line, col);
         }
 
         private Token CheckIdentifier()
         {
-            char c = Peek();
+            char c = this.Peek();
 
             if (!char.IsLetter(c) && c != '_' && c != '$')
                 return null;
 
-            int line = _Line;
-            int col = _Col;
-            string val = Consume().ToString();
-            while (HasInput())
+            int line = this.line;
+            int col = this.col;
+            string val = this.Consume().ToString();
+            while (this.HasInput())
             {
-                c = Peek();
+                c = this.Peek();
                 if (!char.IsLetterOrDigit(c) && c != '_')
                     break;
-                val += Consume();
+                val += this.Consume();
             }
 
-            return BuildToken(_Keywords.ContainsKey(val) ? _Keywords[val] : TokenType.Identifier, val, line, col);
+            return this.BuildToken(keywords.ContainsKey(val) ? keywords[val] : TokenType.Identifier, val, line, col);
         }
 
         private Token CheckChar()
         {
-            char c = Peek();
+            char c = this.Peek();
 
             if (c != '\'')
                 return null;
 
-            int line = _Line;
-            int col = _Col;
-            Consume(); // First '
+            int line = this.line;
+            int col = this.col;
+            this.Consume(); // First '
             string val = "";
             // Escaped char
-            if (Peek() == '\\')
+            if (this.Peek() == '\\')
             {
-                Consume(); // Consume the backslash
-                var ec = Consume(); // Consume the escaped char
+                this.Consume(); // Consume the backslash
+                var ec = this.Consume(); // Consume the escaped char
                 switch (ec)
                 {
                     case 'n':
@@ -499,43 +499,43 @@ namespace Fl.Parser
             else
             {
                 // Consume char
-                val += Consume();
+                val += this.Consume();
             }
 
             if (c != '\'')
                 throw new LexerException("Bad char literal");
 
-            Consume(); // Last '
+            this.Consume(); // Last '
 
-            return BuildToken(TokenType.Char, val, line, col);
+            return this.BuildToken(TokenType.Char, val, line, col);
         }
 
         private Token CheckString()
         {
-            char c = Peek();
+            char c = this.Peek();
 
             if (c != '"')
                 return null;
 
-            int line = _Line;
-            int col = _Col;
-            Consume(); // First "
+            int line = this.line;
+            int col = this.col;
+            this.Consume(); // First "
             string val = "";
             c = '\0';
-            while (HasInput())
+            while (this.HasInput())
             {
-                c = Peek();
+                c = this.Peek();
                 if (c == '"')
                     break;
-                val += Consume();
+                val += this.Consume();
             }
 
             if (c != '"')
                 throw new LexerException("Bad string literal");
 
-            Consume(); // Last "
+            this.Consume(); // Last "
 
-            return BuildToken(TokenType.String, val, line, col);
+            return this.BuildToken(TokenType.String, val, line, col);
         }
     }
 }

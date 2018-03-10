@@ -7,22 +7,22 @@ namespace Fl.Engine.Symbols.Objects
 {
     public class FlFloat : FlInstance
     {
-        private float _RawValue;
+        private float rawValue;
 
         public FlFloat(float value)
         {
-            _RawValue = value;
+            this.rawValue = value;
         }
 
         public override FlType Type => FlFloatType.Instance;
 
-        public override object RawValue => _RawValue;
+        public override object RawValue => this.rawValue;
 
-        public float Value { get => _RawValue; set => _RawValue = value; }
+        public float Value { get => this.rawValue; set => this.rawValue = value; }
 
         public override FlObject Clone()
         {
-            return new FlFloat(_RawValue);
+            return new FlFloat(this.rawValue);
         }
     }
 }

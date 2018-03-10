@@ -11,7 +11,7 @@ namespace Fl.Parser.Ast
 
         public AstDeclarationNode(List<AstNode> statements)
         {
-            Statements = statements;
+            this.Statements = statements;
         }
     }
 }

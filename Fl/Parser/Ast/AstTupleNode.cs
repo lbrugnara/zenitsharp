@@ -11,12 +11,12 @@ namespace Fl.Parser.Ast
 
         public AstTupleNode(List<AstNode> init)
         {
-            Items = init;
+            this.Items = init;
         }
 
         public AstTupleNode(AstExpressionListNode exprlist)
         {
-            Items = exprlist.Expressions;
+            this.Items = exprlist.Expressions;
         }
     }
 }

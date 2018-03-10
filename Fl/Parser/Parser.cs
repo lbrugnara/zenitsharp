@@ -16,29 +16,29 @@ namespace Fl.Parser
         /// <summary>
         /// Stream of tokens
         /// </summary>
-        private List<Token> _Tokens;
+        private List<Token> tokens;
 
         /// <summary>
         /// Pointer to keep track of the current position
         /// </summary>
-        private int _Pointer;
+        private int pointer;
 
-        private List<ParserException> _ParsingErrors;
+        private List<ParserException> parsingErrors;
         #endregion
 
         #region Constructor
 
         public AstNode Parse(List<Token> tokens)
         {
-            _Pointer = 0;
-            _Tokens = tokens;
-            _ParsingErrors = new List<ParserException>();
-            return Program();
+            this.pointer = 0;
+            this.tokens = tokens;
+            this.parsingErrors = new List<ParserException>();
+            return this.Program();
         }
 
         #endregion
 
-        public ReadOnlyCollection<ParserException> ParsingErrors => new ReadOnlyCollection<ParserException>(_ParsingErrors);
+        public ReadOnlyCollection<ParserException> ParsingErrors => new ReadOnlyCollection<ParserException>(this.parsingErrors);
 
         #region Parser state
 
@@ -53,7 +53,7 @@ namespace Fl.Parser
 
             public ParserCheckpoint(int pointer)
             {
-                Pointer = pointer;
+                this.Pointer = pointer;
             }
         }
 
@@ -63,7 +63,7 @@ namespace Fl.Parser
         /// <returns></returns>
         protected ParserCheckpoint SaveCheckpoint()
         {
-            return new ParserCheckpoint(_Pointer);
+            return new ParserCheckpoint(this.pointer);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Fl.Parser
         /// <param name="checkpoint"></param>
         protected void RestoreCheckpoint(ParserCheckpoint checkpoint)
         {
-            _Pointer = checkpoint.Pointer;
+            this.pointer = checkpoint.Pointer;
         }
 
         #endregion
@@ -81,7 +81,7 @@ namespace Fl.Parser
 
         private bool HasInput()
         {
-            return _Pointer < _Tokens.Count;
+            return this.pointer < this.tokens.Count;
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Fl.Parser
         /// <returns></returns>
         private bool Match(params TokenType[] types)
         {
-            return MatchFrom(0, types);
+            return this.MatchFrom(0, types);
         }
 
         /// <summary>
@@ -105,13 +105,13 @@ namespace Fl.Parser
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
 
             var l = types.Length;
-            if (l + _Pointer + offset > _Tokens.Count || _Pointer + offset < 0)
+            if (l + this.pointer + offset > this.tokens.Count || this.pointer + offset < 0)
                 return false;
             for (int i = 0; i < types.Length; i++)
             {
                 if (types[i] == TokenType.Unknown)
                     continue;
-                if (_Tokens[_Pointer + i + offset].Type != types[i])
+                if (this.tokens[this.pointer + i + offset].Type != types[i])
                     return false;
             }
             return true;
@@ -124,7 +124,7 @@ namespace Fl.Parser
         /// <returns></returns>
         private bool MatchAny(params TokenType[] types)
         {
-            var t = Peek();
+            var t = this.Peek();
             return t != null && types.Contains(t.Type);
         }
 
@@ -136,7 +136,7 @@ namespace Fl.Parser
         private bool MatchAnyFrom(int offset, params TokenType[] types)
         {
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
-            var t = PeekFrom(offset);
+            var t = this.PeekFrom(offset);
             return t != null && types.Contains(t.Type);
         }
 
@@ -152,12 +152,12 @@ namespace Fl.Parser
 
             int q = 0;
             var l = types.Length;
-            if (l + _Pointer + offset > _Tokens.Count)
+            if (l + this.pointer + offset > this.tokens.Count)
                 return 0;
 
             int i = 0;
             bool valid = true;
-            while (valid && i + offset + _Pointer < _Tokens.Count)
+            while (valid && i + offset + this.pointer < this.tokens.Count)
             {
                 for (int j = 0; j < types.Length; j++, i++)
                 {
@@ -166,7 +166,7 @@ namespace Fl.Parser
                         q++;
                         continue;
                     }
-                    if (_Pointer + i + offset >= _Tokens.Count || _Tokens[_Pointer + i + offset].Type != types[j])
+                    if (this.pointer + i + offset >= this.tokens.Count || this.tokens[this.pointer + i + offset].Type != types[j])
                     {
                         valid = false;
                         break;
@@ -183,7 +183,7 @@ namespace Fl.Parser
         /// <returns></returns>
         private Token Peek()
         {
-            return _Pointer < _Tokens.Count ? _Tokens[_Pointer] : null;
+            return this.pointer < this.tokens.Count ? this.tokens[this.pointer] : null;
         }
 
         /// <summary>
@@ -194,8 +194,8 @@ namespace Fl.Parser
         private Token PeekFrom(int offset)
         {
             //if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative");
-            int i = _Pointer + offset;
-            return i >= 0 && i < _Tokens.Count ? _Tokens[i] : null;
+            int i = this.pointer + offset;
+            return i >= 0 && i < this.tokens.Count ? this.tokens[i] : null;
         }
 
         /// <summary>
@@ -204,9 +204,9 @@ namespace Fl.Parser
         /// <returns></returns>
         private Token Consume()
         {
-            if (!HasInput())
+            if (!this.HasInput())
                 return null;
-            return _Tokens[_Pointer++];
+            return this.tokens[this.pointer++];
         }
 
         private string GetSourceContext()
@@ -217,7 +217,7 @@ namespace Fl.Parser
 
         private string GetCurrentLineAndCol()
         {
-            Token t = _Tokens.ElementAtOrDefault(_Pointer - 1);
+            Token t = this.tokens.ElementAtOrDefault(this.pointer - 1);
             return t != null ? $"[Line {t.Line}:{t.Col}]" : "[Line 0:0]";
         }
 
@@ -230,12 +230,12 @@ namespace Fl.Parser
         /// <returns></returns>
         private Token Consume(TokenType type, string message = null)
         {
-            if (!HasInput())
+            if (!this.HasInput())
             {
                 // ; is optional at the end of the input
                 if (type == TokenType.Semicolon)
                 {
-                    var lt = _Tokens.LastOrDefault();
+                    var lt = this.tokens.LastOrDefault();
                     return new Token()
                     {
                         Line = lt?.Line ?? 0,
@@ -245,15 +245,15 @@ namespace Fl.Parser
                     };
                 }
                 
-                throw new ParserException(message ?? $"{GetCurrentLineAndCol()} Expects {type} but received the end of the input: {GetSourceContext()}");
+                throw new ParserException(message ?? $"{this.GetCurrentLineAndCol()} Expects {type} but received the end of the input: {this.GetSourceContext()}");
             }
 
-            if (!Match(type))
+            if (!this.Match(type))
             {
-                throw new ParserException(message ?? $"{GetCurrentLineAndCol()} Expects {type} but received {Peek().Type}: {GetSourceContext()}");
+                throw new ParserException(message ?? $"{this.GetCurrentLineAndCol()} Expects {type} but received {this.Peek().Type}: {this.GetSourceContext()}");
             }
 
-            return _Tokens[_Pointer++];
+            return this.tokens[this.pointer++];
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace Fl.Parser
         /// <param name="t"></param>
         private void Restore(Token t)
         {
-            _Pointer--;
+            this.pointer--;
         }
 
         #endregion
@@ -274,22 +274,22 @@ namespace Fl.Parser
         private AstDeclarationNode Program()
         {            
             List<AstNode> statements = new List<AstNode>();
-            while (HasInput())
+            while (this.HasInput())
             {
                 try
                 {
-                    if (Match(TokenType.Semicolon))
+                    if (this.Match(TokenType.Semicolon))
                     {
-                        Consume();
+                        this.Consume();
                         continue;
                     }
-                    statements.Add(Declaration());
+                    statements.Add(this.Declaration());
                 }
                 catch (ParserException pe)
                 {
-                    _ParsingErrors.Add(pe);
-                    while (HasInput() && !Match(TokenType.Semicolon))
-                        Consume();
+                    this.parsingErrors.Add(pe);
+                    while (this.HasInput() && !this.Match(TokenType.Semicolon))
+                        this.Consume();
                 }
             }
             return new AstDeclarationNode(statements);
@@ -303,19 +303,19 @@ namespace Fl.Parser
         //
         private AstNode Declaration()
         {
-            if (IsVarDeclaration())
+            if (this.IsVarDeclaration())
             {
-                return VarDeclaration();
+                return this.VarDeclaration();
             }
-            else if (Match(TokenType.Constant))
+            else if (this.Match(TokenType.Constant))
             {
-                return ConstDeclaration();
+                return this.ConstDeclaration();
             }
-            else if (Match(TokenType.Function))
+            else if (this.Match(TokenType.Function))
             {
-                return FuncDeclaration();
+                return this.FuncDeclaration();
             }
-            return Statement();
+            return this.Statement();
         }
 
         // Rule:
@@ -323,15 +323,15 @@ namespace Fl.Parser
         private AstVariableNode VarDeclaration()
         {
             AstVariableNode variable = null;
-            if (Match(TokenType.Variable))
+            if (this.Match(TokenType.Variable))
             {
-                variable = ImplicitVarDeclaration();
+                variable = this.ImplicitVarDeclaration();
             }
             else
             {
-                variable = TypedVarDeclaration();
+                variable = this.TypedVarDeclaration();
             }
-            Consume(TokenType.Semicolon);
+            this.Consume(TokenType.Semicolon);
             return variable;
         }
 
@@ -339,16 +339,16 @@ namespace Fl.Parser
         // implicit_var_declaration -> VAR ( IDENTIFIER '=' expression | var_destructuring )';'
         private AstVariableNode ImplicitVarDeclaration()
         {
-            AstVariableTypeNode variableType = new AstVariableTypeNode(Consume(TokenType.Variable));
+            AstVariableTypeNode variableType = new AstVariableTypeNode(this.Consume(TokenType.Variable));
 
             // If there is a left parent present, it is a destructuring declaration
-            if (IsDestructuring())
-                return VarDestructuring(variableType);
+            if (this.IsDestructuring())
+                return this.VarDestructuring(variableType);
             
             // If not it is a common var declaration
-            Token identifier = Consume(TokenType.Identifier);
-            Consume(TokenType.Assignment, "Implicitly typed variables must be initialized");
-            AstNode expression = Expression();
+            Token identifier = this.Consume(TokenType.Identifier);
+            this.Consume(TokenType.Assignment, "Implicitly typed variables must be initialized");
+            AstNode expression = this.Expression();
             return new AstVarDefinitionNode(variableType, new List<Tuple<Token, AstNode>>() { new Tuple<Token, AstNode>(identifier, expression) });
         }
 
@@ -357,27 +357,27 @@ namespace Fl.Parser
         private AstVariableNode TypedVarDeclaration()
         {
             // Get the variable type
-            Token varType = Consume(TokenType.Identifier);
+            Token varType = this.Consume(TokenType.Identifier);
             AstVariableTypeNode variableType = new AstVariableTypeNode(varType);
 
             // If it contains a left bracket, it is an array variable
-            if (Match(TokenType.LeftBracket))
+            if (this.Match(TokenType.LeftBracket))
             {
                 List<Token> dimensions = new List<Token>();
-                while (Match(TokenType.LeftBracket))
+                while (this.Match(TokenType.LeftBracket))
                 {
-                    dimensions.Add(Consume(TokenType.LeftBracket));
-                    dimensions.Add(Consume(TokenType.RightBracket));
+                    dimensions.Add(this.Consume(TokenType.LeftBracket));
+                    dimensions.Add(this.Consume(TokenType.RightBracket));
                 }
                 variableType = new AstVariableTypeNode(varType, dimensions);
             }
 
             // If there is a left parent present, it is a destructuring declaration
-            if (IsDestructuring())
-                return VarDestructuring(variableType);
+            if (this.IsDestructuring())
+                return this.VarDestructuring(variableType);
 
             // If not, it is a simple typed var definition
-            return new AstVarDefinitionNode(variableType, TypedVarDefinition());
+            return new AstVarDefinitionNode(variableType, this.TypedVarDefinition());
         }
 
         // Rule: 
@@ -389,14 +389,14 @@ namespace Fl.Parser
             {
                 // There could be multiple declarations and definitions, so consume the
                 // identifier and the check if it is a definition or just a declaration
-                var id = Consume(TokenType.Identifier);
+                var id = this.Consume(TokenType.Identifier);
 
-                if (Match(TokenType.Assignment) && Consume(TokenType.Assignment) != null)
-                    vars.Add(new Tuple<Token, AstNode>(id, Expression()));
+                if (this.Match(TokenType.Assignment) && this.Consume(TokenType.Assignment) != null)
+                    vars.Add(new Tuple<Token, AstNode>(id, this.Expression()));
                 else
                     vars.Add(new Tuple<Token, AstNode>(id, null));
 
-            } while (Match(TokenType.Comma) && Consume(TokenType.Comma) != null);
+            } while (this.Match(TokenType.Comma) && this.Consume(TokenType.Comma) != null);
 
             return vars;
         }
@@ -410,29 +410,29 @@ namespace Fl.Parser
             // Consume the left hand side: (x,y,z) or (,y,) or (x,,) etc.
             bool hasParenthesis = false;
 
-            if (Match(TokenType.LeftParen) && Consume(TokenType.LeftParen) != null)
+            if (this.Match(TokenType.LeftParen) && this.Consume(TokenType.LeftParen) != null)
                 hasParenthesis = true;
 
             do
             {
-                if (Match(TokenType.Comma))
+                if (this.Match(TokenType.Comma))
                 {
                     tokens.Add(null);
                 }
-                else if (Match(TokenType.Identifier))
+                else if (this.Match(TokenType.Identifier))
                 {
-                    tokens.Add(Consume(TokenType.Identifier));
+                    tokens.Add(this.Consume(TokenType.Identifier));
                 }
-            } while (Match(TokenType.Comma) && Consume(TokenType.Comma) != null);
+            } while (this.Match(TokenType.Comma) && this.Consume(TokenType.Comma) != null);
 
             if (hasParenthesis)
-                Consume(TokenType.RightParen);
+                this.Consume(TokenType.RightParen);
 
             // Destructuring just work with assignment, it is a must
-            Consume(TokenType.Assignment);
+            this.Consume(TokenType.Assignment);
 
             // Get the expression that will need to return a Tuple value, let the runtime check that
-            return new AstVarDestructuringNode(varType, tokens, Expression());
+            return new AstVarDestructuringNode(varType, tokens, this.Expression());
         }
 
         // Rule:
@@ -440,24 +440,24 @@ namespace Fl.Parser
         private AstConstantNode ConstDeclaration()
         {
             // Consume the keyword
-            Consume(TokenType.Constant);
+            this.Consume(TokenType.Constant);
 
             // Get the constant type
-            Token type = Consume(TokenType.Identifier);
+            Token type = this.Consume(TokenType.Identifier);
 
             // Consume multiple constants declarations and definitions
             List<Tuple<Token, AstNode>> constdefs = new List<Tuple<Token, AstNode>>();
             do
             {
-                Token identifier = Consume(TokenType.Identifier);
-                Consume(TokenType.Assignment, "A constant value needs to be defined when declared.");
-                AstNode expression = Expression();
+                Token identifier = this.Consume(TokenType.Identifier);
+                this.Consume(TokenType.Assignment, "A constant value needs to be defined when declared.");
+                AstNode expression = this.Expression();
 
                 constdefs.Add(new Tuple<Token, AstNode>(identifier, expression));
 
-            } while (Match(TokenType.Comma) && Consume(TokenType.Comma) != null);
+            } while (this.Match(TokenType.Comma) && this.Consume(TokenType.Comma) != null);
 
-            Consume(TokenType.Semicolon);
+            this.Consume(TokenType.Semicolon);
 
             return new AstConstantNode(type, constdefs);
         }
@@ -466,23 +466,23 @@ namespace Fl.Parser
         // func_declaration -> "fn" IDENTIFIER "(" func_params? ")" "{" declaration* "}"
         private AstFuncDeclNode FuncDeclaration()
         {
-            Consume(TokenType.Function);
+            this.Consume(TokenType.Function);
 
-            Token name = Consume(TokenType.Identifier);
+            Token name = this.Consume(TokenType.Identifier);
 
-            Consume(TokenType.LeftParen);
+            this.Consume(TokenType.LeftParen);
 
-            AstParametersNode parameters = FuncParameters();
+            AstParametersNode parameters = this.FuncParameters();
 
-            Consume(TokenType.RightParen);
+            this.Consume(TokenType.RightParen);
             
             List<AstNode> decls = new List<AstNode>();
-            Consume(TokenType.LeftBrace);
-            while (!Match(TokenType.RightBrace))
+            this.Consume(TokenType.LeftBrace);
+            while (!this.Match(TokenType.RightBrace))
             {
-                decls.Add(Declaration());
+                decls.Add(this.Declaration());
             }
-            Consume(TokenType.RightBrace);
+            this.Consume(TokenType.RightBrace);
 
             return new AstFuncDeclNode(name, parameters, decls);
         }
@@ -492,11 +492,11 @@ namespace Fl.Parser
         private AstParametersNode FuncParameters()
         {
             List<Token> parameters = new List<Token>();
-            while (Match(TokenType.Identifier))
+            while (this.Match(TokenType.Identifier))
             {
-                parameters.Add(Consume(TokenType.Identifier));
-                if (Match(TokenType.Comma))
-                    Consume();
+                parameters.Add(this.Consume(TokenType.Identifier));
+                if (this.Match(TokenType.Comma))
+                    this.Consume();
             }
             return new AstParametersNode(parameters);
         }
@@ -512,41 +512,41 @@ namespace Fl.Parser
         //	            | block
         private AstNode Statement()
         {
-            if (Match(TokenType.If))
-                return IfStatement();
+            if (this.Match(TokenType.If))
+                return this.IfStatement();
 
-            if (Match(TokenType.LeftBrace))
-                return Block();
+            if (this.Match(TokenType.LeftBrace))
+                return this.Block();
 
-            if (Match(TokenType.While))
-                return WhileStatement();
+            if (this.Match(TokenType.While))
+                return this.WhileStatement();
 
-            if (Match(TokenType.For))
-                return ForStatement();
+            if (this.Match(TokenType.For))
+                return this.ForStatement();
 
-            if (Match(TokenType.Break))
-                return BreakStatement();
+            if (this.Match(TokenType.Break))
+                return this.BreakStatement();
 
-            if (Match(TokenType.Continue))
-                return ContinueStatement();
+            if (this.Match(TokenType.Continue))
+                return this.ContinueStatement();
 
-            if (Match(TokenType.Return))
-                return ReturnStatement();
+            if (this.Match(TokenType.Return))
+                return this.ReturnStatement();
 
-            return ExpressionStatement();
+            return this.ExpressionStatement();
         }
 
         // Rule:
         // return_statement -> 'return' ( expression ( ',' expression )* )? ';'
         private AstReturnNode ReturnStatement()
         {
-            Token kw = Consume(TokenType.Return);
+            Token kw = this.Consume(TokenType.Return);
 
             AstTupleNode expr = null;
-            if (!Match(TokenType.Semicolon))
-                expr = new AstTupleNode(ExpressionList());
+            if (!this.Match(TokenType.Semicolon))
+                expr = new AstTupleNode(this.ExpressionList());
 
-            Consume(TokenType.Semicolon);
+            this.Consume(TokenType.Semicolon);
 
             return new AstReturnNode(kw, expr);
         }
@@ -555,8 +555,8 @@ namespace Fl.Parser
         // continue_statement -> "continue" ";"
         private AstContinueNode ContinueStatement()
         {
-            var cont = new AstContinueNode(Consume(TokenType.Continue));
-            Consume(TokenType.Semicolon);
+            var cont = new AstContinueNode(this.Consume(TokenType.Continue));
+            this.Consume(TokenType.Semicolon);
             return cont;
         }
 
@@ -565,10 +565,10 @@ namespace Fl.Parser
         private AstBreakNode BreakStatement()
         {
             AstNode nbreaks = null;
-            Token kw = Consume(TokenType.Break);
-            if (Match(TokenType.Integer))
-                nbreaks = new AstLiteralNode(Consume(TokenType.Integer));
-            Consume(TokenType.Semicolon);
+            Token kw = this.Consume(TokenType.Break);
+            if (this.Match(TokenType.Integer))
+                nbreaks = new AstLiteralNode(this.Consume(TokenType.Integer));
+            this.Consume(TokenType.Semicolon);
             return new AstBreakNode(kw, nbreaks);
         }
 
@@ -576,16 +576,16 @@ namespace Fl.Parser
         // parenthesized_expr -> "(" expression ")" ( statement | ";" )
         private (AstNode, AstNode) ParenthesizedStatement()
         {
-            AstNode expression = ParenthesizedExpression();
-            AstNode stmt = Match(TokenType.Semicolon) ? new AstNoOpNode(Consume(TokenType.Semicolon)) : Statement();
+            AstNode expression = this.ParenthesizedExpression();
+            AstNode stmt = this.Match(TokenType.Semicolon) ? new AstNoOpNode(this.Consume(TokenType.Semicolon)) : this.Statement();
             return (expression, stmt);
         }
 
         private AstNode ParenthesizedExpression()
         {
-            Consume(TokenType.LeftParen);
-            AstNode expression = Expression();
-            Consume(TokenType.RightParen);
+            this.Consume(TokenType.LeftParen);
+            AstNode expression = this.Expression();
+            this.Consume(TokenType.RightParen);
             return expression;
         }
 
@@ -593,8 +593,8 @@ namespace Fl.Parser
         // braced_expr -> expression block
         private (AstNode, AstNode) BracedStatement()
         {
-            AstNode expression = Expression();
-            AstNode block = Block();
+            AstNode expression = this.Expression();
+            AstNode block = this.Block();
             return (expression, block);
         }
 
@@ -602,11 +602,11 @@ namespace Fl.Parser
         // while_statement -> "while" ( parenthesized_expr | braced_expr )
         private AstNode WhileStatement()
         {
-            Token kw = Consume(TokenType.While);
+            Token kw = this.Consume(TokenType.While);
 
             AstNode condition = null;
             AstNode body = null;
-            (condition, body) = Match(TokenType.LeftParen) ? ParenthesizedStatement() : BracedStatement();
+            (condition, body) = this.Match(TokenType.LeftParen) ? this.ParenthesizedStatement() : this.BracedStatement();
             return new AstWhileNode(kw, condition, body);
         }
 
@@ -617,48 +617,48 @@ namespace Fl.Parser
         // 			      | "for" for_initializer? ";" expression? ";" for_iterator? block
         private AstForNode ForStatement()
         {
-            if (Match(TokenType.For, TokenType.LeftParen))
-                return ParenthesizedForStatemet();
+            if (this.Match(TokenType.For, TokenType.LeftParen))
+                return this.ParenthesizedForStatemet();
 
-            Token kw = Consume(TokenType.For);
+            Token kw = this.Consume(TokenType.For);
             AstNode forInitializer = null;
             AstNode expression = null;
             AstNode forIterator = null;
             AstNode body = null;
 
             // Initializer
-            if (Match(TokenType.Semicolon))
+            if (this.Match(TokenType.Semicolon))
             {
-                forInitializer = new AstNoOpNode(Consume());
+                forInitializer = new AstNoOpNode(this.Consume());
             }
             else
             {
-                forInitializer = ForInitializer();
-                Consume(TokenType.Semicolon);
+                forInitializer = this.ForInitializer();
+                this.Consume(TokenType.Semicolon);
             }
             // Expression
-            if (Match(TokenType.Semicolon))
+            if (this.Match(TokenType.Semicolon))
             {
-                expression = new AstNoOpNode(Consume());
+                expression = new AstNoOpNode(this.Consume());
             }
             else
             {
-                expression = Expression();
-                Consume(TokenType.Semicolon);
+                expression = this.Expression();
+                this.Consume(TokenType.Semicolon);
             }
 
             // Iterator
-            if (Match(TokenType.LeftBrace))
+            if (this.Match(TokenType.LeftBrace))
             {
-                forIterator = new AstNoOpNode(Peek()); // Get a reference of the line/col
+                forIterator = new AstNoOpNode(this.Peek()); // Get a reference of the line/col
             }
             else
             {
-                forIterator = ForIterator();
+                forIterator = this.ForIterator();
             }
 
             // Body
-            body = Block();
+            body = this.Block();
             return new AstForNode(kw, forInitializer, expression, forIterator, body);
         }
 
@@ -666,8 +666,8 @@ namespace Fl.Parser
         // for_statement -> "for" "(" for_initializer? ";" expression? ";" for_iterator? ")" statement
         private AstForNode ParenthesizedForStatemet()
         {
-            Token kw = Consume(TokenType.For);
-            Consume(TokenType.LeftParen);
+            Token kw = this.Consume(TokenType.For);
+            this.Consume(TokenType.LeftParen);
 
             AstNode forInitializer = null;
             AstNode expression = null;
@@ -675,40 +675,40 @@ namespace Fl.Parser
             AstNode body = null;
 
             // Initializer
-            if (Match(TokenType.Semicolon))
+            if (this.Match(TokenType.Semicolon))
             {
-                forInitializer = new AstNoOpNode(Consume());
+                forInitializer = new AstNoOpNode(this.Consume());
             }
             else
             {
-                forInitializer = ForInitializer();
-                Consume(TokenType.Semicolon);
+                forInitializer = this.ForInitializer();
+                this.Consume(TokenType.Semicolon);
             }
 
             // Expression
-            if (Match(TokenType.Semicolon))
+            if (this.Match(TokenType.Semicolon))
             {
-                expression = new AstNoOpNode(Consume());
+                expression = new AstNoOpNode(this.Consume());
             }
             else
             {
-                expression = Expression();
-                Consume(TokenType.Semicolon);
+                expression = this.Expression();
+                this.Consume(TokenType.Semicolon);
             }
 
             // Iterator
-            if (Match(TokenType.RightParen))
+            if (this.Match(TokenType.RightParen))
             {
-                forIterator = new AstNoOpNode(Consume());
+                forIterator = new AstNoOpNode(this.Consume());
             }
             else
             {
-                forIterator = ForIterator();
-                Consume(TokenType.RightParen);
+                forIterator = this.ForIterator();
+                this.Consume(TokenType.RightParen);
             }
 
             // Body
-            body = Match(TokenType.Semicolon) ? new AstNoOpNode(Consume(TokenType.Semicolon)) : Statement();
+            body = this.Match(TokenType.Semicolon) ? new AstNoOpNode(this.Consume(TokenType.Semicolon)) : this.Statement();
             return new AstForNode(kw, forInitializer, expression, forIterator, body);
         }
 
@@ -717,11 +717,11 @@ namespace Fl.Parser
         // 				    | expression_list
         private AstNode ForInitializer()
         {
-            if (IsVarDeclaration())
+            if (this.IsVarDeclaration())
             {
-                return ForDeclaration();
+                return this.ForDeclaration();
             }
-            return ExpressionList();
+            return this.ExpressionList();
         }
 
         // Rule:
@@ -729,13 +729,13 @@ namespace Fl.Parser
         private AstDeclarationNode ForDeclaration()
         {
             AstNode variable = null;
-            if (Match(TokenType.Variable))
+            if (this.Match(TokenType.Variable))
             {
-                variable = ImplicitVarDeclaration();
+                variable = this.ImplicitVarDeclaration();
             }
             else
             {
-                variable = TypedVarDeclaration();
+                variable = this.TypedVarDeclaration();
             }
             return new AstDeclarationNode(new List<AstNode>() { variable });
         }
@@ -745,12 +745,12 @@ namespace Fl.Parser
         private AstDeclarationNode ForIterator()
         {
             List<AstNode> exprs = new List<AstNode> {
-                Expression()
+                this.Expression()
             };
-            while (Match(TokenType.Comma))
+            while (this.Match(TokenType.Comma))
             {
-                Consume();
-                exprs.Add(Expression());
+                this.Consume();
+                exprs.Add(this.Expression());
             }
             // TODO: Check if DeclarationNode is correct
             return new AstDeclarationNode(exprs);
@@ -763,18 +763,18 @@ namespace Fl.Parser
         // braced_expr -> expression block
         private AstIfNode IfStatement()
         {
-            Token kw = Consume(TokenType.If);
+            Token kw = this.Consume(TokenType.If);
             AstNode condition = null;
             AstNode thenbranch = null;
             AstNode elsebranch = null;
 
-            (condition, thenbranch) = Match(TokenType.LeftParen) ? ParenthesizedStatement() : BracedStatement();
+            (condition, thenbranch) = this.Match(TokenType.LeftParen) ? this.ParenthesizedStatement() : this.BracedStatement();
 
             // Parse the else branch if present
-            if (Match(TokenType.Else))
+            if (this.Match(TokenType.Else))
             {
-                Consume(TokenType.Else);
-                elsebranch = Match(TokenType.Semicolon) ? new AstNoOpNode(Consume(TokenType.Semicolon)) : Statement();
+                this.Consume(TokenType.Else);
+                elsebranch = this.Match(TokenType.Semicolon) ? new AstNoOpNode(this.Consume(TokenType.Semicolon)) : this.Statement();
             }
             return new AstIfNode(kw, condition, thenbranch, elsebranch);
         }
@@ -784,12 +784,12 @@ namespace Fl.Parser
         private AstBlockNode Block()
         {
             List<AstNode> statements = new List<AstNode>();
-            Consume(TokenType.LeftBrace);
-            while (!Match(TokenType.RightBrace))
+            this.Consume(TokenType.LeftBrace);
+            while (!this.Match(TokenType.RightBrace))
             {
-                statements.Add(Declaration());
+                statements.Add(this.Declaration());
             }
-            Consume(TokenType.RightBrace);
+            this.Consume(TokenType.RightBrace);
             return new AstBlockNode(statements);
         }
 
@@ -797,8 +797,8 @@ namespace Fl.Parser
         // expression_statement	-> expression ";"
         private AstNode ExpressionStatement()
         {
-            AstNode expr = Expression();
-            Consume(TokenType.Semicolon);
+            AstNode expr = this.Expression();
+            this.Consume(TokenType.Semicolon);
             return expr;
         }
 
@@ -807,12 +807,12 @@ namespace Fl.Parser
         private AstExpressionListNode ExpressionList()
         {
             List<AstNode> exprs = new List<AstNode> {
-                Expression()
+                this.Expression()
             };
-            while (Match(TokenType.Comma))
+            while (this.Match(TokenType.Comma))
             {
-                Consume();
-                exprs.Add(Expression());
+                this.Consume();
+                exprs.Add(this.Expression());
             }
             return new AstExpressionListNode(exprs);
         }
@@ -821,16 +821,16 @@ namespace Fl.Parser
         // expression -> expression_assignment
         private AstNode Expression()
         {
-            return ExpressionAssignment();
+            return this.ExpressionAssignment();
         }
 
         // Rule:
         // lambda_expression -> lambda_params '=>' ( block | expression )
         private AstFuncDeclNode LambdaExpression()
         {
-            AstParametersNode lambdaParams = LambdaParams();
-            var arrow = Consume(TokenType.RightArrow);
-            AstNode expr = Match(TokenType.LeftBrace) ? Block() : Expression();
+            AstParametersNode lambdaParams = this.LambdaParams();
+            var arrow = this.Consume(TokenType.RightArrow);
+            AstNode expr = this.Match(TokenType.LeftBrace) ? this.Block() : this.Expression();
             return new AstFuncDeclNode(arrow, lambdaParams, new List<AstNode>() { expr });
         }
 
@@ -846,19 +846,19 @@ namespace Fl.Parser
             if (Match(TokenType.LeftParen))
             {
                 parenthesis = true;
-                Consume();
+                this.Consume();
             }
 
             // Consume the identifiers separated by commas
-            while (Match(TokenType.Identifier))
+            while (this.Match(TokenType.Identifier))
             {
-                parameters.Add(Consume(TokenType.Identifier));
-                if (Match(TokenType.Comma))
-                    Consume();
+                parameters.Add(this.Consume(TokenType.Identifier));
+                if (this.Match(TokenType.Comma))
+                    this.Consume();
             }
 
             if (parenthesis)
-                Consume(TokenType.RightParen);
+                this.Consume(TokenType.RightParen);
 
             return new AstParametersNode(parameters);
         }
@@ -868,7 +868,7 @@ namespace Fl.Parser
         private AstNode MemberAccess()
         {
             // Create an accessor node for the identifier
-            AstNode accessor = new AstAccessorNode(Consume(TokenType.Identifier), null);
+            AstNode accessor = new AstAccessorNode(this.Consume(TokenType.Identifier), null);
 
             // Try to find member accessors or callable members like:
             //  member.property
@@ -878,15 +878,15 @@ namespace Fl.Parser
             //  member.property.property2().property3
             while (true)
             {
-                if (Match(TokenType.LeftParen))
+                if (this.Match(TokenType.LeftParen))
                 {
-                    AstExpressionListNode arguments = Arguments();
+                    AstExpressionListNode arguments = this.Arguments();
                     accessor = new AstCallableNode(accessor, arguments);
                 }
-                else if (Match(TokenType.Dot))
+                else if (this.Match(TokenType.Dot))
                 {
-                    Consume();
-                    accessor = new AstAccessorNode(Consume(TokenType.Identifier), accessor);
+                    this.Consume();
+                    accessor = new AstAccessorNode(this.Consume(TokenType.Identifier), accessor);
                 }
                 else break;
             }
@@ -901,7 +901,7 @@ namespace Fl.Parser
 
             bool hasParenthesis = false;
 
-            if (Match(TokenType.LeftParen) && Consume(TokenType.LeftParen) != null)
+            if (this.Match(TokenType.LeftParen) && this.Consume(TokenType.LeftParen) != null)
                 hasParenthesis = true;
             do
             {
@@ -909,12 +909,12 @@ namespace Fl.Parser
 
                 // Try to find member accessors or callable members
                 //  member.property.property2
-                if (Match(TokenType.Identifier))
+                if (this.Match(TokenType.Identifier))
                 {
                     do
                     {
-                        accessor = new AstAccessorNode(Consume(TokenType.Identifier), accessor);
-                    } while (Match(TokenType.Dot) && Consume(TokenType.Dot) != null);
+                        accessor = new AstAccessorNode(this.Consume(TokenType.Identifier), accessor);
+                    } while (this.Match(TokenType.Dot) && this.Consume(TokenType.Dot) != null);
                 }
 
                 if (accessor == null)
@@ -922,10 +922,10 @@ namespace Fl.Parser
 
                 exprs.Add(accessor);
 
-            } while (Match(TokenType.Comma) && Consume(TokenType.Comma) != null);
+            } while (this.Match(TokenType.Comma) && this.Consume(TokenType.Comma) != null);
 
             if (hasParenthesis)
-                Consume(TokenType.RightParen);
+                this.Consume(TokenType.RightParen);
 
             return new AstTupleNode(exprs);
         }
@@ -937,19 +937,19 @@ namespace Fl.Parser
             List<AstNode> args = new List<AstNode>();
             bool isValidTuple = false;
 
-            Consume(TokenType.LeftParen);
+            this.Consume(TokenType.LeftParen);
 
-            while (!Match(TokenType.RightParen))
+            while (!this.Match(TokenType.RightParen))
             {
-                args.Add(Expression());
-                while (Match(TokenType.Comma))
+                args.Add(this.Expression());
+                while (this.Match(TokenType.Comma))
                 {
                     isValidTuple = true;
-                    Consume();
+                    this.Consume();
                 }
             }
 
-            Consume(TokenType.RightParen);
+            this.Consume(TokenType.RightParen);
 
             return isValidTuple ? new AstTupleNode(args) : null;
         }
@@ -964,46 +964,46 @@ namespace Fl.Parser
             //  identifier ( = | += | -= | *= | /= )
             //  identifier.
             //  identifier(
-            if (IsAssignment())
+            if (this.IsAssignment())
             {
-                var checkpoint = SaveCheckpoint();
+                var checkpoint = this.SaveCheckpoint();
 
-                AstNode lvalue = MemberAccess();
+                AstNode lvalue = this.MemberAccess();
 
                 // If we now match an assignment of any type, create an assignment node
-                if (MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
+                if (this.MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
                 {
-                    Token assignmentop = Consume();
-                    AstNode expression = Expression();
+                    Token assignmentop = this.Consume();
+                    AstNode expression = this.Expression();
 
                     if (lvalue is AstCallableNode)
-                        throw new ParserException($"{GetCurrentLineAndCol()} Left-hand side of an assignment must be a variable.");
+                        throw new ParserException($"{this.GetCurrentLineAndCol()} Left-hand side of an assignment must be a variable.");
 
                     return new AstVariableAssignmentNode(lvalue as AstAccessorNode, assignmentop, expression);
                 }
 
                 // If we are not seeing an assignment operator, then try again with ConditionalExpression
-                RestoreCheckpoint(checkpoint);
-                return ConditionalExpression();
+                this.RestoreCheckpoint(checkpoint);
+                return this.ConditionalExpression();
             }
 
             // Try to parse a lambda expression
-            if (MatchLambda())
-                return LambdaExpression();
+            if (this.MatchLambda())
+                return this.LambdaExpression();
 
-            if (IsDestructuring())
+            if (this.IsDestructuring())
             {
-                ParserCheckpoint checkpoint = SaveCheckpoint();
+                ParserCheckpoint checkpoint = this.SaveCheckpoint();
                 // First try if it is a left-hand side expression
                 try
                 {
-                    AstTupleNode lvalue = Destructuring();
+                    AstTupleNode lvalue = this.Destructuring();
 
                     // If we now match an assignment of any type, create an assignment node
-                    if (MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
+                    if (this.MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
                     {
-                        Token assignmentop = Consume();
-                        AstNode expression = Expression();
+                        Token assignmentop = this.Consume();
+                        AstNode expression = this.Expression();
                         return new AstDestructuringAssignmentNode(lvalue, assignmentop, expression);
                     }
                 }
@@ -1011,24 +1011,24 @@ namespace Fl.Parser
                 {
                 }
                 // If we reach this point, we restore the checkpoint
-                RestoreCheckpoint(checkpoint);
+                this.RestoreCheckpoint(checkpoint);
             }
 
             // Finally try with a conditional expression
-            return ConditionalExpression();
+            return this.ConditionalExpression();
         }
 
         // Rule:
         // conditional_expression -> null_coalescing_expression ( '?' expression ':' expression )?
         private AstNode ConditionalExpression()
         {
-            AstNode nullCoalescingExpr = NullCoalescingExpression();
-            if (Match(TokenType.Question))
+            AstNode nullCoalescingExpr = this.NullCoalescingExpression();
+            if (this.Match(TokenType.Question))
             {
-                Token q = Consume();
-                AstNode trueExpr = Expression();
-                Consume(TokenType.Colon);
-                AstNode falseExpr = Expression();
+                Token q = this.Consume();
+                AstNode trueExpr = this.Expression();
+                this.Consume(TokenType.Colon);
+                AstNode falseExpr = this.Expression();
                 return new AstIfNode(q, nullCoalescingExpr, trueExpr, falseExpr);
             }
             return nullCoalescingExpr;
@@ -1038,11 +1038,11 @@ namespace Fl.Parser
         // null_coalescing_expression -> or_expression ( '??' null_coalescing_expression )?
         private AstNode NullCoalescingExpression()
         {
-            AstNode orExpr = OrExpression();
-            if (Match(TokenType.QuestionQuestion))
+            AstNode orExpr = this.OrExpression();
+            if (this.Match(TokenType.QuestionQuestion))
             {
-                Token q = Consume();
-                AstNode rightExpr = NullCoalescingExpression();
+                Token q = this.Consume();
+                AstNode rightExpr = this.NullCoalescingExpression();
                 return new AstNullCoalescingNode(q, orExpr, rightExpr);
             }
             return orExpr;
@@ -1052,11 +1052,11 @@ namespace Fl.Parser
         // or_expression -> and_expression ( "||" and_expression )*
         private AstNode OrExpression()
         {
-            AstNode orexpr = AndExpression();
-            while (Match(TokenType.Or))
+            AstNode orexpr = this.AndExpression();
+            while (this.Match(TokenType.Or))
             {
-                Token or = Consume();
-                AstNode right = AndExpression();
+                Token or = this.Consume();
+                AstNode right = this.AndExpression();
                 orexpr = new AstBinaryNode(or, orexpr, right);
             }
             return orexpr;
@@ -1066,11 +1066,11 @@ namespace Fl.Parser
         // and_expression -> equality_expression ( "&&" equality_expression )*
         private AstNode AndExpression()
         {
-            AstNode andexpr = EqualityExpression();
-            while (Match(TokenType.And))
+            AstNode andexpr = this.EqualityExpression();
+            while (this.Match(TokenType.And))
             {
-                Token and = Consume();
-                AstNode right = EqualityExpression();
+                Token and = this.Consume();
+                AstNode right = this.EqualityExpression();
                 andexpr = new AstBinaryNode(and, andexpr, right);
             }
             return andexpr;
@@ -1080,11 +1080,11 @@ namespace Fl.Parser
         // equality_expression -> comparison_expression ( ( "!=" | "==" ) comparison_expression )*
         private AstNode EqualityExpression()
         {
-            AstNode compexpr = ComparisonExpression();
-            while (Match(TokenType.Equal) || Match(TokenType.NotEqual))
+            AstNode compexpr = this.ComparisonExpression();
+            while (this.Match(TokenType.Equal) || this.Match(TokenType.NotEqual))
             {
-                Token equality = Consume();
-                AstNode right = ComparisonExpression();
+                Token equality = this.Consume();
+                AstNode right = this.ComparisonExpression();
                 compexpr = new AstBinaryNode(equality, compexpr, right);
             }
             return compexpr;
@@ -1094,14 +1094,14 @@ namespace Fl.Parser
         // comparison_expression -> addition_expression(( ">" | ">=" | "<" | "<=" ) addition_expression )*
         private AstNode ComparisonExpression()
         {
-            AstNode additionexpr = AdditionExpression();
-            while (Match(TokenType.GreatThan)
-                || Match(TokenType.GreatThanEqual)
-                || Match(TokenType.LessThan)
-                || Match(TokenType.LessThanEqual))
+            AstNode additionexpr = this.AdditionExpression();
+            while (this.Match(TokenType.GreatThan)
+                || this.Match(TokenType.GreatThanEqual)
+                || this.Match(TokenType.LessThan)
+                || this.Match(TokenType.LessThanEqual))
             {
-                Token comp = Consume();
-                AstNode right = AdditionExpression();
+                Token comp = this.Consume();
+                AstNode right = this.AdditionExpression();
                 additionexpr = new AstBinaryNode(comp, additionexpr, right);
             }
             return additionexpr;
@@ -1111,11 +1111,11 @@ namespace Fl.Parser
         // addition_expression -> multiplication_expression(( "-" | "+" ) multiplication_expression )*
         private AstNode AdditionExpression()
         {
-            AstNode multexpr = MultiplicationExpression();
-            while (Match(TokenType.Minus) || Match(TokenType.Addition))
+            AstNode multexpr = this.MultiplicationExpression();
+            while (this.Match(TokenType.Minus) || this.Match(TokenType.Addition))
             {
-                Token addition = Consume();
-                AstNode right = MultiplicationExpression();
+                Token addition = this.Consume();
+                AstNode right = this.MultiplicationExpression();
                 multexpr = new AstBinaryNode(addition, multexpr, right);
             }
             return multexpr;
@@ -1125,11 +1125,11 @@ namespace Fl.Parser
         // multiplication_expression -> unary_expression(( "/" | "*" ) unary_expression )*
         private AstNode MultiplicationExpression()
         {
-            AstNode unaryexpr = UnaryExpression();
-            while (Match(TokenType.Multiplication) || Match(TokenType.Division))
+            AstNode unaryexpr = this.UnaryExpression();
+            while (this.Match(TokenType.Multiplication) || this.Match(TokenType.Division))
             {
-                Token mult = Consume();
-                AstNode right = UnaryExpression();
+                Token mult = this.Consume();
+                AstNode right = this.UnaryExpression();
                 unaryexpr = new AstBinaryNode(mult, unaryexpr, right);
             }
             return unaryexpr;
@@ -1141,19 +1141,19 @@ namespace Fl.Parser
         // 					| primary_expression ( "++" | "--" )?
         private AstUnaryNode UnaryExpression()
         {
-            if (Match(TokenType.Not) || Match(TokenType.Minus))
+            if (this.Match(TokenType.Not) || this.Match(TokenType.Minus))
             {
-                Token op = Consume();
-                return new AstUnaryNode(op, UnaryExpression());
+                Token op = this.Consume();
+                return new AstUnaryNode(op, this.UnaryExpression());
             }
-            else if (Match(TokenType.Increment) || Match(TokenType.Decrement))
+            else if (this.Match(TokenType.Increment) || this.Match(TokenType.Decrement))
             {
-                Token op = Consume();
-                return new AstUnaryPrefixNode(op, PrimaryExpression());
+                Token op = this.Consume();
+                return new AstUnaryPrefixNode(op, this.PrimaryExpression());
             }
-            var expr = PrimaryExpression();
-            if (Match(TokenType.Increment) || Match(TokenType.Decrement))
-                return new AstUnaryPostfixNode(Consume(), expr);
+            var expr = this.PrimaryExpression();
+            if (this.Match(TokenType.Increment) || this.Match(TokenType.Decrement))
+                return new AstUnaryPostfixNode(this.Consume(), expr);
             return new AstUnaryNode(null, expr);
         }
 
@@ -1162,37 +1162,37 @@ namespace Fl.Parser
         private AstNode PrimaryExpression()
         {
             Token newt = null;
-            if (Match(TokenType.New))
+            if (this.Match(TokenType.New))
             {
-                newt = Consume();
+                newt = this.Consume();
             }
-            AstNode primary = Primary();
-            var checkpoint = SaveCheckpoint();
+            AstNode primary = this.Primary();
+            var checkpoint = this.SaveCheckpoint();
             while (true)
             {
-                if (Match(TokenType.LeftParen))
+                if (this.Match(TokenType.LeftParen))
                 {
-                    if (TryGetAccessor(primary) == null && TryGetLiteral(primary)?.Literal?.Type != TokenType.Identifier)
-                        throw new ParserException($"{GetCurrentLineAndCol()} '{primary}' is not an invokable object");
-                    AstExpressionListNode arguments = Arguments();
+                    if (this.TryGetAccessor(primary) == null && this.TryGetLiteral(primary)?.Literal?.Type != TokenType.Identifier)
+                        throw new ParserException($"{this.GetCurrentLineAndCol()} '{primary}' is not an invokable object");
+                    AstExpressionListNode arguments = this.Arguments();
                     primary = new AstCallableNode(primary, arguments, newt);
                 }
-                else if (Match(TokenType.LeftBracket))
+                else if (this.Match(TokenType.LeftBracket))
                 {
-                    primary = new AstIndexerNode(primary, Indexer());
+                    primary = new AstIndexerNode(primary, this.Indexer());
                 }
-                else if (Match(TokenType.Dot))
+                else if (this.Match(TokenType.Dot))
                 {
-                    Consume();
-                    primary = new AstAccessorNode(Consume(TokenType.Identifier), primary);
+                    this.Consume();
+                    primary = new AstAccessorNode(this.Consume(TokenType.Identifier), primary);
                 }
                 else
                 {
-                    if (_Pointer == checkpoint.Pointer
+                    if (this.pointer == checkpoint.Pointer
                         && (primary is AstLiteralNode && (primary as AstLiteralNode).Literal.Type != TokenType.Identifier)
                         && newt != null)
-                        throw new ParserException($"{GetCurrentLineAndCol()} Type expected");
-                    if (_Pointer == checkpoint.Pointer && (primary is AstAccessorNode) && newt != null)
+                        throw new ParserException($"{this.GetCurrentLineAndCol()} Type expected");
+                    if (this.pointer == checkpoint.Pointer && (primary is AstAccessorNode) && newt != null)
                         primary = new AstCallableNode(primary, new AstExpressionListNode(new List<AstNode>()), newt);
                     break;
                 }
@@ -1206,17 +1206,17 @@ namespace Fl.Parser
         private AstExpressionListNode Indexer()
         {
             List<AstNode> args = new List<AstNode>();
-            Consume(TokenType.LeftBracket);
+            this.Consume(TokenType.LeftBracket);
             do
             {
-                args.Add(Expression());
-                while (Match(TokenType.Comma))
+                args.Add(this.Expression());
+                while (this.Match(TokenType.Comma))
                 {
-                    Consume();
-                    args.Add(Expression());
+                    this.Consume();
+                    args.Add(this.Expression());
                 }
-            } while ((!Match(TokenType.RightBracket)));
-            Consume(TokenType.RightBracket);
+            } while ((!this.Match(TokenType.RightBracket)));
+            this.Consume(TokenType.RightBracket);
             return new AstExpressionListNode(args);
         }
 
@@ -1225,17 +1225,17 @@ namespace Fl.Parser
         private AstExpressionListNode Arguments()
         {
             List<AstNode> args = new List<AstNode>();
-            Consume(TokenType.LeftParen);
-            if (!Match(TokenType.RightParen))
+            this.Consume(TokenType.LeftParen);
+            if (!this.Match(TokenType.RightParen))
             {
-                args.Add(Expression());
-                while (Match(TokenType.Comma))
+                args.Add(this.Expression());
+                while (this.Match(TokenType.Comma))
                 {
-                    Consume();
-                    args.Add(Expression());
+                    this.Consume();
+                    args.Add(this.Expression());
                 }
             }
-            Consume(TokenType.RightParen);
+            this.Consume(TokenType.RightParen);
             return new AstExpressionListNode(args);
         }
 
@@ -1243,18 +1243,18 @@ namespace Fl.Parser
         // primary	-> "true" | "false" | "null" | INTEGER | DOUBLE | DECIMAL | STRING | IDENTIFIER	| tuple_initializer | "(" expression ")"
         private AstNode Primary()
         {
-            if (Match(TokenType.LeftParen))
+            if (this.Match(TokenType.LeftParen))
             {
-                var checkpoint = SaveCheckpoint();
+                var checkpoint = this.SaveCheckpoint();
                 // Now we can try if it is a literal tuple initializer
                 try
                 {
                     // This call will return null if it is not a valid tuple initializer
-                    var node = TupleInitializer();
+                    var node = this.TupleInitializer();
 
                     // If we match a dot, it could be a primary expression followed by a member access,
                     // it is not a literal tuple initializer
-                    if (node != null && !MatchAny(TokenType.Dot))
+                    if (node != null && !this.MatchAny(TokenType.Dot))
                         return node;
                 }
                 catch
@@ -1263,22 +1263,24 @@ namespace Fl.Parser
 
                 // If we didn't match destructuring or tuple initializer, restore and try
                 // a parenthesized expression
-                RestoreCheckpoint(checkpoint);
-                return ParenthesizedExpression();
+                this.RestoreCheckpoint(checkpoint);
+                return this.ParenthesizedExpression();
             }
 
-            if (!Match(TokenType.Boolean)
-                && !Match(TokenType.Null)
-                && !Match(TokenType.Char)
-                && !Match(TokenType.Integer)
-                && !Match(TokenType.Float)
-                && !Match(TokenType.Double)
-                && !Match(TokenType.Decimal)
-                && !Match(TokenType.String)
-                && !Match(TokenType.Identifier))
-                throw new ParserException($"{GetCurrentLineAndCol()} Expects primary but received {(HasInput() ? Peek().Type.ToString() : "end of input")}");
+            bool isPrimary = this.Match(TokenType.Boolean)
+                                || this.Match(TokenType.Null) 
+                                || this.Match(TokenType.Char)
+                                || this.Match(TokenType.Integer) 
+                                || this.Match(TokenType.Float) 
+                                || this.Match(TokenType.Double)
+                                || this.Match(TokenType.Decimal) 
+                                || this.Match(TokenType.String) 
+                                || this.Match(TokenType.Identifier);
 
-            return Match(TokenType.Identifier) ? (AstNode)new AstAccessorNode(Consume(), null) : new AstLiteralNode(Consume());
+            if (!isPrimary)
+                throw new ParserException($"{this.GetCurrentLineAndCol()} Expects primary but received {(this.HasInput() ? this.Peek().Type.ToString() : "end of input")}");
+
+            return this.Match(TokenType.Identifier) ? (AstNode)new AstAccessorNode(this.Consume(), null) : new AstLiteralNode(this.Consume());
         }
         #endregion
 
@@ -1287,13 +1289,13 @@ namespace Fl.Parser
         private bool IsVarDeclaration()
         {
             // 'var' identifier ( '=' expression )?
-            if (Match(TokenType.Variable))
+            if (this.Match(TokenType.Variable))
                 return true;
 
-            if (Match(TokenType.Identifier, TokenType.LeftParen, TokenType.Identifier))
+            if (this.Match(TokenType.Identifier, TokenType.LeftParen, TokenType.Identifier))
             {
                 // identifier (identifier, identifier, ..., identifier)
-                if (MatchAnyFrom(3, TokenType.Identifier, TokenType.Comma))
+                if (this.MatchAnyFrom(3, TokenType.Identifier, TokenType.Comma))
                     return true;
 
                 /*// identifier ( '[' ']' )+ (identifier, identifier, ..., identifier)
@@ -1301,15 +1303,15 @@ namespace Fl.Parser
                 return dimensions > 0 && MatchFrom(dimensions + 1, TokenType.Identifier);*/
             }
 
-            if (Match(TokenType.Identifier))
+            if (this.Match(TokenType.Identifier))
             {
                 // identifier identifier ( '=' expression )?
-                if (MatchFrom(1, TokenType.Identifier))
+                if (this.MatchFrom(1, TokenType.Identifier))
                     return true;
 
                 // identifier ( '[' ']' )+ identifier ( '=' expression )?
-                int dimensions = CountRepeatedMatchesFrom(1, TokenType.LeftBracket, TokenType.RightBracket);
-                return dimensions > 0 && MatchFrom(dimensions + 1, TokenType.Identifier);
+                int dimensions = this.CountRepeatedMatchesFrom(1, TokenType.LeftBracket, TokenType.RightBracket);
+                return dimensions > 0 && this.MatchFrom(dimensions + 1, TokenType.Identifier);
             }
 
             return false;
@@ -1322,11 +1324,11 @@ namespace Fl.Parser
         private bool IsDestructuring()
         {
             // Check for a left-hand side expression containing a Comma
-            if (!Match(TokenType.LeftParen))
+            if (!this.Match(TokenType.LeftParen))
             {
-                for (int i=0; i < _Tokens.Count; i++)
+                for (int i=0; i < this.tokens.Count; i++)
                 {
-                    var t = PeekFrom(i);
+                    var t = this.PeekFrom(i);
                     if (t == null || t.Type == TokenType.Assignment)
                         break;
                     if (t.Type == TokenType.Comma)
@@ -1335,30 +1337,30 @@ namespace Fl.Parser
             }
 
             // Check for parenthesized list of identifiers
-            return (Match(TokenType.LeftParen, TokenType.Identifier) && MatchAnyFrom(2, TokenType.Dot, TokenType.Comma, TokenType.RightParen))
-                || Match(TokenType.LeftParen, TokenType.Comma);
+            return (this.Match(TokenType.LeftParen, TokenType.Identifier) && this.MatchAnyFrom(2, TokenType.Dot, TokenType.Comma, TokenType.RightParen))
+                || this.Match(TokenType.LeftParen, TokenType.Comma);
         }
 
         private bool IsAssignment()
         {
-            return Match(TokenType.Identifier)
-                && MatchAnyFrom(1, TokenType.Dot, TokenType.LeftParen, TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign);
+            return this.Match(TokenType.Identifier)
+                && this.MatchAnyFrom(1, TokenType.Dot, TokenType.LeftParen, TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign);
         }
 
         private bool MatchLambda()
         {
             // =>
-            bool arrow = Match(TokenType.RightArrow);
+            bool arrow = this.Match(TokenType.RightArrow);
             // a =>
-            bool paramArrow = (!Match(TokenType.LeftParen) && Match(TokenType.Unknown, TokenType.RightArrow));
+            bool paramArrow = (!this.Match(TokenType.LeftParen) && this.Match(TokenType.Unknown, TokenType.RightArrow));
             // a,b =>
-            bool paramListArrow = MatchFrom(CountRepeatedMatchesFrom(0, TokenType.Unknown, TokenType.Comma), TokenType.RightArrow);
+            bool paramListArrow = this.MatchFrom(this.CountRepeatedMatchesFrom(0, TokenType.Unknown, TokenType.Comma), TokenType.RightArrow);
             // () =>
-            bool parentArrow = Match(TokenType.LeftParen, TokenType.RightParen, TokenType.RightArrow);
+            bool parentArrow = this.Match(TokenType.LeftParen, TokenType.RightParen, TokenType.RightArrow);
             // (a) =>
-            bool parentParamArrow = (!MatchFrom(1, TokenType.LeftParen) && Match(TokenType.LeftParen, TokenType.Unknown, TokenType.RightParen, TokenType.RightArrow));
+            bool parentParamArrow = (!this.MatchFrom(1, TokenType.LeftParen) && this.Match(TokenType.LeftParen, TokenType.Unknown, TokenType.RightParen, TokenType.RightArrow));
             // (a,b) =>
-            bool parentParamListArrow = (Match(TokenType.LeftParen) && MatchFrom(1 + CountRepeatedMatchesFrom(1, TokenType.Unknown, TokenType.Comma), TokenType.RightParen, TokenType.RightArrow));
+            bool parentParamListArrow = (this.Match(TokenType.LeftParen) && this.MatchFrom(1 + this.CountRepeatedMatchesFrom(1, TokenType.Unknown, TokenType.Comma), TokenType.RightParen, TokenType.RightArrow));
 
             return arrow || paramArrow || paramListArrow || parentArrow || parentParamArrow || parentParamListArrow;
         }

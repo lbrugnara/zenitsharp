@@ -12,9 +12,9 @@ namespace Fl.Parser.Ast
 
         public AstWhileNode(Token token, AstNode condition, AstNode body)
         {
-            Keyword = token;
-            Condition = condition;
-            Body = body;
+            this.Keyword = token;
+            this.Condition = condition;
+            this.Body = body;
         }
     }
 }

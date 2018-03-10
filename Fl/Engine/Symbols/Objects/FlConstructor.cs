@@ -8,26 +8,26 @@ namespace Fl.Engine.Symbols.Objects
 {
     public class FlConstructor: FlInstanceMethod
     {
-        private int _ParamsCount;
-        private Action<FlObject, List<FlObject>> _Body;
-        private string _Name;
+        private int paramsCount;
+        private Action<FlObject, List<FlObject>> body;
+        private string name;
 
         public FlConstructor(Action<FlObject, List<FlObject>> body)
             : base("constructor", (self, args) => { body(self, args); return self; })
         {
-            _Body = body;
-            _ParamsCount = -1;
-            _Name = $"{base.Name}@params";
+            this.body = body;
+            this.paramsCount = -1;
+            this.name = $"{base.Name}@params";
         }
 
         public FlConstructor(int paramsCount, Action<FlObject, List<FlObject>> body)
             : base("constructor", (self, args) => { body(self, args); return self; })
         {
-            _Body = body;
-            _ParamsCount = paramsCount;
-            _Name = $"{base.Name}@{_ParamsCount}";
+            this.body = body;
+            this.paramsCount = paramsCount;
+            this.name = $"{base.Name}@{this.paramsCount}";
         }
 
-        public override string Name => _Name;
+        public override string Name => this.name;
     }
 }

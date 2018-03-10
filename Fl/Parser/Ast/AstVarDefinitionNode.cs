@@ -13,7 +13,7 @@ namespace Fl.Parser.Ast
         public AstVarDefinitionNode(AstVariableTypeNode variableType, List<Tuple<Token, AstNode>> vardefs)
             : base(variableType)
         {
-            VarDefinitions = vardefs;
+            this.VarDefinitions = vardefs;
         }
     }
 }

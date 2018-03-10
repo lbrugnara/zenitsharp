@@ -10,7 +10,7 @@ namespace Fl.Parser.Ast
         public AstDestructuringAssignmentNode(AstTupleNode lvalue, Token assignmentOp, AstNode expression)
             : base (assignmentOp, expression)
         {
-            Lvalues = lvalue;
+            this.Lvalues = lvalue;
         }
     }
 }
