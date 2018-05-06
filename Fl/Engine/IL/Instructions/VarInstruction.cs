@@ -9,13 +9,13 @@ namespace Fl.Engine.IL.Instructions
 {
     public class VarInstruction : AssignInstruction
     {        
-        public TypeResolver TypeResolver { get; }
+        public OperandType Type { get; }
         public Operand Value { get; }
 
-        public VarInstruction(SymbolOperand name, TypeResolver type, Operand value = null)
+        public VarInstruction(SymbolOperand name, OperandType type, Operand value = null)
             : base(OpCode.Var, name)
         {
-            this.TypeResolver = type;
+            this.Type = type;
             this.Value = value;
         }
 

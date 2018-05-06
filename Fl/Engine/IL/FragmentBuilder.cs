@@ -12,34 +12,34 @@ namespace Fl.Engine.IL
     {
         public string Name { get; }
         public FragmentType Type { get; }
-        public List<Instruction> _instructions;
+        public List<Instruction> Instructions { get; }
 
         public FragmentBuilder(string name, FragmentType type)
         {
             this.Name = name;
             this.Type = type;
-            _instructions = new List<Instruction>();
+            this.Instructions = new List<Instruction>();
         }
 
         public void AddInstruction(Instruction i)
         {
-            _instructions.Add(i);
+            this.Instructions.Add(i);
         }
 
-        public Fragment Build() => new Fragment(Name, Type, _instructions);
+        public Fragment Build() => new Fragment(this.Name, this.Type, this.Instructions);
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
 
-            if (Type == FragmentType.Global)
-                sb.AppendLine($"{Name}:");
+            if (this.Type == FragmentType.Global)
+                sb.AppendLine($"{this.Name}:");
             else
-                sb.AppendLine($"{Type.ToString().ToLower()} {Name}:");
+                sb.AppendLine($"{this.Type.ToString().ToLower()} {this.Name}:");
 
-            for (int i = 0; i < _instructions.Count; i++)
+            for (int i = 0; i < this.Instructions.Count; i++)
             {
-                var instruction = _instructions[i];
+                var instruction = this.Instructions[i];
                 if (instruction.Label != null)
                     sb.AppendLine($"{instruction.Label}");
                 sb.AppendLine($"{i.ToString().PadLeft(6, ' ')}: {instruction.ToString()}");

@@ -11,38 +11,40 @@ namespace Fl.Engine.IL.Generators
     {
         public Operand Visit(ILGenerator generator, AstForNode fornode)
         {
-            // Generate a destination Label to leave the for-block (to be backpatched at the end)
-            Label exitPoint = generator.Program.NewLabel();
-
-            // Generate an eblock instruction for the for-block initialization
+            // Create a new block to contain the for's initialization
             generator.EnterBlock(BlockType.Common);
 
             // Initialize the for-block
             fornode.Init.Exec(generator);
 
-            // Generate the goto to re-test the condition (the destination is the next instruction: eblock)
-            Label entryPoint = generator.Program.NewLabel();
-            generator.BindLabel(entryPoint);
+            // Generate the for's entry point label
+            Label entryPoint = generator.ProgramBuilder.NewLabel();
+            
+            // Generate the for's exit point label (to be backpatched at the end)
+            Label exitPoint = generator.ProgramBuilder.NewLabel();
 
-            // Generate an eblock instruction for the rest of the for-block
+            // Generate the loop block (for's body) with the entry and exit points
             generator.EnterBlock(BlockType.Loop, entryPoint, exitPoint);
+
+            // The entry points starts here (before the for's condition), so bind the label
+            generator.BindLabel(entryPoint);
 
             // Emmit the condition code
             var condition = fornode.Condition.Exec(generator);
 
-            // Emmit the if_false instruction with the break label
+            // Emmit the if_false instruction with the break label (if condition is false, go to exit point)
             generator.Emmit(new IfFalseInstruction(condition, exitPoint));
 
             // Emmit the body code
             fornode.Body.Exec(generator);
 
-            // Emmit the for-block's increment part
+            // Emmit the for's increment part
             fornode.Increment.Exec(generator);
 
-            // Leave the for-block
+            // Leave the for
             generator.LeaveBlock();
 
-            // Emmit the goto instruction to the for-block's test part
+            // Emmit the goto instruction to the for's condition (entry point)
             generator.Emmit(new GotoInstruction(entryPoint));
 
             // Backpatch the exit label for the for-block

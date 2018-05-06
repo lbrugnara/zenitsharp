@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Engine.IL.Instructions.Operands;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser.Ast;
 
 namespace Fl.Engine.IL.Generators
@@ -10,13 +11,19 @@ namespace Fl.Engine.IL.Generators
     {
         public Operand Visit(ILGenerator generator, AstAccessorNode accessor)
         {
-            // If it is the root member (or the only accessed one) return the symbol
-            if (accessor.Enclosing == null)
-                return generator.SymbolTable.GetSymbol(accessor.Identifier.Value.ToString());
+            string currentIdentifier = accessor.Identifier.Value.ToString();
 
-            // Resolve the parent member and add current as a child
+            // If current ID is the root member (or the only accessed one) return its symbol
+            if (accessor.Enclosing == null)
+                // If the symbol is not defined, create a new one that is not resolved yet (it could be a symbol that is not yet defined)
+                return generator.SymbolTable.GetSymbol(currentIdentifier) ?? new SymbolOperand(currentIdentifier, OperandType.Auto, generator.SymbolTable.CurrentBlock.Name, false);
+
+            // If not, resolve its parrent...
             Operand parent = accessor.Enclosing.Exec(generator);
-            parent.AddMember(new SymbolOperand(accessor.Identifier.Value.ToString(), null));
+
+            // ... add current ID as accessor's member of parent
+            parent.AddMember(new SymbolOperand(currentIdentifier));
+
             return parent;
         }
     }

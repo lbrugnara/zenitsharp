@@ -8,10 +8,10 @@ namespace Fl.Engine.IL.Instructions
 {
     public class ConstInstruction : AssignInstruction
     {
-        public TypeResolver TypeResolver { get; }
+        public OperandType TypeResolver { get; }
         public Operand Value { get; }
 
-        public ConstInstruction(SymbolOperand name, TypeResolver typeres, Operand value)
+        public ConstInstruction(SymbolOperand name, OperandType typeres, Operand value)
             : base(OpCode.Const, name)
         {
             this.TypeResolver = typeres;

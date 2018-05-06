@@ -4,7 +4,7 @@ using Fl.Parser;
 using System.Linq;
 
 namespace Fl.Engine.Symbols.Types
-{
+{/*
     public class TypeResolver
     {
         public string TypeName { get; }
@@ -79,5 +79,5 @@ namespace Fl.Engine.Symbols.Types
             }
             return new TypeResolver(typeName);
         }
-    }
+    }*/
 }

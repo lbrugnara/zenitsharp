@@ -3,6 +3,7 @@
 
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser;
 using Fl.Parser.Ast;
 
@@ -19,7 +20,7 @@ namespace Fl.Engine.IL.Generators
             if (unary.Operator == null)
                 return operand;
 
-            var tmpsymbol = generator.SymbolTable.NewTempSymbol();
+            var tmpsymbol = generator.SymbolTable.NewTempSymbol(OperandType.Auto);
             Instruction unaryInstruction = null;
             switch (unary.Operator.Type)
             {
@@ -53,7 +54,7 @@ namespace Fl.Engine.IL.Generators
 
             // var @tX null
             // <unary> @tX <operand>
-            generator.Emmit(new VarInstruction(tmpsymbol, null, null));
+            generator.Emmit(new VarInstruction(tmpsymbol, null));
             generator.Emmit(unaryInstruction);
             return tmpsymbol;
         }

@@ -20,12 +20,12 @@ namespace Fl.Engine.IL
         /// <summary>
         /// Contains program fragments and instructions
         /// </summary>
-        public ILProgramBuilder Program { get; }
+        public ILProgramBuilder ProgramBuilder { get; }
 
         /// <summary>
         /// Set of labels to be "resolved" on the next instructions emission
         /// </summary>
-        private Stack<Label> labels { get; }
+        private Stack<Label> Labels { get; }
 
         /// <summary>
         /// All the visitor logic is moved to the AstVisitor
@@ -35,9 +35,9 @@ namespace Fl.Engine.IL
         public ILGenerator()
         {
             this.SymbolTable = new ILSymbolTable();
-            this.Program = new ILProgramBuilder();
-            labels = new Stack<Label>();
-            astVisitor = new AstVisitor(this);            
+            this.ProgramBuilder = new ILProgramBuilder();
+            this.Labels = new Stack<Label>();
+            this.astVisitor = new AstVisitor(this);            
         }
 
         // Adds a new block to the SymbolTable, it represents a new scope
@@ -56,45 +56,45 @@ namespace Fl.Engine.IL
         // in the symbol table
         public void PushFragment(string name, FragmentType type)
         {
-            this.Program.PushFragment(name, type);
+            this.ProgramBuilder.PushFragment(name, type);
             this.EnterBlock(BlockType.Common);
         }
 
         // Returns true if the current fragment is a function fragment
-        public bool InFunction => Program.IsFunctionFragment();
+        public bool InFunction => this.ProgramBuilder.IsFunctionFragment();
 
         // Removes the current fragment and leaves the current symbol table block
         public void PopFragment()
         {
             this.LeaveBlock();
-            this.Program.PopFragment();            
+            this.ProgramBuilder.PopFragment();            
         }
 
         public void BindLabel(Label l)
         {
-            labels.Push(l);
+            this.Labels.Push(l);
         }
 
         // Adds a new instruction to the current fragment
         public Instruction Emmit(Instruction i)
         {
-            if (labels.Any())
-                i.Label = labels.Pop();
-            this.Program.CurrentFragment.AddInstruction(i);
+            if (this.Labels.Any())
+                i.Label = this.Labels.Pop();
+            this.ProgramBuilder.CurrentFragment.AddInstruction(i);
             return i;
         }
 
         public ILProgram Build(AstNode node)
         {
             this.Visit(node);
-            while (labels.Any())
+            while (this.Labels.Any())
                 this.Emmit(new NopInstruction());
-            return this.Program.Build();
+            return this.ProgramBuilder.Build();
         }
 
         public Operand Visit(AstNode node)
         {
-            return astVisitor.Visit(node);
+            return this.astVisitor.Visit(node);
         }
     }
 }

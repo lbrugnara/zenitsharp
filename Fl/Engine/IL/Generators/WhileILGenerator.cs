@@ -12,11 +12,11 @@ namespace Fl.Engine.IL.Generators
         public Operand Visit(ILGenerator generator, AstWhileNode wnode)
         {
             // Generate the goto to re-test the condition (the destination is the next instruction: eblock)
-            Label entryPoint = generator.Program.NewLabel();
+            Label entryPoint = generator.ProgramBuilder.NewLabel();
             generator.BindLabel(entryPoint);
 
             // Generate a destination Label to leave the while-block (to be backpatched at the end)
-            Label exitPoint = generator.Program.NewLabel();
+            Label exitPoint = generator.ProgramBuilder.NewLabel();
 
             // Generate an eblock instruction for the whole while-block
             generator.EnterBlock(BlockType.Loop, entryPoint, exitPoint);

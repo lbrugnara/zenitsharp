@@ -12,7 +12,7 @@ namespace Fl.Engine.IL.Generators
         public Operand Visit(ILGenerator generator, AstIfNode ifnode)
         {
             // Get a (non-resolved) label to skip the if
-            var thenExitPoint = generator.Program.NewLabel();
+            var thenExitPoint = generator.ProgramBuilder.NewLabel();
 
             // Generate the condition and check the result, using exitPoint
             // as the destination if the condition is true
@@ -50,7 +50,7 @@ namespace Fl.Engine.IL.Generators
                 generator.BindLabel(elseEntryPoint);
 
                 // Generate the label for the (pending) goto instruction
-                var elseExitPoint = generator.Program.NewLabel();
+                var elseExitPoint = generator.ProgramBuilder.NewLabel();
                 @goto.SetDestination(elseExitPoint);
 
                 // Add a block for the else's body and generate it, then leave the block

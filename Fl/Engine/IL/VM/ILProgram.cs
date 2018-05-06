@@ -30,32 +30,32 @@ namespace Fl.Engine.IL.VM
 
             this.OpCodeHandler = new Dictionary<OpCode, Action>()
             {
-                { OpCode.Add , OpCodeAdd },
-                { OpCode.Sub , OpCodeSub },
-                { OpCode.Mult , OpCodeMult },
-                { OpCode.Div , OpCodeDiv },
-                { OpCode.Ceq , OpCodeCeq },
-                { OpCode.Cgt , OpCodeCgt },
-                { OpCode.Cgte , OpCodeCgte },
-                { OpCode.Clt , OpCodeClt },
-                { OpCode.Clte , OpCodeClte },
-                { OpCode.And , OpCodeAnd },
-                { OpCode.Or , OpCodeOr },
-                { OpCode.Not , OpCodeNot },
-                { OpCode.Neg , OpCodeNeg },
-                { OpCode.PreInc , OpCodePreInc },
-                { OpCode.PreDec , OpCodePreDec },
-                { OpCode.PostInc , OpCodePostInc },
-                { OpCode.PostDec , OpCodePostDec },
-                { OpCode.Store , OpCodeStore },
-                { OpCode.Var , OpCodeVar },
-                { OpCode.Const , OpCodeConst },
-                { OpCode.Call , OpCodeCall },
-                { OpCode.Param , OpCodeParam },
-                { OpCode.Local , OpCodeLocal },
-                { OpCode.IfFalse , OpCodeIfFalse },
-                { OpCode.Goto , OpCodeGoto },
-                { OpCode.Return , OpCodeReturn },
+                { OpCode.Add, OpCodeAdd },
+                { OpCode.Sub, OpCodeSub },
+                { OpCode.Mult, OpCodeMult },
+                { OpCode.Div, OpCodeDiv },
+                { OpCode.Ceq, OpCodeCeq },
+                { OpCode.Cgt, OpCodeCgt },
+                { OpCode.Cgte, OpCodeCgte },
+                { OpCode.Clt, OpCodeClt },
+                { OpCode.Clte, OpCodeClte },
+                { OpCode.And, OpCodeAnd },
+                { OpCode.Or, OpCodeOr },
+                { OpCode.Not, OpCodeNot },
+                { OpCode.Neg, OpCodeNeg },
+                { OpCode.PreInc, OpCodePreInc },
+                { OpCode.PreDec, OpCodePreDec },
+                { OpCode.PostInc, OpCodePostInc },
+                { OpCode.PostDec, OpCodePostDec },
+                { OpCode.Store, OpCodeStore },
+                { OpCode.Var, OpCodeVar },
+                { OpCode.Const, OpCodeConst },
+                { OpCode.Call, OpCodeCall },
+                { OpCode.Param, OpCodeParam },
+                { OpCode.Local, OpCodeLocal },
+                { OpCode.IfFalse, OpCodeIfFalse },
+                { OpCode.Goto, OpCodeGoto },
+                { OpCode.Return, OpCodeReturn },
             };
         }
 
@@ -109,7 +109,7 @@ namespace Fl.Engine.IL.VM
         {
             FlObject value = FlNull.Value;
 
-            if (o == null || o.TypeResolver?.TypeName == FlNullType.Instance.Name)
+            if (o == null)
                 return value;
 
             if (o is SymbolOperand)
@@ -122,8 +122,8 @@ namespace Fl.Engine.IL.VM
             else
             {
                 var io = (o as ImmediateOperand);
-                FlType operandType = io.TypeResolver.Resolve(SymbolTable);                
-                value = operandType.Activator(io.Value);
+                /*FlType operandType = io.TypeResolver.Resolve(SymbolTable);                
+                value = operandType.Activator(io.Value);*/
             }
 
             if (o.Member != null)
@@ -338,7 +338,7 @@ namespace Fl.Engine.IL.VM
             VarInstruction vi = this.FetchCurrentInstruction<VarInstruction>();
 
             FlObject value = this.GetFlObjectFromOperand(vi.Value);
-            if (vi.TypeResolver != null)
+            /*if (vi.TypeResolver != null)
             {
                 FlType type = vi.TypeResolver.Resolve(this.SymbolTable);
                 Symbol symbol = new Symbol(SymbolType.Variable);
@@ -354,9 +354,9 @@ namespace Fl.Engine.IL.VM
                     symbol.UpdateBinding(value);
                 }                
             }
-            else
+            else*/
             {
-                this.SymbolTable.AddSymbol(vi.Destination.Name, new Symbol(SymbolType.Variable), value);
+                //this.SymbolTable.AddSymbol(vi.Destination.Name, new Symbol(SymbolType.Variable), value);
             }
         }
 
@@ -365,7 +365,7 @@ namespace Fl.Engine.IL.VM
             ConstInstruction ci = this.FetchCurrentInstruction<ConstInstruction>();
 
             FlObject value = this.GetFlObjectFromOperand(ci.Value);
-            this.SymbolTable.AddSymbol(ci.Destination.Name, new Symbol(SymbolType.Constant), value);
+            //this.SymbolTable.AddSymbol(ci.Destination.Name, new Symbol(SymbolType.Constant), value);
         }
 
         private void OpCodeReturn()
@@ -460,7 +460,7 @@ namespace Fl.Engine.IL.VM
                 throw new InvalidInstructionException("Cannot declare local variable in a non-function fragment");
 
             LocalInstruction li = this.FetchCurrentInstruction<LocalInstruction>();
-            this.SymbolTable.AddSymbol(li.Destination.Name, new Symbol(SymbolType.Variable), this.Frame.Parameters.Pop());
+            //this.SymbolTable.AddSymbol(li.Destination.Name, new Symbol(SymbolType.Variable), this.Frame.Parameters.Pop());
         }
 
         private void OpCodeIfFalse()

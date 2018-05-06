@@ -10,7 +10,7 @@ namespace Fl.Engine.IL.Instructions.Operands
     {                
         public object Value { get; }
 
-        public ImmediateOperand(TypeResolver type, object val)
+        public ImmediateOperand(OperandType type, object val)
             : base(type)
         {            
             this.Value = val;

@@ -9,49 +9,49 @@ namespace Fl.Engine.IL
 {
     public class AstVisitor
     {
-        private ILGenerator _Generator;
-        private UnaryILGenerator _UnaryILGenerator;
-        private BinaryILGenerator _BinaryILGenerator;
-        private AssignmentILGenerator _AssignmentILGenerator;
-        private ConstantILGenerator _ConstantILGenerator;
-        private VariableILGenerator _VariableILGenerator;
-        private BlockILGenerator _BlockILGenerator;
-        private DeclarationILGenerator _DeclarationILGenerator;
-        private LiteralILGenerator _LiteralILGenerator;
-        private AccessorILGenerator _AccessorILGenerator;
-        private IfILGenerator _IfILGenerator;
-        private WhileILGenerator _WhileILGenerator;
-        private ForILGenerator _ForILGenerator;
-        private BreakILGenerator _BreakILGenerator;
-        private ContinueILGenerator _ContinueILGenerator;
-        private ReturnILGenerator _ReturnILGenerator;
-        private CallableILGenerator _CallILGenerator;
-        private FuncDeclILGenerator _FuncDeclILGenerator;
-        private TupleILGenerator _TupleILGenerator;
-        private NullCoalescingILGenerator _NullCoalescingILGenerator;
+        private ILGenerator generator;
+        private UnaryILGenerator unaryILGenerator;
+        private BinaryILGenerator binaryILGenerator;
+        private AssignmentILGenerator assignmentILGenerator;
+        private ConstantILGenerator constantILGenerator;
+        private VariableILGenerator variableILGenerator;
+        private BlockILGenerator blockILGenerator;
+        private DeclarationILGenerator declarationILGenerator;
+        private LiteralILGenerator literalILGenerator;
+        private AccessorILGenerator accessorILGenerator;
+        private IfILGenerator ifILGenerator;
+        private WhileILGenerator whileILGenerator;
+        private ForILGenerator forILGenerator;
+        private BreakILGenerator breakILGenerator;
+        private ContinueILGenerator continueILGenerator;
+        private ReturnILGenerator returnILGenerator;
+        private CallableILGenerator callILGenerator;
+        private FuncDeclILGenerator funcDeclILGenerator;
+        private TupleILGenerator tupleILGenerator;
+        private NullCoalescingILGenerator nullCoalescingILGenerator;
 
         public AstVisitor(ILGenerator generator)
         {
-            _Generator = generator;
-            _UnaryILGenerator = new UnaryILGenerator();
-            _BinaryILGenerator = new BinaryILGenerator();
-            _AssignmentILGenerator = new AssignmentILGenerator();
-            _ConstantILGenerator = new ConstantILGenerator();
-            _VariableILGenerator = new VariableILGenerator();
-            _BlockILGenerator = new BlockILGenerator();
-            _DeclarationILGenerator = new DeclarationILGenerator();
-            _LiteralILGenerator = new LiteralILGenerator();
-            _AccessorILGenerator = new AccessorILGenerator();
-            _IfILGenerator = new IfILGenerator();
-            _WhileILGenerator = new WhileILGenerator();
-            _ForILGenerator = new ForILGenerator();
-            _BreakILGenerator = new BreakILGenerator();
-            _ContinueILGenerator = new ContinueILGenerator();
-            _CallILGenerator = new CallableILGenerator();
-            _FuncDeclILGenerator = new FuncDeclILGenerator();
-            _TupleILGenerator = new TupleILGenerator();
-            _ReturnILGenerator = new ReturnILGenerator();
-            _NullCoalescingILGenerator = new NullCoalescingILGenerator();
+            this.generator = generator;
+            this.unaryILGenerator = new UnaryILGenerator();
+            this.binaryILGenerator = new BinaryILGenerator();
+            this.assignmentILGenerator = new AssignmentILGenerator();
+            this.constantILGenerator = new ConstantILGenerator();
+            this.variableILGenerator = new VariableILGenerator();
+            this.blockILGenerator = new BlockILGenerator();
+            this.declarationILGenerator = new DeclarationILGenerator();
+            this.literalILGenerator = new LiteralILGenerator();
+            this.accessorILGenerator = new AccessorILGenerator();
+            this.ifILGenerator = new IfILGenerator();
+            this.whileILGenerator = new WhileILGenerator();
+            this.forILGenerator = new ForILGenerator();
+            this.breakILGenerator = new BreakILGenerator();
+            this.continueILGenerator = new ContinueILGenerator();
+            this.callILGenerator = new CallableILGenerator();
+            this.funcDeclILGenerator = new FuncDeclILGenerator();
+            this.tupleILGenerator = new TupleILGenerator();
+            this.returnILGenerator = new ReturnILGenerator();
+            this.nullCoalescingILGenerator = new NullCoalescingILGenerator();
         }
 
         public Operand Visit(AstNode node)
@@ -60,43 +60,43 @@ namespace Fl.Engine.IL
             switch (n)
             {
                 case AstUnaryNode u:
-                    return _UnaryILGenerator.Visit(_Generator, u);
+                    return this.unaryILGenerator.Visit(this.generator, u);
                 case AstBinaryNode b:
-                    return _BinaryILGenerator.Visit(_Generator, b);
+                    return this.binaryILGenerator.Visit(this.generator, b);
                 case AstAssignmentNode a:
-                    return _AssignmentILGenerator.Visit(_Generator, a);
+                    return this.assignmentILGenerator.Visit(this.generator, a);
                 case AstConstantNode c:
-                    return _ConstantILGenerator.Visit(_Generator, c);
+                    return this.constantILGenerator.Visit(this.generator, c);
                 case AstVariableNode v:
-                    return _VariableILGenerator.Visit(_Generator, v);
+                    return this.variableILGenerator.Visit(this.generator, v);
                 case AstBlockNode bl:
-                    return _BlockILGenerator.Visit(_Generator, bl);
+                    return this.blockILGenerator.Visit(this.generator, bl);
                 case AstDeclarationNode d:
-                    return _DeclarationILGenerator.Visit(_Generator, d);
+                    return this.declarationILGenerator.Visit(this.generator, d);
                 case AstLiteralNode l:
-                    return _LiteralILGenerator.Visit(_Generator, l);
+                    return this.literalILGenerator.Visit(this.generator, l);
                 case AstAccessorNode ivk:
-                    return _AccessorILGenerator.Visit(_Generator, ivk);
+                    return this.accessorILGenerator.Visit(this.generator, ivk);
                 case AstIfNode i:
-                    return _IfILGenerator.Visit(_Generator, i);
+                    return this.ifILGenerator.Visit(this.generator, i);
                 case AstWhileNode w:
-                    return _WhileILGenerator.Visit(_Generator, w);
+                    return this.whileILGenerator.Visit(this.generator, w);
                 case AstForNode f:
-                    return _ForILGenerator.Visit(_Generator, f);
+                    return this.forILGenerator.Visit(this.generator, f);
                 case AstBreakNode brk:
-                    return _BreakILGenerator.Visit(_Generator, brk);
+                    return this.breakILGenerator.Visit(this.generator, brk);
                 case AstContinueNode cont:
-                    return _ContinueILGenerator.Visit(_Generator, cont);
+                    return this.continueILGenerator.Visit(this.generator, cont);
                 case AstCallableNode call:
-                    return _CallILGenerator.Visit(_Generator, call);
+                    return this.callILGenerator.Visit(this.generator, call);
                 case AstFuncDeclNode func:
-                    return _FuncDeclILGenerator.Visit(_Generator, func);
+                    return this.funcDeclILGenerator.Visit(this.generator, func);
                 case AstTupleNode t:
-                    return _TupleILGenerator.Visit(_Generator, t);
+                    return this.tupleILGenerator.Visit(this.generator, t);
                 case AstReturnNode ret:
-                    return _ReturnILGenerator.Visit(_Generator, ret);
+                    return this.returnILGenerator.Visit(this.generator, ret);
                 case AstNullCoalescingNode nc:
-                    return _NullCoalescingILGenerator.Visit(_Generator, nc);
+                    return this.nullCoalescingILGenerator.Visit(this.generator, nc);
                 case AstNoOpNode np:
                     return null;
             }

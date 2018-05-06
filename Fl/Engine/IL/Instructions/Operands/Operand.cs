@@ -8,12 +8,12 @@ namespace Fl.Engine.IL.Instructions.Operands
 {
     public abstract class Operand
     {
-        public TypeResolver TypeResolver { get; }
+        public OperandType Type { get; }
         public SymbolOperand Member { get; private set; }
 
-        public Operand(TypeResolver type)
+        public Operand(OperandType type)
         {
-            this.TypeResolver = type;
+            this.Type = type;
         }
 
         public void AddMember(SymbolOperand member)

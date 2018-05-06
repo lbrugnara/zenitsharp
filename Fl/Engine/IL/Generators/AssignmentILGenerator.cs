@@ -4,6 +4,7 @@
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Exceptions;
 using Fl.Engine.IL.Instructions.Operands;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser;
 using Fl.Parser.Ast;
 
@@ -23,6 +24,10 @@ namespace Fl.Engine.IL.Generators
         {
             SymbolOperand leftHandSide = node.Accessor.Exec(generator) as SymbolOperand;
             Operand rightHandSide = node.Expression.Exec(generator);
+
+            // If right-hand side exists and has a type, do some type checking
+            /*if (rightHandSide.Type != leftHandSide.Type)
+                throw new AstWalkerException($"Cannot convert {rightHandSide.Type} to {leftHandSide.Type} ('{leftHandSide.Name}')");*/
 
             if (node.AssignmentOp.Type == TokenType.Assignment)
             {
@@ -51,6 +56,7 @@ namespace Fl.Engine.IL.Generators
             }
 
             generator.Emmit(instr);
+
             return leftHandSide;
         }
     }

@@ -52,7 +52,7 @@ namespace FlInterpreter
 
                     ILProgram ip = g.Build(ast);
                     Console.WriteLine(ip.ToString());
-                    ip.Run();
+                    /*ip.Run();
 
                     AssignInstruction instr = ip.Fragments[".global"].Instructions.LastOrDefault() as AssignInstruction;
                     if (instr == null || instr.Destination == null || !ip.SymbolTable.HasSymbol(instr.Destination.ToString()))
@@ -62,7 +62,7 @@ namespace FlInterpreter
                     if (result == null)
                         continue;
 
-                    Console.WriteLine($"<= {result.ToDebugStr()}");
+                    Console.WriteLine($"<= {result.ToDebugStr()}");*/
                 }
                 catch (Exception e)
                 {

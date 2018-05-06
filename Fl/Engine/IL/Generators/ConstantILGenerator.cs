@@ -12,19 +12,21 @@ namespace Fl.Engine.IL.Generators
     {
         public Operand Visit(ILGenerator generator, AstConstantNode constdec)
         {
-            // Get the variable type
-            TypeResolver typeres = TypeResolver.GetTypeResolverFromToken(constdec.Type);
-
             foreach (var declaration in constdec.Constants)
             {
                 // Get the identifier name
-                var identifierToken = declaration.Item1;
-                // Get the right-hand side operand
-                var operand = declaration.Item2.Exec(generator);
+                var constantName = declaration.Item1.Value.ToString();
+
+                // Get the constant's type
+                var type = OperandType.FromToken(constdec.Type);
+
+                // Get the right-hand side operand (a must for a constant)
+                var rhs = declaration.Item2.Exec(generator);
 
                 // const <identifier> = <operand>
-                var symbol = generator.SymbolTable.NewSymbol(identifierToken.Value.ToString(), typeres); //new SymbolOperand(generator.SymbolTable.GetMangledName(identifierToken.Value.ToString()));
-                generator.Emmit(new ConstInstruction(symbol, typeres, operand));
+                var symbol = generator.SymbolTable.NewSymbol(constantName, type);
+
+                generator.Emmit(new ConstInstruction(symbol, type, rhs));
             }
             return null;
         }

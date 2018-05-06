@@ -26,26 +26,35 @@ namespace Fl.Engine.IL.Generators
 
         protected Operand VarDefinitionNode(ILGenerator generator, AstVarDefinitionNode vardecl)
         {
-            // Get the variable type
-            TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardecl.VarType.TypeToken);
-
             foreach (var declaration in vardecl.VarDefinitions)
             {
                 // Get the identifier name
-                var identifierToken = declaration.Item1;
+                var variableName = declaration.Item1.Value.ToString();
 
-                if (generator.SymbolTable.SymbolIsDefinedInBlock(identifierToken.Value.ToString()))
-                    throw new SymbolException($"Symbol {identifierToken.Value} is already defined.");
+                // Check if the symbol is already defined
+                if (generator.SymbolTable.SymbolIsDefinedInBlock(variableName))
+                    throw new SymbolException($"Symbol {variableName} is already defined.");
 
-                // Get the right-hand side operand
-                var operand = declaration.Item2?.Exec(generator);
+                // If it is a variable definition, emmit the code to resolve the right-hand side
+                var rhs = declaration.Item2?.Exec(generator);
 
-                if (typeresolver.TypeName == FlNullType.Instance.Name && operand != null && operand.TypeResolver.TypeName != FlNullType.Instance.Name)
-                    typeresolver = operand.TypeResolver;
+                // Get the variable type from the declaration
+                var type = OperandType.FromToken(vardecl.VarType.TypeToken);
 
-                // var <identifier> = <operand>
-                var symbol = generator.SymbolTable.NewSymbol(identifierToken.Value.ToString(), typeresolver);
-                generator.Emmit(new VarInstruction(symbol, typeresolver, operand));
+                if (type == OperandType.Auto)
+                {
+                    // If variable is implicitly typed, the right-hand side expression is a must
+                    if (rhs == null)
+                        throw new AstWalkerException($"Implicitly-typed variable must be initialized");
+
+                    // Take the type from the right hand side expression
+                    type = rhs.Type;
+                }
+
+                // Create the new symbol for the variable
+                var symbol = generator.SymbolTable.NewSymbol(variableName, type);
+
+                generator.Emmit(new VarInstruction(symbol, type, rhs));
             }
             return null;
         }
@@ -53,7 +62,7 @@ namespace Fl.Engine.IL.Generators
         protected Operand VarDestructuringNode(ILGenerator generator, AstVarDestructuringNode vardestnode)
         {
             // Get the variable type
-            TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);
+            //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);
 
             /*vardestnode.DestructInit.Exec()
 

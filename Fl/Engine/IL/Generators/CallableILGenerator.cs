@@ -25,8 +25,8 @@ namespace Fl.Engine.IL.Generators
             // Generate the call instruction
             generator.Emmit(new CallInstruction(target, parameters.Count));
 
-            SymbolOperand dest = generator.SymbolTable.NewTempSymbol();
-            generator.Emmit(new VarInstruction(dest, target.TypeResolver, generator.SymbolTable.ReturnSymbol));
+            SymbolOperand dest = generator.SymbolTable.NewTempSymbol(OperandType.Null);
+            generator.Emmit(new VarInstruction(dest, OperandType.Null));
             return dest;
         }
     }

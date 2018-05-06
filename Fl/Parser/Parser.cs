@@ -388,7 +388,7 @@ namespace Fl.Parser
             do
             {
                 // There could be multiple declarations and definitions, so consume the
-                // identifier and the check if it is a definition or just a declaration
+                // identifier and then check if it is a definition or just a declaration
                 var id = this.Consume(TokenType.Identifier);
 
                 if (this.Match(TokenType.Assignment) && this.Consume(TokenType.Assignment) != null)

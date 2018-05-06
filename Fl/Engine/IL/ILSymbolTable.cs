@@ -13,89 +13,88 @@ namespace Fl.Engine.IL
     public class ILSymbolTable
     {
         // Represents the global block (main block)
-        private Block _Global;
+        private readonly Block global;
         
         // List of the current chain
-        private List<Block> _Blocks;
+        private readonly List<Block> blocks;
         
         // Once a block is finished it is moved to this list
-        private List<Block> _ResolvedBlocks;
+        private readonly List<Block> resolvedBlocks;
 
-        public SymbolOperand ReturnSymbol { get; } = new SymbolOperand("@return", null, null);
+        public SymbolOperand ReturnSymbol { get; } = new SymbolOperand("@return", OperandType.Auto);
 
-        private int TemporalVarCounter = 0;
+        private int tempVarCounter = 0;
 
-        private int BlockCounter = 1;
+        private int blockCounter = 1;
 
         public ILSymbolTable()
         {
-            _Global = new Block(BlockType.Global, "0", null, null);
-            _Blocks = new List<Block>();
-            _ResolvedBlocks = new List<Block>();            
+            this.global = new Block(BlockType.Global, "0", null, null);
+            this.blocks = new List<Block>();
+            this.resolvedBlocks = new List<Block>();            
         }
 
         // The symbol table is inside a block if there is at least one entry in the _Blocks list
-        private bool InBlock => _Blocks.Count() > 0;
+        private bool InBlock => this.blocks.Count() > 0;
 
         // The current block is the last in the chain or the global block
-        private Block CurrentBlock => InBlock ? _Blocks.Last() : _Global;
+        public Block CurrentBlock => this.InBlock ? this.blocks.Last() : this.global;
 
         public bool SymbolIsDefinedInBlock(string name)
+            => this.InBlock ? this.CurrentBlock.HasSymbol(name) : this.global.HasSymbol(name);
+
+        public SymbolOperand NewSymbol(string name, OperandType type)
         {
-            if (InBlock)
-                return CurrentBlock.HasSymbol(name);
-            return _Global.HasSymbol(name);
+            var symbolOperand = new SymbolOperand(name, type, this.CurrentBlock.Name);
+            this.CurrentBlock[name] = symbolOperand;
+            return symbolOperand;
         }
 
-        public SymbolOperand NewSymbol(string name, TypeResolver typeResolver = null)
-        {
-            var symbol = new SymbolOperand(name, CurrentBlock.Name, typeResolver);
-            CurrentBlock[name] = symbol;
-            return symbol;
-        }
-
-        public SymbolOperand NewTempSymbol(string suggestedName = null) => NewSymbol($"@{suggestedName ?? "t"}{(TemporalVarCounter++)}");
+        public SymbolOperand NewTempSymbol(OperandType type, string suggestedName = null) 
+            => this.NewSymbol($"@{suggestedName ?? "t"}{(this.tempVarCounter++)}", type);
 
         public SymbolOperand GetSymbol(string name)
         {
-            if (InBlock)
+            if (this.InBlock)
             {
-                for (int i = _Blocks.Count-1; i >= 0; i--)
+                for (int i = this.blocks.Count-1; i >= 0; i--)
                 {
-                    var scope = _Blocks[i];
+                    var scope = this.blocks[i];
                     if (scope.HasSymbol(name))
                         return scope[name];
                 }
             }
-            if (_Global != null && _Global.HasSymbol(name))
-                return _Global[name];
 
-            return new SymbolOperand(name, null);
+            if (this.global != null && this.global.HasSymbol(name))
+                return global[name];
+
+            return null;
         }
 
         public void EnterBlock(BlockType blockType, Label entryPoint, Label exitPoint)
         {
-            _Blocks.Add(new Block(blockType, BlockCounter++.ToString(), entryPoint, exitPoint));
+            this.blocks.Add(new Block(blockType, this.blockCounter++.ToString(), entryPoint, exitPoint));
         }
         
         public void LeaveBlock()
         {
-            var popblock = _Blocks.ElementAt(_Blocks.Count - 1);
-            _Blocks.Remove(popblock);
-            _ResolvedBlocks.Add(popblock);
+            var popblock = this.blocks.ElementAt(this.blocks.Count - 1);
+            this.blocks.Remove(popblock);
+            this.resolvedBlocks.Add(popblock);
         }
         
         public Block GetLoopBlock()
         {
-            if (!InBlock)
+            if (!this.InBlock)
                 throw new ScopeOperationException("Current block is not a loop");
 
-            for (int i = _Blocks.Count-1; i >= 0; i--)
+            for (int i = this.blocks.Count-1; i >= 0; i--)
             {
-                var block = _Blocks.ElementAt(i);
+                var block = this.blocks.ElementAt(i);
                 if (block.Type == BlockType.Loop)
                     return block;
             }
+
             throw new ScopeOperationException("Current block is not a loop");
         }
     }

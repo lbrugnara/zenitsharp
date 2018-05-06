@@ -3,6 +3,7 @@
 
 
 using Fl.Engine.Symbols.Types;
+using System;
 
 namespace Fl.Engine.IL.Instructions.Operands
 {
@@ -10,16 +11,28 @@ namespace Fl.Engine.IL.Instructions.Operands
     {
         public string Name { get; }
         public string Scope { get; private set; }
-        public string MangledName => Scope != null ? $"{Name}__`{Scope}" : Name;
+        public string MangledName => Scope != null ? $"{Name}__{{{Scope}}}" : Name;
+        public bool IsResolved { get; private set; }
 
-        public SymbolOperand(string name, string scope, TypeResolver type = null)
+        public SymbolOperand(string name, OperandType type, string scope, bool isResolved = true)
             : base (type)
         {
             this.Name = name;
-            this.Scope = scope;
+            this.Scope = scope ?? throw new ArgumentNullException(nameof(scope));
+            this.IsResolved = isResolved;
         }
 
-        public bool IsResolved => Scope != null;
+        public SymbolOperand(string name, OperandType type)
+            : base(type)
+        {
+            this.Name = name;
+        }
+
+        public SymbolOperand(string name)
+            : base(OperandType.Auto)
+        {
+            this.Name = name;
+        }
 
         public void SetScope(string scope)
         {

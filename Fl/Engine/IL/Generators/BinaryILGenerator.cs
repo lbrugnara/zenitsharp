@@ -3,6 +3,7 @@
 
 using Fl.Engine.IL.Instructions;
 using Fl.Engine.IL.Instructions.Operands;
+using Fl.Engine.Symbols.Types;
 using Fl.Parser;
 using Fl.Parser.Ast;
 
@@ -15,7 +16,8 @@ namespace Fl.Engine.IL.Generators
             Operand left = binary.Left.Exec(generator);
             Operand right = binary.Right.Exec(generator);
 
-            SymbolOperand tmpname = generator.SymbolTable.NewTempSymbol();
+            SymbolOperand tmpname = generator.SymbolTable.NewTempSymbol(OperandType.Auto);
+
             Instruction instr = null;
             
             switch (binary.Operator.Type)
@@ -66,13 +68,13 @@ namespace Fl.Engine.IL.Generators
                     break;
             }
 
-            generator.Emmit(new VarInstruction(tmpname, null, null));
+            generator.Emmit(new VarInstruction(tmpname, null));
             generator.Emmit(instr);
 
             if (binary.Operator.Type == TokenType.NotEqual)
             {
-                SymbolOperand notname = generator.SymbolTable.NewTempSymbol();
-                generator.Emmit(new VarInstruction(notname, null, null));
+                SymbolOperand notname = generator.SymbolTable.NewTempSymbol(OperandType.Auto);
+                generator.Emmit(new VarInstruction(notname, null));
                 generator.Emmit(new NotInstruction(notname, tmpname));
                 return notname;
             }
