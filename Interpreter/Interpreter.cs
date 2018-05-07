@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.IL;
-using Fl.Engine.IL.VM;
-using Fl.Engine.IL.Instructions;
+using Fl.IL;
+using Fl.IL.VM;
+using Fl.IL.Instructions;
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Objects;
 using Fl.Parser;
@@ -11,6 +11,8 @@ using Fl.Parser.Ast;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Fl.Symbols;
+using Fl.TypeChecker;
 
 namespace FlInterpreter
 {
@@ -48,6 +50,13 @@ namespace FlInterpreter
                         continue;
                     }
 
+                    SymbolResolver sr = new SymbolResolver();
+
+                    SymbolTable st = sr.Resolve(ast);
+
+                    TypeChecker tc = new TypeChecker(st);
+                    tc.Visit(ast);
+                    
                     var g = new ILGenerator();
 
                     ILProgram ip = g.Build(ast);

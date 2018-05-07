@@ -80,7 +80,7 @@ namespace Fl.Parser
 
         // More keywords
         Function,
-        Namespace,
+        Package,
         New
     }
 }

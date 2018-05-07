@@ -5,7 +5,7 @@ namespace Fl.Parser.Ast
 {
     public abstract class AstNode
     {
-        public T Exec<T>(IAstWalker<T> walker) where T : class
+        public T Visit<T>(IAstWalker<T> walker) where T : class
         {
             return walker.Visit(this);
         }

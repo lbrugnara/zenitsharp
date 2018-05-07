@@ -3,6 +3,7 @@
 
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Types;
+using Fl.Symbols;
 using System;
 using System.Collections.Generic;
 

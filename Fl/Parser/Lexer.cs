@@ -48,7 +48,7 @@ namespace Fl.Parser
             { "continue", TokenType.Continue },
             { "return", TokenType.Return },
             { "fn", TokenType.Function },
-            { "namespace", TokenType.Namespace },
+            { "package", TokenType.Package },
             { "new", TokenType.New }
         };
 

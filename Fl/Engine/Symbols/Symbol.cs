@@ -3,6 +3,7 @@
 
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Objects;
+using Fl.Symbols;
 
 namespace Fl.Engine.Symbols
 {
