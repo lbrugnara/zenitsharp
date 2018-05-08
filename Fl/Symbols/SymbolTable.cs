@@ -9,64 +9,70 @@ using Fl.Lang.Types;
 
 namespace Fl.Symbols
 {
-    public class SymbolTable
+    public class SymbolTable : ISymbolTable
     {
+        /// <summary>
+        /// An stack to keep track of nested blocks
+        /// </summary>
         private Stack<Block> Blocks { get; }
 
+        /// <summary>
+        /// Used in temporal symbol's name
+        /// </summary>
         private int tempVarCounter = 0;
 
         public SymbolTable()
         {
             this.Blocks = new Stack<Block>();
+
+            // Push the initial block (Global)
             this.Blocks.Push(new Block(BlockType.Global, "0"));
         }
 
+        /// <summary>
+        /// Current block is the last one added to the stack
+        /// </summary>
         public Block CurrentBlock => this.Blocks.Peek();
 
-        public bool SymbolIsDefinedInBlock(string name) => this.CurrentBlock.HasSymbol(name);
+        /// <summary>
+        /// Check if there's a child block in CurrentBlock with the provided UID. If the block exists, check the block's type
+        /// and if it differs throw an exception because block definition mismatches.
+        /// If block does not exist, create a new block and chain it to the current block.
+        /// Either way, push retrieved/created block to the stack to make it the CurrentBlock.
+        /// </summary>
+        /// <param name="blockType">Type of the block to get/create</param>
+        /// <param name="uid">ID of the block to get/create</param>
+        public void EnterBlock(BlockType blockType, string uid) => this.Blocks.Push(this.CurrentBlock.GetOrCreateInnerBlock(blockType, uid));
 
-        public void AddSymbol(Symbol symbol)
-        {
-            this.CurrentBlock.AddSymbol(symbol);
-        }
+        /// <summary>
+        /// Remove CurrentBlock from the stack (go back to the CurrentBlock's parent block)
+        /// </summary>
+        public void LeaveBlock() => this.Blocks.Pop();
 
-        public Symbol NewSymbol(string name, Type type, bool resolved = true)
-        {
-            return this.CurrentBlock.NewSymbol(name, type);            
-        }
 
+        #region ISymbolTable implementation
+
+        /// <inheritdoc/>
+        public void AddSymbol(Symbol symbol) => this.CurrentBlock.AddSymbol(symbol);
+
+        /// <inheritdoc/>
+        public Symbol NewSymbol(string name, Type type) => this.CurrentBlock.NewSymbol(name, type);
+
+        /// <inheritdoc/>
+        public bool HasSymbol(string name) => this.CurrentBlock.HasSymbol(name);
+
+        /// <inheritdoc/>
+        public Symbol GetSymbol(string name) => this.CurrentBlock.GetSymbol(name);
+
+        #endregion
+
+        /// <summary>
+        /// Create a temporal symbol and add it to the CurrentBlock
+        /// </summary>
+        /// <param name="type">Temp symbol's type</param>
+        /// <param name="suggestedName">Temp symbol's name can be specified here</param>
+        /// <returns></returns>
         public Symbol NewTempSymbol(Type type, string suggestedName = null) 
             => this.NewSymbol($"@{suggestedName ?? "t"}{(this.tempVarCounter++)}", type);
-
-        public Symbol GetSymbol(string name)
-        {
-            return this.CurrentBlock[name];
-        }
-
-        public void EnterBlock(BlockType blockType, string name)
-        {
-            var block = this.CurrentBlock.GetOrCreateChild(blockType, name);
-            this.Blocks.Push(block);
-        }
-        
-        public void LeaveBlock()
-        {
-            this.Blocks.Pop();
-        }
-        
-        public Block GetLoopBlock()
-        {
-            /*if (!this.InBlock)
-                throw new ScopeOperationException("Current block is not a loop");
-
-            for (int i = this.blocks.Count-1; i >= 0; i--)
-            {
-                var block = this.blocks.ElementAt(i);
-                if (block.Type == BlockType.Loop)
-                    return block;
-            }*/
-
-            throw new ScopeOperationException("Current block is not a loop");
-        }
     }
 }

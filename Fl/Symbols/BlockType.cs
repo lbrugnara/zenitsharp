@@ -25,6 +25,9 @@ namespace Fl.Symbols
         /// </summary>
         Function,
 
-        Namespace
+        /// <summary>
+        /// Represents a package block
+        /// </summary>
+        Package
     }
 }

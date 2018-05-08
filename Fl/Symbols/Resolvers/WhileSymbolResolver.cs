@@ -11,7 +11,7 @@ namespace Fl.Symbols.Resolvers
         public Symbol Visit(SymbolResolver checker, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
-            checker.EnterBlock(BlockType.Loop, $"while-body-{wnode.GetHashCode()}");
+            checker.SymbolTable.EnterBlock(BlockType.Loop, $"while-body-{wnode.GetHashCode()}");
 
             // Emmit the condition code
             wnode.Condition.Visit(checker);
@@ -20,7 +20,7 @@ namespace Fl.Symbols.Resolvers
             wnode.Body.Visit(checker);
 
             // Leave the while-block
-            checker.LeaveBlock();
+            checker.SymbolTable.LeaveBlock();
 
             return null;
         }

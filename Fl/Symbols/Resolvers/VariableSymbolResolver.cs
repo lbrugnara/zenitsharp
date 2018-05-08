@@ -34,7 +34,7 @@ namespace Fl.Symbols.Resolvers
                 var variableName = declaration.Item1.Value.ToString();
 
                 // Check if the symbol is already defined
-                if (checker.SymbolTable.SymbolIsDefinedInBlock(variableName))
+                if (checker.SymbolTable.HasSymbol(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // Create the new symbol for the variable

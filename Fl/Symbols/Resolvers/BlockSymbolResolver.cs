@@ -10,12 +10,12 @@ namespace Fl.Symbols.Resolvers
     {
         public Symbol Visit(SymbolResolver checker, AstBlockNode node)
         {
-            checker.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
+            checker.SymbolTable.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
 
             foreach (AstNode statement in node.Statements)
                 statement.Visit(checker);
 
-            checker.LeaveBlock();
+            checker.SymbolTable.LeaveBlock();
             return null;
         }
     }

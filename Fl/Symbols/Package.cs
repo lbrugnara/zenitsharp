@@ -6,49 +6,42 @@ using System.Collections.Generic;
 
 namespace Fl.Symbols
 {
-    public class Package : Symbol
+    public class Package : Symbol, ISymbolTable
     {
         /// <summary>
         /// Contains symbols defined in this block
         /// </summary>
-        private Dictionary<string, Symbol> Symbols { get; }
+        private Block Symbols { get; }
 
         public Package(string name, string scope = null)
             : base(name, Lang.Types.Package.Instance, scope)
         {
-            this.Symbols = new Dictionary<string, Symbol>();
+            this.Symbols = new Block(BlockType.Package, this.MangledName);
         }
 
-        public void AddSymbol(Symbol symbol)
-        {
-            if (this.Symbols.ContainsKey(symbol.Name))
-                throw new SymbolException($"Symbol {symbol.Name} is already defined in package {this.Name}");
+        #region ISymbolTable implementation
 
-            this.Symbols[symbol.Name] = symbol;
-        }
+        /// <inheritdoc/>
+        public void AddSymbol(Symbol symbol) => this.Symbols.AddSymbol(symbol);
+
+        /// <inheritdoc/>
+        public Symbol NewSymbol(string name, Type type) => this.Symbols.NewSymbol(name, type);
+
+        /// <inheritdoc/>
+        public bool HasSymbol(string name) => this.Symbols.HasSymbol(name);
+
+        /// <inheritdoc/>
+        public Symbol GetSymbol(string name) => this.Symbols.GetSymbol(name);
+
+        #endregion
 
         internal Package NewPackage(string name)
         {
-            if (this.Symbols.ContainsKey(name))
-                throw new SymbolException($"Symbol {name} is already defined in package {this.Name}");
-
             var pkg = new Package(name, this.MangledName);
-            this.Symbols[name] = pkg;
+
+            this.Symbols.AddSymbol(pkg);
+
             return pkg;
-        }
-
-        public Symbol NewSymbol(string name, Type type)
-        {
-            if (this.Symbols.ContainsKey(name))
-                throw new SymbolException($"Symbol {name} is already defined in package {this.Name}");
-
-            var symbol = new Symbol(name, type, this.MangledName);
-            this.Symbols[name] = symbol;
-            return symbol;
-        }
-
-        public bool HasSymbol(string name) => this.Symbols.ContainsKey(name);
-
-        public Symbol this[string name] => this.Symbols[name];
+        }        
     }
 }

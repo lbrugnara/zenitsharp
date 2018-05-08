@@ -27,27 +27,12 @@ namespace Fl.Symbols
 
             this.SymbolTable = new SymbolTable();
 
-            Package std = new Package("std", this.SymbolTable.CurrentBlock.Name);
+            Package std = new Package("std", this.SymbolTable.CurrentBlock.Uid);
             Package lang = std.NewPackage("lang");
             lang.NewSymbol("version", String.Instance);
 
             this.SymbolTable.AddSymbol(std);
         }
-
-        // Adds a new block to the SymbolTable, it represents a new scope
-        public void EnterBlock(BlockType type, string name)
-        {
-            this.SymbolTable.EnterBlock(type, name);
-        }
-
-        // Leave the current block in the SymbolTable
-        public void LeaveBlock()
-        {
-            this.SymbolTable.LeaveBlock();
-        }
-
-        // Returns true if the current fragment is a function fragment
-        public bool InFunction => this.SymbolTable.CurrentBlock.Type == BlockType.Function;
 
         public SymbolTable Resolve(AstNode node)
         {

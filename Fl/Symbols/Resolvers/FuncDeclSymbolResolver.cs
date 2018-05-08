@@ -10,7 +10,7 @@ namespace Fl.Symbols.Resolvers
     {
         public Symbol Visit(SymbolResolver checker, AstFuncDeclNode funcdecl)
         {
-            checker.EnterBlock(BlockType.Function, $"func-{funcdecl.Identifier.Value}-{funcdecl.GetHashCode()}");
+            checker.SymbolTable.EnterBlock(BlockType.Function, $"func-{funcdecl.Identifier.Value}-{funcdecl.GetHashCode()}");
 
             funcdecl.Parameters.Parameters.ForEach(p => checker.SymbolTable.NewSymbol(p.Value.ToString(), null));
 
@@ -19,7 +19,7 @@ namespace Fl.Symbols.Resolvers
             if (!funcdecl.Body.Any(n => n is AstReturnNode))
                 funcdecl.Body.OfType<AstReturnNode>().ToList().ForEach(rn => rn.Visit(checker));
 
-            checker.LeaveBlock();
+            checker.SymbolTable.LeaveBlock();
 
             return null;
         }

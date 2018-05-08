@@ -25,7 +25,7 @@ namespace Fl.Symbols.Resolvers
             if (parent is Package pkg)
             {
                 if (pkg.HasSymbol(currentIdentifier))
-                    return pkg[currentIdentifier];
+                    return pkg.GetSymbol(currentIdentifier);
                 // Unresolved
                 return new Symbol(currentIdentifier, null, pkg.MangledName);
             }

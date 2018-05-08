@@ -12,7 +12,7 @@ namespace Fl.Symbols.Resolvers
         public Symbol Visit(SymbolResolver checker, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
-            checker.EnterBlock(BlockType.Loop, $"for-{fornode.GetHashCode()}");
+            checker.SymbolTable.EnterBlock(BlockType.Loop, $"for-{fornode.GetHashCode()}");
 
             // Initialize the for-block
             fornode.Init.Visit(checker);
@@ -27,7 +27,7 @@ namespace Fl.Symbols.Resolvers
             fornode.Increment.Visit(checker);
 
             // Leave the for
-            checker.LeaveBlock();
+            checker.SymbolTable.LeaveBlock();
 
             return null;
         }

@@ -12,7 +12,7 @@ namespace Fl.Symbols.Resolvers
     {
         public Symbol Visit(SymbolResolver checker, AstReturnNode rnode)
         {
-            if (!checker.InFunction)
+            if (checker.SymbolTable.CurrentBlock.Type != BlockType.Function)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
             return rnode.ReturnTuple?.Visit(checker);

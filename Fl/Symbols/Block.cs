@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using System;
 using System.Collections.Generic;
 using Fl.Lang.Types;
 
 namespace Fl.Symbols
 {
-    public class Block
+
+    public class Block : ISymbolTable
     {
         /// <summary>
-        /// Scope name used for mangled names
+        /// Scope unique id used in mangled names
         /// </summary>
-        public string Name { get; }
+        public string Uid { get; }
 
         /// <summary>
         /// Type of the current block
@@ -39,46 +39,43 @@ namespace Fl.Symbols
         /// </summary>
         private Dictionary<string, Block> Children { get; }
 
-        public Block(BlockType type, string name)
+        public Block(BlockType type, string uid)
         {
-            this.Name = name;
+            this.Uid = uid;
             this.Type = type;
             this.Symbols = new Dictionary<string, Symbol>();
             this.Children = new Dictionary<string, Block>();
         }
 
-        public Block(BlockType type, string name, Block global, Block parent = null)
-            : this(type, name)
+        public Block(BlockType type, string uid, Block global, Block parent = null)
+            : this(type, uid)
         {
             this.Global = global;
             this.Parent = parent;
         }
 
-        public Block GetOrCreateChild(BlockType type, string name)
+        public Block GetOrCreateInnerBlock(BlockType type, string uid)
         {
             Block block = null;
 
-            if (this.Children.ContainsKey(name))
+            if (this.Children.ContainsKey(uid))
             {
-                block = this.Children[name];
+                block = this.Children[uid];
 
                 if (block.Type != type)
-                    throw new Exception();
+                    throw new BlockException($"Expecting block {uid} to be of type {type} but it has type {block.Type}");
             }
             else
             {
-                block = this.ChainBlock(type, name);
+                block = new Block(type, uid, this.Global, this);
+
+                this.Children[uid] = block;
             }
 
             return block;
         }
 
-        private Block ChainBlock(BlockType type, string name)
-        {
-            var block = new Block(type, name, this.Global, this);
-            this.Children[name] = block;
-            return block;
-        }
+        #region ISymbolTable implementation
 
         public void AddSymbol(Symbol symbol)
         {
@@ -93,20 +90,22 @@ namespace Fl.Symbols
             if (this.Symbols.ContainsKey(name))
                 throw new SymbolException($"Symbol {name} is already defined in current block");
 
-            var symbol = new Symbol(name, type, this.Name);
+            var symbol = new Symbol(name, type, this.Uid);
             this.Symbols[name] = symbol;
             return symbol;
         }
 
         public bool HasSymbol(string name) => this.Symbols.ContainsKey(name) || (this.Parent != null && this.Parent.HasSymbol(name)) || (this.Global != null && this.Global.HasSymbol(name));
 
-        public Symbol this[string name] =>
+        public Symbol GetSymbol(string name) =>
             this.Symbols.ContainsKey(name)
             ? this.Symbols[name]
             : this.Parent != null && this.Parent.HasSymbol(name)
-                ? this.Parent?[name]
+                ? this.Parent.GetSymbol(name)
                 : this.Global != null && this.Global.HasSymbol(name)
-                    ? this.Global[name]
+                    ? this.Global.GetSymbol(name)
                     : throw new SymbolException($"Symbol {name} is not defined in current scope");
+
+        #endregion
     }
 }

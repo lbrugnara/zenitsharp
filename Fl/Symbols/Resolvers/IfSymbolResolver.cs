@@ -16,20 +16,20 @@ namespace Fl.Symbols.Resolvers
             var condition = ifnode.Condition.Visit(checker);            
             
             // Add a new common block for the if's boyd
-            checker.EnterBlock(BlockType.Common, $"if-then-{ifnode.GetHashCode()}");
+            checker.SymbolTable.EnterBlock(BlockType.Common, $"if-then-{ifnode.GetHashCode()}");
 
             // Generate the if's body
             ifnode.Then?.Visit(checker);
 
             // Leave the if's then block
-            checker.LeaveBlock();
+            checker.SymbolTable.LeaveBlock();
 
             if (ifnode.Else != null)
             {
                 // Add a block for the else's body and generate it, then leave the block
-                checker.EnterBlock(BlockType.Common, $"if-else-{ifnode.GetHashCode()}");
+                checker.SymbolTable.EnterBlock(BlockType.Common, $"if-else-{ifnode.GetHashCode()}");
                 ifnode.Else.Visit(checker);                
-                checker.LeaveBlock();
+                checker.SymbolTable.LeaveBlock();
             }
 
             return null;

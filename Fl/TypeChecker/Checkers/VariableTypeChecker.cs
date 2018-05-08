@@ -33,7 +33,7 @@ namespace Fl.TypeChecker.Checkers
                 var variableName = declaration.Item1.Value.ToString();
 
                 // Symbol should already be defined
-                if (!checker.SymbolTable.SymbolIsDefinedInBlock(variableName))
+                if (!checker.SymbolTable.HasSymbol(variableName))
                     throw new SymbolException($"Symbol {variableName} is not defined.");                
 
                 // If it is a variable definition, get the right-hand side type info
