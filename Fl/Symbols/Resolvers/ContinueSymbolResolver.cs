@@ -3,15 +3,14 @@
 
 using Fl.Symbols;
 
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class ContinueSymbolResolver : INodeVisitor<SymbolResolver, AstContinueNode, Symbol>
+    class ContinueSymbolResolver : INodeVisitor<SymbolResolver, AstContinueNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstContinueNode cnode)
+        public void Visit(SymbolResolver checker, AstContinueNode cnode)
         {
-            return null;
         }
     }
 }

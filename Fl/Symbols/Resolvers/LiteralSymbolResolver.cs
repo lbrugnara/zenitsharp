@@ -4,15 +4,14 @@
 
 using Fl.Engine.Symbols.Types;
 using Fl.Parser;
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class LiteralSymbolResolver : INodeVisitor<SymbolResolver, AstLiteralNode, Symbol>
+    class LiteralSymbolResolver : INodeVisitor<SymbolResolver, AstLiteralNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstLiteralNode literal)
+        public void Visit(SymbolResolver checker, AstLiteralNode literal)
         {
-            return null;
         }
     }
 }

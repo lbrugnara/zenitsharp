@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Ast;
 using Fl.Engine.Symbols;
 using Fl.Engine.Symbols.Objects;
 using Fl.Parser;
@@ -27,7 +28,7 @@ namespace Fl.Engine.StdLib.builtin
                 }
 
                 Parser.Parser p = new Fl.Parser.Parser();
-                Parser.Ast.AstNode ast = p.Parse(tokens);
+                AstNode ast = p.Parse(tokens);
 
                 var errors = p.ParsingErrors;
                 if (errors.Count > 0)

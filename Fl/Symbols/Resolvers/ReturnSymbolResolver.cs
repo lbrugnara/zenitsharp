@@ -4,18 +4,18 @@
 using Fl.Symbols;
 
 using Fl.Engine.Symbols.Exceptions;
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class ReturnSymbolResolver : INodeVisitor<SymbolResolver, AstReturnNode, Symbol>
+    class ReturnSymbolResolver : INodeVisitor<SymbolResolver, AstReturnNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstReturnNode rnode)
+        public void Visit(SymbolResolver checker, AstReturnNode rnode)
         {
             if (checker.SymbolTable.CurrentBlock.Type != BlockType.Function)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            return rnode.ReturnTuple?.Visit(checker);
+            rnode.ReturnTuple?.Visit(checker);
         }
     }
 }

@@ -2,13 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class BlockSymbolResolver : INodeVisitor<SymbolResolver, AstBlockNode, Symbol>
+    class BlockSymbolResolver : INodeVisitor<SymbolResolver, AstBlockNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstBlockNode node)
+        public void Visit(SymbolResolver checker, AstBlockNode node)
         {
             checker.SymbolTable.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
 
@@ -16,7 +16,6 @@ namespace Fl.Symbols.Resolvers
                 statement.Visit(checker);
 
             checker.SymbolTable.LeaveBlock();
-            return null;
         }
     }
 }

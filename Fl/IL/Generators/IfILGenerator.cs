@@ -3,7 +3,7 @@
 
 using Fl.IL.Instructions;
 using Fl.IL.Instructions.Operands;
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.IL.Generators
 {

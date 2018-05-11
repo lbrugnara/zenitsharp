@@ -3,13 +3,13 @@
 
 using Fl.Symbols;
 
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class ForSymbolResolver : INodeVisitor<SymbolResolver, AstForNode, Symbol>
+    class ForSymbolResolver : INodeVisitor<SymbolResolver, AstForNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstForNode fornode)
+        public void Visit(SymbolResolver checker, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
             checker.SymbolTable.EnterBlock(BlockType.Loop, $"for-{fornode.GetHashCode()}");
@@ -18,7 +18,7 @@ namespace Fl.Symbols.Resolvers
             fornode.Init.Visit(checker);
 
             // Emmit the condition code
-            var condition = fornode.Condition.Visit(checker);
+            fornode.Condition.Visit(checker);
 
             // Emmit the body code
             fornode.Body.Visit(checker);
@@ -28,8 +28,6 @@ namespace Fl.Symbols.Resolvers
 
             // Leave the for
             checker.SymbolTable.LeaveBlock();
-
-            return null;
         }
     }
 }

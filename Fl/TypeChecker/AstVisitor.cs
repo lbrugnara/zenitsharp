@@ -2,7 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Symbols;
-using Fl.Parser.Ast;
+using Fl.Ast;
 using Fl.TypeChecker.Checkers;
 using Fl.Lang.Types;
 

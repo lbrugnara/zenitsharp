@@ -4,18 +4,16 @@
 using Fl.Symbols;
 
 using Fl.Engine.Symbols.Types;
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class NullCoalescingSymbolResolver : INodeVisitor<SymbolResolver, AstNullCoalescingNode, Symbol>
+    class NullCoalescingSymbolResolver : INodeVisitor<SymbolResolver, AstNullCoalescingNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstNullCoalescingNode nullc)
+        public void Visit(SymbolResolver checker, AstNullCoalescingNode nullc)
         {
             nullc.Left.Visit(checker);
             nullc.Right.Visit(checker);
-
-            return null;
         }
     }
 }

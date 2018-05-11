@@ -2,7 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 
-using Fl.Parser.Ast;
+using Fl.Ast;
 using Fl.Symbols;
 
 namespace Fl.TypeChecker.Checkers

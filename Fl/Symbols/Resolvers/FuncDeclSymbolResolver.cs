@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Parser.Ast;
+using Fl.Ast;
 using System.Linq;
 
 namespace Fl.Symbols.Resolvers
 {
-    class FuncDeclSymbolResolver : INodeVisitor<SymbolResolver, AstFuncDeclNode, Symbol>
+    class FuncDeclSymbolResolver : INodeVisitor<SymbolResolver, AstFuncDeclNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstFuncDeclNode funcdecl)
+        public void Visit(SymbolResolver checker, AstFuncDeclNode funcdecl)
         {
             checker.SymbolTable.EnterBlock(BlockType.Function, $"func-{funcdecl.Identifier.Value}-{funcdecl.GetHashCode()}");
 
@@ -20,8 +20,6 @@ namespace Fl.Symbols.Resolvers
                 funcdecl.Body.OfType<AstReturnNode>().ToList().ForEach(rn => rn.Visit(checker));
 
             checker.SymbolTable.LeaveBlock();
-
-            return null;
         }
     }
 }

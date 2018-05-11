@@ -2,18 +2,16 @@
 // Full copyright and license information in LICENSE file
 
 
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class DeclarationSymbolResolver : INodeVisitor<SymbolResolver, AstDeclarationNode, Symbol>
+    class DeclarationSymbolResolver : INodeVisitor<SymbolResolver, AstDeclarationNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstDeclarationNode decls)
+        public void Visit(SymbolResolver checker, AstDeclarationNode decls)
         {
             foreach (AstNode statement in decls.Statements)
                 statement.Visit(checker);
-
-            return null;
         }
     }
 }

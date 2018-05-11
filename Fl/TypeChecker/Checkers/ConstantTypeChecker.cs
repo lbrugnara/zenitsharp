@@ -4,7 +4,7 @@
 using Fl.Symbols;
 
 using Fl.Engine.Symbols.Types;
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.TypeChecker.Checkers
 {

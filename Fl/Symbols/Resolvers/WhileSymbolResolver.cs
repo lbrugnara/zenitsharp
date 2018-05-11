@@ -2,13 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Symbols;
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class WhileSymbolResolver : INodeVisitor<SymbolResolver, AstWhileNode, Symbol>
+    class WhileSymbolResolver : INodeVisitor<SymbolResolver, AstWhileNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstWhileNode wnode)
+        public void Visit(SymbolResolver checker, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             checker.SymbolTable.EnterBlock(BlockType.Loop, $"while-body-{wnode.GetHashCode()}");
@@ -21,8 +21,6 @@ namespace Fl.Symbols.Resolvers
 
             // Leave the while-block
             checker.SymbolTable.LeaveBlock();
-
-            return null;
         }
     }
 }

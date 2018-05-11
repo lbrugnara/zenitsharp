@@ -2,13 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Symbols;
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class ConstantSymbolResolver : INodeVisitor<SymbolResolver, AstConstantNode, Symbol>
+    class ConstantSymbolResolver : INodeVisitor<SymbolResolver, AstConstantNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstConstantNode constdec)
+        public void Visit(SymbolResolver checker, AstConstantNode constdec)
         {
             // Get the constant's type
             var type = TypeHelper.FromToken(constdec.Type);
@@ -25,8 +25,6 @@ namespace Fl.Symbols.Resolvers
                 declaration.Item2.Visit(checker);                
 
             }
-
-            return null;
         }
     }
 }

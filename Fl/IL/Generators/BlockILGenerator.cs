@@ -2,7 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.IL.Instructions.Operands;
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.IL.Generators
 {

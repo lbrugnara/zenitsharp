@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Parser.Ast;
+using Fl.Ast;
 using System.Collections.Generic;
 using System.Linq;
 using Fl.Lang.Types;
@@ -9,7 +9,7 @@ using Fl.Symbols;
 
 namespace Fl.Symbols
 {
-    public class SymbolResolver : IAstWalker<Symbol>
+    public class SymbolResolver : IAstWalker
     {
         /// <summary>
         /// Tracks variables per blocks
@@ -40,9 +40,9 @@ namespace Fl.Symbols
             return this.SymbolTable;
         }
 
-        public Symbol Visit(AstNode node)
+        public void Visit(AstNode node)
         {
-            return this.AstVisitor.Visit(node);
+            this.AstVisitor.Visit(node);
         }
     }
 }

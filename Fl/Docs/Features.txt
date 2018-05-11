@@ -1,0 +1,26 @@
+﻿Type system
+===========
+
+Primitives
+----------
+
+bool
+char
+int
+float
+double
+decimal
+string
+object
+func
+tuple
+
+Classes
+-------
+
+type
+constructor
+method
+indexer
+instance
+static_method 

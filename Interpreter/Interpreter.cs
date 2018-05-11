@@ -7,7 +7,7 @@ using Fl.IL.Instructions;
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Engine.Symbols.Objects;
 using Fl.Parser;
-using Fl.Parser.Ast;
+using Fl.Ast;
 using System;
 using System.Collections.Generic;
 using System.Linq;

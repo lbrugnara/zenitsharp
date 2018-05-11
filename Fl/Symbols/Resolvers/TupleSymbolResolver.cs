@@ -2,24 +2,15 @@
 // Full copyright and license information in LICENSE file
 
 
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class TupleSymbolResolver : INodeVisitor<SymbolResolver, AstTupleNode, Symbol>
+    class TupleSymbolResolver : INodeVisitor<SymbolResolver, AstTupleNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstTupleNode node)
+        public void Visit(SymbolResolver checker, AstTupleNode node)
         {
-            // TODO: Fix tuple visitor
-            if (node.Items.Count > 0)
-            {
-                foreach (var item in node.Items)
-                {
-                    return item.Visit(checker);
-                }
-            }
-
-            return null;
+            node.Items.ForEach(item => item.Visit(checker));
         }
     }
 }

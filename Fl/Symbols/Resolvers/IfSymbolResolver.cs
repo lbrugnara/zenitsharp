@@ -3,17 +3,17 @@
 
 using Fl.Symbols;
 
-using Fl.Parser.Ast;
+using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class IfSymbolResolver : INodeVisitor<SymbolResolver, AstIfNode, Symbol>
+    class IfSymbolResolver : INodeVisitor<SymbolResolver, AstIfNode>
     {
-        public Symbol Visit(SymbolResolver checker, AstIfNode ifnode)
+        public void Visit(SymbolResolver checker, AstIfNode ifnode)
         {
             // Generate the condition and check the result, using exitPoint
             // as the destination if the condition is true
-            var condition = ifnode.Condition.Visit(checker);            
+            ifnode.Condition.Visit(checker);            
             
             // Add a new common block for the if's boyd
             checker.SymbolTable.EnterBlock(BlockType.Common, $"if-then-{ifnode.GetHashCode()}");
@@ -31,8 +31,6 @@ namespace Fl.Symbols.Resolvers
                 ifnode.Else.Visit(checker);                
                 checker.SymbolTable.LeaveBlock();
             }
-
-            return null;
         }
     }
 }

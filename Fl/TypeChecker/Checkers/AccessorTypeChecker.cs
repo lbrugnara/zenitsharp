@@ -3,7 +3,7 @@
 
 
 using Fl.Engine.Symbols.Types;
-using Fl.Parser.Ast;
+using Fl.Ast;
 using Fl.Symbols;
 
 namespace Fl.TypeChecker.Checkers

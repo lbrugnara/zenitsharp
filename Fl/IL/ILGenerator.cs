@@ -2,7 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.IL.Instructions;
-using Fl.Parser.Ast;
+using Fl.Ast;
 using Fl.IL.Instructions.Operands;
 using Fl.IL.VM;
 using System.Collections.Generic;
