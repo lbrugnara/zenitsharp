@@ -2,19 +2,16 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Symbols;
-
-using Fl.Engine.Symbols.Types;
 using Fl.Ast;
-using System.Collections.Generic;
-using System.Linq;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    public class CallableTypeChecker : INodeVisitor<TypeChecker, AstCallableNode, Symbol>
+    public class CallableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstCallableNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstCallableNode node)
+        public Type Visit(TypeCheckerVisitor checker, AstCallableNode node)
         {
-            Symbol target = node.Callable.Visit(checker);
+            Type target = node.Callable.Visit(checker);
 
             // Generate the "param" instructions
             node.Arguments.Expressions.ForEach(a => a.Visit(checker));

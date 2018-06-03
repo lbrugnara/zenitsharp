@@ -8,16 +8,16 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class AssignmentSymbolResolver : INodeVisitor<SymbolResolver, AstAssignmentNode>
+    class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstAssignmentNode>
     {
-        public void Visit(SymbolResolver checker, AstAssignmentNode node)
+        public void Visit(SymbolResolverVisitor checker, AstAssignmentNode node)
         {
             if (node is AstVariableAssignmentNode)
                 MakeVariableAssignment(node as AstVariableAssignmentNode, checker);
 
         }
 
-        private void MakeVariableAssignment(AstVariableAssignmentNode node, SymbolResolver checker)
+        private void MakeVariableAssignment(AstVariableAssignmentNode node, SymbolResolverVisitor checker)
         {
             node.Accessor.Visit(checker);
             node.Expression.Visit(checker);

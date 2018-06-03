@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class IfSymbolResolver : INodeVisitor<SymbolResolver, AstIfNode>
+    class IfSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstIfNode>
     {
-        public void Visit(SymbolResolver checker, AstIfNode ifnode)
+        public void Visit(SymbolResolverVisitor checker, AstIfNode ifnode)
         {
             // Generate the condition and check the result, using exitPoint
             // as the destination if the condition is true

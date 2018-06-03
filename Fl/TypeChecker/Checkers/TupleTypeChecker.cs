@@ -1,25 +1,19 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Symbols;
 using Fl.Ast;
+using Fl.Lang.Types;
+using System.Linq;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class TupleTypeChecker : INodeVisitor<TypeChecker, AstTupleNode, Symbol>
+    class TupleTypeChecker : INodeVisitor<TypeCheckerVisitor, AstTupleNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstTupleNode node)
+        public Type Visit(TypeCheckerVisitor checker, AstTupleNode node)
         {
-            // TODO: Fix tuple visitor
-            if (node.Items.Count > 0)
-            {
-                foreach (var item in node.Items)
-                {
-                    return item.Visit(checker);
-                }
-            }
-
-            return null;
+            var types = node.Items?.Select(i => i.Visit(checker));
+            // TODO: Handle tuple type
+            return new Tuple(types.ToArray());
         }
     }
 }

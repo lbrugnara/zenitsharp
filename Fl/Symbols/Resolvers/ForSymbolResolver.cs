@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class ForSymbolResolver : INodeVisitor<SymbolResolver, AstForNode>
+    class ForSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstForNode>
     {
-        public void Visit(SymbolResolver checker, AstForNode fornode)
+        public void Visit(SymbolResolverVisitor checker, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
             checker.SymbolTable.EnterBlock(BlockType.Loop, $"for-{fornode.GetHashCode()}");

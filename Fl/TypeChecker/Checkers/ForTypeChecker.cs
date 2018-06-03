@@ -3,12 +3,13 @@
 
 using Fl.Symbols;
 using Fl.Ast;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class ForTypeChecker : INodeVisitor<TypeChecker, AstForNode, Symbol>
+    class ForTypeChecker : INodeVisitor<TypeCheckerVisitor, AstForNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstForNode fornode)
+        public Type Visit(TypeCheckerVisitor checker, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
             checker.EnterBlock(BlockType.Loop, $"for-{fornode.GetHashCode()}");
@@ -16,11 +17,11 @@ namespace Fl.TypeChecker.Checkers
             // Initialize the for-block
             fornode.Init.Visit(checker);
 
-            // Generate the loop block (for's body) with the entry and exit points
-            //checker.EnterBlock(BlockType.Loop, $"for-body-{fornode.GetHashCode()}");
-
             // Emmit the condition code
-            var condition = fornode.Condition.Visit(checker);
+            var conditionType = fornode.Condition.Visit(checker);
+
+            if (conditionType != Bool.Instance)
+                throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Emmit the body code
             fornode.Body.Visit(checker);
@@ -31,10 +32,7 @@ namespace Fl.TypeChecker.Checkers
             // Leave the for
             checker.LeaveBlock();
 
-            // Leave the for-block
-            //checker.LeaveBlock();
-
-            return null;
+            return Null.Instance;
         }
     }
 }

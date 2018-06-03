@@ -9,22 +9,15 @@ using Fl.Symbols;
 
 namespace Fl.Symbols
 {
-    public class SymbolResolver : IAstWalker
+    public class SymbolResolver
     {
         /// <summary>
         /// Tracks variables per blocks
         /// </summary>
         public SymbolTable SymbolTable { get; }
 
-        /// <summary>
-        /// All the visitor logic is moved to the AstVisitor
-        /// </summary>
-        private AstVisitor AstVisitor { get; }
-
         public SymbolResolver()
-        {            
-            this.AstVisitor = new AstVisitor(this);
-
+        {
             this.SymbolTable = new SymbolTable();
 
             Package std = new Package("std", this.SymbolTable.CurrentBlock.Uid);
@@ -36,13 +29,9 @@ namespace Fl.Symbols
 
         public SymbolTable Resolve(AstNode node)
         {
-            this.AstVisitor.Visit(node);
+            var visitor = new SymbolResolverVisitor(this.SymbolTable);
+            visitor.Visit(node);
             return this.SymbolTable;
-        }
-
-        public void Visit(AstNode node)
-        {
-            this.AstVisitor.Visit(node);
         }
     }
 }

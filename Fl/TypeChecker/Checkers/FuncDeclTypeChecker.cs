@@ -2,24 +2,38 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Symbols;
-using Fl.Engine.Symbols.Types;
 using Fl.Ast;
 using System.Linq;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class FuncDeclTypeChecker : INodeVisitor<TypeChecker, AstFuncDeclNode, Symbol>
+    class FuncDeclTypeChecker : INodeVisitor<TypeCheckerVisitor, AstFuncDeclNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstFuncDeclNode funcdecl)
+        public Type Visit(TypeCheckerVisitor checker, AstFuncDeclNode funcdecl)
         {
             checker.EnterBlock(BlockType.Function, $"func-{funcdecl.Identifier.Value}-{funcdecl.GetHashCode()}");
-            funcdecl.Parameters.Parameters.ForEach(p => checker.SymbolTable.NewSymbol(p.Value.ToString(), null));
+
+            //funcdecl.Parameters.Parameters.ForEach(p => p);
+
             funcdecl.Body.ForEach(s => s.Visit(checker));
-            if (!funcdecl.Body.Any(n => n is AstReturnNode))
-                funcdecl.Body.OfType<AstReturnNode>().ToList().ForEach(rn => rn.Visit(checker));
+
+
+            Type returnType = Null.Instance;
+
+            if (funcdecl.Body.Any(n => n is AstReturnNode))
+            {
+                var returnTypes = funcdecl.Body.OfType<AstReturnNode>().ToList().Select(rn => rn.Visit(checker));
+
+                if (returnTypes.Distinct().Count() != 1)
+                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes.Distinct())}) in function {funcdecl.Identifier.Value}");
+
+                returnType = returnTypes.First();
+            }
+
             checker.LeaveBlock();
 
-            return null;
+            return returnType;
         }
     }
 }

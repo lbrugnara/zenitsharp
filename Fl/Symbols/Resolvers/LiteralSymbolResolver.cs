@@ -8,9 +8,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class LiteralSymbolResolver : INodeVisitor<SymbolResolver, AstLiteralNode>
+    class LiteralSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstLiteralNode>
     {
-        public void Visit(SymbolResolver checker, AstLiteralNode literal)
+        public void Visit(SymbolResolverVisitor checker, AstLiteralNode literal)
         {
         }
     }

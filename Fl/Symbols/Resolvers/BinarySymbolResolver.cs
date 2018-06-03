@@ -9,9 +9,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class BinarySymbolResolver : INodeVisitor<SymbolResolver, AstBinaryNode>
+    class BinarySymbolResolver : INodeVisitor<SymbolResolverVisitor, AstBinaryNode>
     {
-        public void Visit(SymbolResolver checker, AstBinaryNode binary)
+        public void Visit(SymbolResolverVisitor checker, AstBinaryNode binary)
         {
             binary.Left.Visit(checker);
             binary.Right.Visit(checker);

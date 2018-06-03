@@ -6,9 +6,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class ConstantSymbolResolver : INodeVisitor<SymbolResolver, AstConstantNode>
+    class ConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstConstantNode>
     {
-        public void Visit(SymbolResolver checker, AstConstantNode constdec)
+        public void Visit(SymbolResolverVisitor checker, AstConstantNode constdec)
         {
             // Get the constant's type
             var type = TypeHelper.FromToken(constdec.Type);

@@ -6,9 +6,8 @@ using Fl.Symbols.Resolvers;
 
 namespace Fl.Symbols
 {
-    public class AstVisitor
+    public class SymbolResolverVisitor : IAstWalker
     {
-        private SymbolResolver resolver;
         private UnarySymbolResolver unarySymbolResolver;
         private BinarySymbolResolver binarySymbolResolver;
         private AssignmentSymbolResolver assignmentSymbolResolver;
@@ -29,9 +28,9 @@ namespace Fl.Symbols
         private TupleSymbolResolver tupleSymbolResolver;
         private NullCoalescingSymbolResolver nullCoalescingSymbolResolver;
 
-        public AstVisitor(SymbolResolver resolver)
+        public SymbolResolverVisitor(SymbolTable symtable)
         {
-            this.resolver = resolver;
+            this.SymbolTable = symtable;
             this.unarySymbolResolver = new UnarySymbolResolver();
             this.binarySymbolResolver = new BinarySymbolResolver();
             this.assignmentSymbolResolver = new AssignmentSymbolResolver();
@@ -53,6 +52,11 @@ namespace Fl.Symbols
             this.nullCoalescingSymbolResolver = new NullCoalescingSymbolResolver();
         }
 
+        /// <summary>
+        /// Tracks variables per blocks
+        /// </summary>
+        public SymbolTable SymbolTable { get; private set; }
+
         public void Visit(AstNode node)
         {
             object n = node;
@@ -60,79 +64,79 @@ namespace Fl.Symbols
             switch (n)
             {
                 case AstUnaryNode u:
-                    this.unarySymbolResolver.Visit(this.resolver, u);
+                    this.unarySymbolResolver.Visit(this, u);
                     break;
 
                 case AstBinaryNode b:
-                    this.binarySymbolResolver.Visit(this.resolver, b);
+                    this.binarySymbolResolver.Visit(this, b);
                     break;
 
                 case AstAssignmentNode a:
-                    this.assignmentSymbolResolver.Visit(this.resolver, a);
+                    this.assignmentSymbolResolver.Visit(this, a);
                     break;
 
                 case AstConstantNode c:
-                    this.constantSymbolResolver.Visit(this.resolver, c);
+                    this.constantSymbolResolver.Visit(this, c);
                     break;
 
                 case AstVariableNode v:
-                    this.variableSymbolResolver.Visit(this.resolver, v);
+                    this.variableSymbolResolver.Visit(this, v);
                     break;
 
                 case AstBlockNode bl:
-                    this.blockSymbolResolver.Visit(this.resolver, bl);
+                    this.blockSymbolResolver.Visit(this, bl);
                     break;
 
                 case AstDeclarationNode d:
-                    this.declarationSymbolResolver.Visit(this.resolver, d);
+                    this.declarationSymbolResolver.Visit(this, d);
                     break;
 
                 case AstLiteralNode l:
-                    this.literalSymbolResolver.Visit(this.resolver, l);
+                    this.literalSymbolResolver.Visit(this, l);
                     break;
 
                 case AstAccessorNode ivk:
-                    this.accessorSymbolResolver.Visit(this.resolver, ivk);
+                    this.accessorSymbolResolver.Visit(this, ivk);
                     break;
 
                 case AstIfNode i:
-                    this.ifSymbolResolver.Visit(this.resolver, i);
+                    this.ifSymbolResolver.Visit(this, i);
                     break;
 
                 case AstWhileNode w:
-                    this.whileSymbolResolver.Visit(this.resolver, w);
+                    this.whileSymbolResolver.Visit(this, w);
                     break;
 
                 case AstForNode f:
-                    this.forSymbolResolver.Visit(this.resolver, f);
+                    this.forSymbolResolver.Visit(this, f);
                     break;
 
                 case AstBreakNode brk:
-                    this.breakSymbolResolver.Visit(this.resolver, brk);
+                    this.breakSymbolResolver.Visit(this, brk);
                     break;
 
                 case AstContinueNode cont:
-                    this.continueSymbolResolver.Visit(this.resolver, cont);
+                    this.continueSymbolResolver.Visit(this, cont);
                     break;
 
                 case AstCallableNode call:
-                    this.callSymbolResolver.Visit(this.resolver, call);
+                    this.callSymbolResolver.Visit(this, call);
                     break;
 
                 case AstFuncDeclNode func:
-                    this.funcDeclSymbolResolver.Visit(this.resolver, func);
+                    this.funcDeclSymbolResolver.Visit(this, func);
                     break;
 
                 case AstTupleNode t:
-                    this.tupleSymbolResolver.Visit(this.resolver, t);
+                    this.tupleSymbolResolver.Visit(this, t);
                     break;
 
                 case AstReturnNode ret:
-                    this.returnSymbolResolver.Visit(this.resolver, ret);
+                    this.returnSymbolResolver.Visit(this, ret);
                     break;
 
                 case AstNullCoalescingNode nc:
-                    this.nullCoalescingSymbolResolver.Visit(this.resolver, nc);
+                    this.nullCoalescingSymbolResolver.Visit(this, nc);
                     break;
 
                 case AstNoOpNode np:

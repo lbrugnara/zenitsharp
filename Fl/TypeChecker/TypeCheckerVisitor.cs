@@ -8,9 +8,8 @@ using Fl.Lang.Types;
 
 namespace Fl.TypeChecker
 {
-    public class AstVisitor
+    public class TypeCheckerVisitor : IAstWalker<Type>
     {
-        private TypeChecker checker;
         private UnaryTypeChecker unaryTypeChecker;
         private BinaryTypeChecker binaryTypeChecker;
         private AssignmentTypeChecker assignmentTypeChecker;
@@ -31,9 +30,9 @@ namespace Fl.TypeChecker
         private TupleTypeChecker tupleTypeChecker;
         private NullCoalescingTypeChecker nullCoalescingTypeChecker;
 
-        public AstVisitor(TypeChecker checker)
+        public TypeCheckerVisitor(SymbolTable symtable)
         {
-            this.checker = checker;
+            this.SymbolTable = symtable;
             this.unaryTypeChecker = new UnaryTypeChecker();
             this.binaryTypeChecker = new BinaryTypeChecker();
             this.assignmentTypeChecker = new AssignmentTypeChecker();
@@ -55,49 +54,69 @@ namespace Fl.TypeChecker
             this.nullCoalescingTypeChecker = new NullCoalescingTypeChecker();
         }
 
-        public Symbol Visit(AstNode node)
+        /// <summary>
+        /// Tracks variables per blocks
+        /// </summary>
+        public SymbolTable SymbolTable { get; private set; }
+
+        // Adds a new block to the SymbolTable, it represents a new scope
+        public void EnterBlock(BlockType type, string name)
+        {
+            this.SymbolTable.EnterBlock(type, name);
+        }
+
+        // Leave the current block in the SymbolTable
+        public void LeaveBlock()
+        {
+            this.SymbolTable.LeaveBlock();
+        }
+
+        // Returns true if the current fragment is a function fragment
+        public bool InFunction => this.SymbolTable.CurrentBlock.Type == BlockType.Function;
+
+        public Type Visit(AstNode node)
         {
             object n = node;
             switch (n)
             {
                 case AstUnaryNode u:
-                    return this.unaryTypeChecker.Visit(this.checker, u);
+                    return this.unaryTypeChecker.Visit(this, u);
                 case AstBinaryNode b:
-                    return this.binaryTypeChecker.Visit(this.checker, b);
+                    return this.binaryTypeChecker.Visit(this, b);
                 case AstAssignmentNode a:
-                    return this.assignmentTypeChecker.Visit(this.checker, a);
+                    return this.assignmentTypeChecker.Visit(this, a);
                 case AstConstantNode c:
-                    return this.constantTypeChecker.Visit(this.checker, c);
+                    return this.constantTypeChecker.Visit(this, c);
                 case AstVariableNode v:
-                    return this.variableTypeChecker.Visit(this.checker, v);
+                    return this.variableTypeChecker.Visit(this, v);
                 case AstBlockNode bl:
-                    return this.blockTypeChecker.Visit(this.checker, bl);
+                    return this.blockTypeChecker.Visit(this, bl);
                 case AstDeclarationNode d:
-                    return this.declarationTypeChecker.Visit(this.checker, d);
+                    return this.declarationTypeChecker.Visit(this, d);
                 case AstLiteralNode l:
-                    return this.literalTypeChecker.Visit(this.checker, l);
+                    return this.literalTypeChecker.Visit(this, l);
                 case AstAccessorNode ivk:
-                    return this.accessorTypeChecker.Visit(this.checker, ivk);
+                    return this.accessorTypeChecker.Visit(this, ivk);
                 case AstIfNode i:
-                    return this.ifTypeChecker.Visit(this.checker, i);
+                    return this.ifTypeChecker.Visit(this, i);
                 case AstWhileNode w:
-                    return this.whileTypeChecker.Visit(this.checker, w);
+                    return this.whileTypeChecker.Visit(this, w);
                 case AstForNode f:
-                    return this.forTypeChecker.Visit(this.checker, f);
+                    return this.forTypeChecker.Visit(this, f);
                 case AstBreakNode brk:
-                    return this.breakTypeChecker.Visit(this.checker, brk);
+                    return this.breakTypeChecker.Visit(this, brk);
                 case AstContinueNode cont:
-                    return this.continueTypeChecker.Visit(this.checker, cont);
+                    return this.continueTypeChecker.Visit(this, cont);
                 case AstCallableNode call:
-                    return this.callTypeChecker.Visit(this.checker, call);
+                    return this.callTypeChecker.Visit(this, call);
                 case AstFuncDeclNode func:
-                    return this.funcDeclTypeChecker.Visit(this.checker, func);
+                    return this.funcDeclTypeChecker.Visit(this, func);
                 case AstTupleNode t:
-                    return this.tupleTypeChecker.Visit(this.checker, t);
+                    return this.tupleTypeChecker.Visit(this, t);
                 case AstReturnNode ret:
-                    return this.returnTypeChecker.Visit(this.checker, ret);
+                    return this.returnTypeChecker.Visit(this, ret);
                 case AstNullCoalescingNode nc:
-                    return this.nullCoalescingTypeChecker.Visit(this.checker, nc);
+                    return this.nullCoalescingTypeChecker.Visit(this, nc);
                 case AstNoOpNode np:
                     return null;
             }

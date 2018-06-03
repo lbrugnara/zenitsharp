@@ -6,15 +6,20 @@ using Fl.Symbols;
 using Fl.Engine.Symbols.Types;
 using Fl.Parser;
 using Fl.Ast;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class BinaryTypeChecker : INodeVisitor<TypeChecker, AstBinaryNode, Symbol>
+    class BinaryTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBinaryNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstBinaryNode binary)
+        public Type Visit(TypeCheckerVisitor checker, AstBinaryNode binary)
         {
-            Symbol left = binary.Left.Visit(checker);
-            Symbol right = binary.Right.Visit(checker);
+            Type left = binary.Left.Visit(checker);
+            Type right = binary.Right.Visit(checker);
+
+            if (left != right)
+                throw new System.Exception($"Operator {binary.Operator.Value} cannot be applied on operands of type {left} and {right}");
+
             return left;
         }
     }

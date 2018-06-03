@@ -55,7 +55,7 @@ namespace FlInterpreter
                     SymbolTable st = sr.Resolve(ast);
 
                     TypeChecker tc = new TypeChecker(st);
-                    tc.Visit(ast);
+                    tc.Check(ast);
                     
                     var g = new ILGenerator();
 

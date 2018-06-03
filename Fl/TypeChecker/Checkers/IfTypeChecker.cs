@@ -3,14 +3,18 @@
 
 using Fl.Symbols;
 using Fl.Ast;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class IfTypeChecker : INodeVisitor<TypeChecker, AstIfNode, Symbol>
+    class IfTypeChecker : INodeVisitor<TypeCheckerVisitor, AstIfNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstIfNode ifnode)
+        public Type Visit(TypeCheckerVisitor checker, AstIfNode ifnode)
         {
-            var condition = ifnode.Condition.Visit(checker);            
+            var conditionType = ifnode.Condition.Visit(checker);
+
+            if (conditionType != Bool.Instance)
+                throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Add a new common block for the if's boyd
             checker.EnterBlock(BlockType.Common, $"if-then-{ifnode.GetHashCode()}");
@@ -25,11 +29,13 @@ namespace Fl.TypeChecker.Checkers
             {
                 // Add a block for the else's body and generate it, then leave the block
                 checker.EnterBlock(BlockType.Common, $"if-else-{ifnode.GetHashCode()}");
-                ifnode.Else.Visit(checker);                
+
+                ifnode.Else.Visit(checker);
+
                 checker.LeaveBlock();
             }
 
-            return null;
+            return Null.Instance;
         }
     }
 }

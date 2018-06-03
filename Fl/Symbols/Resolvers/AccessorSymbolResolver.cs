@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class AccessorSymbolResolver : INodeVisitor<SymbolResolver, AstAccessorNode>
+    class AccessorSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstAccessorNode>
     {
-        public void Visit(SymbolResolver checker, AstAccessorNode accessor)
+        public void Visit(SymbolResolverVisitor checker, AstAccessorNode accessor)
         {
             accessor.Enclosing?.Visit(checker);
         }

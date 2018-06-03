@@ -45,6 +45,9 @@ namespace Fl.Symbols
             this.Type = type;
             this.Symbols = new Dictionary<string, Symbol>();
             this.Children = new Dictionary<string, Block>();
+
+            if (type == BlockType.Function)
+                this.NewSymbol("@ret", Null.Instance);
         }
 
         public Block(BlockType type, string uid, Block global, Block parent = null)
@@ -73,6 +76,14 @@ namespace Fl.Symbols
             }
 
             return block;
+        }
+
+        public bool IsFunction
+        {
+            get
+            {
+                return this.Type == BlockType.Function || Parent != null && Parent.IsFunction;
+            }
         }
 
         #region ISymbolTable implementation

@@ -6,9 +6,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class BlockSymbolResolver : INodeVisitor<SymbolResolver, AstBlockNode>
+    class BlockSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstBlockNode>
     {
-        public void Visit(SymbolResolver checker, AstBlockNode node)
+        public void Visit(SymbolResolverVisitor checker, AstBlockNode node)
         {
             checker.SymbolTable.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
 

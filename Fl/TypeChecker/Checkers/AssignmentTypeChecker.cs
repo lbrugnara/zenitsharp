@@ -4,23 +4,28 @@
 using Fl.Symbols;
 using Fl.Parser;
 using Fl.Ast;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class AssignmentTypeChecker : INodeVisitor<TypeChecker, AstAssignmentNode, Symbol>
+    class AssignmentTypeChecker : INodeVisitor<TypeCheckerVisitor, AstAssignmentNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstAssignmentNode node)
+        public Type Visit(TypeCheckerVisitor checker, AstAssignmentNode node)
         {
             if (node is AstVariableAssignmentNode)
                 return MakeVariableAssignment(node as AstVariableAssignmentNode, checker);
 
-            return null;
+            throw new AstWalkerException($"Invalid variable assifnment of type {node.GetType().FullName}");
         }
 
-        private Symbol MakeVariableAssignment(AstVariableAssignmentNode node, TypeChecker checker)
+        private Type MakeVariableAssignment(AstVariableAssignmentNode node, TypeCheckerVisitor checker)
         {
-            Symbol leftHandSide = node.Accessor.Visit(checker);
-            Symbol rightHandSide = node.Expression.Visit(checker);
+            Type leftHandSide = node.Accessor.Visit(checker);
+            Type rightHandSide = node.Expression.Visit(checker);
+
+            if (leftHandSide != rightHandSide)
+                throw new System.Exception($"Cannot convert type {rightHandSide} to {leftHandSide}");
+
             return leftHandSide;
         }
     }

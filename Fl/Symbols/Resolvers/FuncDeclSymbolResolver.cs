@@ -6,18 +6,17 @@ using System.Linq;
 
 namespace Fl.Symbols.Resolvers
 {
-    class FuncDeclSymbolResolver : INodeVisitor<SymbolResolver, AstFuncDeclNode>
+    class FuncDeclSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstFuncDeclNode>
     {
-        public void Visit(SymbolResolver checker, AstFuncDeclNode funcdecl)
+        public void Visit(SymbolResolverVisitor checker, AstFuncDeclNode funcdecl)
         {
+            checker.SymbolTable.NewSymbol(funcdecl.Identifier.Value.ToString(), Lang.Types.Null.Instance);
+
             checker.SymbolTable.EnterBlock(BlockType.Function, $"func-{funcdecl.Identifier.Value}-{funcdecl.GetHashCode()}");
 
             funcdecl.Parameters.Parameters.ForEach(p => checker.SymbolTable.NewSymbol(p.Value.ToString(), null));
 
             funcdecl.Body.ForEach(s => s.Visit(checker));
-
-            if (!funcdecl.Body.Any(n => n is AstReturnNode))
-                funcdecl.Body.OfType<AstReturnNode>().ToList().ForEach(rn => rn.Visit(checker));
 
             checker.SymbolTable.LeaveBlock();
         }

@@ -1,20 +1,19 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Symbols;
 using Fl.Ast;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class DeclarationTypeChecker : INodeVisitor<TypeChecker, AstDeclarationNode, Symbol>
+    class DeclarationTypeChecker : INodeVisitor<TypeCheckerVisitor, AstDeclarationNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstDeclarationNode decls)
+        public Type Visit(TypeCheckerVisitor checker, AstDeclarationNode decls)
         {
             foreach (AstNode statement in decls.Statements)
-            {
                 statement.Visit(checker);
-            }
-            return null;
+
+            return Null.Instance;
         }
     }
 }

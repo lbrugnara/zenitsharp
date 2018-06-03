@@ -1,19 +1,22 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Symbols;
 using Fl.Ast;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class NullCoalescingTypeChecker : INodeVisitor<TypeChecker, AstNullCoalescingNode, Symbol>
+    class NullCoalescingTypeChecker : INodeVisitor<TypeCheckerVisitor, AstNullCoalescingNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstNullCoalescingNode nullc)
+        public Type Visit(TypeCheckerVisitor checker, AstNullCoalescingNode nullc)
         {
             var left = nullc.Left.Visit(checker);
             var right = nullc.Right.Visit(checker);
 
-            return null;
+            if (left != right)
+                throw new System.Exception($"Operator ?? cannot be applied to operands of type {left} and {right}");
+
+            return left;
         }
     }
 }

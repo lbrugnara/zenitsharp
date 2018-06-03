@@ -1,18 +1,17 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Symbols;
-
 using Fl.Engine.Symbols.Exceptions;
 using Fl.Ast;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class ReturnTypeChecker : INodeVisitor<TypeChecker, AstReturnNode, Symbol>
+    class ReturnTypeChecker : INodeVisitor<TypeCheckerVisitor, AstReturnNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstReturnNode rnode)
+        public Type Visit(TypeCheckerVisitor checker, AstReturnNode rnode)
         {
-            if (!checker.InFunction)
+            if (!checker.SymbolTable.CurrentBlock.IsFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
             return rnode.ReturnTuple?.Visit(checker);

@@ -1,16 +1,17 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Symbols;
 using Fl.Ast;
+using Fl.Lang.Types;
+using Fl.Symbols;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class LiteralTypeChecker : INodeVisitor<TypeChecker, AstLiteralNode, Symbol>
+    class LiteralTypeChecker : INodeVisitor<TypeCheckerVisitor, AstLiteralNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstLiteralNode literal)
+        public Type Visit(TypeCheckerVisitor checker, AstLiteralNode literal)
         {
-            return null;
+            return TypeHelper.FromToken(literal.Literal);
         }
     }
 }

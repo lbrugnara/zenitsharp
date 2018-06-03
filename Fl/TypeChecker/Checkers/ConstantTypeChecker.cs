@@ -2,31 +2,29 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Symbols;
-
-using Fl.Engine.Symbols.Types;
 using Fl.Ast;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class ConstantTypeChecker : INodeVisitor<TypeChecker, AstConstantNode, Symbol>
+    class ConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, AstConstantNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstConstantNode constdec)
+        public Type Visit(TypeCheckerVisitor checker, AstConstantNode constdec)
         {
             // Get the constant's type
-            var type = TypeHelper.FromToken(constdec.Type);
+            var lhsType = TypeHelper.FromToken(constdec.Type);
 
             foreach (var declaration in constdec.Constants)
             {
-                // Get the identifier name
-                var constantName = declaration.Item1.Value.ToString();
-
                 // Get the right-hand side operand (a must for a constant)
-                var rhs = declaration.Item2.Visit(checker);
+                var rhsType = declaration.Item2.Visit(checker);
 
-                // const <identifier> = <operand>
-                var symbol = checker.SymbolTable.NewSymbol(constantName, type);
+                if (lhsType != rhsType)
+                    throw new System.Exception($"Cannot convert {rhsType} to {lhsType}");
+
             }
-            return null;
+
+            return lhsType;
         }
     }
 }

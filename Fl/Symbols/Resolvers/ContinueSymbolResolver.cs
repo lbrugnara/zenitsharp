@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class ContinueSymbolResolver : INodeVisitor<SymbolResolver, AstContinueNode>
+    class ContinueSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstContinueNode>
     {
-        public void Visit(SymbolResolver checker, AstContinueNode cnode)
+        public void Visit(SymbolResolverVisitor checker, AstContinueNode cnode)
         {
         }
     }

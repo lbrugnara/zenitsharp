@@ -8,9 +8,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class UnarySymbolResolver : INodeVisitor<SymbolResolver, AstUnaryNode>
+    class UnarySymbolResolver : INodeVisitor<SymbolResolverVisitor, AstUnaryNode>
     {
-        public void Visit(SymbolResolver checker, AstUnaryNode unary)
+        public void Visit(SymbolResolverVisitor checker, AstUnaryNode unary)
         {
             unary.Left.Visit(checker);
         }

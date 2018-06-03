@@ -6,9 +6,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class WhileSymbolResolver : INodeVisitor<SymbolResolver, AstWhileNode>
+    class WhileSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstWhileNode>
     {
-        public void Visit(SymbolResolver checker, AstWhileNode wnode)
+        public void Visit(SymbolResolverVisitor checker, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             checker.SymbolTable.EnterBlock(BlockType.Loop, $"while-body-{wnode.GetHashCode()}");

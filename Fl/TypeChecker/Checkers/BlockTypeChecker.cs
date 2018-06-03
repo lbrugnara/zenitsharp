@@ -3,13 +3,14 @@
 
 
 using Fl.Ast;
+using Fl.Lang.Types;
 using Fl.Symbols;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class BlockTypeChecker : INodeVisitor<TypeChecker, AstBlockNode, Symbol>
+    class BlockTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBlockNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstBlockNode node)
+        public Type Visit(TypeCheckerVisitor checker, AstBlockNode node)
         {
             checker.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
             foreach (AstNode statement in node.Statements)
@@ -17,7 +18,7 @@ namespace Fl.TypeChecker.Checkers
                 statement.Visit(checker);
             }
             checker.LeaveBlock();
-            return null;
+            return Null.Instance;
         }
     }
 }

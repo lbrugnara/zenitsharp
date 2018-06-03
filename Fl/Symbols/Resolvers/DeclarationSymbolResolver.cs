@@ -6,9 +6,9 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class DeclarationSymbolResolver : INodeVisitor<SymbolResolver, AstDeclarationNode>
+    class DeclarationSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstDeclarationNode>
     {
-        public void Visit(SymbolResolver checker, AstDeclarationNode decls)
+        public void Visit(SymbolResolverVisitor checker, AstDeclarationNode decls)
         {
             foreach (AstNode statement in decls.Statements)
                 statement.Visit(checker);

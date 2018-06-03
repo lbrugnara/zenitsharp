@@ -7,9 +7,9 @@ using Fl.Lang.Types;
 
 namespace Fl.Symbols.Resolvers
 {
-    class VariableSymbolResolver : INodeVisitor<SymbolResolver, AstVariableNode>
+    class VariableSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstVariableNode>
     {
-        public void Visit(SymbolResolver checker, AstVariableNode vardecl)
+        public void Visit(SymbolResolverVisitor checker, AstVariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -25,7 +25,7 @@ namespace Fl.Symbols.Resolvers
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected void VarDefinitionNode(SymbolResolver checker, AstVarDefinitionNode vardecl)
+        protected void VarDefinitionNode(SymbolResolverVisitor checker, AstVarDefinitionNode vardecl)
         {
             // Get the variable type from the declaration
             var lhsType = TypeHelper.FromToken(vardecl.VarType.TypeToken);
@@ -47,7 +47,7 @@ namespace Fl.Symbols.Resolvers
             }
         }
 
-        protected void VarDestructuringNode(SymbolResolver checker, AstVarDestructuringNode vardestnode)
+        protected void VarDestructuringNode(SymbolResolverVisitor checker, AstVarDestructuringNode vardestnode)
         {
             // Get the variable type
             //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);

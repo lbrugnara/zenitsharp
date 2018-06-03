@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Symbols;
-using Fl.Parser;
 using Fl.Ast;
+using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class UnaryTypeChecker : INodeVisitor<TypeChecker, AstUnaryNode, Symbol>
+    class UnaryTypeChecker : INodeVisitor<TypeCheckerVisitor, AstUnaryNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstUnaryNode unary)
+        public Type Visit(TypeCheckerVisitor checker, AstUnaryNode unary)
         {
             return unary.Left.Visit(checker);
         }

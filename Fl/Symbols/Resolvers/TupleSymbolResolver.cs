@@ -6,11 +6,11 @@ using Fl.Ast;
 
 namespace Fl.Symbols.Resolvers
 {
-    class TupleSymbolResolver : INodeVisitor<SymbolResolver, AstTupleNode>
+    class TupleSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstTupleNode>
     {
-        public void Visit(SymbolResolver checker, AstTupleNode node)
+        public void Visit(SymbolResolverVisitor checker, AstTupleNode node)
         {
-            node.Items.ForEach(item => item.Visit(checker));
+            node.Items?.ForEach(item => item.Visit(checker));
         }
     }
 }

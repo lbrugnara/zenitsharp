@@ -7,9 +7,9 @@ using Fl.Lang.Types;
 
 namespace Fl.TypeChecker.Checkers
 {
-    class VariableTypeChecker : INodeVisitor<TypeChecker, AstVariableNode, Symbol>
+    class VariableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstVariableNode, Type>
     {
-        public Symbol Visit(TypeChecker checker, AstVariableNode vardecl)
+        public Type Visit(TypeCheckerVisitor checker, AstVariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -22,23 +22,15 @@ namespace Fl.TypeChecker.Checkers
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected Symbol VarDefinitionNode(TypeChecker checker, AstVarDefinitionNode vardecl)
+        protected Type VarDefinitionNode(TypeCheckerVisitor checker, AstVarDefinitionNode vardecl)
         {
             // Get the variable type from the declaration
             var lhsType = TypeHelper.FromToken(vardecl.VarType.TypeToken);
 
             foreach (var declaration in vardecl.VarDefinitions)
             {
-                // Get the identifier name
-                var variableName = declaration.Item1.Value.ToString();
-
-                // Symbol should already be defined
-                if (!checker.SymbolTable.HasSymbol(variableName))
-                    throw new SymbolException($"Symbol {variableName} is not defined.");                
-
                 // If it is a variable definition, get the right-hand side type info
-                var rhs = declaration.Item2?.Visit(checker);
-                var rhsType = rhs?.Type;
+                var rhsType = declaration.Item2?.Visit(checker);
 
                 // When lhs is "var", take the type from the right hand side expression, or throw if it is not available
                 if (lhsType == null)
@@ -50,7 +42,7 @@ namespace Fl.TypeChecker.Checkers
             return null;
         }
 
-        protected Symbol VarDestructuringNode(TypeChecker checker, AstVarDestructuringNode vardestnode)
+        protected Type VarDestructuringNode(TypeCheckerVisitor checker, AstVarDestructuringNode vardestnode)
         {
             // Get the variable type
             //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);
