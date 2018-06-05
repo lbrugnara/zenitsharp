@@ -10,7 +10,7 @@ namespace Fl.Symbols.Resolvers
     {
         public void Visit(SymbolResolverVisitor checker, AstFuncDeclNode funcdecl)
         {
-            checker.SymbolTable.NewSymbol(funcdecl.Identifier.Value.ToString(), Lang.Types.Null.Instance);
+            checker.SymbolTable.NewSymbol(funcdecl.Identifier.Value.ToString(), null);
 
             checker.SymbolTable.EnterBlock(BlockType.Function, $"func-{funcdecl.Identifier.Value}-{funcdecl.GetHashCode()}");
 

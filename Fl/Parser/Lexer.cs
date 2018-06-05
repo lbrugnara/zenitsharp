@@ -66,6 +66,21 @@ namespace Fl.Parser
 
         #endregion
 
+        public List<Token> Tokenize()
+        {
+            this.Reset();
+
+            var tokens = new List<Token>();
+
+            Token t = null;
+            while ((t = this.NextToken()) != null)
+                tokens.Add(t);
+
+            this.Reset();
+
+            return tokens;
+        }
+
         #region Scanning helpers
 
         /// <summary>
