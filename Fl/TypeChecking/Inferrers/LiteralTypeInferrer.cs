@@ -11,10 +11,7 @@ namespace Fl.TypeChecking.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor checker, AstLiteralNode literal)
         {
-            return new InferredType
-            {
-                Type = TypeHelper.FromToken(literal.Literal)
-            };
+            return new InferredType(TypeHelper.FromToken(literal.Literal) ?? new Anonymous("l"));
         }
     }
 }

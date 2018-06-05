@@ -47,6 +47,7 @@ namespace Fl.Parser
             { "break", TokenType.Break },
             { "continue", TokenType.Continue },
             { "return", TokenType.Return },
+            { "ret", TokenType.Return },
             { "fn", TokenType.Function },
             { "package", TokenType.Package },
             { "new", TokenType.New }

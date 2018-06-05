@@ -19,7 +19,6 @@ namespace Fl
             // Lexical analysis and Parsing 
             var ast = parser.Parse(lexer.Tokenize());
 
-
             var errors = parser.ParsingErrors;
 
             if (errors.Count > 0)

@@ -13,10 +13,7 @@ namespace Fl.TypeChecking.Inferrers
         {
             var inferredTypes = node.Items?.Select(i => i.Visit(checker));
             // TODO: Handle tuple type
-            return new InferredType
-            {
-                Type = new Tuple(inferredTypes.Select(it => it.Type).ToArray())
-            };
+            return new InferredType(new Tuple(inferredTypes.Select(it => it.Type).ToArray()));
         }
     }
 }

@@ -13,10 +13,10 @@ namespace Fl.TypeChecking.Inferrers
         public InferredType Visit(TypeInferrerVisitor checker, AstBlockNode node)
         {
             checker.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
+
             foreach (AstNode statement in node.Statements)
-            {
                 statement.Visit(checker);
-            }
+
             checker.LeaveBlock();
             return null;
         }

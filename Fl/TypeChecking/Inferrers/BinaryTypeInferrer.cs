@@ -17,7 +17,25 @@ namespace Fl.TypeChecking.Inferrers
             var left = binary.Left.Visit(checker);
             var right = binary.Right.Visit(checker);
 
-            return left;
+            InferredType inferredType = null;
+
+            if (left.Type is Anonymous && !(right.Type is Anonymous))
+            {
+                inferredType = new InferredType(right.Type);
+
+                checker.Constraints.InferTypeAs(left.Type as Anonymous, inferredType.Type);
+            }
+            else
+            {
+                inferredType = new InferredType(left.Type);
+
+                if (right.Type is Anonymous)
+                {
+                    checker.Constraints.InferTypeAs(right.Type as Anonymous, inferredType.Type);
+                }
+            }
+
+            return inferredType;
         }
     }
 }

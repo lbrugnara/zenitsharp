@@ -10,9 +10,13 @@ namespace Fl.Symbols.Resolvers
     {
         public void Visit(SymbolResolverVisitor checker, AstFuncDeclNode funcdecl)
         {
-            checker.SymbolTable.NewSymbol(funcdecl.Identifier.Value.ToString(), null);
+            var funcSymbol = new Function(funcdecl.Identifier.Value.ToString(), funcdecl.Parameters.Parameters.Select(p => p.Value.ToString()).ToArray());
+            
+            // Register symbol if it is not an anontmous function
+            if (!funcdecl.IsAnonymous)
+                checker.SymbolTable.AddSymbol(funcSymbol);
 
-            checker.SymbolTable.EnterBlock(BlockType.Function, $"func-{funcdecl.Identifier.Value}-{funcdecl.GetHashCode()}");
+            checker.SymbolTable.EnterFunctionBlock(funcSymbol);
 
             funcdecl.Parameters.Parameters.ForEach(p => checker.SymbolTable.NewSymbol(p.Value.ToString(), null));
 

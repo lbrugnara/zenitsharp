@@ -44,6 +44,8 @@ namespace Fl.Symbols
         /// <param name="uid">ID of the block to get/create</param>
         public void EnterBlock(BlockType blockType, string uid) => this.Blocks.Push(this.CurrentBlock.GetOrCreateInnerBlock(blockType, uid));
 
+        public void EnterFunctionBlock(Function functionBlock) => this.Blocks.Push(functionBlock.Block);
+
         /// <summary>
         /// Remove CurrentBlock from the stack (go back to the CurrentBlock's parent block)
         /// </summary>

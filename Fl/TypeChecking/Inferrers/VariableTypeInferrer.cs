@@ -25,26 +25,38 @@ namespace Fl.TypeChecking.Inferrers
         protected InferredType VarDefinitionNode(TypeInferrerVisitor checker, AstVarDefinitionNode vardecl)
         {
             // Get the variable type from the declaration
-            var lhsType = new InferredType
-            {
-                Type = TypeHelper.FromToken(vardecl.VarType.TypeToken)
-            };
+            InferredType inferredType = null;
 
             foreach (var declaration in vardecl.VarDefinitions)
             {
+                var lhs = checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString());
+
+                if (lhs.Type == null)
+                    checker.Constraints.AssignTemporalType(lhs);
+
+                if (inferredType == null)
+                    inferredType = new InferredType(lhs.Type);
+
                 // If it is a variable definition, get the right-hand side type info
                 var rhsType = declaration.Item2?.Visit(checker);
 
                 // When lhs is "var", take the type from the right hand side expression, or throw if it is not available
-                if (lhsType == null)
-                    lhsType = rhsType ?? throw new SymbolException("Implicitly-typed variable must be initialized");
-                else if (rhsType != null && !lhsType.Type.IsAssignableFrom(rhsType.Type))
-                    throw new SymbolException($"Cannot assign type {rhsType} to variable of type {lhsType}");
-
-                checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type = lhsType.Type;
+                if (inferredType.Type is Anonymous)
+                {
+                    checker.Constraints.InferTypeAs(inferredType.Type as Anonymous, rhsType.Type);
+                    inferredType = new InferredType(rhsType?.Type ?? throw new SymbolException("Implicitly-typed variable must be initialized"), declaration.Item1.Value.ToString());
+                }
+                else if (rhsType.Type is Anonymous)
+                {
+                    checker.Constraints.InferTypeAs(rhsType.Type as Anonymous, inferredType.Type);
+                }
+                else if (inferredType.Type != null && !inferredType.Type.IsAssignableFrom(rhsType?.Type))
+                {
+                    throw new SymbolException($"Cannot assign type {rhsType.Type} to variable of type {inferredType.Type}");
+                }
             }
 
-            return null;
+            return inferredType;
         }
 
         protected InferredType VarDestructuringNode(TypeInferrerVisitor checker, AstVarDestructuringNode vardestnode)

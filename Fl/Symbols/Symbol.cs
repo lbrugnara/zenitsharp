@@ -35,5 +35,10 @@ namespace Fl.Symbols
             this.Type = type;
             this.Scope = scope;
         }
+
+        public override string ToString()
+        {
+            return $"{this.Name}: {this.Type}";
+        }
     }
 }

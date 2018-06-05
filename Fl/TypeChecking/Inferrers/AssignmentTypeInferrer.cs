@@ -23,7 +23,25 @@ namespace Fl.TypeChecking.Inferrers
             var leftHandSide = node.Accessor.Visit(checker);
             var rightHandSide = node.Expression.Visit(checker);
 
-            return leftHandSide;
+            InferredType inferredType = null;
+
+            if (leftHandSide.Type is Anonymous && !(rightHandSide.Type is Anonymous))
+            {
+                inferredType = new InferredType(rightHandSide.Type);
+
+                checker.Constraints.InferTypeAs(leftHandSide.Type as Anonymous, inferredType.Type);
+            }
+            else
+            {
+                inferredType = new InferredType(leftHandSide.Type);
+
+                if (rightHandSide.Type is Anonymous)
+                {
+                    checker.Constraints.InferTypeAs(rightHandSide.Type as Anonymous, inferredType.Type);
+                }
+            }
+
+            return inferredType;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 namespace Fl.Symbols
 {
+
     public class Package : Symbol, ISymbolTable
     {
         /// <summary>
@@ -42,6 +43,6 @@ namespace Fl.Symbols
             this.Symbols.AddSymbol(pkg);
 
             return pkg;
-        }        
+        }
     }
 }

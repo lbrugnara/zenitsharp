@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Fl.Lang.Types;
+using System.Linq;
 
 namespace Fl.Symbols
 {
@@ -47,7 +48,7 @@ namespace Fl.Symbols
             this.Children = new Dictionary<string, Block>();
 
             if (type == BlockType.Function)
-                this.NewSymbol("@ret", Null.Instance);
+                this.NewSymbol("@ret", null);
         }
 
         public Block(BlockType type, string uid, Block global, Block parent = null)

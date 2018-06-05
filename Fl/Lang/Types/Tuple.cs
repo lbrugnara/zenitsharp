@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.Symbols.Objects;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,26 +8,28 @@ namespace Fl.Lang.Types
 {
     public class Tuple : Type
     {
-        public static Tuple Instance { get; } = new Tuple();
-
-        private List<Type> Types;
+        private List<Type> types;
 
         private Tuple()
             : base("tuple")
         {
-            this.Types = new List<Type>();
+            this.types = new List<Type>();
         }
 
         public Tuple(params Type[] types)
             : base("tuple")
         {
-            this.Types = types?.ToList() ?? new List<Type>();
+            this.types = types?.ToList() ?? new List<Type>();
         }
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj) && this.Types.SequenceEqual((obj as Tuple).Types);
+            return base.Equals(obj) && this.types.SequenceEqual((obj as Tuple).types);
         }
+
+        public int Count => this.types.Count;
+
+        public List<Type> Types => new List<Type>(this.types);
 
         public static bool operator ==(Tuple type1, Type type2)
         {
@@ -45,7 +46,7 @@ namespace Fl.Lang.Types
 
         public override string ToString()
         {
-            return base.ToString() + "(" + string.Join(", ", this.Types) + ")";
+            return base.ToString() + "(" + string.Join(", ", this.types) + ")";
         }
 
         public override bool IsAssignableFrom(Type type)

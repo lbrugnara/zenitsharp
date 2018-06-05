@@ -4,9 +4,102 @@
 using Fl.Symbols;
 using Fl.Ast;
 using Fl.Lang.Types;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Fl.TypeChecking.Inferrers
 {
+    public class Constraints
+    {
+        private Dictionary<string, List<Symbol>> constraints;
+
+        private int[] names = new int[] { -1, -1, -1, -1, -1, -1, -1 };
+
+        public Constraints()
+        {
+            this.constraints = new Dictionary<string, List<Symbol>>();
+        }
+
+        public void AddConstraint(Symbol s)
+        {
+            var name = s.Type.ToString();
+
+            if (!this.constraints.ContainsKey(name))
+                this.constraints[s.Type.ToString()] = new List<Symbol>();
+
+            this.constraints[name].Add(s);
+        }
+
+        public bool HasConstraints(Symbol s) => this.constraints.ContainsKey(s.Type.ToString());
+
+        public void ResolveConstraint(Symbol symbol, Type t)
+        {
+            var prevInferredType = symbol.Type.ToString();
+
+            this.constraints[prevInferredType].ForEach(s => s.Type = t);
+
+            if (t is Anonymous)
+                this.constraints[t.ToString()].AddRange(this.constraints[prevInferredType]);
+
+            this.constraints.Remove(prevInferredType);
+        }
+
+        public Anonymous AssignTemporalType(Symbol s)
+        {            
+            var tempType = new Anonymous(this.GetName());
+            s.Type = tempType;
+
+            var tempName = tempType.ToString();
+
+            if (!this.constraints.ContainsKey(tempName))
+                this.constraints[tempName] = new List<Symbol>();
+
+            this.constraints[tempName].Add(s);
+
+            return tempType;
+        }
+
+        public void InferTypeAs(Anonymous prevInferredType, Type newInferredType)
+        {
+            this.constraints[prevInferredType.ToString()].ForEach(s => s.Type = newInferredType);
+
+            if (newInferredType is Anonymous)
+                this.constraints[newInferredType.ToString()].AddRange(this.constraints[prevInferredType.ToString()]);
+
+            this.constraints.Remove(prevInferredType.ToString());
+        }
+
+        private void RestoreName()
+        {
+            // Poor's man type name generator
+            for (var i = this.names.Length - 1; i >= 0; i--)
+            {
+                if (this.names[i] >= 0)
+                {
+                    this.names[i] -= 1;
+                    return;
+                }
+                continue;
+            }
+            throw new System.Exception("Carry Underflow");
+        }
+
+        private string GetName()
+        {
+            // Poor's man type name generator
+            for (var i=0; i < this.names.Length; i++)
+            {
+                if (this.names[i] < 25)
+                {
+                    this.names[i] += 1;
+                    return string.Join("", this.names.Where(n => n > -1).Select(n => (char)('A' + n)));
+                }
+                this.names[i] = 0;
+            }
+            throw new System.Exception("Carry Overflow");
+        }
+    }
+
     public class TypeInferrerVisitor : IAstWalker<InferredType>
     {
         private UnaryTypeInferrer unaryTypeInferencer;
@@ -32,6 +125,7 @@ namespace Fl.TypeChecking.Inferrers
         public TypeInferrerVisitor(SymbolTable symtable)
         {
             this.SymbolTable = symtable;
+            this.Constraints = new Constraints();
             this.unaryTypeInferencer = new UnaryTypeInferrer();
             this.binaryTypeInferencer = new BinaryTypeInferrer();
             this.assignmentTypeInferencer = new AssignmentTypeInferrer();
@@ -57,6 +151,8 @@ namespace Fl.TypeChecking.Inferrers
         /// Tracks variables per blocks
         /// </summary>
         public SymbolTable SymbolTable { get; private set; }
+
+        public Constraints Constraints { get; private set; }
 
         // Adds a new block to the SymbolTable, it represents a new scope
         public void EnterBlock(BlockType type, string name)

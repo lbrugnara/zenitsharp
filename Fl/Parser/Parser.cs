@@ -475,7 +475,14 @@ namespace Fl.Parser
             AstParametersNode parameters = this.FuncParameters();
 
             this.Consume(TokenType.RightParen);
-            
+
+            if (this.Peek().Type == TokenType.RightArrow)
+            {
+                // RightArrow followed by brace doesn't make sense here, expression is the only accepted node
+                this.Consume(TokenType.RightArrow);                
+                return new AstFuncDeclNode(name, parameters, new List<AstNode>() { this.Expression() }, false, true);
+            }
+
             List<AstNode> decls = new List<AstNode>();
             this.Consume(TokenType.LeftBrace);
             while (!this.Match(TokenType.RightBrace))
@@ -484,7 +491,7 @@ namespace Fl.Parser
             }
             this.Consume(TokenType.RightBrace);
 
-            return new AstFuncDeclNode(name, parameters, decls);
+            return new AstFuncDeclNode(name, parameters, decls, false, false);
         }
 
         // Rule:
@@ -831,7 +838,7 @@ namespace Fl.Parser
             AstParametersNode lambdaParams = this.LambdaParams();
             var arrow = this.Consume(TokenType.RightArrow);
             AstNode expr = this.Match(TokenType.LeftBrace) ? this.Block() : this.Expression();
-            return new AstFuncDeclNode(arrow, lambdaParams, new List<AstNode>() { expr });
+            return new AstFuncDeclNode(arrow, lambdaParams, new List<AstNode>() { expr }, true, true);
         }
 
         // Rule:

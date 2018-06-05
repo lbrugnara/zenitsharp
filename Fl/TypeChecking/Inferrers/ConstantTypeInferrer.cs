@@ -20,10 +20,7 @@ namespace Fl.TypeChecking.Inferrers
                 var rhsType = declaration.Item2.Visit(checker);
             }
 
-            return new InferredType
-            {
-                Type = lhsType
-            };
+            return new InferredType(lhsType);
         }
     }
 }

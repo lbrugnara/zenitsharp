@@ -4,12 +4,12 @@ using System.Text;
 
 namespace Fl.Lang.Types
 {
-    class Anonymous : Type
+    public class Anonymous : Type
     {
         private string name;
         
         public Anonymous(string name)
-            : base("anonymous")
+            : base("'")
         {
             this.name = name;
         }
@@ -34,7 +34,7 @@ namespace Fl.Lang.Types
 
         public override string ToString()
         {
-            return base.ToString() + $"('{this.name})";
+            return $"{base.ToString()}{this.name}";
         }
 
         public override bool IsAssignableFrom(Type type)
