@@ -5,7 +5,7 @@ using Fl.Engine.Symbols.Objects;
 
 namespace Fl.Lang.Types
 {
-    public class Error : Type
+    public class Error : PrimitiveType
     {
         public static Error Instance { get; } = new Error();
 

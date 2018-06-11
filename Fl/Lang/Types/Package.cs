@@ -5,7 +5,7 @@ using Fl.Engine.Symbols.Objects;
 
 namespace Fl.Lang.Types
 {
-    public class Package : Type
+    public class Package : ComplexType
     {
         public static Package Instance { get; } = new Package();
 

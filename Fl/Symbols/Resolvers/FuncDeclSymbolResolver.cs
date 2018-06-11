@@ -8,21 +8,21 @@ namespace Fl.Symbols.Resolvers
 {
     class FuncDeclSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstFuncDeclNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstFuncDeclNode funcdecl)
+        public void Visit(SymbolResolverVisitor visitor, AstFuncDeclNode funcdecl)
         {
-            var funcSymbol = new Function(funcdecl.Identifier.Value.ToString(), funcdecl.Parameters.Parameters.Select(p => p.Value.ToString()).ToArray());
-            
-            // Register symbol if it is not an anontmous function
-            if (!funcdecl.IsAnonymous)
-                checker.SymbolTable.AddSymbol(funcSymbol);
+            var funcName = funcdecl.Name;
+            var funcParams = funcdecl.Parameters.Parameters.Select(p => p.Value.ToString()).ToArray();
+            var funcSymbol = new Function(funcName, funcParams, visitor.SymbolTable.GlobalBlock, visitor.SymbolTable.CurrentBlock);
 
-            checker.SymbolTable.EnterFunctionBlock(funcSymbol);
+            visitor.SymbolTable.AddSymbol(funcSymbol);
 
-            funcdecl.Parameters.Parameters.ForEach(p => checker.SymbolTable.NewSymbol(p.Value.ToString(), null));
+            visitor.SymbolTable.EnterFunctionBlock(funcSymbol);
 
-            funcdecl.Body.ForEach(s => s.Visit(checker));
+            funcdecl.Parameters.Parameters.ForEach(p => visitor.SymbolTable.NewSymbol(p.Value.ToString(), null));
 
-            checker.SymbolTable.LeaveBlock();
+            funcdecl.Body.ForEach(s => s.Visit(visitor));
+
+            visitor.SymbolTable.LeaveBlock();
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Fl.Lang.Types
 {
-    public class Float : Type
+    public class Float : PrimitiveType
     {
         public static Float Instance { get; } = new Float();
 

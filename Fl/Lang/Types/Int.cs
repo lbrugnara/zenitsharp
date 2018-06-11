@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Fl.Lang.Types
 {
-    public class Int : Type
+    public class Int : PrimitiveType
     {
         public static Int Instance { get; } = new Int();
 

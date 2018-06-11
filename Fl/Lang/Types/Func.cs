@@ -5,10 +5,10 @@ using System.Linq;
 
 namespace Fl.Lang.Types
 {
-    public class Func : Type
+    public class Func : ComplexType
     {
         public Type[] Parameters { get; private set; }
-        public Type Return { get; private set; }
+        public Type Return { get; set; }
 
         public Func(Type[] parameters, Type returns)
             : base("func")

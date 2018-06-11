@@ -1,16 +1,28 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.Symbols.Objects;
-
 namespace Fl.Lang.Types
 {
-    public class Type
+    public abstract class PrimitiveType : Type
+    {
+        public PrimitiveType(string name)
+            : base(name)
+        {
+        }
+    }
+
+    public abstract class ComplexType : Type
+    {
+        public ComplexType(string name)
+            : base(name)
+        {
+        }
+    }
+
+    public abstract class Type
     {
         private string Name { get; }
 
-        public static Type Instance { get; } = new Type();
-        
         private Type()
         {
             this.Name = "type";

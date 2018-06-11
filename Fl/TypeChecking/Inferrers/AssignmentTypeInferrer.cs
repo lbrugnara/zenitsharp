@@ -10,38 +10,20 @@ namespace Fl.TypeChecking.Inferrers
 {
     class AssignmentTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstAssignmentNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstAssignmentNode node)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstAssignmentNode node)
         {
             if (node is AstVariableAssignmentNode)
-                return MakeVariableAssignment(node as AstVariableAssignmentNode, checker);
+                return MakeVariableAssignment(node as AstVariableAssignmentNode, visitor);
 
             throw new AstWalkerException($"Invalid variable assifnment of type {node.GetType().FullName}");
         }
 
-        private InferredType MakeVariableAssignment(AstVariableAssignmentNode node, TypeInferrerVisitor checker)
+        private InferredType MakeVariableAssignment(AstVariableAssignmentNode node, TypeInferrerVisitor visitor)
         {
-            var leftHandSide = node.Accessor.Visit(checker);
-            var rightHandSide = node.Expression.Visit(checker);
+            var leftHandSide = node.Accessor.Visit(visitor);
+            var rightHandSide = node.Expression.Visit(visitor);
 
-            InferredType inferredType = null;
-
-            if (leftHandSide.Type is Anonymous && !(rightHandSide.Type is Anonymous))
-            {
-                inferredType = new InferredType(rightHandSide.Type);
-
-                checker.Constraints.InferTypeAs(leftHandSide.Type as Anonymous, inferredType.Type);
-            }
-            else
-            {
-                inferredType = new InferredType(leftHandSide.Type);
-
-                if (rightHandSide.Type is Anonymous)
-                {
-                    checker.Constraints.InferTypeAs(rightHandSide.Type as Anonymous, inferredType.Type);
-                }
-            }
-
-            return inferredType;
+            return new InferredType(visitor.Inferrer.UnifyTypesIfPossible(leftHandSide.Type, rightHandSide.Type));
         }
     }
 }

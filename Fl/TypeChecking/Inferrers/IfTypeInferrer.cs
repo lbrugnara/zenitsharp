@@ -9,27 +9,27 @@ namespace Fl.TypeChecking.Inferrers
 {
     class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstIfNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstIfNode ifnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstIfNode ifnode)
         {
-            var conditionType = ifnode.Condition.Visit(checker);
+            var conditionType = ifnode.Condition.Visit(visitor);
 
             // Add a new common block for the if's boyd
-            checker.EnterBlock(BlockType.Common, $"if-then-{ifnode.GetHashCode()}");
+            visitor.EnterBlock(BlockType.Common, $"if-then-{ifnode.GetHashCode()}");
 
             // Generate the if's body
-            ifnode.Then?.Visit(checker);
+            ifnode.Then?.Visit(visitor);
 
             // Leave the if's then block
-            checker.LeaveBlock();
+            visitor.LeaveBlock();
 
             if (ifnode.Else != null)
             {
                 // Add a block for the else's body and generate it, then leave the block
-                checker.EnterBlock(BlockType.Common, $"if-else-{ifnode.GetHashCode()}");
+                visitor.EnterBlock(BlockType.Common, $"if-else-{ifnode.GetHashCode()}");
 
-                ifnode.Else.Visit(checker);
+                ifnode.Else.Visit(visitor);
 
-                checker.LeaveBlock();
+                visitor.LeaveBlock();
             }
 
             return null;

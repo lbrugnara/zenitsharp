@@ -9,7 +9,7 @@ namespace Fl.TypeChecking.Inferrers
 {
     class ConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstConstantNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstConstantNode constdec)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstConstantNode constdec)
         {
             // Get the constant's type
             var lhsType = TypeHelper.FromToken(constdec.Type);
@@ -17,7 +17,9 @@ namespace Fl.TypeChecking.Inferrers
             foreach (var declaration in constdec.Constants)
             {
                 // Get the right-hand side operand (a must for a constant)
-                var rhsType = declaration.Item2.Visit(checker);
+                var rhs = declaration.Item2.Visit(visitor);
+
+                visitor.Inferrer.UnifyTypesIfPossible(lhsType, rhs.Type);
             }
 
             return new InferredType(lhsType);

@@ -8,7 +8,7 @@ namespace Fl.TypeChecking.Inferrers
 {
     class ContinueTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstContinueNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstContinueNode cnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstContinueNode cnode)
         {
             return null;
         }

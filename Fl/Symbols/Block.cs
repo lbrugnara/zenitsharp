@@ -55,7 +55,8 @@ namespace Fl.Symbols
             : this(type, uid)
         {
             this.Global = global;
-            this.Parent = parent;
+            if (parent != global)
+                this.Parent = parent;
         }
 
         public Block GetOrCreateInnerBlock(BlockType type, string uid)

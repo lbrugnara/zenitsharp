@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Fl.Lang.Types
 {
-    public class Decimal : Type
+    public class Decimal : PrimitiveType
     {
         public static Decimal Instance { get; } = new Decimal();
 

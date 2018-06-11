@@ -10,45 +10,87 @@ namespace Fl.TypeChecking.Inferrers
 {
     public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstCallableNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstCallableNode node)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstCallableNode node)
         {
-            var target = node.Callable.Visit(checker);
+            // Get the callable inferred type (and symbol)
+            var callableInferredType = node.Callable.Visit(visitor);
 
-            if (!(target.Type is Func))
-                throw new System.Exception($"Cannot invoke a non-function object");
+            // Get the symbol function
+            var symbol = callableInferredType.Symbol;
 
-            var function = checker.SymbolTable.GetSymbol(target.Symbol) as Function;
-
-            if (function.Parameters.Length != node.Arguments.Expressions.Count)
-                throw new System.Exception($"Function {function.Name} expects {function.Parameters.Length} but received {node.Arguments.Expressions.Count}");
-
-            var parameters = new List<Type>();
-
-            for (var i=0; i < function.Parameters.Length; i++)
+            if (symbol is Function function)
             {
-                var p = function.GetSymbol(function.Parameters[i]);
-                var inferredParamType = node.Arguments.Expressions[i].Visit(checker);
+                // Check parameters cound
+                // TODO: This is not needed to be here
+                if (function.Parameters.Length != node.Arguments.Expressions.Count)
+                    throw new System.Exception($"Function {function.Name} expects {function.Parameters.Length} arguments but received {node.Arguments.Expressions.Count}");
 
-                parameters.Add(inferredParamType.Type);
+                // Get the parameters used to invoke the target function
+                var parameters = new List<Type>();
 
-                if (p.Type is Anonymous && !(inferredParamType.Type is Anonymous))
+                // Iterate over the function parameters and infer types if needed
+                for (var i = 0; i < function.Parameters.Length; i++)
                 {
-                    checker.Constraints.InferTypeAs(p.Type as Anonymous, inferredParamType.Type);
-                }
-                else if (inferredParamType.Type is Anonymous && !(p.Type is Anonymous))
-                {
-                    checker.Constraints.InferTypeAs(inferredParamType.Type as Anonymous, p.Type);
-                }
-            }
+                    // Get parameter symbol
+                    var paramSymbol = function.GetSymbol(function.Parameters[i]);
 
-            if (checker.Constraints.HasConstraints(function))
-            {
+                    // Get the inferred parameter type for this call
+                    var inferredParamType = node.Arguments.Expressions[i].Visit(visitor);
+
+                    // If needed, unify the types
+                    if (paramSymbol.Type == null)
+                        visitor.Inferrer.AssumeSymbolType(paramSymbol);
+
+                    visitor.Inferrer.UnifyTypesIfPossible(paramSymbol.Type, inferredParamType.Type);
+
+                    // Save the inferred type
+                    parameters.Add(inferredParamType.Type);
+                }
+
+                // Inferred type at Callable node will be the target's return type
                 var retSymbol = function.GetSymbol("@ret");
 
-                checker.Constraints.ResolveConstraint(function, new Func(parameters.ToArray(), retSymbol.Type));
-            }
+                // If the type is not yet infererd, assign a temporal one
+                if (retSymbol.Type == null)
+                    visitor.Inferrer.AssumeSymbolType(retSymbol);
 
-            return new InferredType((function.Type as Func).Return);
+                return new InferredType(retSymbol.Type);
+            }
+            else if (callableInferredType.Type is Func typeFunc)
+            {
+                // Check parameters cound
+                // TODO: This is not needed to be here
+                if (typeFunc.Parameters.Length != node.Arguments.Expressions.Count)
+                    throw new System.Exception($"Function {symbol.Name} expects {typeFunc.Parameters.Length} arguments but received {node.Arguments.Expressions.Count}");
+
+                // Get the parameters used to invoke the target function
+                var parameters = new List<Type>();
+
+                // Iterate over the function parameters and infer types if needed
+                for (var i = 0; i < typeFunc.Parameters.Length; i++)
+                {
+                    // Get the inferred parameter type for this call
+                    var inferredParamType = node.Arguments.Expressions[i].Visit(visitor);
+
+                    // If needed, unify the types
+                    visitor.Inferrer.UnifyTypesIfPossible(typeFunc.Parameters[i], inferredParamType.Type);
+
+                    // Save the inferred type
+                    parameters.Add(inferredParamType.Type);
+                }
+
+                // If the type is not yet infererd, assign a temporal one
+                /*if (typeFunc.Return == null)
+                    visitor.Inferrer.AssignTemporalTypeToSymbol(retSymbol);*/
+
+                return new InferredType(typeFunc.Return);
+            }
+            else
+            {
+                // If the callable inferred type is not a Func, throw an exception
+                // TODO: This could be replaced by structural typing, using the operator() method
+                throw new System.Exception($"Cannot invoke a non-function object");
+            }
         }
     }
 }

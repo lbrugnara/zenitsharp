@@ -8,12 +8,12 @@ namespace Fl.TypeChecking.Inferrers
 {
     class NullCoalescingTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstNullCoalescingNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstNullCoalescingNode nullc)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstNullCoalescingNode nullc)
         {
-            var left = nullc.Left.Visit(checker);
-            var right = nullc.Right.Visit(checker);
+            var left = nullc.Left.Visit(visitor);
+            var right = nullc.Right.Visit(visitor);
 
-            return left ?? right ?? null;
+            return new InferredType(visitor.Inferrer.UnifyTypesIfPossible(left.Type, right.Type));
         }
     }
 }

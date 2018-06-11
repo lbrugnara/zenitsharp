@@ -9,25 +9,25 @@ namespace Fl.TypeChecking.Inferrers
 {
     class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstForNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstForNode fornode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
-            checker.EnterBlock(BlockType.Loop, $"for-{fornode.GetHashCode()}");
+            visitor.EnterBlock(BlockType.Loop, $"for-{fornode.GetHashCode()}");
 
             // Initialize the for-block
-            fornode.Init.Visit(checker);
+            fornode.Init.Visit(visitor);
 
             // Emmit the condition code
-            var conditionType = fornode.Condition.Visit(checker);
+            var conditionType = fornode.Condition.Visit(visitor);
 
             // Emmit the body code
-            fornode.Body.Visit(checker);
+            fornode.Body.Visit(visitor);
 
             // Emmit the for's increment part
-            fornode.Increment.Visit(checker);
+            fornode.Increment.Visit(visitor);
 
             // Leave the for
-            checker.LeaveBlock();
+            visitor.LeaveBlock();
 
             return null;
         }

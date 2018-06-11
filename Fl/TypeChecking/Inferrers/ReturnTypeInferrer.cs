@@ -10,12 +10,12 @@ namespace Fl.TypeChecking.Inferrers
 {
     class ReturnTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstReturnNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstReturnNode rnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstReturnNode rnode)
         {
-            if (!checker.SymbolTable.CurrentBlock.IsFunction)
+            if (!visitor.SymbolTable.CurrentBlock.IsFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            var ret = checker.SymbolTable.GetSymbol("@ret");
+            var ret = visitor.SymbolTable.GetSymbol("@ret");
 
             // void
             if (rnode.ReturnTuple == null)
@@ -24,7 +24,7 @@ namespace Fl.TypeChecking.Inferrers
                 return null;
             }
 
-            var tupleInferredType = rnode.ReturnTuple.Visit(checker);
+            var tupleInferredType = rnode.ReturnTuple.Visit(visitor);
 
             // Set return type to the same type of the tuple
             ret.Type = tupleInferredType.Type;

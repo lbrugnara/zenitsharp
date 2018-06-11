@@ -9,9 +9,9 @@ namespace Fl.TypeChecking.Inferrers
 {
     class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstLiteralNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstLiteralNode literal)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstLiteralNode literal)
         {
-            return new InferredType(TypeHelper.FromToken(literal.Literal) ?? new Anonymous("l"));
+            return new InferredType(TypeHelper.FromToken(literal.Literal));
         }
     }
 }

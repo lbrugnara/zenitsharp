@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Fl.Lang.Types
 {
-    public class Null : Type
+    public class Null : PrimitiveType
     {
         public static Null Instance { get; } = new Null();
 

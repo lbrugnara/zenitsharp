@@ -10,14 +10,14 @@ namespace Fl.TypeChecking.Inferrers
 {
     class BlockTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBlockNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstBlockNode node)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstBlockNode node)
         {
-            checker.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
+            visitor.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
 
             foreach (AstNode statement in node.Statements)
-                statement.Visit(checker);
+                statement.Visit(visitor);
 
-            checker.LeaveBlock();
+            visitor.LeaveBlock();
             return null;
         }
     }

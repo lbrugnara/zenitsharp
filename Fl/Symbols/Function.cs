@@ -14,10 +14,10 @@ namespace Fl.Symbols
 
         public string[] Parameters { get; private set; }
 
-        public Function(string name, string[] parameters, string scope = null)
+        public Function(string name, string[] parameters, Block global, Block parent = null, string scope = null)
             : base(name, new Func(), scope)
         {
-            this.Block = new Block(BlockType.Function, this.MangledName);
+            this.Block = new Block(BlockType.Function, this.MangledName, global, parent);
             this.Parameters = parameters;
         }
 

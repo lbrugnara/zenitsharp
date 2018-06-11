@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Fl.Lang.Types
 {
-    public class Bool : Type
+    public class Bool : PrimitiveType
     {
         public static Bool Instance { get; } = new Bool();
 

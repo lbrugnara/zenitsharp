@@ -12,7 +12,7 @@ namespace Fl.TypeChecking.Checkers
     {
         public Type Visit(TypeCheckerVisitor checker, AstFuncDeclNode funcdecl)
         {
-            checker.EnterBlock(BlockType.Function, $"func-{funcdecl.Identifier.Value}-{funcdecl.GetHashCode()}");
+            checker.EnterBlock(BlockType.Function, $"func-{funcdecl.Name}-{funcdecl.GetHashCode()}");
 
             //funcdecl.Parameters.Parameters.ForEach(p => p);
 
@@ -26,7 +26,7 @@ namespace Fl.TypeChecking.Checkers
                 var returnTypes = funcdecl.Body.OfType<AstReturnNode>().ToList().Select(rn => rn.Visit(checker));
 
                 if (returnTypes.Distinct().Count() != 1)
-                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes.Distinct())}) in function {funcdecl.Identifier.Value}");
+                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes.Distinct())}) in function {funcdecl.Name}");
 
                 returnType = returnTypes.First();
             }

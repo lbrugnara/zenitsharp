@@ -11,83 +11,87 @@ namespace Fl.TypeChecking.Inferrers
 {
     class FuncDeclTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstFuncDeclNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor inferrer, AstFuncDeclNode funcdecl)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstFuncDeclNode funcdecl)
         {
-            // Enter to the function scope and get the @ret symbol
+            Function functionSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Name) as Function ?? throw new System.Exception($"Function {funcdecl.Name} has not been resolved");
 
-            // If it is a new symbol, update the symbol's type in the symbol table
-            string funcName = !funcdecl.IsAnonymous ? funcdecl.Identifier.Value.ToString() : null;
-
-            Function functionSymbol = null;
-
-            // Enter the requested function block if it is a named function. Otherwise access to the block with the UID
-            if (funcName != null)
-                inferrer.SymbolTable.EnterFunctionBlock(functionSymbol = inferrer.SymbolTable.GetSymbol(funcName) as Function);
-            else
-                inferrer.EnterBlock(BlockType.Function, $"func-{funcdecl.Identifier.Value}-{funcdecl.GetHashCode()}");
-
-
-            var retSymbol = inferrer.SymbolTable.CurrentBlock.GetSymbol("@ret");
+            // Enter the requested function's block
+            visitor.SymbolTable.EnterFunctionBlock(functionSymbol);
 
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
 
             for (int i=0; i < funcdecl.Parameters.Parameters.Count; i++)
             {
-                var p = funcdecl.Parameters.Parameters[i];
-                var paramSymbol = inferrer.SymbolTable.GetSymbol(p.Value.ToString());
+                var paramSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Parameters.Parameters[i].Value.ToString());
 
-                // Assign an anonymous type for this parameter
-                inferrer.Constraints.AssignTemporalType(paramSymbol);
+                // If parameter doesn't have a type, assign a temporal one
+                if (paramSymbol.Type == null)
+                    visitor.Inferrer.AssumeSymbolType(paramSymbol);
 
                 parametersSymbols.Add(paramSymbol);
             }
 
-            inferrer.Constraints.AssignTemporalType(retSymbol);
+            // Get the return symbol and assign a temporal type
+            var retSymbol = visitor.SymbolTable.CurrentBlock.GetSymbol("@ret");
+
+            // If return type is not yet inferred, assign a temporal one
+            if (retSymbol.Type == null)
+                visitor.Inferrer.AssumeSymbolType(retSymbol);
 
             // Visit the function's body
-            var statements = funcdecl.Body.Select(s => (node: s, s.Visit(inferrer))).ToList();
+            var statements = funcdecl.Body.Select(s => (node: s, inferred: s.Visit(visitor))).ToList();
 
             // Let's infer the function type
             InferredType funcType = null;
 
-            // If there's a lambda, the return type should be already populated by the lambda's body expression
             if (funcdecl.IsLambda)
             {
-                var lambdaExpr = statements.Select(s => s.Item2).Last();
+                // If there's a lambda, the return type should be already populated by the lambda's body expression
+                // and that should be reflected on the @ret symbol
+                var lambdaExpr = statements.Select(s => s.inferred).Last();
 
-                if (retSymbol.Type is Anonymous)
-                    inferrer.Constraints.InferTypeAs(retSymbol.Type as Anonymous, lambdaExpr.Type);
+                // Try to unify these types
+                visitor.Inferrer.UnifyTypesIfPossible(retSymbol.Type, lambdaExpr.Type);
 
-                funcType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type));
+                // The inferred Func type with the paremters type and the return type
+                funcType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type), functionSymbol);
             }
             else
             {
-                // If it has a body, get all the AstReturnNode, and check that all the returned types are same (TODO: This needs to get the common ancestor type)
+                // If it has a body, get all the AstReturnNode, and check that all the returned types are same
+                // TODO: This needs to get the common ancestor type (union)
                 var returnTypesNode = statements.Where(t => t.node is AstReturnNode).ToList();
 
-                var returnTypes = returnTypesNode.Select(t => t.Item2).Distinct().ToList();
+                var returnTypes = returnTypesNode.Select(t => t.inferred).Distinct().ToList();
 
                 if (returnTypes.Count() == 1)
-                    funcType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), returnTypes.First().Type));
+                {
+                    visitor.Inferrer.UnifyTypesIfPossible(retSymbol.Type, returnTypes.First().Type);
+                    funcType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type), functionSymbol);
+                }
                 else if (returnTypes.Count() == 0)
-                    funcType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), Null.Instance));
+                {
+                    visitor.Inferrer.UnifyTypesIfPossible(retSymbol.Type, Null.Instance);
+                    funcType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type), functionSymbol);
+                }
                 else
-                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes)}) in function {funcdecl.Identifier.Value}");
+                {
+                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes)}) in function {funcdecl.Name}");
+                }
             }
-
-            // Double check: Update @ret type
-            retSymbol.Type = (funcType.Type as Func).Return;
 
             // Leave the function's scope
-            inferrer.LeaveBlock();
+            visitor.LeaveBlock();
 
-            if (funcName != null)
-            {
-                functionSymbol.Type = funcType.Type;
-                inferrer.Constraints.AddConstraint(functionSymbol);
-            }
+            // Symbol types is the inferred type
+            functionSymbol.Type = funcType.Type;
 
+            // If the inferred type has unresolved constraints, register the function symbol under these constraints
+            if (visitor.Inferrer.TypeIsAssumed(funcType.Type))
+                visitor.Inferrer.AssumeSymbolTypeAs(functionSymbol, funcType.Type);
+
+            // Return inferred function type
             return funcType;
         }
     }

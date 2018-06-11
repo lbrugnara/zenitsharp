@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Fl.Lang.Types
 {
-    public class Anonymous : Type
+    public class Anonymous : PrimitiveType
     {
         private string name;
         

@@ -12,7 +12,36 @@ namespace Fl.Symbols
         internal static Type FromToken(Token token)
         {
             if (token.Type == TokenType.Identifier)
-                return new Type(token.Value.ToString());
+            {
+                string val = token.Value.ToString();
+
+                if (val == Bool.Instance.ToString())
+                    return Bool.Instance;
+
+                else if (val == Char.Instance.ToString())
+                    return Char.Instance;
+
+                else if (val == Int.Instance.ToString())
+                    return Int.Instance;
+
+                else if (val == Float.Instance.ToString())
+                    return Float.Instance;
+
+                else if (val == Double.Instance.ToString())
+                    return Double.Instance;
+
+                else if (val == Decimal.Instance.ToString())
+                    return Decimal.Instance;
+
+                else if (val == String.Instance.ToString())
+                    return String.Instance;
+
+                else if (val == Null.Instance.ToString())
+                    return Null.Instance;
+
+                // TODO: Fix this once custom types are implemented
+                throw new SymbolException($"Unrecognized identifier {token.Type}");
+            }
 
             switch (token.Type)
             {

@@ -8,9 +8,9 @@ namespace Fl.TypeChecking.Inferrers
 {
     class UnaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstUnaryNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstUnaryNode unary)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstUnaryNode unary)
         {
-            return unary.Left.Visit(checker);
+            return unary.Left.Visit(visitor);
         }
     }
 }

@@ -6,30 +6,28 @@ using System.Linq;
 
 namespace Fl.Lang.Types
 {
-    public class Tuple : Type
+    public class Tuple : ComplexType
     {
-        private List<Type> types;
+        public List<Type> Types { get; set; }
 
         private Tuple()
             : base("tuple")
         {
-            this.types = new List<Type>();
+            this.Types = new List<Type>();
         }
 
         public Tuple(params Type[] types)
             : base("tuple")
         {
-            this.types = types?.ToList() ?? new List<Type>();
+            this.Types = types?.ToList() ?? new List<Type>();
         }
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj) && this.types.SequenceEqual((obj as Tuple).types);
+            return base.Equals(obj) && this.Types.SequenceEqual((obj as Tuple).Types);
         }
 
-        public int Count => this.types.Count;
-
-        public List<Type> Types => new List<Type>(this.types);
+        public int Count => this.Types.Count;
 
         public static bool operator ==(Tuple type1, Type type2)
         {
@@ -46,7 +44,7 @@ namespace Fl.Lang.Types
 
         public override string ToString()
         {
-            return base.ToString() + "(" + string.Join(", ", this.types) + ")";
+            return base.ToString() + "(" + string.Join(", ", this.Types) + ")";
         }
 
         public override bool IsAssignableFrom(Type type)

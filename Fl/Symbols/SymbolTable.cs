@@ -34,6 +34,8 @@ namespace Fl.Symbols
         /// </summary>
         public Block CurrentBlock => this.Blocks.Peek();
 
+        public Block GlobalBlock => this.Blocks.First();
+
         /// <summary>
         /// Check if there's a child block in CurrentBlock with the provided UID. If the block exists, check the block's type
         /// and if it differs throw an exception because block definition mismatches.

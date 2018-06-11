@@ -9,19 +9,19 @@ namespace Fl.TypeChecking.Inferrers
 {
     class WhileTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstWhileNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstWhileNode wnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
-            checker.EnterBlock(BlockType.Loop, $"while-body-{wnode.GetHashCode()}");
+            visitor.EnterBlock(BlockType.Loop, $"while-body-{wnode.GetHashCode()}");
 
             // Emmit the condition code
-            var conditionType = wnode.Condition.Visit(checker);
+            var conditionType = wnode.Condition.Visit(visitor);
 
             // Emmit the body code
-            wnode.Body.Visit(checker);
+            wnode.Body.Visit(visitor);
 
             // Leave the while-block
-            checker.LeaveBlock();
+            visitor.LeaveBlock();
 
             return null;
         }

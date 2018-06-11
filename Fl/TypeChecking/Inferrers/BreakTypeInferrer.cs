@@ -10,9 +10,9 @@ namespace Fl.TypeChecking.Inferrers
 {
     class BreakTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBreakNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor checker, AstBreakNode wnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstBreakNode wnode)
         {
-            var nbreak = wnode.Number.Visit(checker);
+            var nbreak = wnode.Number?.Visit(visitor);
 
             return nbreak;
         }

@@ -479,8 +479,14 @@ namespace Fl.Parser
             if (this.Peek().Type == TokenType.RightArrow)
             {
                 // RightArrow followed by brace doesn't make sense here, expression is the only accepted node
-                this.Consume(TokenType.RightArrow);                
-                return new AstFuncDeclNode(name, parameters, new List<AstNode>() { this.Expression() }, false, true);
+                this.Consume(TokenType.RightArrow);
+
+                var f = new AstFuncDeclNode(name, parameters, new List<AstNode>() { this.Expression() }, false, true);
+
+                if (this.Match(TokenType.Semicolon))
+                    this.Consume(TokenType.Semicolon);
+
+                return f;
             }
 
             List<AstNode> decls = new List<AstNode>();

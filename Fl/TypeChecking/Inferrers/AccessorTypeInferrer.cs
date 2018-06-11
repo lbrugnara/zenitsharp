@@ -9,21 +9,20 @@ namespace Fl.TypeChecking.Inferrers
 {
     class AccessorTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstAccessorNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor inferrer, AstAccessorNode accessor)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstAccessorNode accessor)
         {
             // TODO: Check this logic
             if (accessor.Enclosing != null)
-                return accessor.Enclosing?.Visit(inferrer);
+                return accessor.Enclosing?.Visit(visitor);
 
             // Get accessed symbol 
-            var symbol = inferrer.SymbolTable.GetSymbol(accessor.Identifier.Value.ToString());
+            var symbol = visitor.SymbolTable.GetSymbol(accessor.Identifier.Value.ToString());
 
-            // If it doesn't have a type, assign a temporal one
             if (symbol.Type == null)
-                inferrer.Constraints.AssignTemporalType(symbol);
+                throw new System.Exception($"Symbol {symbol.Name} has a null type, it should have defined one at this point.");
 
             // Return the inferred type information for this symbol
-            return new InferredType(symbol.Type, symbol.Name);
+            return new InferredType(symbol.Type, symbol);
         }
     }
 }
