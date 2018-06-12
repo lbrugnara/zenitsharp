@@ -17,7 +17,7 @@ namespace Fl.TypeChecking.Inferrers
             var left = binary.Left.Visit(visitor);
             var right = binary.Right.Visit(visitor);
 
-            return new InferredType(visitor.Inferrer.UnifyTypesIfPossible(left.Type, right.Type));
+            return new InferredType(visitor.Inferrer.MakeConclusion(left.Type, right.Type));
         }
     }
 }

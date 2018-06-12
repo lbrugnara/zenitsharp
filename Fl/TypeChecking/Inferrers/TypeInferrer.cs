@@ -74,7 +74,7 @@ namespace Fl.TypeChecking.Inferrers
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public Type UnifyTypesIfPossible(Type left, Type right)
+        public Type MakeConclusion(Type left, Type right)
         {
             // Can't unify null objects
             if (left == null || right == null)

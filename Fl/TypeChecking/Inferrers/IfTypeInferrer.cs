@@ -13,6 +13,9 @@ namespace Fl.TypeChecking.Inferrers
         {
             var conditionType = ifnode.Condition.Visit(visitor);
 
+            // We know we need a boolean type here
+            visitor.Inferrer.MakeConclusion(conditionType.Type, Bool.Instance);
+
             // Add a new common block for the if's boyd
             visitor.EnterBlock(BlockType.Common, $"if-then-{ifnode.GetHashCode()}");
 

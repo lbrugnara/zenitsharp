@@ -20,6 +20,9 @@ namespace Fl.TypeChecking.Inferrers
             // Emmit the condition code
             var conditionType = fornode.Condition.Visit(visitor);
 
+            // We know we need a boolean type here
+            visitor.Inferrer.MakeConclusion(conditionType.Type, Bool.Instance);
+
             // Emmit the body code
             fornode.Body.Visit(visitor);
 

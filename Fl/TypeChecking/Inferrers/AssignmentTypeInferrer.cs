@@ -23,7 +23,7 @@ namespace Fl.TypeChecking.Inferrers
             var leftHandSide = node.Accessor.Visit(visitor);
             var rightHandSide = node.Expression.Visit(visitor);
 
-            return new InferredType(visitor.Inferrer.UnifyTypesIfPossible(leftHandSide.Type, rightHandSide.Type));
+            return new InferredType(visitor.Inferrer.MakeConclusion(leftHandSide.Type, rightHandSide.Type));
         }
     }
 }

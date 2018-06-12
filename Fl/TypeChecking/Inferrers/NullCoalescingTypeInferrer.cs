@@ -13,7 +13,7 @@ namespace Fl.TypeChecking.Inferrers
             var left = nullc.Left.Visit(visitor);
             var right = nullc.Right.Visit(visitor);
 
-            return new InferredType(visitor.Inferrer.UnifyTypesIfPossible(left.Type, right.Type));
+            return new InferredType(visitor.Inferrer.MakeConclusion(left.Type, right.Type));
         }
     }
 }

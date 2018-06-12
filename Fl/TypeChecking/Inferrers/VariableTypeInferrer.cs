@@ -47,7 +47,7 @@ namespace Fl.TypeChecking.Inferrers
                 var rhs = declaration.Item2?.Visit(visitor);
 
                 // Check types to see if we can unify them
-                visitor.Inferrer.UnifyTypesIfPossible(lhs.Type, rhs.Type);
+                visitor.Inferrer.MakeConclusion(lhs.Type, rhs.Type);
             }
 
             return inferredType;

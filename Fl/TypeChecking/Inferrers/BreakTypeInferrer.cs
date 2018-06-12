@@ -13,7 +13,6 @@ namespace Fl.TypeChecking.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, AstBreakNode wnode)
         {
             var nbreak = wnode.Number?.Visit(visitor);
-
             return nbreak;
         }
     }

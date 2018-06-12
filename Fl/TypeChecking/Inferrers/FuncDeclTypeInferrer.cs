@@ -25,7 +25,7 @@ namespace Fl.TypeChecking.Inferrers
             {
                 var paramSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Parameters.Parameters[i].Value.ToString());
 
-                // If parameter doesn't have a type, assign a temporal one
+                // If parameter doesn't have a type, assume it
                 if (paramSymbol.Type == null)
                     visitor.Inferrer.AssumeSymbolType(paramSymbol);
 
@@ -35,7 +35,7 @@ namespace Fl.TypeChecking.Inferrers
             // Get the return symbol and assign a temporal type
             var retSymbol = visitor.SymbolTable.CurrentBlock.GetSymbol("@ret");
 
-            // If return type is not yet inferred, assign a temporal one
+            // If return type is not yet inferred, assume one
             if (retSymbol.Type == null)
                 visitor.Inferrer.AssumeSymbolType(retSymbol);
 
@@ -43,19 +43,19 @@ namespace Fl.TypeChecking.Inferrers
             var statements = funcdecl.Body.Select(s => (node: s, inferred: s.Visit(visitor))).ToList();
 
             // Let's infer the function type
-            InferredType funcType = null;
+            InferredType inferredFuncType = null;
 
             if (funcdecl.IsLambda)
             {
                 // If there's a lambda, the return type should be already populated by the lambda's body expression
                 // and that should be reflected on the @ret symbol
-                var lambdaExpr = statements.Select(s => s.inferred).Last();
+                var lambdaReturnExpr = statements.Select(s => s.inferred).Last();
 
                 // Try to unify these types
-                visitor.Inferrer.UnifyTypesIfPossible(retSymbol.Type, lambdaExpr.Type);
+                visitor.Inferrer.MakeConclusion(retSymbol.Type, lambdaReturnExpr.Type);
 
                 // The inferred Func type with the paremters type and the return type
-                funcType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type), functionSymbol);
+                inferredFuncType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type), functionSymbol);
             }
             else
             {
@@ -67,13 +67,13 @@ namespace Fl.TypeChecking.Inferrers
 
                 if (returnTypes.Count() == 1)
                 {
-                    visitor.Inferrer.UnifyTypesIfPossible(retSymbol.Type, returnTypes.First().Type);
-                    funcType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type), functionSymbol);
+                    visitor.Inferrer.MakeConclusion(retSymbol.Type, returnTypes.First().Type);
+                    inferredFuncType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type), functionSymbol);
                 }
                 else if (returnTypes.Count() == 0)
                 {
-                    visitor.Inferrer.UnifyTypesIfPossible(retSymbol.Type, Null.Instance);
-                    funcType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type), functionSymbol);
+                    visitor.Inferrer.MakeConclusion(retSymbol.Type, Null.Instance);
+                    inferredFuncType = new InferredType(new Func(parametersSymbols.Select(s => s.Type).ToArray(), retSymbol.Type), functionSymbol);
                 }
                 else
                 {
@@ -85,14 +85,15 @@ namespace Fl.TypeChecking.Inferrers
             visitor.LeaveBlock();
 
             // Symbol types is the inferred type
-            functionSymbol.Type = funcType.Type;
+            functionSymbol.Type = inferredFuncType.Type;
 
-            // If the inferred type has unresolved constraints, register the function symbol under these constraints
-            if (visitor.Inferrer.TypeIsAssumed(funcType.Type))
-                visitor.Inferrer.AssumeSymbolTypeAs(functionSymbol, funcType.Type);
+            // The inferred function type is a complex type, it might contain assumptions for parameters' types or return type
+            // if that is the case, make this inferred type an assumption
+            if (visitor.Inferrer.TypeIsAssumed(inferredFuncType.Type))
+                visitor.Inferrer.AssumeSymbolTypeAs(functionSymbol, inferredFuncType.Type);
 
             // Return inferred function type
-            return funcType;
+            return inferredFuncType;
         }
     }
 }

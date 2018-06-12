@@ -19,7 +19,7 @@ namespace Fl.TypeChecking.Inferrers
                 // Get the right-hand side operand (a must for a constant)
                 var rhs = declaration.Item2.Visit(visitor);
 
-                visitor.Inferrer.UnifyTypesIfPossible(lhsType, rhs.Type);
+                visitor.Inferrer.MakeConclusion(lhsType, rhs.Type);
             }
 
             return new InferredType(lhsType);

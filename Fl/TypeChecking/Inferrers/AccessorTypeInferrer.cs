@@ -11,12 +11,13 @@ namespace Fl.TypeChecking.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, AstAccessorNode accessor)
         {
-            // TODO: Check this logic
+            ISymbolTable table = visitor.SymbolTable;
+
             if (accessor.Enclosing != null)
-                return accessor.Enclosing?.Visit(visitor);
+                table = accessor.Enclosing?.Visit(visitor).Symbol as ISymbolTable;
 
             // Get accessed symbol 
-            var symbol = visitor.SymbolTable.GetSymbol(accessor.Identifier.Value.ToString());
+            var symbol = table.GetSymbol(accessor.Identifier.Value.ToString());
 
             if (symbol.Type == null)
                 throw new System.Exception($"Symbol {symbol.Name} has a null type, it should have defined one at this point.");
