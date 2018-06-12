@@ -3,11 +3,11 @@
 
 using System;
 
-namespace Fl.Engine.Symbols.Exceptions
+namespace Fl.Symbols.Exceptions
 {
-    public class CastException : Exception
+    public class InvocationException : Exception
     {
-        public CastException(string msg) : base(msg)
+        public InvocationException(string msg) : base(msg)
         {
         }
     }

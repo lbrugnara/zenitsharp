@@ -3,7 +3,6 @@
 
 using Fl.Symbols;
 using Fl.Ast;
-using Fl.Lang.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {

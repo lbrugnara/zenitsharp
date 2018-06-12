@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Fl.Lang.Types
+﻿namespace Fl.Lang.Types
 {
     public class Anonymous : PrimitiveType
     {

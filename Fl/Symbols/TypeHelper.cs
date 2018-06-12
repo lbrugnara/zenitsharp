@@ -3,7 +3,6 @@
 
 using Fl.Lang.Types;
 using Fl.Parser;
-using Fl.Symbols;
 
 namespace Fl.Symbols
 {

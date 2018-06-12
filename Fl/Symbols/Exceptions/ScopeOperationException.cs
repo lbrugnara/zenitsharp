@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Fl.Engine.Symbols.Exceptions
+namespace Fl.Symbols.Exceptions
 {
     public class ScopeOperationException : Exception
     {

@@ -2,8 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using System.Collections.Generic;
-using Fl.Engine.Symbols.Types;
-using Fl.Engine.Symbols.Exceptions;
 using System.Linq;
 using Fl.Lang.Types;
 

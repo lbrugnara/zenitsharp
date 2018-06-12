@@ -2,7 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Lang.Types;
 using Fl.Symbols;
 
 namespace Fl.TypeChecking.Inferrers

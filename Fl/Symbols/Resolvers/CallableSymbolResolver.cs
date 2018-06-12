@@ -1,12 +1,8 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Symbols;
 
-using Fl.Engine.Symbols.Types;
 using Fl.Ast;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Fl.Symbols.Resolvers
 {

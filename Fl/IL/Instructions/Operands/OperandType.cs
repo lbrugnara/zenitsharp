@@ -1,9 +1,5 @@
-﻿using Fl.Engine.Symbols.Exceptions;
-using Fl.Engine.Symbols.Objects;
-using Fl.Parser;
+﻿using Fl.Parser;
 using Fl.Symbols;
-using System;
-using System.Linq;
 
 namespace Fl.Engine.Symbols.Types
 {

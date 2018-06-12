@@ -2,7 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using System.Collections.Generic;
-using System.Linq;
 using Fl.IL.Instructions;
 using Fl.IL.VM;
 
@@ -42,7 +41,8 @@ namespace Fl.IL
         public ILProgram Build()
         {
             this.ResolvedFragments.Add(this.CurrentFragment.Build());
-            return new ILProgram(Fl.Engine.Symbols.SymbolTable.Instance, this.ResolvedFragments);
+            //return new ILProgram(Fl.Engine.Symbols.SymbolTable.Instance, this.ResolvedFragments);
+            return null;
         }
 
         /// <summary>

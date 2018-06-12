@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Fl.IL.Instructions.Operands;
 using Fl.Engine.Symbols.Types;
-using Fl.Engine.Symbols.Exceptions;
+using Fl.Symbols.Exceptions;
 using System.Linq;
 using Fl.IL.Instructions;
 

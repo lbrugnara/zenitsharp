@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Engine.Symbols.Exceptions;
+using Fl.Symbols.Exceptions;
 using Fl.Ast;
 using Fl.Lang.Types;
 

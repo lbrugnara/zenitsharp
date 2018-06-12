@@ -2,7 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.IL.Instructions.Operands;
-using Fl.Engine.Symbols.Objects;
 using Fl.Engine.Symbols.Types;
 
 namespace Fl.IL.Instructions
@@ -23,7 +22,7 @@ namespace Fl.IL.Instructions
         {
             if (this.Value != null)
                 return $"{this.OpCode.InstructionName()} {this.Destination} = {this.Value}";
-            return $"{this.OpCode.InstructionName()} {this.Destination} = {FlNull.Value}";
+            return $"{this.OpCode.InstructionName()} {this.Destination} = null";
         }
     }
 }

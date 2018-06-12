@@ -4,7 +4,6 @@
 using Fl.IL.Instructions;
 using Fl.IL.Instructions.Exceptions;
 using Fl.IL.Instructions.Operands;
-using Fl.Engine.Symbols.Types;
 using Fl.Parser;
 using Fl.Ast;
 

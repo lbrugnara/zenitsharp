@@ -2,7 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Symbols.Resolvers;
 
 namespace Fl.Symbols.Resolvers
 {
