@@ -11,7 +11,7 @@ namespace Fl.TypeChecking.Checkers
     {
         public Type Visit(TypeCheckerVisitor checker, AstReturnNode rnode)
         {
-            if (!checker.SymbolTable.Scope.IsFunction)
+            if (!checker.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
             return rnode.ReturnTuple?.Visit(checker);

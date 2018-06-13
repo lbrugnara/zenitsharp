@@ -49,7 +49,7 @@ namespace Fl.Symbols.Types
         {
             return base.Equals(obj) 
                 && this.Return == (obj as Function).Return
-                && this.Parameters.SequenceEqual((obj as Function).Parameters);
+                && this.Parameters.Select(p => this.GetSymbol(p).DataType).SequenceEqual((obj as Function).Parameters.Select(p => this.GetSymbol(p).DataType));
         }
 
         public static bool operator ==(Function type1, Type type2)
@@ -68,7 +68,7 @@ namespace Fl.Symbols.Types
         public override string ToString()
         {
             var parameters = this.Parameters.Select(p => this.Scope.GetSymbol(p))
-                            .Select(s => $"{s.DataType} {s.Name}")
+                            .Select(s => s.DataType)
                             .ToList();
             return base.ToString() + "(" + string.Join(", ", parameters) + $"): {this.Return}";
         }

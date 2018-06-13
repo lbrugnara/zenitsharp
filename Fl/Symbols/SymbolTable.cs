@@ -23,11 +23,6 @@ namespace Fl.Symbols
         }
 
         /// <summary>
-        /// Current executing scope
-        /// </summary>
-        public Scope Scope => this.Scopes.Peek();
-
-        /// <summary>
         /// Global scope is the first created (last in the stack) scope
         /// </summary>
         public Scope Global => this.Scopes.Last();
@@ -39,7 +34,7 @@ namespace Fl.Symbols
         /// </summary>
         /// <param name="type">Type of the scope to get/create</param>
         /// <param name="uid">ID of the scope to get/create</param>
-        public void EnterScope(ScopeType type, string uid) => this.Scopes.Push(this.Scope.GetOrCreateNestedScope(type, uid));
+        public void EnterScope(ScopeType type, string uid) => this.Scopes.Push(this.Scopes.Peek().GetOrCreateNestedScope(type, uid));
 
         /// <summary>
         /// Enter to the function's scope, chain it to the stack of scopes, and make it the current 
@@ -53,20 +48,21 @@ namespace Fl.Symbols
         /// </summary>
         public void LeaveScope() => this.Scopes.Pop();
 
+        public bool InFunction => this.Scopes.Peek().IsFunction;
 
         #region ISymbolTable implementation
 
         /// <inheritdoc/>
-        public void AddSymbol(Symbol symbol) => this.Scope.AddSymbol(symbol);
+        public void AddSymbol(Symbol symbol) => this.Scopes.Peek().AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, Type type) => this.Scope.NewSymbol(name, type);
+        public Symbol NewSymbol(string name, Type type) => this.Scopes.Peek().NewSymbol(name, type);
 
         /// <inheritdoc/>
-        public bool HasSymbol(string name) => this.Scope.HasSymbol(name);
+        public bool HasSymbol(string name) => this.Scopes.Peek().HasSymbol(name);
 
         /// <inheritdoc/>
-        public Symbol GetSymbol(string name) => this.Scope.GetSymbol(name);
+        public Symbol GetSymbol(string name) => this.Scopes.Peek().GetSymbol(name);
 
         #endregion
     }

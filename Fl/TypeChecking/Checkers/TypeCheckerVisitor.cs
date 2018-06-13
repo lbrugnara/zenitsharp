@@ -71,7 +71,7 @@ namespace Fl.TypeChecking.Checkers
         }
 
         // Returns true if the current fragment is a function fragment
-        public bool InFunction => this.SymbolTable.Scope.Type == ScopeType.Function;
+        public bool InFunction => this.SymbolTable.InFunction;
 
         public Type Visit(AstNode node)
         {

@@ -15,11 +15,58 @@ namespace Fl.TypeChecking.Inferrers
             // Get the callable inferred type (and symbol)
             var symbol = node.Callable.Visit(visitor);
 
-            // If symbol is not a function, throw an exception
-            // TODO: This could be replaced by structural typing, using the operator() method
-            if (!(symbol is Function function))                
-                throw new System.Exception($"Cannot invoke a non-function object");
+            switch (symbol)
+            {
+                case Anonymous at:
+                    return this.CallableAnonymous(visitor, node, at);
+                case Function function:
+                    return this.CallableFunction(visitor, node, function);
+            }
+            throw new System.Exception($"Cannot invoke a non-function object");
+        }
 
+        private Type CallableAnonymous(TypeInferrerVisitor visitor, AstCallableNode node, Anonymous symbol)
+        {
+            // Get the parameters used to invoke the target function
+            var parameters = new List<Type>();
+
+            // Iterate over the function parameters and infer types if needed
+            for (var i = 0; i < node.Arguments.Count; i++)
+            {
+                // Get the inferred argument type for this call
+                var inferredParamType = node.Arguments.Expressions[i].Visit(visitor);
+
+                // Get the declared parameter symbol
+                //var paramSymbol = function.GetSymbol(function.Parameters[i]);
+
+                // If the parameter does not have a type, assume it
+                //if (paramSymbol.DataType == null)
+                //    visitor.Inferrer.AssumeSymbolType(paramSymbol);
+
+                // If possible, make conclusions about the inferred argument type and the parameter type
+                //visitor.Inferrer.MakeConclusion(paramSymbol.DataType, inferredParamType.DataType);
+
+                // Save the inferred type
+                parameters.Add(inferredParamType.DataType);
+            }
+
+            Function anonFunc = new Function(symbol.ToString(), visitor.SymbolTable.Global, null);
+
+            // Inferred type at Callable node will be the target's return type
+            var retSymbol = anonFunc.GetSymbol("@ret");
+
+            // If the type is not yet infererd, assign a temporal one
+            if (retSymbol.DataType == null)
+                visitor.Inferrer.AssumeSymbolType(retSymbol);
+
+            visitor.Inferrer.AssumeSymbolTypeAs(symbol, anonFunc);
+
+            // This invocation will have the function's return type
+            return retSymbol.DataType;
+        }
+
+        private Type CallableFunction(TypeInferrerVisitor visitor, AstCallableNode node, Function function)
+        {
             // Check parameters count
             // TODO: This is not needed to be here
             if (function.Parameters.Length != node.Arguments.Expressions.Count)

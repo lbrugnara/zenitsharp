@@ -12,7 +12,7 @@ namespace Fl.TypeChecking.Inferrers
     {
         public Type Visit(TypeInferrerVisitor visitor, AstReturnNode rnode)
         {
-            if (!visitor.SymbolTable.Scope.IsFunction)
+            if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
 //            var ret = visitor.SymbolTable.GetSymbol("@ret");

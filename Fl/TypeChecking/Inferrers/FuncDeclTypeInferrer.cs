@@ -33,7 +33,7 @@ namespace Fl.TypeChecking.Inferrers
             }
 
             // Get the return symbol and assign a temporal type
-            var retSymbol = visitor.SymbolTable.Scope.GetSymbol("@ret");
+            var retSymbol = visitor.SymbolTable.GetSymbol("@ret");
 
             // If return type is not yet inferred, assume one
             if (retSymbol.DataType == null)
