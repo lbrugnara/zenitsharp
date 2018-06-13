@@ -4,14 +4,15 @@
 
 using Fl.Ast;
 using Fl.Symbols;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class BlockTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBlockNode, InferredType>
+    class BlockTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBlockNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstBlockNode node)
+        public Type Visit(TypeInferrerVisitor visitor, AstBlockNode node)
         {
-            visitor.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
+            visitor.EnterBlock(ScopeType.Common, $"block-{node.GetHashCode()}");
 
             foreach (AstNode statement in node.Statements)
                 statement.Visit(visitor);

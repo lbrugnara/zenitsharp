@@ -2,11 +2,11 @@
 // Full copyright and license information in LICENSE file
 
 
-namespace Fl.Symbols
+namespace Fl.Symbols.Exceptions
 {
-    public class BlockException : System.Exception
+    public class ScopeException : System.Exception
     {
-        public BlockException(string message)
+        public ScopeException(string message)
             : base (message)
         {
 

@@ -2,9 +2,9 @@
 // Full copyright and license information in LICENSE file
 
 
-namespace Fl.Lang.Types
+namespace Fl.Symbols.Types
 {
-    public class Error : PrimitiveType
+    public class Error : Primitive
     {
         public static Error Instance { get; } = new Error();
 

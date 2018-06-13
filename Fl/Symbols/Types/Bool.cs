@@ -2,9 +2,9 @@
 // Full copyright and license information in LICENSE file
 
 
-namespace Fl.Lang.Types
+namespace Fl.Symbols.Types
 {
-    public class Bool : PrimitiveType
+    public class Bool : Primitive
     {
         public static Bool Instance { get; } = new Bool();
 

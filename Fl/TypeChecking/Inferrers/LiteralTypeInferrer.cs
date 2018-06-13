@@ -3,14 +3,15 @@
 
 using Fl.Ast;
 using Fl.Symbols;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstLiteralNode, InferredType>
+    class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstLiteralNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstLiteralNode literal)
+        public Type Visit(TypeInferrerVisitor visitor, AstLiteralNode literal)
         {
-            return new InferredType(TypeHelper.FromToken(literal.Literal));
+            return TypeHelper.FromToken(literal.Literal);
         }
     }
 }

@@ -4,7 +4,7 @@
 using Fl.Symbols;
 using Fl.Ast;
 using System.Linq;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
@@ -12,7 +12,7 @@ namespace Fl.TypeChecking.Checkers
     {
         public Type Visit(TypeCheckerVisitor checker, AstFuncDeclNode funcdecl)
         {
-            checker.EnterBlock(BlockType.Function, $"func-{funcdecl.Name}-{funcdecl.GetHashCode()}");
+            checker.EnterBlock(ScopeType.Function, $"func-{funcdecl.Name}-{funcdecl.GetHashCode()}");
 
             //funcdecl.Parameters.Parameters.ForEach(p => p);
 

@@ -5,7 +5,7 @@ using Fl.IL.Instructions;
 using Fl.IL.Instructions.Operands;
 using Fl.Engine.Symbols.Types;
 using Fl.Ast;
-using Fl.Symbols;
+using Fl.Symbols.Exceptions;
 
 namespace Fl.IL.Generators
 {

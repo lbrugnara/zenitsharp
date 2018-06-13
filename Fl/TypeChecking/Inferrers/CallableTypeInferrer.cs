@@ -1,22 +1,19 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Symbols;
+using Fl.Symbols.Types;
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 using System.Collections.Generic;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstCallableNode, InferredType>
+    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstCallableNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstCallableNode node)
+        public Type Visit(TypeInferrerVisitor visitor, AstCallableNode node)
         {
             // Get the callable inferred type (and symbol)
-            var callableInferredType = node.Callable.Visit(visitor);
-
-            // Get the symbol function
-            var symbol = callableInferredType.Symbol;
+            var symbol = node.Callable.Visit(visitor);
 
             // If symbol is not a function, throw an exception
             // TODO: This could be replaced by structural typing, using the operator() method
@@ -41,25 +38,25 @@ namespace Fl.TypeChecking.Inferrers
                 var paramSymbol = function.GetSymbol(function.Parameters[i]);
 
                 // If the parameter does not have a type, assume it
-                if (paramSymbol.Type == null)
+                if (paramSymbol.DataType == null)
                     visitor.Inferrer.AssumeSymbolType(paramSymbol);
 
                 // If possible, make conclusions about the inferred argument type and the parameter type
-                visitor.Inferrer.MakeConclusion(paramSymbol.Type, inferredParamType.Type);
+                visitor.Inferrer.MakeConclusion(paramSymbol.DataType, inferredParamType.DataType);
 
                 // Save the inferred type
-                parameters.Add(inferredParamType.Type);
+                parameters.Add(inferredParamType.DataType);
             }
 
             // Inferred type at Callable node will be the target's return type
             var retSymbol = function.GetSymbol("@ret");
 
             // If the type is not yet infererd, assign a temporal one
-            if (retSymbol.Type == null)
+            if (retSymbol.DataType == null)
                 visitor.Inferrer.AssumeSymbolType(retSymbol);
 
             // This invocation will have the function's return type
-            return new InferredType(retSymbol.Type);
+            return retSymbol.DataType;
         }
     }
 }

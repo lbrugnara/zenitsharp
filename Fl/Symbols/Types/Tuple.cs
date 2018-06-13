@@ -4,9 +4,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Fl.Lang.Types
+namespace Fl.Symbols.Types
 {
-    public class Tuple : ComplexType
+    public class Tuple : Struct
     {
         public List<Type> Types { get; set; }
 

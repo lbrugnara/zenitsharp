@@ -3,21 +3,21 @@
 
 using Fl.Symbols;
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstIfNode, InferredType>
+    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstIfNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstIfNode ifnode)
+        public Type Visit(TypeInferrerVisitor visitor, AstIfNode ifnode)
         {
             var conditionType = ifnode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.MakeConclusion(conditionType.Type, Bool.Instance);
+            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.DataType);
 
             // Add a new common block for the if's boyd
-            visitor.EnterBlock(BlockType.Common, $"if-then-{ifnode.GetHashCode()}");
+            visitor.EnterBlock(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
 
             // Generate the if's body
             ifnode.Then?.Visit(visitor);
@@ -28,7 +28,7 @@ namespace Fl.TypeChecking.Inferrers
             if (ifnode.Else != null)
             {
                 // Add a block for the else's body and generate it, then leave the block
-                visitor.EnterBlock(BlockType.Common, $"if-else-{ifnode.GetHashCode()}");
+                visitor.EnterBlock(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
 
                 ifnode.Else.Visit(visitor);
 

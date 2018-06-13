@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Symbols;
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
+using Fl.Symbols.Exceptions;
 
 namespace Fl.TypeChecking.Checkers
 {
@@ -27,7 +27,7 @@ namespace Fl.TypeChecking.Checkers
             foreach (var declaration in vardecl.VarDefinitions)
             {
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type;
+                var lhsType = checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).DataType;
 
                 // If it is a variable definition, get the right-hand side type info
                 var rhsType = declaration.Item2?.Visit(checker);

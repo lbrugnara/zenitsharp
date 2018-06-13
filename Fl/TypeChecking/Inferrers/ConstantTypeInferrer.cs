@@ -3,12 +3,13 @@
 
 using Fl.Symbols;
 using Fl.Ast;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class ConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstConstantNode, InferredType>
+    class ConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstConstantNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstConstantNode constdec)
+        public Type Visit(TypeInferrerVisitor visitor, AstConstantNode constdec)
         {
             // Get the constant's type
             var lhsType = TypeHelper.FromToken(constdec.Type);
@@ -18,10 +19,10 @@ namespace Fl.TypeChecking.Inferrers
                 // Get the right-hand side operand (a must for a constant)
                 var rhs = declaration.Item2.Visit(visitor);
 
-                visitor.Inferrer.MakeConclusion(lhsType, rhs.Type);
+                visitor.Inferrer.MakeConclusion(lhsType, rhs.DataType);
             }
 
-            return new InferredType(lhsType);
+            return lhsType;
         }
     }
 }

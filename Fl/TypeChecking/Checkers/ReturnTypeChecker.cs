@@ -3,7 +3,7 @@
 
 using Fl.Symbols.Exceptions;
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
@@ -11,7 +11,7 @@ namespace Fl.TypeChecking.Checkers
     {
         public Type Visit(TypeCheckerVisitor checker, AstReturnNode rnode)
         {
-            if (!checker.SymbolTable.CurrentBlock.IsFunction)
+            if (!checker.SymbolTable.Scope.IsFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
             return rnode.ReturnTuple?.Visit(checker);

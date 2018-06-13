@@ -1,6 +1,6 @@
-﻿namespace Fl.Lang.Types
+﻿namespace Fl.Symbols.Types
 {
-    public class Anonymous : PrimitiveType
+    public class Anonymous : Primitive
     {
         private string name;
         

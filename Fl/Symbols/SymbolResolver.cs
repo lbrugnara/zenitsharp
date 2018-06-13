@@ -2,7 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 using Fl.Symbols.Resolvers;
 
 namespace Fl.Symbols
@@ -18,11 +18,11 @@ namespace Fl.Symbols
         {
             this.SymbolTable = new SymbolTable();
 
-            Package std = new Package("std", this.SymbolTable.CurrentBlock.Uid);
+            /*Package std = new Package("std", this.SymbolTable.Scope.Uid);
             Package lang = std.NewPackage("lang");
             lang.NewSymbol("version", String.Instance);
 
-            this.SymbolTable.AddSymbol(std);
+            this.SymbolTable.AddSymbol(std);*/
         }
 
         public SymbolTable Resolve(AstNode node)

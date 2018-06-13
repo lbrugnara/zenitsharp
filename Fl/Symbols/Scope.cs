@@ -1,12 +1,13 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Symbols.Exceptions;
 using System.Collections.Generic;
 
 namespace Fl.Symbols
 {
 
-    public class Block : ISymbolTable
+    public class Scope : ISymbolTable
     {
         /// <summary>
         /// Scope unique id used in mangled names
@@ -16,7 +17,7 @@ namespace Fl.Symbols
         /// <summary>
         /// Type of the current block
         /// </summary>
-        public BlockType Type { get; }
+        public ScopeType Type { get; }
 
         /// <summary>
         /// Contains symbols defined in this block
@@ -26,30 +27,31 @@ namespace Fl.Symbols
         /// <summary>
         /// Reference to the Global block
         /// </summary>
-        private Block Global { get; }
+        public Scope Global { get; private set; }
 
         /// <summary>
         /// If present, reference to the parent block
         /// </summary>
-        private Block Parent { get; }
+        public Scope Parent { get; private set; }
 
         /// <summary>
-        /// List of block's children
+        /// Block's children
         /// </summary>
-        private Dictionary<string, Block> Children { get; }
+        private Dictionary<string, Scope> Children { get; }
 
-        public Block(BlockType type, string uid)
+
+        public Scope(ScopeType type, string uid)
         {
             this.Uid = uid;
             this.Type = type;
             this.Symbols = new Dictionary<string, Symbol>();
-            this.Children = new Dictionary<string, Block>();
+            this.Children = new Dictionary<string, Scope>();
 
-            if (type == BlockType.Function)
+            if (type == ScopeType.Function)
                 this.NewSymbol("@ret", null);
         }
 
-        public Block(BlockType type, string uid, Block global, Block parent = null)
+        public Scope(ScopeType type, string uid, Scope global, Scope parent = null)
             : this(type, uid)
         {
             this.Global = global;
@@ -57,20 +59,21 @@ namespace Fl.Symbols
                 this.Parent = parent;
         }
 
-        public Block GetOrCreateInnerBlock(BlockType type, string uid)
+
+        public Scope GetOrCreateNestedScope(ScopeType type, string uid)
         {
-            Block block = null;
+            Scope block = null;
 
             if (this.Children.ContainsKey(uid))
             {
                 block = this.Children[uid];
 
                 if (block.Type != type)
-                    throw new BlockException($"Expecting block {uid} to be of type {type} but it has type {block.Type}");
+                    throw new ScopeException($"Expecting block {uid} to be of type {type} but it has type {block.Type}");
             }
             else
             {
-                block = new Block(type, uid, this.Global, this);
+                block = new Scope(type, uid, this.Global, this);
 
                 this.Children[uid] = block;
             }
@@ -82,7 +85,7 @@ namespace Fl.Symbols
         {
             get
             {
-                return this.Type == BlockType.Function || Parent != null && Parent.IsFunction;
+                return this.Type == ScopeType.Function || Parent != null && Parent.IsFunction;
             }
         }
 
@@ -96,7 +99,7 @@ namespace Fl.Symbols
             this.Symbols[symbol.Name] = symbol;
         }
 
-        public Symbol NewSymbol(string name, Lang.Types.Type type)
+        public Symbol NewSymbol(string name, Symbols.Types.Type type)
         {
             if (this.Symbols.ContainsKey(name))
                 throw new SymbolException($"Symbol {name} is already defined in current block");

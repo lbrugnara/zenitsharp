@@ -2,9 +2,9 @@
 // Full copyright and license information in LICENSE file
 
 
-namespace Fl.Lang.Types
+namespace Fl.Symbols.Types
 {
-    public class Int : PrimitiveType
+    public class Int : Primitive
     {
         public static Int Instance { get; } = new Int();
 

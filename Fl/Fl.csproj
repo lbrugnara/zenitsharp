@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Folder Include="IL\VM\Exceptions\" />
+    <Folder Include="Lang\" />
   </ItemGroup>
 
 </Project>

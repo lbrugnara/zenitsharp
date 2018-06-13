@@ -3,51 +3,41 @@
 
 using Fl.Symbols.Exceptions;
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 using System.Linq;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class ReturnTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstReturnNode, InferredType>
+    class ReturnTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstReturnNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstReturnNode rnode)
+        public Type Visit(TypeInferrerVisitor visitor, AstReturnNode rnode)
         {
-            if (!visitor.SymbolTable.CurrentBlock.IsFunction)
+            if (!visitor.SymbolTable.Scope.IsFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            var ret = visitor.SymbolTable.GetSymbol("@ret");
+//            var ret = visitor.SymbolTable.GetSymbol("@ret");
 
             // void
             if (rnode.ReturnTuple == null)
-            {
-                ret.Type = Null.Instance;
-                return null;
-            }
+                return Void.Instance;
 
-            var tupleInferredType = rnode.ReturnTuple.Visit(visitor);
-
-            // Set return type to the same type of the tuple
-            ret.Type = tupleInferredType.Type;
+            var tupleType = rnode.ReturnTuple.Visit(visitor);
 
             // If tuple comes from a variable, return it as it is
-            if (tupleInferredType.Symbol != null)
-                return tupleInferredType;
+            if (tupleType != null)
+                return tupleType;
 
             // Literal tuple
-            var tupleTypes = (tupleInferredType.Type as Tuple).Types;
+            var tupleTypes = (tupleType.DataType as Tuple).Types;
 
             // Just one lement is like
             //  return 1;
             //  return 2;
             //  etc
             if (tupleTypes.Count == 1)
-            {
-                tupleInferredType = new InferredType(tupleTypes.First());
-                // Set return type to the same type of the first type in the tuple
-                ret.Type = tupleInferredType.Type;
-            }
+                return tupleTypes.First();
 
-            return tupleInferredType;
+            return tupleType;
         }
     }
 }

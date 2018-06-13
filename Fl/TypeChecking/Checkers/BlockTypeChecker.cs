@@ -3,7 +3,7 @@
 
 
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 using Fl.Symbols;
 
 namespace Fl.TypeChecking.Checkers
@@ -12,7 +12,7 @@ namespace Fl.TypeChecking.Checkers
     {
         public Type Visit(TypeCheckerVisitor checker, AstBlockNode node)
         {
-            checker.EnterBlock(BlockType.Common, $"block-{node.GetHashCode()}");
+            checker.EnterBlock(ScopeType.Common, $"block-{node.GetHashCode()}");
             foreach (AstNode statement in node.Statements)
             {
                 statement.Visit(checker);

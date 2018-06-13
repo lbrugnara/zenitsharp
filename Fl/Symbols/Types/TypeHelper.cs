@@ -1,10 +1,11 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 using Fl.Parser;
+using Fl.Symbols.Exceptions;
 
-namespace Fl.Symbols
+namespace Fl.Symbols.Types
 {
     public class TypeHelper
     {

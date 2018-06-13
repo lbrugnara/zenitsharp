@@ -3,16 +3,16 @@
 
 using Fl.Symbols;
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstForNode, InferredType>
+    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstForNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstForNode fornode)
+        public Type Visit(TypeInferrerVisitor visitor, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
-            visitor.EnterBlock(BlockType.Loop, $"for-{fornode.GetHashCode()}");
+            visitor.EnterBlock(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
 
             // Initialize the for-block
             fornode.Init.Visit(visitor);
@@ -21,7 +21,7 @@ namespace Fl.TypeChecking.Inferrers
             var conditionType = fornode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.MakeConclusion(conditionType.Type, Bool.Instance);
+            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.DataType);
 
             // Emmit the body code
             fornode.Body.Visit(visitor);

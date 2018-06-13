@@ -1,14 +1,6 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.IL.Instructions;
-using Fl.IL.Instructions.Exceptions;
-using Fl.IL.Instructions.Operands;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 
 namespace Fl.IL.VM
 {

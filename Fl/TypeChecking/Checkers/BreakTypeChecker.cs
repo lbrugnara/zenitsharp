@@ -3,7 +3,7 @@
 
 
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
@@ -13,8 +13,8 @@ namespace Fl.TypeChecking.Checkers
         {
             Type nbreak = wnode.Number.Visit(checker);
 
-            if (nbreak != Lang.Types.Int.Instance)
-                throw new System.Exception($"Number of breaks must be an {Lang.Types.Int.Instance}");
+            if (nbreak != Symbols.Types.Int.Instance)
+                throw new System.Exception($"Number of breaks must be an {Symbols.Types.Int.Instance}");
 
             return nbreak;
         }

@@ -3,17 +3,18 @@
 
 
 using Fl.Ast;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class BinaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBinaryNode, InferredType>
+    class BinaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBinaryNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstBinaryNode binary)
+        public Type Visit(TypeInferrerVisitor visitor, AstBinaryNode binary)
         {
             var left = binary.Left.Visit(visitor);
             var right = binary.Right.Visit(visitor);
 
-            return new InferredType(visitor.Inferrer.MakeConclusion(left.Type, right.Type));
+            return visitor.Inferrer.MakeConclusion(left, right);
         }
     }
 }

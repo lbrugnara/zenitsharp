@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 
 namespace Fl.Symbols
 {
@@ -16,29 +16,34 @@ namespace Fl.Symbols
         /// <summary>
         /// Type information
         /// </summary>
-        public Type Type { get; set; }
+        public virtual Type DataType { get; set; }
 
         /// <summary>
         /// Scope name
         /// </summary>
-        public string Scope { get; private set; }
+        public string ScopeName { get; private set; }
 
         /// <summary>
         /// FQN used by the compiler
         /// </summary>
-        public string MangledName => Scope != null ? $"{this.Scope}__{this.Name}" : this.Name;
+        public string MangledName => ScopeName != null ? $"{this.ScopeName}__{this.Name}" : this.Name;
 
 
         public Symbol(string name, Type type, string scope = null)
         {
             this.Name = name;
-            this.Type = type;
-            this.Scope = scope;
+            this.DataType = type;
+            this.ScopeName = scope;
+        }
+
+        protected Symbol(string name)
+        {
+            this.Name = name;
         }
 
         public override string ToString()
         {
-            return $"{this.Name}: {this.Type}";
+            return $"{this.Name}: {this.DataType}";
         }
     }
 }

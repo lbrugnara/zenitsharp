@@ -1,37 +1,25 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-namespace Fl.Lang.Types
+using Fl.Symbols;
+
+namespace Fl.Symbols.Types
 {
-    public abstract class PrimitiveType : Type
+    public abstract class Type : Symbol
     {
-        public PrimitiveType(string name)
-            : base(name)
-        {
-        }
-    }
-
-    public abstract class ComplexType : Type
-    {
-        public ComplexType(string name)
-            : base(name)
-        {
-        }
-    }
-
-    public abstract class Type
-    {
-        private string Name { get; }
-
         private Type()
+            : base("type", null)
         {
             this.Name = "type";
         }
 
         public Type(string name)
+            : base (name, null)
         {
             this.Name = name;
         }
+
+        public override Type DataType { get => this; set => base.DataType = this; }
 
         public override bool Equals(object obj)
         {

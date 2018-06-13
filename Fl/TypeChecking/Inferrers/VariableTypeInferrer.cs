@@ -2,12 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class VariableTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstVariableNode, InferredType>
+    class VariableTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstVariableNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstVariableNode vardecl)
+        public Type Visit(TypeInferrerVisitor visitor, AstVariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -20,10 +21,10 @@ namespace Fl.TypeChecking.Inferrers
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected InferredType VarDefinitionNode(TypeInferrerVisitor visitor, AstVarDefinitionNode vardecl)
+        protected Type VarDefinitionNode(TypeInferrerVisitor visitor, AstVarDefinitionNode vardecl)
         {
             // Get the variable type from the declaration
-            InferredType inferredType = null;
+            Type inferredType = null;
 
             foreach (var declaration in vardecl.VarDefinitions)
             {
@@ -31,11 +32,11 @@ namespace Fl.TypeChecking.Inferrers
                 var lhs = visitor.SymbolTable.GetSymbol(declaration.Item1.Value.ToString());
 
                 // Assign a temporal type if it is not present
-                if (lhs.Type == null)
+                if (lhs.DataType == null)
                     visitor.Inferrer.AssumeSymbolType(lhs);
 
                 if (inferredType == null)
-                    inferredType = new InferredType(lhs.Type);
+                    inferredType = lhs.DataType;
 
                 // If the rhs is null, continue, is just a declaration
                 if (declaration.Item2 == null)
@@ -45,13 +46,13 @@ namespace Fl.TypeChecking.Inferrers
                 var rhs = declaration.Item2?.Visit(visitor);
 
                 // Check types to see if we can unify them
-                visitor.Inferrer.MakeConclusion(lhs.Type, rhs.Type);
+                visitor.Inferrer.MakeConclusion(lhs.DataType, rhs.DataType);
             }
 
             return inferredType;
         }
 
-        protected InferredType VarDestructuringNode(TypeInferrerVisitor checker, AstVarDestructuringNode vardestnode)
+        protected Type VarDestructuringNode(TypeInferrerVisitor checker, AstVarDestructuringNode vardestnode)
         {
             // Get the variable type
             //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);

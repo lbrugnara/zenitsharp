@@ -2,9 +2,9 @@
 // Full copyright and license information in LICENSE file
 
 
-namespace Fl.Lang.Types
+namespace Fl.Symbols.Types
 {
-    public class Float : PrimitiveType
+    public class Float : Primitive
     {
         public static Float Instance { get; } = new Float();
 

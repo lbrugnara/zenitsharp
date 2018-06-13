@@ -3,7 +3,7 @@
 
 using Fl.Symbols;
 using Fl.Ast;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
@@ -17,7 +17,7 @@ namespace Fl.TypeChecking.Checkers
                 throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Add a new common block for the if's boyd
-            checker.EnterBlock(BlockType.Common, $"if-then-{ifnode.GetHashCode()}");
+            checker.EnterBlock(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
 
             // Generate the if's body
             ifnode.Then?.Visit(checker);
@@ -28,7 +28,7 @@ namespace Fl.TypeChecking.Checkers
             if (ifnode.Else != null)
             {
                 // Add a block for the else's body and generate it, then leave the block
-                checker.EnterBlock(BlockType.Common, $"if-else-{ifnode.GetHashCode()}");
+                checker.EnterBlock(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
 
                 ifnode.Else.Visit(checker);
 

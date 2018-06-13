@@ -4,7 +4,7 @@
 
 using System;
 
-namespace Fl.Symbols
+namespace Fl.Symbols.Exceptions
 {
     public class SymbolException : Exception
     {

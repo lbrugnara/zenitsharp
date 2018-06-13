@@ -3,7 +3,7 @@
 
 namespace Fl.Symbols
 {
-    public enum BlockType
+    public enum ScopeType
     {
         /// <summary>
         /// Represents the root block in the chain of blocks

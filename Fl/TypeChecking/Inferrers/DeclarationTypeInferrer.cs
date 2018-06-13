@@ -2,12 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class DeclarationTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstDeclarationNode, InferredType>
+    class DeclarationTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstDeclarationNode, Type>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstDeclarationNode decls)
+        public Type Visit(TypeInferrerVisitor visitor, AstDeclarationNode decls)
         {
             foreach (AstNode statement in decls.Statements)
                 statement.Visit(visitor);

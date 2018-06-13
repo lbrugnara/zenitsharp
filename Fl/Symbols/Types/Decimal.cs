@@ -2,9 +2,9 @@
 // Full copyright and license information in LICENSE file
 
 
-namespace Fl.Lang.Types
+namespace Fl.Symbols.Types
 {
-    public class Decimal : PrimitiveType
+    public class Decimal : Primitive
     {
         public static Decimal Instance { get; } = new Decimal();
 

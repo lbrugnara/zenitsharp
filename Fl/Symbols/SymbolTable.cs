@@ -3,78 +3,71 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Fl.Lang.Types;
+using Fl.Symbols.Types;
 
 namespace Fl.Symbols
 {
     public class SymbolTable : ISymbolTable
     {
         /// <summary>
-        /// An stack to keep track of nested blocks
+        /// An stack to keep track of nested scopes
         /// </summary>
-        private Stack<Block> Blocks { get; }
-
-        /// <summary>
-        /// Used in temporal symbol's name
-        /// </summary>
-        private int tempVarCounter = 0;
+        private Stack<Scope> Scopes { get; }
 
         public SymbolTable()
         {
-            this.Blocks = new Stack<Block>();
+            this.Scopes = new Stack<Scope>();
 
-            // Push the initial block (Global)
-            this.Blocks.Push(new Block(BlockType.Global, "0"));
+            // Create the initial scope (Global)
+            this.Scopes.Push(new Scope(ScopeType.Global, "global"));
         }
 
         /// <summary>
-        /// Current block is the last one added to the stack
+        /// Current executing scope
         /// </summary>
-        public Block CurrentBlock => this.Blocks.Peek();
-
-        public Block GlobalBlock => this.Blocks.First();
+        public Scope Scope => this.Scopes.Peek();
 
         /// <summary>
-        /// Check if there's a child block in CurrentBlock with the provided UID. If the block exists, check the block's type
-        /// and if it differs throw an exception because block definition mismatches.
-        /// If block does not exist, create a new block and chain it to the current block.
-        /// Either way, push retrieved/created block to the stack to make it the CurrentBlock.
+        /// Global scope is the first created (last in the stack) scope
         /// </summary>
-        /// <param name="blockType">Type of the block to get/create</param>
-        /// <param name="uid">ID of the block to get/create</param>
-        public void EnterBlock(BlockType blockType, string uid) => this.Blocks.Push(this.CurrentBlock.GetOrCreateInnerBlock(blockType, uid));
-
-        public void EnterFunctionBlock(Function functionBlock) => this.Blocks.Push(functionBlock.Block);
+        public Scope Global => this.Scopes.Last();
 
         /// <summary>
-        /// Remove CurrentBlock from the stack (go back to the CurrentBlock's parent block)
+        /// Check if there's a child scope in the current scope with the provided UID.
+        /// If scope does not exist, create a new scope and chain it to the current scope.
+        /// Either way, push retrieved/created scope to the stack to make it the current scope.
         /// </summary>
-        public void LeaveBlock() => this.Blocks.Pop();
+        /// <param name="type">Type of the scope to get/create</param>
+        /// <param name="uid">ID of the scope to get/create</param>
+        public void EnterScope(ScopeType type, string uid) => this.Scopes.Push(this.Scope.GetOrCreateNestedScope(type, uid));
+
+        /// <summary>
+        /// Enter to the function's scope, chain it to the stack of scopes, and make it the current 
+        /// executing scope
+        /// </summary>
+        /// <param name="function">Function symbol owner of the scope</param>
+        public void EnterFunctionScope(Function function) => this.Scopes.Push(function.Scope);
+
+        /// <summary>
+        /// Remove the current scope from the stack (go back to the current scope's parent)
+        /// </summary>
+        public void LeaveScope() => this.Scopes.Pop();
 
 
         #region ISymbolTable implementation
 
         /// <inheritdoc/>
-        public void AddSymbol(Symbol symbol) => this.CurrentBlock.AddSymbol(symbol);
+        public void AddSymbol(Symbol symbol) => this.Scope.AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, Type type) => this.CurrentBlock.NewSymbol(name, type);
+        public Symbol NewSymbol(string name, Type type) => this.Scope.NewSymbol(name, type);
 
         /// <inheritdoc/>
-        public bool HasSymbol(string name) => this.CurrentBlock.HasSymbol(name);
+        public bool HasSymbol(string name) => this.Scope.HasSymbol(name);
 
         /// <inheritdoc/>
-        public Symbol GetSymbol(string name) => this.CurrentBlock.GetSymbol(name);
+        public Symbol GetSymbol(string name) => this.Scope.GetSymbol(name);
 
         #endregion
-
-        /// <summary>
-        /// Create a temporal symbol and add it to the CurrentBlock
-        /// </summary>
-        /// <param name="type">Temp symbol's type</param>
-        /// <param name="suggestedName">Temp symbol's name can be specified here</param>
-        /// <returns></returns>
-        public Symbol NewTempSymbol(Type type, string suggestedName = null) 
-            => this.NewSymbol($"@{suggestedName ?? "t"}{(this.tempVarCounter++)}", type);
     }
 }
