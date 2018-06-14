@@ -6,14 +6,14 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class NullCoalescingTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstNullCoalescingNode, Type>
+    class NullCoalescingTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstNullCoalescingNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstNullCoalescingNode nullc)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstNullCoalescingNode nullc)
         {
             var left = nullc.Left.Visit(visitor);
             var right = nullc.Right.Visit(visitor);
 
-            return visitor.Inferrer.MakeConclusion(left.DataType, right.DataType);
+            return new InferredType(visitor.Inferrer.MakeConclusion(left.Type, right.Type));
         }
     }
 }

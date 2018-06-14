@@ -7,9 +7,9 @@ using Fl.Symbols.Exceptions;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class VariableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstVariableNode, Type>
+    class VariableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstVariableNode, SType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstVariableNode vardecl)
+        public SType Visit(TypeCheckerVisitor checker, AstVariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -22,12 +22,12 @@ namespace Fl.TypeChecking.Checkers
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected Type VarDefinitionNode(TypeCheckerVisitor checker, AstVarDefinitionNode vardecl)
+        protected SType VarDefinitionNode(TypeCheckerVisitor checker, AstVarDefinitionNode vardecl)
         {
             foreach (var declaration in vardecl.VarDefinitions)
             {
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).DataType;
+                var lhsType = checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type;
 
                 // If it is a variable definition, get the right-hand side type info
                 var rhsType = declaration.Item2?.Visit(checker);
@@ -42,7 +42,7 @@ namespace Fl.TypeChecking.Checkers
             return null;
         }
 
-        protected Type VarDestructuringNode(TypeCheckerVisitor checker, AstVarDestructuringNode vardestnode)
+        protected SType VarDestructuringNode(TypeCheckerVisitor checker, AstVarDestructuringNode vardestnode)
         {
             // Get the variable type
             //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);

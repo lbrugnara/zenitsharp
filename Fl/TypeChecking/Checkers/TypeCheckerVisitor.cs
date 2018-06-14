@@ -7,7 +7,7 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    public class TypeCheckerVisitor : IAstWalker<Type>
+    public class TypeCheckerVisitor : IAstWalker<SType>
     {
         private UnaryTypeChecker unaryTypeChecker;
         private BinaryTypeChecker binaryTypeChecker;
@@ -73,7 +73,7 @@ namespace Fl.TypeChecking.Checkers
         // Returns true if the current fragment is a function fragment
         public bool InFunction => this.SymbolTable.InFunction;
 
-        public Type Visit(AstNode node)
+        public SType Visit(AstNode node)
         {
             object n = node;
             switch (n)

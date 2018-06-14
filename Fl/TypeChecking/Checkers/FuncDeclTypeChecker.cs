@@ -8,9 +8,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class FuncDeclTypeChecker : INodeVisitor<TypeCheckerVisitor, AstFuncDeclNode, Type>
+    class FuncDeclTypeChecker : INodeVisitor<TypeCheckerVisitor, AstFuncDeclNode, SType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstFuncDeclNode funcdecl)
+        public SType Visit(TypeCheckerVisitor checker, AstFuncDeclNode funcdecl)
         {
             checker.EnterBlock(ScopeType.Function, $"func-{funcdecl.Name}-{funcdecl.GetHashCode()}");
 
@@ -19,7 +19,7 @@ namespace Fl.TypeChecking.Checkers
             funcdecl.Body.ForEach(s => s.Visit(checker));
 
 
-            Type returnType = null;
+            SType returnType = null;
 
             if (funcdecl.Body.Any(n => n is AstReturnNode))
             {

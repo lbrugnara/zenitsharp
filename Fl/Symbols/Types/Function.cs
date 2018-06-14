@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Fl.Symbols.Types
@@ -15,19 +16,27 @@ namespace Fl.Symbols.Types
         /// <summary>
         /// Parameters names that should be defined in the scope
         /// </summary>
-        public string[] Parameters { get; private set; }
+        public List<string> Parameters { get; private set; }
 
-        public Function(string name, Scope global, string[] parameters)
+        public Function(string name, Scope global)
             : base(name)
         {
-            this.Parameters = parameters ?? new string[] { };
+            this.Parameters = new List<string>();
             this.Scope = new Scope(ScopeType.Function, name, global);
         }
 
         /// <summary>
         /// Return type is always the @ret type
         /// </summary>
-        public Type Return => this.Scope.GetSymbol("@ret")?.DataType;
+        public SType Return => this.Scope.GetSymbol("@ret")?.Type;
+
+        public Symbol DefineParameter(string name, SType type)
+        {
+            if (name == null)
+                name = $"#p{this.Parameters.Count}";
+            this.Parameters.Add(name);
+            return this.NewSymbol(name, type);
+        }
 
         #region ISymbolTable implementation
 
@@ -35,7 +44,7 @@ namespace Fl.Symbols.Types
         public void AddSymbol(Symbol symbol) => this.Scope.AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, Type type) => this.Scope.NewSymbol(name, type);
+        public Symbol NewSymbol(string name, SType type) => this.Scope.NewSymbol(name, type);
 
         /// <inheritdoc/>
         public bool HasSymbol(string name) => this.Scope.HasSymbol(name);
@@ -49,10 +58,10 @@ namespace Fl.Symbols.Types
         {
             return base.Equals(obj) 
                 && this.Return == (obj as Function).Return
-                && this.Parameters.Select(p => this.GetSymbol(p).DataType).SequenceEqual((obj as Function).Parameters.Select(p => this.GetSymbol(p).DataType));
+                && this.Parameters.Select(p => this.GetSymbol(p).Type).SequenceEqual((obj as Function).Parameters.Select(p => this.GetSymbol(p).Type));
         }
 
-        public static bool operator ==(Function type1, Type type2)
+        public static bool operator ==(Function type1, SType type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -60,7 +69,7 @@ namespace Fl.Symbols.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Function type1, Type type2)
+        public static bool operator !=(Function type1, SType type2)
         {
             return !(type1 == type2);
         }
@@ -68,12 +77,12 @@ namespace Fl.Symbols.Types
         public override string ToString()
         {
             var parameters = this.Parameters.Select(p => this.Scope.GetSymbol(p))
-                            .Select(s => s.DataType)
+                            .Select(s => s.Type)
                             .ToList();
             return base.ToString() + "(" + string.Join(", ", parameters) + $"): {this.Return}";
         }
 
-        public override bool IsAssignableFrom(Type type)
+        public override bool IsAssignableFrom(SType type)
         {
             return this.Equals(type);
         }

@@ -8,9 +8,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class BlockTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBlockNode, Type>
+    class BlockTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBlockNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstBlockNode node)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstBlockNode node)
         {
             visitor.EnterBlock(ScopeType.Common, $"block-{node.GetHashCode()}");
 

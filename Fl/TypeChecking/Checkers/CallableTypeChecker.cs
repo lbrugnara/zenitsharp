@@ -6,11 +6,11 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    public class CallableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstCallableNode, Type>
+    public class CallableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstCallableNode, SType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstCallableNode node)
+        public SType Visit(TypeCheckerVisitor checker, AstCallableNode node)
         {
-            Type target = node.Callable.Visit(checker);
+            SType target = node.Callable.Visit(checker);
 
             // Generate the "param" instructions
             node.Arguments.Expressions.ForEach(a => a.Visit(checker));

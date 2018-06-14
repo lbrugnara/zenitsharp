@@ -99,7 +99,7 @@ namespace Fl.Symbols
             this.Symbols[symbol.Name] = symbol;
         }
 
-        public Symbol NewSymbol(string name, Symbols.Types.Type type)
+        public Symbol NewSymbol(string name, Symbols.Types.SType type)
         {
             if (this.Symbols.ContainsKey(name))
                 throw new SymbolException($"Symbol {name} is already defined in current block");

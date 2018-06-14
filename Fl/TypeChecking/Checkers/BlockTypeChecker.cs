@@ -8,9 +8,9 @@ using Fl.Symbols;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class BlockTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBlockNode, Type>
+    class BlockTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBlockNode, SType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstBlockNode node)
+        public SType Visit(TypeCheckerVisitor checker, AstBlockNode node)
         {
             checker.EnterBlock(ScopeType.Common, $"block-{node.GetHashCode()}");
             foreach (AstNode statement in node.Statements)

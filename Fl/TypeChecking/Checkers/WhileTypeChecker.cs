@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class WhileTypeChecker : INodeVisitor<TypeCheckerVisitor, AstWhileNode, Type>
+    class WhileTypeChecker : INodeVisitor<TypeCheckerVisitor, AstWhileNode, SType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstWhileNode wnode)
+        public SType Visit(TypeCheckerVisitor checker, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             checker.EnterBlock(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");

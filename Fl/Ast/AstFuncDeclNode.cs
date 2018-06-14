@@ -23,6 +23,6 @@ namespace Fl.Ast
         public List<AstNode> Body { get; }
         public bool IsAnonymous { get; }
         public bool IsLambda { get; }
-        public string Name => this.IsAnonymous ? $"@anonymous{this.GetHashCode()}" : this.identifier.Value.ToString();
+        public string Name => this.IsAnonymous ? $"@func{this.GetHashCode()}" : this.identifier.Value.ToString();
     }
 }

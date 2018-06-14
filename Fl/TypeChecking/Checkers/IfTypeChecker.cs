@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class IfTypeChecker : INodeVisitor<TypeCheckerVisitor, AstIfNode, Type>
+    class IfTypeChecker : INodeVisitor<TypeCheckerVisitor, AstIfNode, SType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstIfNode ifnode)
+        public SType Visit(TypeCheckerVisitor checker, AstIfNode ifnode)
         {
             var conditionType = ifnode.Condition.Visit(checker);
 

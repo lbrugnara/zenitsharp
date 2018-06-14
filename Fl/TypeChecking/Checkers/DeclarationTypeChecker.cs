@@ -6,9 +6,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class DeclarationTypeChecker : INodeVisitor<TypeCheckerVisitor, AstDeclarationNode, Type>
+    class DeclarationTypeChecker : INodeVisitor<TypeCheckerVisitor, AstDeclarationNode, SType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstDeclarationNode decls)
+        public SType Visit(TypeCheckerVisitor checker, AstDeclarationNode decls)
         {
             foreach (AstNode statement in decls.Statements)
                 statement.Visit(checker);

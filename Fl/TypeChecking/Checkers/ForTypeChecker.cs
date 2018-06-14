@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class ForTypeChecker : INodeVisitor<TypeCheckerVisitor, AstForNode, Type>
+    class ForTypeChecker : INodeVisitor<TypeCheckerVisitor, AstForNode, SType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstForNode fornode)
+        public SType Visit(TypeCheckerVisitor checker, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
             checker.EnterBlock(ScopeType.Loop, $"for-{fornode.GetHashCode()}");

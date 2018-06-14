@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class AccessorTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstAccessorNode, Type>
+    class AccessorTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstAccessorNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstAccessorNode accessor)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstAccessorNode accessor)
         {
             ISymbolTable table = visitor.SymbolTable;
 
@@ -20,7 +20,7 @@ namespace Fl.TypeChecking.Inferrers
             var symbol = table.GetSymbol(accessor.Identifier.Value.ToString());
 
             // Return the inferred type information for this symbol
-            return symbol.DataType;
+            return new InferredType(symbol.Type, symbol);
         }
     }
 }

@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class WhileTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstWhileNode, Type>
+    class WhileTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstWhileNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstWhileNode wnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             visitor.EnterBlock(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
@@ -18,7 +18,7 @@ namespace Fl.TypeChecking.Inferrers
             var conditionType = wnode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.DataType);
+            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.Type);
 
             // Emmit the body code
             wnode.Body.Visit(visitor);

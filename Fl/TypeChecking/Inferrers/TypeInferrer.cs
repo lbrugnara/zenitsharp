@@ -34,7 +34,7 @@ namespace Fl.TypeChecking.Inferrers
         /// </summary>
         /// <param name="symbol">Symbol that has the type to be inferred</param>
         /// <param name="type">Type to be inferred</param>
-        public void AssumeSymbolTypeAs(Symbol symbol, Type type)
+        public void AssumeSymbolTypeAs(Symbol symbol, SType type)
         {
             // If type is a primitive type other than anonymous type
             // the constraint is not needed as it is understood that
@@ -42,7 +42,7 @@ namespace Fl.TypeChecking.Inferrers
             if (type is Anonymous at)
                 this.AssumeSymbolTypeAsAnonymousType(symbol, at);
             else if (type is Struct ct)
-                this.AssumeSymbolTypeAsComplexType(symbol, ct);
+                this.AssumeSymbolTypeAsAnonymousType(symbol, ct);
 
             // TODO: If we want to be more strict regarding constraint checking, we could allow
             // the following check to detect unnecessary calls to the GenerateConstraint method 
@@ -60,7 +60,7 @@ namespace Fl.TypeChecking.Inferrers
         public Anonymous AssumeSymbolType(Symbol symbol)
         {
             var tempType = new Anonymous(this.GetName());
-            symbol.DataType = tempType;
+            symbol.Type = tempType;
 
             this.AssumeSymbolTypeAs(symbol, tempType);
 
@@ -74,7 +74,7 @@ namespace Fl.TypeChecking.Inferrers
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public Type MakeConclusion(Type left, Type right)
+        public SType MakeConclusion(SType left, SType right)
         {
             // Can't unify null objects
             if (left == null || right == null)
@@ -82,16 +82,16 @@ namespace Fl.TypeChecking.Inferrers
 
             // If left is an anonymous type and right is already inferred,
             // then unify under right's type
-            if (left is Anonymous && !(right is Anonymous))
+            if (this.IsTypeAssumption(left) && !this.IsTypeAssumption(right))
             {
-                this.UnifyTypes(left as Anonymous, right);
+                this.UnifyTypes(left, right);
                 return right;
             }
-            else if (right is Anonymous)
+            else if (this.IsTypeAssumption(right))
             {
                 // If both are Anonymous, or just the right type
                 // then unify under left's type
-                this.UnifyTypes(right as Anonymous, left);
+                this.UnifyTypes(right, left);
             }
             else
             {
@@ -103,17 +103,19 @@ namespace Fl.TypeChecking.Inferrers
             return left;
         }
 
-        public bool TypeIsAssumed(Type t)
+        public bool IsTypeAssumption(SType t)
         {
-            if (t is Primitive pt)
-                return (pt is Anonymous at) ? this.assumptions.ContainsKey(at) : false; // PrimitiveTypes that are not anonymous do not have constraints
+            // Primitive types are type assumption just
+            // when the type is primitive
+            if (t is Primitive)
+                return (t is Anonymous at) ? this.assumptions.ContainsKey(at) : false;
 
             // Complex type
             if (t is Function ft)
-                return ft.Parameters.Any(p => this.TypeIsAssumed(ft.GetSymbol(p).DataType)) || this.TypeIsAssumed(ft.Return);
+                return ft.Parameters.Any(p => this.IsTypeAssumption(ft.GetSymbol(p).Type)) || this.IsTypeAssumption(ft.Return);
 
             if (t is Tuple tt)
-                return tt.Types.Any(this.TypeIsAssumed);
+                return tt.Types.Any(this.IsTypeAssumption);
 
             throw new System.Exception($"Unhandled type {t}");
         }
@@ -122,6 +124,12 @@ namespace Fl.TypeChecking.Inferrers
 
         #region Constraints
 
+        /// <summary>
+        /// Add the symbol under the assumption of having an anonymous type defined
+        /// by type object
+        /// </summary>
+        /// <param name="symbol">Symbol to assume its type</param>
+        /// <param name="type">Anonymous type</param>
         private void AssumeSymbolTypeAsAnonymousType(Symbol symbol, Anonymous type)
         {
             if (!this.assumptions.ContainsKey(type))
@@ -131,11 +139,17 @@ namespace Fl.TypeChecking.Inferrers
                 this.assumptions[type].Add(symbol);
         }
 
-        private void AssumeSymbolTypeAsComplexType(Symbol symbol, Struct type)
+        /// <summary>
+        /// Add the symbol under the assumption of having a complex type where
+        /// its primitive parts might be anonymous types
+        /// </summary>
+        /// <param name="symbol">Symbol to assume its type</param>
+        /// <param name="type">Complex type that might contain anonymous types in its primitives members</param>
+        private void AssumeSymbolTypeAsAnonymousType(Symbol symbol, Struct type)
         {
             if (type is Function f)
             {
-                f.Parameters.ToList().ForEach(paramType => this.AssumeSymbolTypeAs(symbol, f.GetSymbol(paramType).DataType));
+                f.Parameters.ToList().ForEach(paramType => this.AssumeSymbolTypeAs(symbol, f.GetSymbol(paramType).Type));
                 this.AssumeSymbolTypeAs(symbol, f.Return);
             }
             else if (type is Tuple t)
@@ -157,7 +171,7 @@ namespace Fl.TypeChecking.Inferrers
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        private bool IsComplexType(Type t) => t is Struct;
+        private bool IsComplexType(SType t) => t is Struct;
 
         /// <summary>
         /// Update previous inferred type in a symbol by changing the occurrences to the new
@@ -166,12 +180,12 @@ namespace Fl.TypeChecking.Inferrers
         /// <param name="s">Symbol to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateSymbolType(Symbol s, Anonymous prevType, Type newType)
+        private void InferSymbolType(Symbol s, Anonymous prevType, SType newType)
         {
-            if (this.IsComplexType(s.DataType))
-                this.UpdateComplexType(s.DataType, prevType, newType);
+            if (this.IsComplexType(s.Type))
+                this.UpdateComplexType(s.Type, prevType, newType);
             else
-                s.DataType = newType;
+                s.Type = newType;
         }
 
         /// <summary>
@@ -181,7 +195,7 @@ namespace Fl.TypeChecking.Inferrers
         /// <param name="complexType">Type to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateComplexType(Type complexType, Anonymous prevType, Type newType)
+        private void UpdateComplexType(SType complexType, Anonymous prevType, SType newType)
         {
             if (complexType is Function f)
                 this.UpdateFunctionType(f, prevType, newType);
@@ -196,22 +210,22 @@ namespace Fl.TypeChecking.Inferrers
         /// <param name="f">Function type to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateFunctionType(Function f, Anonymous prevType, Type newType)
+        private void UpdateFunctionType(Function f, Anonymous prevType, SType newType)
         {
-            for (int i = 0; i < f.Parameters.Length; i++)
+            for (int i = 0; i < f.Parameters.Count; i++)
             {
                 // If type is a complex type, infer it as a complex type, otherwise just updated the value
-                if (this.IsComplexType(f.GetSymbol(f.Parameters[i]).DataType))
-                    this.UpdateComplexType(f.GetSymbol(f.Parameters[i]).DataType, prevType, newType);
-                else if (f.GetSymbol(f.Parameters[i]).DataType == prevType)
-                    f.GetSymbol(f.Parameters[i]).DataType = newType;
+                if (this.IsComplexType(f.GetSymbol(f.Parameters[i]).Type))
+                    this.UpdateComplexType(f.GetSymbol(f.Parameters[i]).Type, prevType, newType);
+                else if (f.GetSymbol(f.Parameters[i]).Type == prevType)
+                    f.GetSymbol(f.Parameters[i]).Type = newType;
             }
 
             // If return type is a complex type, infer it as a complex type, otherwise just updated the value
             if (this.IsComplexType(f.Return))
                 this.UpdateComplexType(f.Return, prevType, newType);
             else if (f.Return == prevType)
-                f.GetSymbol("@ret").DataType = newType;
+                f.GetSymbol("@ret").Type = newType;
         }
 
         /// <summary>
@@ -221,7 +235,7 @@ namespace Fl.TypeChecking.Inferrers
         /// <param name="t">Tuple type to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateTupleType(Tuple t, Anonymous prevType, Type newType)
+        private void UpdateTupleType(Tuple t, Anonymous prevType, SType newType)
         {
             for (int i = 0; i < t.Types.Count; i++)
             {
@@ -238,17 +252,61 @@ namespace Fl.TypeChecking.Inferrers
         /// </summary>
         /// <param name="prevType">Previous anonymous type</param>
         /// <param name="newType">New inferred type</param>
-        private void UnifyTypes(Anonymous prevType, Type newType)
+        private void UnifyTypes(SType prevType, SType newType)
         {
-            // Infer each symbol type under the previous anonymous inferred type
-            this.assumptions[prevType].ForEach(s => this.UpdateSymbolType(s, prevType, newType));
+            if (prevType is Function prevFuncType)
+            {
+                if (newType is Anonymous)
+                {
+                    this.UnifyTypes(newType, prevType);
+                }
+                else
+                {
+                    var newFuncType = newType as Function;
+                    for (int i = 0; i < prevFuncType.Parameters.Count; i++)
+                    {
+                        var oldParamSymbol = prevFuncType.GetSymbol(prevFuncType.Parameters[i]);
+                        var newParamSymbol = newFuncType.GetSymbol(newFuncType.Parameters[i]);
 
-            // If the new inferred type is also an anonymous type, generate all the constraints for the new anonymous type
-            if (this.TypeIsAssumed(newType))
-                this.assumptions[prevType].ForEach(s => this.AssumeSymbolTypeAs(s, newType));
+                        this.UnifyTypes(oldParamSymbol.Type, newParamSymbol.Type);
+                    }
 
-            // Remove all the resolved types
-            this.assumptions.Remove(prevType);
+                    // If return type is a complex type, infer it as a complex type, otherwise just updated the value
+                    this.UnifyTypes(prevFuncType.Return, newFuncType.Return);
+                }
+            }
+            else if (prevType is Tuple prevTupleType)
+            {
+                if (newType is Anonymous)
+                {
+                    this.UnifyTypes(newType, prevType);
+                }
+                else
+                {
+                    var newTupleType = newType as Tuple;
+                    for (int i = 0; i < prevTupleType.Types.Count; i++)
+                    {
+                        // If type is a complex type, infer it as a complex type, otherwise just updated the value
+                        prevTupleType.Types[i] = newTupleType.Types[i];
+                    }
+                }
+            }
+            else if (prevType is Anonymous prevAnonType)
+            {
+                // Infer each symbol type under the previous anonymous inferred type
+                this.assumptions[prevAnonType].ForEach(s => this.InferSymbolType(s, prevAnonType, newType));
+
+                // If the new inferred type is also an anonymous type, generate all the constraints for the new anonymous type
+                if (this.IsTypeAssumption(newType))
+                    this.assumptions[prevAnonType].ForEach(s => this.AssumeSymbolTypeAs(s, newType));
+
+                // Remove all the resolved types
+                this.assumptions.Remove(prevAnonType);
+            }
+            else
+            {
+
+            }
         }
 
         #endregion

@@ -6,9 +6,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class UnaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstUnaryNode, Type>
+    class UnaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstUnaryNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstUnaryNode unary)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstUnaryNode unary)
         {
             return unary.Left.Visit(visitor);
         }

@@ -1307,8 +1307,9 @@ namespace Fl.Parser
 
             if (this.Match(TokenType.Identifier, TokenType.LeftParen, TokenType.Identifier))
             {
-                // identifier (identifier, identifier, ..., identifier)
-                if (this.MatchAnyFrom(3, TokenType.Identifier, TokenType.Comma))
+                // identifier (identifier, identifier, ..., identifier) '='
+                int decls = this.CountRepeatedMatchesFrom(2, TokenType.Identifier, TokenType.Comma);
+                if (this.MatchFrom(decls+1, TokenType.Identifier, TokenType.RightParen, TokenType.Assignment))
                     return true;
 
                 /*// identifier ( '[' ']' )+ (identifier, identifier, ..., identifier)

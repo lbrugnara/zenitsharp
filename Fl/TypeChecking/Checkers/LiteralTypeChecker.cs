@@ -7,9 +7,9 @@ using Fl.Symbols;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class LiteralTypeChecker : INodeVisitor<TypeCheckerVisitor, AstLiteralNode, Type>
+    class LiteralTypeChecker : INodeVisitor<TypeCheckerVisitor, AstLiteralNode, SType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstLiteralNode literal)
+        public SType Visit(TypeCheckerVisitor checker, AstLiteralNode literal)
         {
             return TypeHelper.FromToken(literal.Literal);
         }

@@ -8,27 +8,30 @@ using System.Collections.Generic;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstCallableNode, Type>
+    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstCallableNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstCallableNode node)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstCallableNode node)
         {
             // Get the callable inferred type (and symbol)
-            var symbol = node.Callable.Visit(visitor);
+            var inferredInfo = node.Callable.Visit(visitor);
 
-            switch (symbol)
-            {
-                case Anonymous at:
-                    return this.CallableAnonymous(visitor, node, at);
-                case Function function:
-                    return this.CallableFunction(visitor, node, function);
-            }
+            if (inferredInfo.Type is Anonymous)
+                return this.CallableAnonymous(visitor, node, inferredInfo);
+
+            if (inferredInfo.Type is Function)
+                    return this.CallableFunction(visitor, node, inferredInfo);
+
             throw new System.Exception($"Cannot invoke a non-function object");
         }
 
-        private Type CallableAnonymous(TypeInferrerVisitor visitor, AstCallableNode node, Anonymous symbol)
+        private InferredType CallableAnonymous(TypeInferrerVisitor visitor, AstCallableNode node, InferredType inferred)
         {
+            var symbol = inferred.Symbol;
+
             // Get the parameters used to invoke the target function
-            var parameters = new List<Type>();
+            var parameters = new List<SType>();
+
+            Function anonFunc = new Function(symbol.Name, visitor.SymbolTable.Global);
 
             // Iterate over the function parameters and infer types if needed
             for (var i = 0; i < node.Arguments.Count; i++)
@@ -36,47 +39,40 @@ namespace Fl.TypeChecking.Inferrers
                 // Get the inferred argument type for this call
                 var inferredParamType = node.Arguments.Expressions[i].Visit(visitor);
 
-                // Get the declared parameter symbol
-                //var paramSymbol = function.GetSymbol(function.Parameters[i]);
-
-                // If the parameter does not have a type, assume it
-                //if (paramSymbol.DataType == null)
-                //    visitor.Inferrer.AssumeSymbolType(paramSymbol);
-
-                // If possible, make conclusions about the inferred argument type and the parameter type
-                //visitor.Inferrer.MakeConclusion(paramSymbol.DataType, inferredParamType.DataType);
+                anonFunc.DefineParameter(null, inferredParamType.Type);
 
                 // Save the inferred type
-                parameters.Add(inferredParamType.DataType);
+                parameters.Add(inferredParamType.Type);
             }
-
-            Function anonFunc = new Function(symbol.ToString(), visitor.SymbolTable.Global, null);
 
             // Inferred type at Callable node will be the target's return type
             var retSymbol = anonFunc.GetSymbol("@ret");
 
             // If the type is not yet infererd, assign a temporal one
-            if (retSymbol.DataType == null)
+            if (retSymbol.Type == null)
                 visitor.Inferrer.AssumeSymbolType(retSymbol);
 
-            visitor.Inferrer.AssumeSymbolTypeAs(symbol, anonFunc);
+            //visitor.Inferrer.AssumeSymbolTypeAs(symbol, anonFunc);
+            visitor.Inferrer.MakeConclusion(anonFunc, symbol.Type);
 
             // This invocation will have the function's return type
-            return retSymbol.DataType;
+            return new InferredType(retSymbol.Type);
         }
 
-        private Type CallableFunction(TypeInferrerVisitor visitor, AstCallableNode node, Function function)
+        private InferredType CallableFunction(TypeInferrerVisitor visitor, AstCallableNode node, InferredType inferred)
         {
+            var function = inferred.Type as Function;
+
             // Check parameters count
             // TODO: This is not needed to be here
-            if (function.Parameters.Length != node.Arguments.Expressions.Count)
-                throw new System.Exception($"Function {function.Name} expects {function.Parameters.Length} arguments but received {node.Arguments.Expressions.Count}");
+            if (function.Parameters.Count != node.Arguments.Expressions.Count)
+                throw new System.Exception($"Function {function.Name} expects {function.Parameters.Count} arguments but received {node.Arguments.Expressions.Count}");
 
             // Get the parameters used to invoke the target function
-            var parameters = new List<Type>();
+            var parameters = new List<SType>();
 
             // Iterate over the function parameters and infer types if needed
-            for (var i = 0; i < function.Parameters.Length; i++)
+            for (var i = 0; i < function.Parameters.Count; i++)
             {
                 // Get the inferred argument type for this call
                 var inferredParamType = node.Arguments.Expressions[i].Visit(visitor);
@@ -85,25 +81,25 @@ namespace Fl.TypeChecking.Inferrers
                 var paramSymbol = function.GetSymbol(function.Parameters[i]);
 
                 // If the parameter does not have a type, assume it
-                if (paramSymbol.DataType == null)
+                if (paramSymbol.Type == null)
                     visitor.Inferrer.AssumeSymbolType(paramSymbol);
 
                 // If possible, make conclusions about the inferred argument type and the parameter type
-                visitor.Inferrer.MakeConclusion(paramSymbol.DataType, inferredParamType.DataType);
+                visitor.Inferrer.MakeConclusion(inferredParamType.Type, paramSymbol.Type);
 
                 // Save the inferred type
-                parameters.Add(inferredParamType.DataType);
+                parameters.Add(inferredParamType.Type);
             }
 
             // Inferred type at Callable node will be the target's return type
             var retSymbol = function.GetSymbol("@ret");
 
             // If the type is not yet infererd, assign a temporal one
-            if (retSymbol.DataType == null)
+            if (retSymbol.Type == null)
                 visitor.Inferrer.AssumeSymbolType(retSymbol);
 
             // This invocation will have the function's return type
-            return retSymbol.DataType;
+            return new InferredType(retSymbol.Type);
         }
     }
 }

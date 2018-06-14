@@ -16,7 +16,7 @@ namespace Fl.Symbols
         /// <summary>
         /// Type information
         /// </summary>
-        public virtual Type DataType { get; set; }
+        public virtual SType Type { get; set; }
 
         /// <summary>
         /// Scope name
@@ -29,10 +29,10 @@ namespace Fl.Symbols
         public string MangledName => ScopeName != null ? $"{this.ScopeName}__{this.Name}" : this.Name;
 
 
-        public Symbol(string name, Type type, string scope = null)
+        public Symbol(string name, SType type, string scope = null)
         {
             this.Name = name;
-            this.DataType = type;
+            this.Type = type;
             this.ScopeName = scope;
         }
 
@@ -43,7 +43,7 @@ namespace Fl.Symbols
 
         public override string ToString()
         {
-            return $"{this.Name}: {this.DataType}";
+            return $"{this.Name}: {this.Type}";
         }
     }
 }

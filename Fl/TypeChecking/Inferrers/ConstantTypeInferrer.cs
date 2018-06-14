@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class ConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstConstantNode, Type>
+    class ConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstConstantNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstConstantNode constdec)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstConstantNode constdec)
         {
             // Get the constant's type
             var lhsType = TypeHelper.FromToken(constdec.Type);
@@ -19,10 +19,10 @@ namespace Fl.TypeChecking.Inferrers
                 // Get the right-hand side operand (a must for a constant)
                 var rhs = declaration.Item2.Visit(visitor);
 
-                visitor.Inferrer.MakeConclusion(lhsType, rhs.DataType);
+                visitor.Inferrer.MakeConclusion(lhsType, rhs.Type);
             }
 
-            return lhsType;
+            return new InferredType(lhsType);
         }
     }
 }

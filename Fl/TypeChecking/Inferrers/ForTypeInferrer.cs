@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstForNode, Type>
+    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstForNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstForNode fornode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
             visitor.EnterBlock(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
@@ -21,7 +21,7 @@ namespace Fl.TypeChecking.Inferrers
             var conditionType = fornode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.DataType);
+            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.Type);
 
             // Emmit the body code
             fornode.Body.Visit(visitor);

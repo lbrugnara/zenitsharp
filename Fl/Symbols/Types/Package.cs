@@ -23,7 +23,7 @@ namespace Fl.Symbols.Types
         public void AddSymbol(Symbol symbol) => this.Scope.AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, Type type) => this.Scope.NewSymbol(name, type);
+        public Symbol NewSymbol(string name, SType type) => this.Scope.NewSymbol(name, type);
 
         /// <inheritdoc/>
         public bool HasSymbol(string name) => this.Scope.HasSymbol(name);

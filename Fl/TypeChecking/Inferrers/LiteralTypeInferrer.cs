@@ -7,11 +7,11 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstLiteralNode, Type>
+    class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstLiteralNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstLiteralNode literal)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstLiteralNode literal)
         {
-            return TypeHelper.FromToken(literal.Literal);
+            return new InferredType(TypeHelper.FromToken(literal.Literal));
         }
     }
 }

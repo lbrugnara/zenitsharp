@@ -7,7 +7,19 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    public class TypeInferrerVisitor : IAstWalker<Type>
+    public class InferredType
+    {
+        public SType Type { get; set; }
+        public Symbol Symbol { get; set; }
+
+        public InferredType(SType type, Symbol symbol = null)
+        {
+            this.Type = type;
+            this.Symbol = symbol;
+        }
+    }
+
+    public class TypeInferrerVisitor : IAstWalker<InferredType>
     {
         private UnaryTypeInferrer unaryTypeInferencer;
         private BinaryTypeInferrer binaryTypeInferencer;
@@ -76,7 +88,7 @@ namespace Fl.TypeChecking.Inferrers
         // Returns true if the current fragment is a function fragment
         public bool InFunction => this.SymbolTable.InFunction;
 
-        public Type Visit(AstNode node)
+        public InferredType Visit(AstNode node)
         {
             object n = node;
             switch (n)

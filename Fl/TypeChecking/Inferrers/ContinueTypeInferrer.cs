@@ -6,9 +6,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class ContinueTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstContinueNode, Type>
+    class ContinueTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstContinueNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstContinueNode cnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstContinueNode cnode)
         {
             return null;
         }

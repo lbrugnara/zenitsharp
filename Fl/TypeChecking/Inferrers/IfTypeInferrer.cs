@@ -7,14 +7,14 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstIfNode, Type>
+    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstIfNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstIfNode ifnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstIfNode ifnode)
         {
             var conditionType = ifnode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.DataType);
+            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.Type);
 
             // Add a new common block for the if's boyd
             visitor.EnterBlock(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");

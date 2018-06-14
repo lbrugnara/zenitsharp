@@ -7,14 +7,14 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class BinaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBinaryNode, Type>
+    class BinaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBinaryNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstBinaryNode binary)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstBinaryNode binary)
         {
             var left = binary.Left.Visit(visitor);
             var right = binary.Right.Visit(visitor);
 
-            return visitor.Inferrer.MakeConclusion(left, right);
+            return new InferredType(visitor.Inferrer.MakeConclusion(left.Type, right.Type));
         }
     }
 }

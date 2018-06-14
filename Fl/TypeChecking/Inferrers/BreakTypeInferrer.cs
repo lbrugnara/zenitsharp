@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class BreakTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBreakNode, Type>
+    class BreakTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBreakNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstBreakNode wnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstBreakNode wnode)
         {
             var nbreak = wnode.Number?.Visit(visitor);
             return nbreak;

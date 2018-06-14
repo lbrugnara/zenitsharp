@@ -9,7 +9,7 @@ namespace Fl.Symbols.Types
 {
     public class TypeHelper
     {
-        internal static Type FromToken(Token token)
+        internal static SType FromToken(Token token)
         {
             if (token.Type == TokenType.Identifier)
             {

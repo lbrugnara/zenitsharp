@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    class AssignmentTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstAssignmentNode, Type>
+    class AssignmentTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstAssignmentNode, InferredType>
     {
-        public Type Visit(TypeInferrerVisitor visitor, AstAssignmentNode node)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstAssignmentNode node)
         {
             if (node is AstVariableAssignmentNode)
                 return MakeVariableAssignment(node as AstVariableAssignmentNode, visitor);
@@ -17,12 +17,12 @@ namespace Fl.TypeChecking.Inferrers
             throw new AstWalkerException($"Invalid variable assifnment of type {node.GetType().FullName}");
         }
 
-        private Type MakeVariableAssignment(AstVariableAssignmentNode node, TypeInferrerVisitor visitor)
+        private InferredType MakeVariableAssignment(AstVariableAssignmentNode node, TypeInferrerVisitor visitor)
         {
             var leftHandSide = node.Accessor.Visit(visitor);
             var rightHandSide = node.Expression.Visit(visitor);
 
-            return visitor.Inferrer.MakeConclusion(leftHandSide, rightHandSide);
+            return new InferredType(visitor.Inferrer.MakeConclusion(leftHandSide.Type, rightHandSide.Type));
         }
     }
 }

@@ -15,7 +15,7 @@
             return base.Equals(obj) && this.name == (obj as Anonymous).name;
         }
 
-        public static bool operator ==(Anonymous type1, Type type2)
+        public static bool operator ==(Anonymous type1, SType type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -23,7 +23,7 @@
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Anonymous type1, Type type2)
+        public static bool operator !=(Anonymous type1, SType type2)
         {
             return !(type1 == type2);
         }
@@ -33,7 +33,7 @@
             return $"{base.ToString()}{this.name}";
         }
 
-        public override bool IsAssignableFrom(Type type)
+        public override bool IsAssignableFrom(SType type)
         {
             return this.Equals(type);
         }
