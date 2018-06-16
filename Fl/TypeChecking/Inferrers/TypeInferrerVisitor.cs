@@ -3,22 +3,9 @@
 
 using Fl.Symbols;
 using Fl.Ast;
-using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Inferrers
 {
-    public class InferredType
-    {
-        public SType Type { get; set; }
-        public Symbol Symbol { get; set; }
-
-        public InferredType(SType type, Symbol symbol = null)
-        {
-            this.Type = type;
-            this.Symbol = symbol;
-        }
-    }
-
     public class TypeInferrerVisitor : IAstWalker<InferredType>
     {
         private UnaryTypeInferrer unaryTypeInferencer;
@@ -72,21 +59,6 @@ namespace Fl.TypeChecking.Inferrers
         public SymbolTable SymbolTable { get; private set; }
 
         public TypeInferrer Inferrer { get; private set; }
-
-        // Adds a new block to the SymbolTable, it represents a new scope
-        public void EnterBlock(ScopeType type, string name)
-        {
-            this.SymbolTable.EnterScope(type, name);
-        }
-
-        // Leave the current block in the SymbolTable
-        public void LeaveBlock()
-        {
-            this.SymbolTable.LeaveScope();
-        }
-
-        // Returns true if the current fragment is a function fragment
-        public bool InFunction => this.SymbolTable.InFunction;
 
         public InferredType Visit(AstNode node)
         {

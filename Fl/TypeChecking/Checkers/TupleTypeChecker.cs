@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class TupleTypeChecker : INodeVisitor<TypeCheckerVisitor, AstTupleNode, SType>
+    class TupleTypeChecker : INodeVisitor<TypeCheckerVisitor, AstTupleNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstTupleNode node)
+        public Type Visit(TypeCheckerVisitor checker, AstTupleNode node)
         {
             var types = node.Items?.Select(i => i.Visit(checker));
             // TODO: Handle tuple type

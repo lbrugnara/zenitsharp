@@ -3,7 +3,7 @@
 
 namespace Fl.Symbols.Types
 {
-    public abstract class Struct : SType
+    public abstract class Struct : Type
     {
         public Struct(string name)
             : base(name)

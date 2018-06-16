@@ -12,7 +12,7 @@ namespace Fl.TypeChecking.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
-            visitor.EnterBlock(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
+            visitor.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
 
             // Emmit the condition code
             var conditionType = wnode.Condition.Visit(visitor);
@@ -24,7 +24,7 @@ namespace Fl.TypeChecking.Inferrers
             wnode.Body.Visit(visitor);
 
             // Leave the while-block
-            visitor.LeaveBlock();
+            visitor.SymbolTable.LeaveScope();
 
             return null;
         }

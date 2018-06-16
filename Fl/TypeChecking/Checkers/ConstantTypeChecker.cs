@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class ConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, AstConstantNode, SType>
+    class ConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, AstConstantNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstConstantNode constdec)
+        public Type Visit(TypeCheckerVisitor checker, AstConstantNode constdec)
         {
             // Get the constant's type
             var lhsType = TypeHelper.FromToken(constdec.Type);

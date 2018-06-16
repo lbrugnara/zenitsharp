@@ -7,9 +7,9 @@ using Fl.Symbols.Exceptions;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class VariableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstVariableNode, SType>
+    class VariableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstVariableNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstVariableNode vardecl)
+        public Type Visit(TypeCheckerVisitor checker, AstVariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -22,7 +22,7 @@ namespace Fl.TypeChecking.Checkers
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected SType VarDefinitionNode(TypeCheckerVisitor checker, AstVarDefinitionNode vardecl)
+        protected Type VarDefinitionNode(TypeCheckerVisitor checker, AstVarDefinitionNode vardecl)
         {
             foreach (var declaration in vardecl.VarDefinitions)
             {
@@ -42,7 +42,7 @@ namespace Fl.TypeChecking.Checkers
             return null;
         }
 
-        protected SType VarDestructuringNode(TypeCheckerVisitor checker, AstVarDestructuringNode vardestnode)
+        protected Type VarDestructuringNode(TypeCheckerVisitor checker, AstVarDestructuringNode vardestnode)
         {
             // Get the variable type
             //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);

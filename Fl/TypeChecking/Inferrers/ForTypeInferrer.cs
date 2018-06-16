@@ -12,7 +12,7 @@ namespace Fl.TypeChecking.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
-            visitor.EnterBlock(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
+            visitor.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
 
             // Initialize the for-block
             fornode.Init.Visit(visitor);
@@ -30,7 +30,7 @@ namespace Fl.TypeChecking.Inferrers
             fornode.Increment.Visit(visitor);
 
             // Leave the for
-            visitor.LeaveBlock();
+            visitor.SymbolTable.LeaveScope();
 
             return null;
         }

@@ -29,9 +29,9 @@ namespace Fl.TypeChecking.Inferrers
             var symbol = inferred.Symbol;
 
             // Get the parameters used to invoke the target function
-            var parameters = new List<SType>();
+            var parameters = new List<Type>();
 
-            Function anonFunc = new Function(symbol.Name, visitor.SymbolTable.Global);
+            Function anonFunc = new Function(visitor.SymbolTable.Global);
 
             // Iterate over the function parameters and infer types if needed
             for (var i = 0; i < node.Arguments.Count; i++)
@@ -69,7 +69,7 @@ namespace Fl.TypeChecking.Inferrers
                 throw new System.Exception($"Function {function.Name} expects {function.Parameters.Count} arguments but received {node.Arguments.Expressions.Count}");
 
             // Get the parameters used to invoke the target function
-            var parameters = new List<SType>();
+            var parameters = new List<Type>();
 
             // Iterate over the function parameters and infer types if needed
             for (var i = 0; i < function.Parameters.Count; i++)

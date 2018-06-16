@@ -11,14 +11,15 @@ namespace Fl.Symbols.Resolvers
     {
         public void Visit(SymbolResolverVisitor visitor, AstFuncDeclNode funcdecl)
         {
-            var funcName = funcdecl.Name;
-            var funcSymbol = new Function(funcName, visitor.SymbolTable.Global);
+            var funcType = new Function(visitor.SymbolTable.Global);
+            var funcSymbol = new Symbol(funcdecl.Name, funcType);
+            
 
             visitor.SymbolTable.AddSymbol(funcSymbol);
 
-            visitor.SymbolTable.EnterFunctionScope(funcSymbol);
+            visitor.SymbolTable.EnterFunctionScope(funcType);
 
-            funcdecl.Parameters.Parameters.ForEach(p => funcSymbol.DefineParameter(p.Value.ToString(), null));
+            funcdecl.Parameters.Parameters.ForEach(p => funcType.DefineParameter(p.Value.ToString(), null));
 
             funcdecl.Body.ForEach(s => s.Visit(visitor));
 

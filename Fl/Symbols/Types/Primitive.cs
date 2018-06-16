@@ -3,7 +3,7 @@
 
 namespace Fl.Symbols.Types
 {
-    public abstract class Primitive : SType
+    public abstract class Primitive : Type
     {
         public Primitive(string name)
             : base(name)

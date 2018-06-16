@@ -7,12 +7,12 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class ForTypeChecker : INodeVisitor<TypeCheckerVisitor, AstForNode, SType>
+    class ForTypeChecker : INodeVisitor<TypeCheckerVisitor, AstForNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstForNode fornode)
+        public Type Visit(TypeCheckerVisitor checker, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
-            checker.EnterBlock(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
+            checker.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
 
             // Initialize the for-block
             fornode.Init.Visit(checker);
@@ -30,7 +30,7 @@ namespace Fl.TypeChecking.Checkers
             fornode.Increment.Visit(checker);
 
             // Leave the for
-            checker.LeaveBlock();
+            checker.SymbolTable.LeaveScope();
 
             return Null.Instance;
         }

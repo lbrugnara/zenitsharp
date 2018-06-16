@@ -20,7 +20,7 @@ namespace Fl.Symbols
         /// <param name="name">Symbol's name</param>
         /// <param name="type">Symbol's data type</param>
         /// <returns></returns>
-        Symbol NewSymbol(string name, SType type);
+        Symbol NewSymbol(string name, Type type);
 
         /// <summary>
         /// Return true if a symbol with that name exists in the

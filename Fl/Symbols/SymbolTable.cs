@@ -28,6 +28,11 @@ namespace Fl.Symbols
         public Scope Global => this.scopes.Last();
 
         /// <summary>
+        /// Current scope is the latest added one
+        /// </summary>
+        public Scope CurrentScope => this.scopes.Last();
+
+        /// <summary>
         /// Check if there's a child scope in the current scope with the provided UID.
         /// If scope does not exist, create a new scope and chain it to the current scope.
         /// Either way, push retrieved/created scope to the stack to make it the current scope.
@@ -56,7 +61,7 @@ namespace Fl.Symbols
         public void AddSymbol(Symbol symbol) => this.scopes.Peek().AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, SType type) => this.scopes.Peek().NewSymbol(name, type);
+        public Symbol NewSymbol(string name, Type type) => this.scopes.Peek().NewSymbol(name, type);
 
         /// <inheritdoc/>
         public bool HasSymbol(string name) => this.scopes.Peek().HasSymbol(name);

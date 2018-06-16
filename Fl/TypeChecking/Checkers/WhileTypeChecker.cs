@@ -7,12 +7,12 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class WhileTypeChecker : INodeVisitor<TypeCheckerVisitor, AstWhileNode, SType>
+    class WhileTypeChecker : INodeVisitor<TypeCheckerVisitor, AstWhileNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstWhileNode wnode)
+        public Type Visit(TypeCheckerVisitor checker, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
-            checker.EnterBlock(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
+            checker.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
 
             // Emmit the condition code
             var conditionType = wnode.Condition.Visit(checker);
@@ -24,7 +24,7 @@ namespace Fl.TypeChecking.Checkers
             wnode.Body.Visit(checker);
 
             // Leave the while-block
-            checker.LeaveBlock();
+            checker.SymbolTable.LeaveScope();
 
             return null;
         }

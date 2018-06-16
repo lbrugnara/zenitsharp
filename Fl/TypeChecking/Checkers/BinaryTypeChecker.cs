@@ -7,12 +7,12 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class BinaryTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBinaryNode, SType>
+    class BinaryTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBinaryNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstBinaryNode binary)
+        public Type Visit(TypeCheckerVisitor checker, AstBinaryNode binary)
         {
-            SType left = binary.Left.Visit(checker);
-            SType right = binary.Right.Visit(checker);
+            Type left = binary.Left.Visit(checker);
+            Type right = binary.Right.Visit(checker);
 
             if (left != right)
                 throw new System.Exception($"Operator {binary.Operator.Value} cannot be applied on operands of type {left} and {right}");

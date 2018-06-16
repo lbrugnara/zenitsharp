@@ -7,7 +7,7 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    public class TypeCheckerVisitor : IAstWalker<SType>
+    public class TypeCheckerVisitor : IAstWalker<Type>
     {
         private UnaryTypeChecker unaryTypeChecker;
         private BinaryTypeChecker binaryTypeChecker;
@@ -58,22 +58,7 @@ namespace Fl.TypeChecking.Checkers
         /// </summary>
         public SymbolTable SymbolTable { get; private set; }
 
-        // Adds a new block to the SymbolTable, it represents a new scope
-        public void EnterBlock(ScopeType type, string name)
-        {
-            this.SymbolTable.EnterScope(type, name);
-        }
-
-        // Leave the current block in the SymbolTable
-        public void LeaveBlock()
-        {
-            this.SymbolTable.LeaveScope();
-        }
-
-        // Returns true if the current fragment is a function fragment
-        public bool InFunction => this.SymbolTable.InFunction;
-
-        public SType Visit(AstNode node)
+        public Type Visit(AstNode node)
         {
             object n = node;
             switch (n)

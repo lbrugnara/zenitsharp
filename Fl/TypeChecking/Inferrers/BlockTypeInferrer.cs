@@ -12,12 +12,12 @@ namespace Fl.TypeChecking.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, AstBlockNode node)
         {
-            visitor.EnterBlock(ScopeType.Common, $"block-{node.GetHashCode()}");
+            visitor.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
 
             foreach (AstNode statement in node.Statements)
                 statement.Visit(visitor);
 
-            visitor.LeaveBlock();
+            visitor.SymbolTable.LeaveScope();
             return null;
         }
     }

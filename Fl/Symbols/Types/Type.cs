@@ -5,28 +5,26 @@ using Fl.Symbols;
 
 namespace Fl.Symbols.Types
 {
-    public abstract class SType : Symbol
+    public abstract class Type
     {
-        private SType()
-            : base("type", null)
+        public string Name { get; private set; }
+
+        private Type()
         {
             this.Name = "type";
         }
 
-        public SType(string name)
-            : base (name, null)
+        public Type(string name)
         {
             this.Name = name;
         }
 
-        public override SType Type { get => this; set => base.Type = this; }
-
         public override bool Equals(object obj)
         {
-            return this.Name == (obj as SType)?.Name;
+            return this.Name == (obj as Type)?.Name;
         }
 
-        public static bool operator ==(SType type1, SType type2)
+        public static bool operator ==(Type type1, Type type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -34,7 +32,7 @@ namespace Fl.Symbols.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(SType type1, SType type2)
+        public static bool operator !=(Type type1, Type type2)
         {
             return !(type1 == type2);
         }
@@ -49,7 +47,7 @@ namespace Fl.Symbols.Types
             return this.Name;
         }
 
-        public virtual bool IsAssignableFrom(SType type)
+        public virtual bool IsAssignableFrom(Type type)
         {
             return this == type;
         }

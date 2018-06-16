@@ -16,24 +16,13 @@ namespace Fl.Symbols
         /// <summary>
         /// Type information
         /// </summary>
-        public virtual SType Type { get; set; }
-
-        /// <summary>
-        /// Scope name
-        /// </summary>
-        public string ScopeName { get; private set; }
-
-        /// <summary>
-        /// FQN used by the compiler
-        /// </summary>
-        public string MangledName => ScopeName != null ? $"{this.ScopeName}__{this.Name}" : this.Name;
+        public virtual Type Type { get; set; }
 
 
-        public Symbol(string name, SType type, string scope = null)
+        public Symbol(string name, Type type)
         {
             this.Name = name;
             this.Type = type;
-            this.ScopeName = scope;
         }
 
         protected Symbol(string name)

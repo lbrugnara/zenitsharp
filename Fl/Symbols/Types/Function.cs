@@ -18,19 +18,19 @@ namespace Fl.Symbols.Types
         /// </summary>
         public List<string> Parameters { get; private set; }
 
-        public Function(string name, Scope global)
-            : base(name)
+        public Function(Scope global)
+            : base("func")
         {
             this.Parameters = new List<string>();
-            this.Scope = new Scope(ScopeType.Function, name, global);
+            this.Scope = new Scope(ScopeType.Function, global.Uid, global);
         }
 
         /// <summary>
         /// Return type is always the @ret type
         /// </summary>
-        public SType Return => this.Scope.GetSymbol("@ret")?.Type;
+        public Type Return => this.Scope.GetSymbol("@ret")?.Type;
 
-        public Symbol DefineParameter(string name, SType type)
+        public Symbol DefineParameter(string name, Type type)
         {
             if (name == null)
                 name = $"#p{this.Parameters.Count}";
@@ -44,7 +44,7 @@ namespace Fl.Symbols.Types
         public void AddSymbol(Symbol symbol) => this.Scope.AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, SType type) => this.Scope.NewSymbol(name, type);
+        public Symbol NewSymbol(string name, Type type) => this.Scope.NewSymbol(name, type);
 
         /// <inheritdoc/>
         public bool HasSymbol(string name) => this.Scope.HasSymbol(name);
@@ -61,7 +61,7 @@ namespace Fl.Symbols.Types
                 && this.Parameters.Select(p => this.GetSymbol(p).Type).SequenceEqual((obj as Function).Parameters.Select(p => this.GetSymbol(p).Type));
         }
 
-        public static bool operator ==(Function type1, SType type2)
+        public static bool operator ==(Function type1, Type type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -69,7 +69,7 @@ namespace Fl.Symbols.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Function type1, SType type2)
+        public static bool operator !=(Function type1, Type type2)
         {
             return !(type1 == type2);
         }
@@ -77,12 +77,12 @@ namespace Fl.Symbols.Types
         public override string ToString()
         {
             var parameters = this.Parameters.Select(p => this.Scope.GetSymbol(p))
-                            .Select(s => s.Type)
+                            .Select(s => s.Type?.ToString() ?? "?")
                             .ToList();
-            return base.ToString() + "(" + string.Join(", ", parameters) + $"): {this.Return}";
+            return base.ToString() + "(" + string.Join(", ", parameters) + $"): {(this.Return?.ToString() ?? "?")}";
         }
 
-        public override bool IsAssignableFrom(SType type)
+        public override bool IsAssignableFrom(Type type)
         {
             return this.Equals(type);
         }

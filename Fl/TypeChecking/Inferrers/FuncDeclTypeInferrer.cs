@@ -13,10 +13,11 @@ namespace Fl.TypeChecking.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, AstFuncDeclNode funcdecl)
         {
-            Function functionSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Name) as Function ?? throw new System.Exception($"Function {funcdecl.Name} has not been resolved");
+            var functionSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Name);
+            Function functionType = functionSymbol.Type as Function ?? throw new System.Exception($"Function {funcdecl.Name} has not been resolved");
 
             // Enter the requested function's block
-            visitor.SymbolTable.EnterFunctionScope(functionSymbol);
+            visitor.SymbolTable.EnterFunctionScope(functionType);
 
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
@@ -68,15 +69,15 @@ namespace Fl.TypeChecking.Inferrers
             }
 
             // Leave the function's scope
-            visitor.LeaveBlock();
+            visitor.SymbolTable.LeaveScope();
 
             // The inferred function type is a complex type, it might contain assumptions for parameters' types or return type
             // if that is the case, make this inferred type an assumption
-            if (visitor.Inferrer.IsTypeAssumption(functionSymbol.Type))
-                visitor.Inferrer.AssumeSymbolTypeAs(functionSymbol, functionSymbol.Type);
+            if (visitor.Inferrer.IsTypeAssumption(functionType))
+                visitor.Inferrer.AssumeSymbolTypeAs(functionSymbol, functionType);
 
             // Return inferred function type
-            return new InferredType(functionSymbol, functionSymbol);
+            return new InferredType(functionType, functionSymbol);
         }
     }
 }

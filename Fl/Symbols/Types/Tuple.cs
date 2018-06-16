@@ -8,18 +8,18 @@ namespace Fl.Symbols.Types
 {
     public class Tuple : Struct
     {
-        public List<SType> Types { get; set; }
+        public List<Type> Types { get; set; }
 
         private Tuple()
             : base("tuple")
         {
-            this.Types = new List<SType>();
+            this.Types = new List<Type>();
         }
 
-        public Tuple(params SType[] types)
+        public Tuple(params Type[] types)
             : base("tuple")
         {
-            this.Types = types?.ToList() ?? new List<SType>();
+            this.Types = types?.ToList() ?? new List<Type>();
         }
 
         public override bool Equals(object obj)
@@ -29,7 +29,7 @@ namespace Fl.Symbols.Types
 
         public int Count => this.Types.Count;
 
-        public static bool operator ==(Tuple type1, SType type2)
+        public static bool operator ==(Tuple type1, Type type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -37,7 +37,7 @@ namespace Fl.Symbols.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Tuple type1, SType type2)
+        public static bool operator !=(Tuple type1, Type type2)
         {
             return !(type1 == type2);
         }
@@ -47,7 +47,7 @@ namespace Fl.Symbols.Types
             return base.ToString() + "(" + string.Join(", ", this.Types) + ")";
         }
 
-        public override bool IsAssignableFrom(SType type)
+        public override bool IsAssignableFrom(Type type)
         {
             return this.Equals(type);
         }

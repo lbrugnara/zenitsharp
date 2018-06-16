@@ -14,7 +14,7 @@ namespace Fl.Symbols.Types
         public Package(string name, Scope global)
             : base(name)
         {
-            this.Scope = new Scope(ScopeType.Package, this.MangledName, global);
+            this.Scope = new Scope(ScopeType.Package, name, global);
         }
 
         #region ISymbolTable implementation
@@ -23,7 +23,7 @@ namespace Fl.Symbols.Types
         public void AddSymbol(Symbol symbol) => this.Scope.AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, SType type) => this.Scope.NewSymbol(name, type);
+        public Symbol NewSymbol(string name, Type type) => this.Scope.NewSymbol(name, type);
 
         /// <inheritdoc/>
         public bool HasSymbol(string name) => this.Scope.HasSymbol(name);
@@ -37,7 +37,7 @@ namespace Fl.Symbols.Types
         {
             var pkg = new Package(name, this.Scope.Global);
 
-            this.Scope.AddSymbol(pkg);
+            //this.Scope.AddSymbol(pkg);
 
             return pkg;
         }

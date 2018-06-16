@@ -6,9 +6,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class NullCoalescingTypeChecker : INodeVisitor<TypeCheckerVisitor, AstNullCoalescingNode, SType>
+    class NullCoalescingTypeChecker : INodeVisitor<TypeCheckerVisitor, AstNullCoalescingNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstNullCoalescingNode nullc)
+        public Type Visit(TypeCheckerVisitor checker, AstNullCoalescingNode nullc)
         {
             var left = nullc.Left.Visit(checker);
             var right = nullc.Right.Visit(checker);

@@ -6,9 +6,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class UnaryTypeChecker : INodeVisitor<TypeCheckerVisitor, AstUnaryNode, SType>
+    class UnaryTypeChecker : INodeVisitor<TypeCheckerVisitor, AstUnaryNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstUnaryNode unary)
+        public Type Visit(TypeCheckerVisitor checker, AstUnaryNode unary)
         {
             return unary.Left.Visit(checker);
         }

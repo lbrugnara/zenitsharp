@@ -17,22 +17,22 @@ namespace Fl.TypeChecking.Inferrers
             visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.Type);
 
             // Add a new common block for the if's boyd
-            visitor.EnterBlock(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
+            visitor.SymbolTable.EnterScope(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
 
             // Generate the if's body
             ifnode.Then?.Visit(visitor);
 
             // Leave the if's then block
-            visitor.LeaveBlock();
+            visitor.SymbolTable.LeaveScope();
 
             if (ifnode.Else != null)
             {
                 // Add a block for the else's body and generate it, then leave the block
-                visitor.EnterBlock(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
+                visitor.SymbolTable.EnterScope(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
 
                 ifnode.Else.Visit(visitor);
 
-                visitor.LeaveBlock();
+                visitor.SymbolTable.LeaveScope();
             }
 
             return null;

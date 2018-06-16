@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class IfTypeChecker : INodeVisitor<TypeCheckerVisitor, AstIfNode, SType>
+    class IfTypeChecker : INodeVisitor<TypeCheckerVisitor, AstIfNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstIfNode ifnode)
+        public Type Visit(TypeCheckerVisitor checker, AstIfNode ifnode)
         {
             var conditionType = ifnode.Condition.Visit(checker);
 
@@ -17,22 +17,22 @@ namespace Fl.TypeChecking.Checkers
                 throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Add a new common block for the if's boyd
-            checker.EnterBlock(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
+            checker.SymbolTable.EnterScope(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
 
             // Generate the if's body
             ifnode.Then?.Visit(checker);
 
             // Leave the if's then block
-            checker.LeaveBlock();
+            checker.SymbolTable.LeaveScope();
 
             if (ifnode.Else != null)
             {
                 // Add a block for the else's body and generate it, then leave the block
-                checker.EnterBlock(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
+                checker.SymbolTable.EnterScope(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
 
                 ifnode.Else.Visit(checker);
 
-                checker.LeaveBlock();
+                checker.SymbolTable.LeaveScope();
             }
 
             return Null.Instance;

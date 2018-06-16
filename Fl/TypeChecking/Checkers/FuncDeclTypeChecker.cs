@@ -8,18 +8,18 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class FuncDeclTypeChecker : INodeVisitor<TypeCheckerVisitor, AstFuncDeclNode, SType>
+    class FuncDeclTypeChecker : INodeVisitor<TypeCheckerVisitor, AstFuncDeclNode, Type>
     {
-        public SType Visit(TypeCheckerVisitor checker, AstFuncDeclNode funcdecl)
+        public Type Visit(TypeCheckerVisitor checker, AstFuncDeclNode funcdecl)
         {
-            checker.EnterBlock(ScopeType.Function, $"func-{funcdecl.Name}-{funcdecl.GetHashCode()}");
+            checker.SymbolTable.EnterScope(ScopeType.Function, $"func-{funcdecl.Name}-{funcdecl.GetHashCode()}");
 
             //funcdecl.Parameters.Parameters.ForEach(p => p);
 
             funcdecl.Body.ForEach(s => s.Visit(checker));
 
 
-            SType returnType = null;
+            Type returnType = null;
 
             if (funcdecl.Body.Any(n => n is AstReturnNode))
             {
@@ -31,7 +31,7 @@ namespace Fl.TypeChecking.Checkers
                 returnType = returnTypes.First();
             }
 
-            checker.LeaveBlock();
+            checker.SymbolTable.LeaveScope();
 
             return returnType;
         }

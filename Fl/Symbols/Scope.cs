@@ -15,27 +15,27 @@ namespace Fl.Symbols
         public string Uid { get; }
 
         /// <summary>
-        /// Type of the current block
+        /// Type of the current scope
         /// </summary>
         public ScopeType Type { get; }
 
         /// <summary>
-        /// Contains symbols defined in this block
+        /// Contains symbols defined in this scope
         /// </summary>
         Dictionary<string, Symbol> Symbols { get; }
 
         /// <summary>
-        /// Reference to the Global block
+        /// Reference to the Global scope
         /// </summary>
         public Scope Global { get; private set; }
 
         /// <summary>
-        /// If present, reference to the parent block
+        /// If present, reference to the parent scope
         /// </summary>
         public Scope Parent { get; private set; }
 
         /// <summary>
-        /// Block's children
+        /// scope's children
         /// </summary>
         private Dictionary<string, Scope> Children { get; }
 
@@ -62,23 +62,23 @@ namespace Fl.Symbols
 
         public Scope GetOrCreateNestedScope(ScopeType type, string uid)
         {
-            Scope block = null;
+            Scope scope = null;
 
             if (this.Children.ContainsKey(uid))
             {
-                block = this.Children[uid];
+                scope = this.Children[uid];
 
-                if (block.Type != type)
-                    throw new ScopeException($"Expecting block {uid} to be of type {type} but it has type {block.Type}");
+                if (scope.Type != type)
+                    throw new ScopeException($"Expecting scope {uid} to be of type {type} but it has type {scope.Type}");
             }
             else
             {
-                block = new Scope(type, uid, this.Global, this);
+                scope = new Scope(type, uid, this.Global, this);
 
-                this.Children[uid] = block;
+                this.Children[uid] = scope;
             }
 
-            return block;
+            return scope;
         }
 
         public bool IsFunction
@@ -94,17 +94,17 @@ namespace Fl.Symbols
         public void AddSymbol(Symbol symbol)
         {
             if (this.Symbols.ContainsKey(symbol.Name))
-                throw new SymbolException($"Symbol {symbol.Name} is already defined in current block");
+                throw new SymbolException($"Symbol {symbol.Name} is already defined in current scope");
 
             this.Symbols[symbol.Name] = symbol;
         }
 
-        public Symbol NewSymbol(string name, Symbols.Types.SType type)
+        public Symbol NewSymbol(string name, Symbols.Types.Type type)
         {
             if (this.Symbols.ContainsKey(name))
-                throw new SymbolException($"Symbol {name} is already defined in current block");
+                throw new SymbolException($"Symbol {name} is already defined in current scope");
 
-            var symbol = new Symbol(name, type, this.Uid);
+            var symbol = new Symbol(name, type);
             this.Symbols[name] = symbol;
             return symbol;
         }
