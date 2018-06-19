@@ -7,13 +7,13 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class IfTypeChecker : INodeVisitor<TypeCheckerVisitor, AstIfNode, Type>
+    class IfTypeChecker : INodeVisitor<TypeCheckerVisitor, AstIfNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstIfNode ifnode)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstIfNode ifnode)
         {
             var conditionType = ifnode.Condition.Visit(checker);
 
-            if (conditionType != Bool.Instance)
+            if (conditionType.Type != Bool.Instance)
                 throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Add a new common block for the if's boyd
@@ -35,7 +35,7 @@ namespace Fl.TypeChecking.Checkers
                 checker.SymbolTable.LeaveScope();
             }
 
-            return Null.Instance;
+            return null;
         }
     }
 }

@@ -6,14 +6,14 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class DeclarationTypeChecker : INodeVisitor<TypeCheckerVisitor, AstDeclarationNode, Type>
+    class DeclarationTypeChecker : INodeVisitor<TypeCheckerVisitor, AstDeclarationNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstDeclarationNode decls)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstDeclarationNode decls)
         {
             foreach (AstNode statement in decls.Statements)
                 statement.Visit(checker);
 
-            return Null.Instance;
+            return null;
         }
     }
 }

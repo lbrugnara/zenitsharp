@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class ReturnTypeChecker : INodeVisitor<TypeCheckerVisitor, AstReturnNode, Type>
+    class ReturnTypeChecker : INodeVisitor<TypeCheckerVisitor, AstReturnNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstReturnNode rnode)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstReturnNode rnode)
         {
             if (!checker.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");

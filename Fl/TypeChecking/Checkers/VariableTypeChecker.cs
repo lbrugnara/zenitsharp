@@ -7,9 +7,9 @@ using Fl.Symbols.Exceptions;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class VariableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstVariableNode, Type>
+    class VariableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstVariableNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstVariableNode vardecl)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstVariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -22,7 +22,7 @@ namespace Fl.TypeChecking.Checkers
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected Type VarDefinitionNode(TypeCheckerVisitor checker, AstVarDefinitionNode vardecl)
+        protected CheckedType VarDefinitionNode(TypeCheckerVisitor checker, AstVarDefinitionNode vardecl)
         {
             foreach (var declaration in vardecl.VarDefinitions)
             {
@@ -30,32 +30,32 @@ namespace Fl.TypeChecking.Checkers
                 var lhsType = checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type;
 
                 // If it is a variable definition, get the right-hand side type info
-                var rhsType = declaration.Item2?.Visit(checker);
+                var rhs = declaration.Item2?.Visit(checker);
 
-                // When lhs is "var", take the type from the right hand side expression, or throw if it is not available
-                if (lhsType == null)
-                    lhsType = rhsType ?? throw new SymbolException("Implicitly-typed variable must be initialized");
-                else if (rhsType != null && !lhsType.IsAssignableFrom(rhsType))
-                    throw new SymbolException($"Cannot assign type {rhsType} to variable of type {lhsType}");
+                if (rhs != null && !lhsType.IsAssignableFrom(rhs.Type))
+                    throw new SymbolException($"Cannot assign type {rhs.Type} to variable of type {lhsType}");
             }
 
             return null;
         }
 
-        protected Type VarDestructuringNode(TypeCheckerVisitor checker, AstVarDestructuringNode vardestnode)
+        protected CheckedType VarDestructuringNode(TypeCheckerVisitor checker, AstVarDestructuringNode vardestnode)
         {
-            // Get the variable type
-            //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);
+            var initType = vardestnode.DestructInit.Visit(checker);
 
-            /*vardestnode.DestructInit.Exec()
-
-            foreach (var declaration in vardestnode.VarDefinitions)
+            for (int i = 0; i < vardestnode.Variables.Count; i++)
             {
-                var identifierToken = declaration.Item1;
-                var initializerInstr = declaration.Item2?.Exec(checker);
+                var declaration = vardestnode.Variables[i];
 
-                checker.Emmit(new LocalVarInstruction(dataType, identifierToken.Value.ToString(), initializerInstr?.TargetName));
-            }*/
+                // Get the variable type from the declaration
+                var lhsType = checker.SymbolTable.GetSymbol(declaration.Value.ToString()).Type;
+                var rhsType = (initType.Type as Tuple).Types[i];
+
+                // When lhs is "var", take the type from the right hand side expression, or throw if it is not available
+                if (!lhsType.IsAssignableFrom(rhsType))
+                    throw new SymbolException($"Cannot assign type {rhsType} to variable of type {lhsType}");
+            }
+
             return null;
         }
     }

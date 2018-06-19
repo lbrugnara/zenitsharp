@@ -2,18 +2,23 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Symbols;
 using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class AccessorTypeChecker : INodeVisitor<TypeCheckerVisitor, AstAccessorNode, Type>
+    class AccessorTypeChecker : INodeVisitor<TypeCheckerVisitor, AstAccessorNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstAccessorNode accessor)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstAccessorNode accessor)
         {
-            if (accessor.Enclosing != null)
-                return accessor.Enclosing?.Visit(checker);
+            ISymbolTable symtable = checker.SymbolTable;
 
-            return checker.SymbolTable.GetSymbol(accessor.Identifier.Value.ToString()).Type;
+            if (accessor.Enclosing != null)
+                symtable = accessor.Enclosing?.Visit(checker).Symbol as ISymbolTable;
+
+            var symbol = symtable.GetSymbol(accessor.Identifier.Value.ToString());
+
+            return new CheckedType(symbol.Type, symbol);
         }
     }
 }

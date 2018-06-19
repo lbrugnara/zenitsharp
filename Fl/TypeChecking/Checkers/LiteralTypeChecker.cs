@@ -7,11 +7,11 @@ using Fl.Symbols;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class LiteralTypeChecker : INodeVisitor<TypeCheckerVisitor, AstLiteralNode, Type>
+    class LiteralTypeChecker : INodeVisitor<TypeCheckerVisitor, AstLiteralNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstLiteralNode literal)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstLiteralNode literal)
         {
-            return TypeHelper.FromToken(literal.Literal);
+            return new CheckedType(TypeHelper.FromToken(literal.Literal));
         }
     }
 }

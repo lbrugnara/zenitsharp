@@ -6,9 +6,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class AssignmentTypeChecker : INodeVisitor<TypeCheckerVisitor, AstAssignmentNode, Type>
+    class AssignmentTypeChecker : INodeVisitor<TypeCheckerVisitor, AstAssignmentNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstAssignmentNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstAssignmentNode node)
         {
             if (node is AstVariableAssignmentNode)
                 return MakeVariableAssignment(node as AstVariableAssignmentNode, checker);
@@ -16,13 +16,15 @@ namespace Fl.TypeChecking.Checkers
             throw new AstWalkerException($"Invalid variable assifnment of type {node.GetType().FullName}");
         }
 
-        private Type MakeVariableAssignment(AstVariableAssignmentNode node, TypeCheckerVisitor checker)
+        private CheckedType MakeVariableAssignment(AstVariableAssignmentNode node, TypeCheckerVisitor checker)
         {
-            Type leftHandSide = node.Accessor.Visit(checker);
-            Type rightHandSide = node.Expression.Visit(checker);
+            var leftHandSide = node.Accessor.Visit(checker);
+            var rightHandSide = node.Expression.Visit(checker);
 
-            if (leftHandSide != rightHandSide)
+            if (!leftHandSide.Type.IsAssignableFrom(rightHandSide.Type))
                 throw new System.Exception($"Cannot convert type {rightHandSide} to {leftHandSide}");
+
+            leftHandSide.Symbol = null;
 
             return leftHandSide;
         }

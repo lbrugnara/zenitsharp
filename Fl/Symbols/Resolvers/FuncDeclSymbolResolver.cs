@@ -30,13 +30,13 @@ namespace Fl.Symbols.Resolvers
                 // create their symbols and define them in the current scope 
                 // (function's scope)
                 var type = visitor.Inferrer.NewAnonymousType();
-                var symbol = new Symbol(p.Value.ToString(), type);
-                visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);
 
                 // Update the function's type
                 funcType.DefineParameterType(type);
 
                 // Define the symbol in the current scope (function's scope)
+                var symbol = new Symbol(p.Value.ToString(), type);
+                visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);
                 visitor.SymbolTable.AddSymbol(symbol);
             });
 
@@ -48,11 +48,13 @@ namespace Fl.Symbols.Resolvers
 
             // Assume the function's return type
             var rettype = visitor.Inferrer.NewAnonymousType();
-            retsym.Type = rettype;
-            visitor.Inferrer.AssumeSymbolTypeAs(retsym, rettype);
 
             // Update the function's type
             funcType.SetReturnType(rettype);
+
+            // Update the @ret symbol
+            retsym.Type = rettype;
+            visitor.Inferrer.AssumeSymbolTypeAs(retsym, rettype);            
 
             // At this point, the function's type is an assumed type, register
             // the function's symbol under that assumption

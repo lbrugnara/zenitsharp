@@ -14,7 +14,7 @@ namespace Fl.TypeChecking.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, AstFuncDeclNode funcdecl)
         {
             var functionSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Name);
-            Function functionType = functionSymbol.Type as Function ?? throw new System.Exception($"Function {funcdecl.Name} has not been resolved");
+            Function functionType = functionSymbol.Type as Function;
 
             // Enter the requested function's block
             visitor.SymbolTable.EnterScope(ScopeType.Function, funcdecl.Name);
@@ -22,12 +22,7 @@ namespace Fl.TypeChecking.Inferrers
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
 
-            for (int i=0; i < funcdecl.Parameters.Parameters.Count; i++)
-            {
-                var paramSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Parameters.Parameters[i].Value.ToString());
-
-                parametersSymbols.Add(paramSymbol);
-            }
+            parametersSymbols.AddRange(funcdecl.Parameters.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Value.ToString())));
 
             // Get the return symbol and assign a temporal type
             var retSymbol = visitor.SymbolTable.GetSymbol("@ret");

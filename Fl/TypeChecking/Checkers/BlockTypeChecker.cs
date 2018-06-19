@@ -8,17 +8,18 @@ using Fl.Symbols;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class BlockTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBlockNode, Type>
+    class BlockTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBlockNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstBlockNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstBlockNode node)
         {
             checker.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
+
             foreach (AstNode statement in node.Statements)
-            {
                 statement.Visit(checker);
-            }
+
             checker.SymbolTable.LeaveScope();
-            return Null.Instance;
+
+            return null;
         }
     }
 }

@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class WhileTypeChecker : INodeVisitor<TypeCheckerVisitor, AstWhileNode, Type>
+    class WhileTypeChecker : INodeVisitor<TypeCheckerVisitor, AstWhileNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstWhileNode wnode)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             checker.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
@@ -17,7 +17,7 @@ namespace Fl.TypeChecking.Checkers
             // Emmit the condition code
             var conditionType = wnode.Condition.Visit(checker);
 
-            if (conditionType != Bool.Instance)
+            if (conditionType.Type != Bool.Instance)
                 throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Emmit the body code

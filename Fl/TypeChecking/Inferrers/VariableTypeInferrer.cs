@@ -31,10 +31,6 @@ namespace Fl.TypeChecking.Inferrers
                 // Symbol should be already resolved here
                 var lhs = visitor.SymbolTable.GetSymbol(declaration.Item1.Value.ToString());
 
-                // Assign a temporal type if it is not present
-                if (lhs.Type == null)
-                    visitor.Inferrer.AssumeSymbolType(lhs);
-
                 if (inferredType == null)
                     inferredType = new InferredType(lhs.Type);
 
@@ -52,21 +48,28 @@ namespace Fl.TypeChecking.Inferrers
             return inferredType;
         }
 
-        protected InferredType VarDestructuringNode(TypeInferrerVisitor checker, AstVarDestructuringNode vardestnode)
+        protected InferredType VarDestructuringNode(TypeInferrerVisitor visitor, AstVarDestructuringNode vardestnode)
         {
-            // Get the variable type
-            //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);
+            var initType = vardestnode.DestructInit.Visit(visitor);
 
-            /*vardestnode.DestructInit.Exec()
+            // Get the variable type from the declaration
+            InferredType inferredType = new InferredType(initType.Type);
 
-            foreach (var declaration in vardestnode.VarDefinitions)
+            for (int i=0; i < vardestnode.Variables.Count; i++)
             {
-                var identifierToken = declaration.Item1;
-                var initializerInstr = declaration.Item2?.Exec(checker);
+                var declaration = vardestnode.Variables[i];
 
-                checker.Emmit(new LocalVarInstruction(dataType, identifierToken.Value.ToString(), initializerInstr?.TargetName));
-            }*/
-            return null;
+                // Symbol should be already resolved here
+                var lhs = visitor.SymbolTable.GetSymbol(declaration.Value.ToString());
+
+                // If it is a variable definition, get the right-hand side type info
+                var rhsType = (initType.Type as Tuple).Types[i];
+
+                // Check types to see if we can unify them
+                visitor.Inferrer.MakeConclusion(lhs.Type, rhsType);
+            }
+
+            return inferredType;
         }
     }
 }

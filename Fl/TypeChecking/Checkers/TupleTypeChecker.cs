@@ -7,13 +7,13 @@ using System.Linq;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class TupleTypeChecker : INodeVisitor<TypeCheckerVisitor, AstTupleNode, Type>
+    class TupleTypeChecker : INodeVisitor<TypeCheckerVisitor, AstTupleNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstTupleNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstTupleNode node)
         {
-            var types = node.Items?.Select(i => i.Visit(checker));
+            var types = node.Items?.Select(i => i.Visit(checker).Type);
             // TODO: Handle tuple type
-            return new Tuple(types.ToArray());
+            return new CheckedType(new Tuple(types.ToArray()));
         }
     }
 }

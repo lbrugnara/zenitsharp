@@ -7,9 +7,9 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class ForTypeChecker : INodeVisitor<TypeCheckerVisitor, AstForNode, Type>
+    class ForTypeChecker : INodeVisitor<TypeCheckerVisitor, AstForNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstForNode fornode)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
             checker.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
@@ -20,7 +20,7 @@ namespace Fl.TypeChecking.Checkers
             // Emmit the condition code
             var conditionType = fornode.Condition.Visit(checker);
 
-            if (conditionType != Bool.Instance)
+            if (conditionType.Type != Bool.Instance)
                 throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Emmit the body code
@@ -32,7 +32,7 @@ namespace Fl.TypeChecking.Checkers
             // Leave the for
             checker.SymbolTable.LeaveScope();
 
-            return Null.Instance;
+            return null;
         }
     }
 }

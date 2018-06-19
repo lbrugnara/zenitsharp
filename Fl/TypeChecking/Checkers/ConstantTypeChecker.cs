@@ -7,22 +7,22 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class ConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, AstConstantNode, Type>
+    class ConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, AstConstantNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstConstantNode constdec)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstConstantNode constdec)
         {
-            Type lhsType = null;
+            CheckedType lhsType = null;
 
             foreach (var declaration in constdec.Constants)
             {
                 if (lhsType == null)
-                    lhsType = checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type;
+                    lhsType = new CheckedType(checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type);
 
                 // Get the right-hand side operand (a must for a constant)
                 var rhsType = declaration.Item2.Visit(checker);
 
-                if (lhsType != rhsType)
-                    throw new System.Exception($"Cannot convert {rhsType} to {lhsType}");
+                if (!lhsType.Type.IsAssignableFrom(rhsType.Type))
+                    throw new System.Exception($"Cannot convert {rhsType.Type} to {lhsType.Type}");
 
             }
 

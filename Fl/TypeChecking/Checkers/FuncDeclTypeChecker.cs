@@ -8,32 +8,13 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class FuncDeclTypeChecker : INodeVisitor<TypeCheckerVisitor, AstFuncDeclNode, Type>
+    class FuncDeclTypeChecker : INodeVisitor<TypeCheckerVisitor, AstFuncDeclNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstFuncDeclNode funcdecl)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstFuncDeclNode funcdecl)
         {
-            checker.SymbolTable.EnterScope(ScopeType.Function, $"func-{funcdecl.Name}-{funcdecl.GetHashCode()}");
-
-            //funcdecl.Parameters.Parameters.ForEach(p => p);
-
-            funcdecl.Body.ForEach(s => s.Visit(checker));
-
-
-            Type returnType = null;
-
-            if (funcdecl.Body.Any(n => n is AstReturnNode))
-            {
-                var returnTypes = funcdecl.Body.OfType<AstReturnNode>().ToList().Select(rn => rn.Visit(checker));
-
-                if (returnTypes.Distinct().Count() != 1)
-                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes.Distinct())}) in function {funcdecl.Name}");
-
-                returnType = returnTypes.First();
-            }
-
-            checker.SymbolTable.LeaveScope();
-
-            return returnType;
+            // TODO
+            var funcsym = checker.SymbolTable.GetSymbol(funcdecl.Name);
+            return new CheckedType(funcsym.Type, funcsym);
         }
     }
 }

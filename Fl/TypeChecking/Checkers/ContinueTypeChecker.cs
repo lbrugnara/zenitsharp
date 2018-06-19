@@ -6,11 +6,11 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class ContinueTypeChecker : INodeVisitor<TypeCheckerVisitor, AstContinueNode, Type>
+    class ContinueTypeChecker : INodeVisitor<TypeCheckerVisitor, AstContinueNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstContinueNode cnode)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstContinueNode cnode)
         {
-            return Null.Instance;
+            return null;
         }
     }
 }

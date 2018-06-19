@@ -6,16 +6,18 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    public class CallableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstCallableNode, Type>
+    public class CallableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstCallableNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstCallableNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstCallableNode node)
         {
-            Type target = node.Callable.Visit(checker);
+            var target = node.Callable.Visit(checker);
 
-            // Generate the "param" instructions
             node.Arguments.Expressions.ForEach(a => a.Visit(checker));
 
-            return target;
+            if (!(target.Type is Function))
+                throw new System.Exception($"Symbol {target.Symbol.Name} is not a function ({target.Type})");
+
+            return new CheckedType((target.Type as Function).Return);
         }
     }
 }

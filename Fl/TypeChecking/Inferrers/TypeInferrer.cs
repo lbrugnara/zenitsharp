@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Helpers;
 using Fl.Symbols;
 using Fl.Symbols.Types;
 using System.Collections.Generic;
@@ -15,14 +16,13 @@ namespace Fl.TypeChecking.Inferrers
         /// it is broken down in its pirmitive types, and the symbols that have the complex
         /// type are all tied to the complex' primitive types
         /// </summary>
-        private Dictionary<Anonymous, List<Symbol>> assumptions;
-
-        private int[] names = new int[] { -1, -1, -1, -1, -1, -1, -1 };
-
+        private readonly Dictionary<Anonymous, List<Symbol>> assumptions;
+        private readonly SequenceGenerator namegen;
 
         public TypeInferrer()
         {
             this.assumptions = new Dictionary<Anonymous, List<Symbol>>();
+            this.namegen = new SequenceGenerator();
         }
 
 
@@ -69,7 +69,7 @@ namespace Fl.TypeChecking.Inferrers
 
         public Anonymous NewAnonymousType()
         {
-            var type = new Anonymous(this.GetName());
+            var type = new Anonymous(this.namegen.Generate());
 
             if (!this.assumptions.ContainsKey(type))
                 this.assumptions[type] = new List<Symbol>();
@@ -320,20 +320,5 @@ namespace Fl.TypeChecking.Inferrers
         }
 
         #endregion
-
-        private string GetName()
-        {
-            // Poor's man type name generator
-            for (var i=0; i < this.names.Length; i++)
-            {
-                if (this.names[i] < 25)
-                {
-                    this.names[i] += 1;
-                    return string.Join("", this.names.Where(n => n > -1).Select(n => (char)('A' + n)));
-                }
-                this.names[i] = 0;
-            }
-            throw new System.Exception("Carry Overflow");
-        }
     }
 }

@@ -7,14 +7,14 @@ using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    class BreakTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBreakNode, Type>
+    class BreakTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBreakNode, CheckedType>
     {
-        public Type Visit(TypeCheckerVisitor checker, AstBreakNode wnode)
+        public CheckedType Visit(TypeCheckerVisitor checker, AstBreakNode wnode)
         {
-            Type nbreak = wnode.Number.Visit(checker);
+            var nbreak = wnode.Number.Visit(checker);
 
-            if (nbreak != Symbols.Types.Int.Instance)
-                throw new System.Exception($"Number of breaks must be an {Symbols.Types.Int.Instance}");
+            if (nbreak.Type != Int.Instance)
+                throw new System.Exception($"Number of breaks must be an {Int.Instance}");
 
             return nbreak;
         }

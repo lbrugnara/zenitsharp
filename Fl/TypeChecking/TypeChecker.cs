@@ -29,7 +29,7 @@ namespace Fl.TypeChecking
             inferencer.Visit(node);
 
             var checker = new TypeCheckerVisitor(this.SymbolTable);
-            //checker.Visit(node);
+            checker.Visit(node);
 
             return this.SymbolTable;
         }

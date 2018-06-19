@@ -53,20 +53,27 @@ namespace Fl.Symbols.Resolvers
             }
         }
 
-        protected void VarDestructuringNode(SymbolResolverVisitor checker, AstVarDestructuringNode vardestnode)
+        protected void VarDestructuringNode(SymbolResolverVisitor visitor, AstVarDestructuringNode destrnode)
         {
-            // Get the variable type
-            //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);
+            destrnode.DestructInit.Visit(visitor);
 
-            /*vardestnode.DestructInit.Exec()
-
-            foreach (var declaration in vardestnode.VarDefinitions)
+            foreach (var declaration in destrnode.Variables)
             {
-                var identifierToken = declaration.Item1;
-                var initializerInstr = declaration.Item2?.Exec(checker);
+                // Get the identifier name
+                var variableName = declaration.Value.ToString();
 
-                checker.Emmit(new LocalVarInstruction(dataType, identifierToken.Value.ToString(), initializerInstr?.TargetName));
-            }*/
+                // Check if the symbol is already defined
+                if (visitor.SymbolTable.HasSymbol(variableName))
+                    throw new SymbolException($"Symbol {variableName} is already defined.");
+
+                var lhsType = visitor.Inferrer.NewAnonymousType();
+
+                // Create the new symbol for the variable
+                var symbol = visitor.SymbolTable.NewSymbol(variableName, lhsType);
+
+                // Register the symbol under that assumption
+                visitor.Inferrer.AssumeSymbolTypeAs(symbol, lhsType);
+            }
         }
     }
 }

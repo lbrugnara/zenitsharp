@@ -3,11 +3,10 @@
 
 using Fl.Symbols;
 using Fl.Ast;
-using Fl.Symbols.Types;
 
 namespace Fl.TypeChecking.Checkers
 {
-    public class TypeCheckerVisitor : IAstWalker<Type>
+    public class TypeCheckerVisitor : IAstWalker<CheckedType>
     {
         private UnaryTypeChecker unaryTypeChecker;
         private BinaryTypeChecker binaryTypeChecker;
@@ -58,7 +57,7 @@ namespace Fl.TypeChecking.Checkers
         /// </summary>
         public SymbolTable SymbolTable { get; private set; }
 
-        public Type Visit(AstNode node)
+        public CheckedType Visit(AstNode node)
         {
             object n = node;
             switch (n)
