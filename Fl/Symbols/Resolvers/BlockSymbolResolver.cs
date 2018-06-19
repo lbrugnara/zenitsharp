@@ -8,14 +8,14 @@ namespace Fl.Symbols.Resolvers
 {
     class BlockSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstBlockNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstBlockNode node)
+        public void Visit(SymbolResolverVisitor visitor, AstBlockNode node)
         {
-            checker.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
+            visitor.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
 
             foreach (AstNode statement in node.Statements)
-                statement.Visit(checker);
+                statement.Visit(visitor);
 
-            checker.SymbolTable.LeaveScope();
+            visitor.SymbolTable.LeaveScope();
         }
     }
 }

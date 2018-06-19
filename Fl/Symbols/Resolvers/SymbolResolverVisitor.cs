@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.TypeChecking.Inferrers;
 
 namespace Fl.Symbols.Resolvers
 {
@@ -27,9 +28,10 @@ namespace Fl.Symbols.Resolvers
         private TupleSymbolResolver tupleSymbolResolver;
         private NullCoalescingSymbolResolver nullCoalescingSymbolResolver;
 
-        public SymbolResolverVisitor(SymbolTable symtable)
+        public SymbolResolverVisitor(SymbolTable symtable, TypeInferrer inferrer)
         {
             this.SymbolTable = symtable;
+            this.Inferrer = inferrer;
             this.unarySymbolResolver = new UnarySymbolResolver();
             this.binarySymbolResolver = new BinarySymbolResolver();
             this.assignmentSymbolResolver = new AssignmentSymbolResolver();
@@ -55,6 +57,8 @@ namespace Fl.Symbols.Resolvers
         /// Tracks variables per blocks
         /// </summary>
         public SymbolTable SymbolTable { get; private set; }
+
+        public TypeInferrer Inferrer { get; private set; }
 
         public void Visit(AstNode node)
         {

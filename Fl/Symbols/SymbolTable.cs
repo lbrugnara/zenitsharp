@@ -30,7 +30,7 @@ namespace Fl.Symbols
         /// <summary>
         /// Current scope is the latest added one
         /// </summary>
-        public Scope CurrentScope => this.scopes.Last();
+        public Scope CurrentScope => this.scopes.Peek();
 
         /// <summary>
         /// Check if there's a child scope in the current scope with the provided UID.
@@ -46,13 +46,16 @@ namespace Fl.Symbols
         /// executing scope
         /// </summary>
         /// <param name="function">Function symbol owner of the scope</param>
-        public void EnterFunctionScope(Function function) => this.scopes.Push(function.Scope);
+        //public void EnterFunctionScope(FunctionSymbol funcsym) => this.scopes.Push(funcsym.Scope);
 
         /// <summary>
         /// Remove the current scope from the stack (go back to the current scope's parent)
         /// </summary>
         public void LeaveScope() => this.scopes.Pop();
 
+        /// <summary>
+        /// Return true if the current scope (or its parent) is a ScopeType.Function
+        /// </summary>
         public bool InFunction => this.scopes.Peek().IsFunction;
 
         #region ISymbolTable implementation

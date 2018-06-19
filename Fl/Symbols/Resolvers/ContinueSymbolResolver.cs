@@ -8,7 +8,7 @@ namespace Fl.Symbols.Resolvers
 {
     class ContinueSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstContinueNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstContinueNode cnode)
+        public void Visit(SymbolResolverVisitor visitor, AstContinueNode cnode)
         {
         }
     }

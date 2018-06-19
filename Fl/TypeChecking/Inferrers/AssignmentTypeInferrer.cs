@@ -22,6 +22,7 @@ namespace Fl.TypeChecking.Inferrers
             var leftHandSide = node.Accessor.Visit(visitor);
             var rightHandSide = node.Expression.Visit(visitor);
 
+            // Make conclusions about the types if possible
             return new InferredType(visitor.Inferrer.MakeConclusion(leftHandSide.Type, rightHandSide.Type));
         }
     }

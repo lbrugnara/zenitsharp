@@ -8,10 +8,10 @@ namespace Fl.Symbols.Resolvers
 {
     class NullCoalescingSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstNullCoalescingNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstNullCoalescingNode nullc)
+        public void Visit(SymbolResolverVisitor visitor, AstNullCoalescingNode nullc)
         {
-            nullc.Left.Visit(checker);
-            nullc.Right.Visit(checker);
+            nullc.Left.Visit(visitor);
+            nullc.Right.Visit(visitor);
         }
     }
 }

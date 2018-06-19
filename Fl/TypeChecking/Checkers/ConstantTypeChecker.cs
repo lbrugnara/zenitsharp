@@ -11,11 +11,13 @@ namespace Fl.TypeChecking.Checkers
     {
         public Type Visit(TypeCheckerVisitor checker, AstConstantNode constdec)
         {
-            // Get the constant's type
-            var lhsType = TypeHelper.FromToken(constdec.Type);
+            Type lhsType = null;
 
             foreach (var declaration in constdec.Constants)
             {
+                if (lhsType == null)
+                    lhsType = checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type;
+
                 // Get the right-hand side operand (a must for a constant)
                 var rhsType = declaration.Item2.Visit(checker);
 

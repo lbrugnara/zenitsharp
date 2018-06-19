@@ -17,7 +17,7 @@ namespace Fl.TypeChecking.Inferrers
             Function functionType = functionSymbol.Type as Function ?? throw new System.Exception($"Function {funcdecl.Name} has not been resolved");
 
             // Enter the requested function's block
-            visitor.SymbolTable.EnterFunctionScope(functionType);
+            visitor.SymbolTable.EnterScope(ScopeType.Function, funcdecl.Name);
 
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
@@ -26,19 +26,11 @@ namespace Fl.TypeChecking.Inferrers
             {
                 var paramSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Parameters.Parameters[i].Value.ToString());
 
-                // If parameter doesn't have a type, assume it
-                if (paramSymbol.Type == null)
-                    visitor.Inferrer.AssumeSymbolType(paramSymbol);
-
                 parametersSymbols.Add(paramSymbol);
             }
 
             // Get the return symbol and assign a temporal type
             var retSymbol = visitor.SymbolTable.GetSymbol("@ret");
-
-            // If return type is not yet inferred, assume one
-            if (retSymbol.Type == null)
-                visitor.Inferrer.AssumeSymbolType(retSymbol);
 
             // Visit the function's body
             var statements = funcdecl.Body.Select(s => (node: s, inferred: s.Visit(visitor))).ToList();

@@ -8,25 +8,25 @@ namespace Fl.Symbols.Resolvers
 {
     class ForSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstForNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstForNode fornode)
+        public void Visit(SymbolResolverVisitor visitor, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
-            checker.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
+            visitor.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
 
             // Initialize the for-block
-            fornode.Init.Visit(checker);
+            fornode.Init.Visit(visitor);
 
             // Emmit the condition code
-            fornode.Condition.Visit(checker);
+            fornode.Condition.Visit(visitor);
 
             // Emmit the body code
-            fornode.Body.Visit(checker);
+            fornode.Body.Visit(visitor);
 
             // Emmit the for's increment part
-            fornode.Increment.Visit(checker);
+            fornode.Increment.Visit(visitor);
 
             // Leave the for
-            checker.SymbolTable.LeaveScope();
+            visitor.SymbolTable.LeaveScope();
         }
     }
 }

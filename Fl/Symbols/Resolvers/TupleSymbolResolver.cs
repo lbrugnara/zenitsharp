@@ -8,9 +8,9 @@ namespace Fl.Symbols.Resolvers
 {
     class TupleSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstTupleNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstTupleNode node)
+        public void Visit(SymbolResolverVisitor visitor, AstTupleNode node)
         {
-            node.Items?.ForEach(item => item.Visit(checker));
+            node.Items?.ForEach(item => item.Visit(visitor));
         }
     }
 }

@@ -442,8 +442,8 @@ namespace Fl.Parser
             // Consume the keyword
             this.Consume(TokenType.Constant);
 
-            // Get the constant type
-            Token type = this.Consume(TokenType.Identifier);
+            // Get the constant type if present
+            Token type = this.Match(TokenType.Identifier, TokenType.Identifier) ? this.Consume(TokenType.Identifier) : null;
 
             // Consume multiple constants declarations and definitions
             List<Tuple<Token, AstNode>> constdefs = new List<Tuple<Token, AstNode>>();

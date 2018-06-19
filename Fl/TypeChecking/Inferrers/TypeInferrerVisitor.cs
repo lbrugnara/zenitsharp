@@ -28,10 +28,10 @@ namespace Fl.TypeChecking.Inferrers
         private TupleTypeInferrer tupleTypeInferencer;
         private NullCoalescingTypeInferrer nullCoalescingTypeInferencer;
 
-        public TypeInferrerVisitor(SymbolTable symtable)
+        public TypeInferrerVisitor(SymbolTable symtable, TypeInferrer inferrer)
         {
             this.SymbolTable = symtable;
-            this.Inferrer = new TypeInferrer();
+            this.Inferrer = inferrer;
             this.unaryTypeInferencer = new UnaryTypeInferrer();
             this.binaryTypeInferencer = new BinaryTypeInferrer();
             this.assignmentTypeInferencer = new AssignmentTypeInferrer();

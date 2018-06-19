@@ -7,17 +7,17 @@ namespace Fl.Symbols.Resolvers
 {
     class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstAssignmentNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstAssignmentNode node)
+        public void Visit(SymbolResolverVisitor visitor, AstAssignmentNode node)
         {
             if (node is AstVariableAssignmentNode)
-                MakeVariableAssignment(node as AstVariableAssignmentNode, checker);
+                MakeVariableAssignment(node as AstVariableAssignmentNode, visitor);
 
         }
 
-        private void MakeVariableAssignment(AstVariableAssignmentNode node, SymbolResolverVisitor checker)
+        private void MakeVariableAssignment(AstVariableAssignmentNode node, SymbolResolverVisitor visitor)
         {
-            node.Accessor.Visit(checker);
-            node.Expression.Visit(checker);
+            node.Accessor.Visit(visitor);
+            node.Expression.Visit(visitor);
         }
     }
 }

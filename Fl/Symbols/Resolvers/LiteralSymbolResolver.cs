@@ -8,7 +8,7 @@ namespace Fl.Symbols.Resolvers
 {
     class LiteralSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstLiteralNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstLiteralNode literal)
+        public void Visit(SymbolResolverVisitor visitor, AstLiteralNode literal)
         {
         }
     }

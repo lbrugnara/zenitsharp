@@ -7,19 +7,19 @@ namespace Fl.Symbols.Resolvers
 {
     class WhileSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstWhileNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstWhileNode wnode)
+        public void Visit(SymbolResolverVisitor visitor, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
-            checker.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
+            visitor.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
 
             // Emmit the condition code
-            wnode.Condition.Visit(checker);
+            wnode.Condition.Visit(visitor);
 
             // Emmit the body code
-            wnode.Body.Visit(checker);
+            wnode.Body.Visit(visitor);
 
             // Leave the while-block
-            checker.SymbolTable.LeaveScope();
+            visitor.SymbolTable.LeaveScope();
         }
     }
 }

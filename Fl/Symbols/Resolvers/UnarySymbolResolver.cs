@@ -7,9 +7,9 @@ namespace Fl.Symbols.Resolvers
 {
     class UnarySymbolResolver : INodeVisitor<SymbolResolverVisitor, AstUnaryNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstUnaryNode unary)
+        public void Visit(SymbolResolverVisitor visitor, AstUnaryNode unary)
         {
-            unary.Left.Visit(checker);
+            unary.Left.Visit(visitor);
         }
     }
 }

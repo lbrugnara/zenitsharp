@@ -9,12 +9,12 @@ namespace Fl.Symbols.Resolvers
 {
     class ReturnSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstReturnNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstReturnNode rnode)
+        public void Visit(SymbolResolverVisitor visitor, AstReturnNode rnode)
         {
-            if (!checker.SymbolTable.InFunction)
+            if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            rnode.ReturnTuple?.Visit(checker);
+            rnode.ReturnTuple?.Visit(visitor);
         }
     }
 }

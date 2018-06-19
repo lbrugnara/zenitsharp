@@ -8,9 +8,9 @@ namespace Fl.Symbols.Resolvers
 {
     class AccessorSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstAccessorNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstAccessorNode accessor)
+        public void Visit(SymbolResolverVisitor visitor, AstAccessorNode accessor)
         {
-            accessor.Enclosing?.Visit(checker);
+            accessor.Enclosing?.Visit(visitor);
         }
     }
 }

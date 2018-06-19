@@ -9,26 +9,28 @@ namespace Fl.Symbols.Resolvers
 {
     class VariableSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstVariableNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstVariableNode vardecl)
+        public void Visit(SymbolResolverVisitor visitor, AstVariableNode vardecl)
         {
             switch (vardecl)
             {
                 case AstVarDefinitionNode vardefnode:
-                    VarDefinitionNode(checker, vardefnode);
+                    VarDefinitionNode(visitor, vardefnode);
                     return;
 
                 case AstVarDestructuringNode vardestnode:
-                    VarDestructuringNode(checker, vardestnode);
+                    VarDestructuringNode(visitor, vardestnode);
                     return;
             }
 
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected void VarDefinitionNode(SymbolResolverVisitor checker, AstVarDefinitionNode vardecl)
+        protected void VarDefinitionNode(SymbolResolverVisitor visitor, AstVarDefinitionNode vardecl)
         {
-            // Get the variable type from the declaration
-            var lhsType = TypeHelper.FromToken(vardecl.VarType.TypeToken);
+            // Get the variable type from the declaration or assume an anonymous type
+            var lhsType = TypeHelper.FromToken(vardecl.VarType.TypeToken) ?? visitor.Inferrer.NewAnonymousType();
+
+            var isAssumedType = visitor.Inferrer.IsTypeAssumption(lhsType);
 
             foreach (var declaration in vardecl.VarDefinitions)
             {
@@ -36,14 +38,18 @@ namespace Fl.Symbols.Resolvers
                 var variableName = declaration.Item1.Value.ToString();
 
                 // Check if the symbol is already defined
-                if (checker.SymbolTable.HasSymbol(variableName))
+                if (visitor.SymbolTable.HasSymbol(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // Create the new symbol for the variable
-                checker.SymbolTable.NewSymbol(variableName, lhsType);
+                var symbol = visitor.SymbolTable.NewSymbol(variableName, lhsType);
+
+                // If it is a type assumption, register the symbol under that assumption
+                if (isAssumedType)
+                    visitor.Inferrer.AssumeSymbolTypeAs(symbol, lhsType);
 
                 // If it is a variable definition, visit the right-hand side expression
-                declaration.Item2?.Visit(checker);
+                declaration.Item2?.Visit(visitor);
             }
         }
 

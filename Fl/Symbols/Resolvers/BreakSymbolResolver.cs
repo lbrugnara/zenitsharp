@@ -8,9 +8,9 @@ namespace Fl.Symbols.Resolvers
 {
     class BreakSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstBreakNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstBreakNode wnode)
+        public void Visit(SymbolResolverVisitor visitor, AstBreakNode wnode)
         {
-            wnode.Number?.Visit(checker);
+            wnode.Number?.Visit(visitor);
         }
     }
 }

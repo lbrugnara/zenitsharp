@@ -11,13 +11,16 @@ namespace Fl.TypeChecking.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, AstAccessorNode accessor)
         {
-            ISymbolTable table = visitor.SymbolTable;
+            // By default use the SymbolTable
+            ISymbolTable symtable = visitor.SymbolTable;
 
+            // If the accessed member has an eclosing accessor node, visit
+            // it to get the enclosing symbol's type
             if (accessor.Enclosing != null)
-                table = accessor.Enclosing?.Visit(visitor) as ISymbolTable;
+                symtable = accessor.Enclosing?.Visit(visitor) as ISymbolTable;
 
-            // Get accessed symbol 
-            var symbol = table.GetSymbol(accessor.Identifier.Value.ToString());
+            // Get accessed symbol that must be defined in the symtable's scope
+            var symbol = symtable.GetSymbol(accessor.Identifier.Value.ToString());
 
             // Return the inferred type information for this symbol
             return new InferredType(symbol.Type, symbol);

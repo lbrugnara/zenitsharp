@@ -13,8 +13,6 @@ namespace Fl
         {
             var lexer = new Lexer(source);
             var parser = new Parser.Parser();
-            var symbolResolver = new SymbolResolver();
-            var ilGenerator = new ILGenerator();
 
             // Lexical analysis and Parsing 
             var ast = parser.Parse(lexer.Tokenize());
@@ -25,13 +23,15 @@ namespace Fl
                 throw new Exception(string.Join("\n", errors));
 
             // Resolve symbols
-            var st = symbolResolver.Resolve(ast);
+            var symbolResolver = new SymbolResolver();
+            symbolResolver.Resolve(ast);
 
             // Type checking
-            var tc = new TypeChecker(st);
+            var tc = new TypeChecker(symbolResolver.SymbolTable, symbolResolver.TypeInferrer);
             tc.Check(ast);
 
             // Generate IL program
+            var ilGenerator = new ILGenerator();
             return ilGenerator.Build(ast);
         }
     }

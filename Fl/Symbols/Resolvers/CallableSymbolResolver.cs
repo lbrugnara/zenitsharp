@@ -8,10 +8,10 @@ namespace Fl.Symbols.Resolvers
 {
     public class CallableSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstCallableNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstCallableNode node)
+        public void Visit(SymbolResolverVisitor visitor, AstCallableNode node)
         {
-            node.Callable.Visit(checker);
-            node.Arguments.Expressions.ForEach(e => e.Visit(checker));
+            node.Callable.Visit(visitor);
+            node.Arguments.Expressions.ForEach(e => e.Visit(visitor));
         }
     }
 }

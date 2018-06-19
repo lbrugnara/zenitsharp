@@ -8,10 +8,10 @@ namespace Fl.Symbols.Resolvers
 {
     class BinarySymbolResolver : INodeVisitor<SymbolResolverVisitor, AstBinaryNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstBinaryNode binary)
+        public void Visit(SymbolResolverVisitor visitor, AstBinaryNode binary)
         {
-            binary.Left.Visit(checker);
-            binary.Right.Visit(checker);
+            binary.Left.Visit(visitor);
+            binary.Right.Visit(visitor);
         }
     }
 }

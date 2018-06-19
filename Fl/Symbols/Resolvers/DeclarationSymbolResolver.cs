@@ -8,10 +8,10 @@ namespace Fl.Symbols.Resolvers
 {
     class DeclarationSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstDeclarationNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstDeclarationNode decls)
+        public void Visit(SymbolResolverVisitor visitor, AstDeclarationNode decls)
         {
             foreach (AstNode statement in decls.Statements)
-                statement.Visit(checker);
+                statement.Visit(visitor);
         }
     }
 }

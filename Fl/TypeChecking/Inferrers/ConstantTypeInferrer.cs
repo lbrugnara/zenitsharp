@@ -11,11 +11,13 @@ namespace Fl.TypeChecking.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, AstConstantNode constdec)
         {
-            // Get the constant's type
-            var lhsType = TypeHelper.FromToken(constdec.Type);
+            Type lhsType = null;
 
             foreach (var declaration in constdec.Constants)
             {
+                if (lhsType == null)
+                    lhsType = visitor.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type;
+
                 // Get the right-hand side operand (a must for a constant)
                 var rhs = declaration.Item2.Visit(visitor);
 

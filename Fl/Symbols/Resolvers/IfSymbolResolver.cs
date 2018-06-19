@@ -8,27 +8,31 @@ namespace Fl.Symbols.Resolvers
 {
     class IfSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstIfNode>
     {
-        public void Visit(SymbolResolverVisitor checker, AstIfNode ifnode)
+        public void Visit(SymbolResolverVisitor visitor, AstIfNode ifnode)
         {
             // Generate the condition and check the result, using exitPoint
             // as the destination if the condition is true
-            ifnode.Condition.Visit(checker);            
+            ifnode.Condition.Visit(visitor);            
             
             // Add a new common block for the if's boyd
-            checker.SymbolTable.EnterScope(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
+            visitor.SymbolTable.EnterScope(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
 
             // Generate the if's body
-            ifnode.Then?.Visit(checker);
+            ifnode.Then?.Visit(visitor);
 
             // Leave the if's then block
-            checker.SymbolTable.LeaveScope();
+            visitor.SymbolTable.LeaveScope();
 
             if (ifnode.Else != null)
             {
-                // Add a block for the else's body and generate it, then leave the block
-                checker.SymbolTable.EnterScope(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
-                ifnode.Else.Visit(checker);                
-                checker.SymbolTable.LeaveScope();
+                // Enter to the Else's scope
+                visitor.SymbolTable.EnterScope(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
+
+                // Visit the else
+                ifnode.Else.Visit(visitor);
+
+                // Leave the else scope
+                visitor.SymbolTable.LeaveScope();
             }
         }
     }

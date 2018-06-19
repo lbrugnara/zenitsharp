@@ -59,12 +59,22 @@ namespace Fl.TypeChecking.Inferrers
         /// <returns>New type that represents the undefined symbol's type</returns>
         public Anonymous AssumeSymbolType(Symbol symbol)
         {
-            var tempType = new Anonymous(this.GetName());
+            var tempType = this.NewAnonymousType();
             symbol.Type = tempType;
 
             this.AssumeSymbolTypeAs(symbol, tempType);
 
             return tempType;
+        }
+
+        public Anonymous NewAnonymousType()
+        {
+            var type = new Anonymous(this.GetName());
+
+            if (!this.assumptions.ContainsKey(type))
+                this.assumptions[type] = new List<Symbol>();
+
+            return type;
         }
 
         /// <summary>
@@ -112,7 +122,7 @@ namespace Fl.TypeChecking.Inferrers
 
             // Complex type
             if (t is Function ft)
-                return ft.Parameters.Any(p => this.IsTypeAssumption(ft.GetSymbol(p).Type)) || this.IsTypeAssumption(ft.Return);
+                return ft.Parameters.Any(p => this.IsTypeAssumption(p)) || this.IsTypeAssumption(ft.Return);
 
             if (t is Tuple tt)
                 return tt.Types.Any(this.IsTypeAssumption);
@@ -149,7 +159,7 @@ namespace Fl.TypeChecking.Inferrers
         {
             if (type is Function f)
             {
-                f.Parameters.ToList().ForEach(paramType => this.AssumeSymbolTypeAs(symbol, f.GetSymbol(paramType).Type));
+                f.Parameters.ToList().ForEach(paramType => this.AssumeSymbolTypeAs(symbol, paramType));
                 this.AssumeSymbolTypeAs(symbol, f.Return);
             }
             else if (type is Tuple t)
@@ -215,17 +225,17 @@ namespace Fl.TypeChecking.Inferrers
             for (int i = 0; i < f.Parameters.Count; i++)
             {
                 // If type is a complex type, infer it as a complex type, otherwise just updated the value
-                if (this.IsComplexType(f.GetSymbol(f.Parameters[i]).Type))
-                    this.UpdateComplexType(f.GetSymbol(f.Parameters[i]).Type, prevType, newType);
-                else if (f.GetSymbol(f.Parameters[i]).Type == prevType)
-                    f.GetSymbol(f.Parameters[i]).Type = newType;
+                if (this.IsComplexType(f.Parameters[i]))
+                    this.UpdateComplexType(f.Parameters[i], prevType, newType);
+                else if (f.Parameters[i] == prevType)
+                    f.Parameters[i] = newType;
             }
 
             // If return type is a complex type, infer it as a complex type, otherwise just updated the value
             if (this.IsComplexType(f.Return))
                 this.UpdateComplexType(f.Return, prevType, newType);
             else if (f.Return == prevType)
-                f.GetSymbol("@ret").Type = newType;
+                f.SetReturnType(newType);
         }
 
         /// <summary>
@@ -265,10 +275,10 @@ namespace Fl.TypeChecking.Inferrers
                     var newFuncType = newType as Function;
                     for (int i = 0; i < prevFuncType.Parameters.Count; i++)
                     {
-                        var oldParamSymbol = prevFuncType.GetSymbol(prevFuncType.Parameters[i]);
-                        var newParamSymbol = newFuncType.GetSymbol(newFuncType.Parameters[i]);
+                        var oldParamSymbol = prevFuncType.Parameters[i];
+                        var newParamSymbol = newFuncType.Parameters[i];
 
-                        this.UnifyTypes(oldParamSymbol.Type, newParamSymbol.Type);
+                        this.UnifyTypes(oldParamSymbol, newParamSymbol);
                     }
 
                     // If return type is a complex type, infer it as a complex type, otherwise just updated the value
@@ -291,7 +301,7 @@ namespace Fl.TypeChecking.Inferrers
                     }
                 }
             }
-            else if (prevType is Anonymous prevAnonType)
+            else if (prevType is Anonymous prevAnonType && prevType != newType)
             {
                 // Infer each symbol type under the previous anonymous inferred type
                 this.assumptions[prevAnonType].ForEach(s => this.InferSymbolType(s, prevAnonType, newType));

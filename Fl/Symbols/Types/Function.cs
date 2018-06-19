@@ -9,56 +9,38 @@ namespace Fl.Symbols.Types
     public class Function : Struct
     {
         /// <summary>
-        /// Contains symbols defined in this function
+        /// Function's parameters types
         /// </summary>
-        public Scope Scope { get; private set; }
+        public List<Type> Parameters { get; private set; }
 
         /// <summary>
-        /// Parameters names that should be defined in the scope
+        /// Function's return type
         /// </summary>
-        public List<string> Parameters { get; private set; }
+        public Type Return { get; private set; }
 
-        public Function(Scope global)
+        public Function()
             : base("func")
         {
-            this.Parameters = new List<string>();
-            this.Scope = new Scope(ScopeType.Function, global.Uid, global);
+            this.Parameters = new List<Type>();
         }
 
         /// <summary>
-        /// Return type is always the @ret type
+        /// Define a new parameter type
         /// </summary>
-        public Type Return => this.Scope.GetSymbol("@ret")?.Type;
+        /// <param name="type"></param>
+        public void DefineParameterType(Type type) => this.Parameters.Add(type);
 
-        public Symbol DefineParameter(string name, Type type)
-        {
-            if (name == null)
-                name = $"#p{this.Parameters.Count}";
-            this.Parameters.Add(name);
-            return this.NewSymbol(name, type);
-        }
-
-        #region ISymbolTable implementation
-
-        /// <inheritdoc/>
-        public void AddSymbol(Symbol symbol) => this.Scope.AddSymbol(symbol);
-
-        /// <inheritdoc/>
-        public Symbol NewSymbol(string name, Type type) => this.Scope.NewSymbol(name, type);
-
-        /// <inheritdoc/>
-        public bool HasSymbol(string name) => this.Scope.HasSymbol(name);
-
-        /// <inheritdoc/>
-        public Symbol GetSymbol(string name) => this.Scope.GetSymbol(name);
-
-        #endregion
+        /// <summary>
+        /// Set the return type
+        /// </summary>
+        /// <param name="ret"></param>
+        public void SetReturnType(Type ret) =>  this.Return = ret;
 
         public override bool Equals(object obj)
         {
             return base.Equals(obj) 
                 && this.Return == (obj as Function).Return
-                && this.Parameters.Select(p => this.GetSymbol(p).Type).SequenceEqual((obj as Function).Parameters.Select(p => this.GetSymbol(p).Type));
+                && this.Parameters.SequenceEqual((obj as Function).Parameters);
         }
 
         public static bool operator ==(Function type1, Type type2)
@@ -76,8 +58,8 @@ namespace Fl.Symbols.Types
 
         public override string ToString()
         {
-            var parameters = this.Parameters.Select(p => this.Scope.GetSymbol(p))
-                            .Select(s => s.Type?.ToString() ?? "?")
+            var parameters = this.Parameters
+                            .Select(s => s?.ToString() ?? "?")
                             .ToList();
             return base.ToString() + "(" + string.Join(", ", parameters) + $"): {(this.Return?.ToString() ?? "?")}";
         }

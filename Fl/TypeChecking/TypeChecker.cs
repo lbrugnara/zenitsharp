@@ -15,14 +15,17 @@ namespace Fl.TypeChecking
         /// </summary>
         public SymbolTable SymbolTable { get; }
 
-        public TypeChecker(SymbolTable symtable)
+        public TypeInferrer TypeInferrer { get; }
+
+        public TypeChecker(SymbolTable symtable, TypeInferrer inferrer)
         {
             this.SymbolTable = symtable ?? throw new System.ArgumentNullException(nameof(symtable));
+            this.TypeInferrer = inferrer ?? throw new System.ArgumentNullException(nameof(inferrer));
         }
 
         public SymbolTable Check(AstNode node)
         {
-            var inferencer = new TypeInferrerVisitor(this.SymbolTable);
+            var inferencer = new TypeInferrerVisitor(this.SymbolTable, this.TypeInferrer);
             inferencer.Visit(node);
 
             var checker = new TypeCheckerVisitor(this.SymbolTable);
