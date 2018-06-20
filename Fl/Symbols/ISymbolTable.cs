@@ -37,5 +37,13 @@ namespace Fl.Symbols
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
         Symbol GetSymbol(string name);
+
+        /// <summary>
+        /// Return a symbol with the provided name. It returns null
+        /// if the symbol does not exist in the symbol table
+        /// </summary>
+        /// <param name="name">Symbol's name to retrieve</param>
+        /// <returns>Symbol instance identified by name</returns>
+        Symbol TryGetSymbol(string name);
     }
 }

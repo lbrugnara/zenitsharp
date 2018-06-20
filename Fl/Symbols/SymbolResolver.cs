@@ -27,6 +27,10 @@ namespace Fl.Symbols
             lang.NewSymbol("version", String.Instance);
 
             this.SymbolTable.AddSymbol(std);*/
+
+            var intClass = new Class();
+            intClass.Methods.NewSymbol("toStr", new Function(String.Instance));
+            this.SymbolTable.NewSymbol("int", intClass);
         }
 
         public void Resolve(AstNode node)

@@ -17,7 +17,24 @@ namespace Fl.TypeChecking.Inferrers
             // If the accessed member has an eclosing accessor node, visit
             // it to get the enclosing symbol's type
             if (accessor.Enclosing != null)
-                symtable = accessor.Enclosing?.Visit(visitor) as ISymbolTable;
+            {
+                var encsym = accessor.Enclosing?.Visit(visitor).Symbol;
+
+                // If the enclosing symbol implements ISymbolTable we simply use it
+                if (encsym is ISymbolTable)
+                {                    
+                    symtable = encsym as ISymbolTable;
+                }
+                else if (encsym.Type is Class || visitor.SymbolTable.TryGetSymbol(encsym.Type.Name)?.Type is Class)
+                {
+                    // Find the Class type
+                    var clasz = encsym.Type as Class ?? visitor.SymbolTable.TryGetSymbol(encsym.Type.Name)?.Type as Class;
+
+                    symtable = clasz.Methods.HasSymbol(accessor.Identifier.Value.ToString())
+                            ? clasz.Methods
+                            : clasz.Properties;
+                }
+            }
 
             // Get accessed symbol that must be defined in the symtable's scope
             var symbol = symtable.GetSymbol(accessor.Identifier.Value.ToString());

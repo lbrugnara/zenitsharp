@@ -7,13 +7,15 @@ namespace Fl.Ast
 {
     public class AstAccessorNode : AstNode
     {
-        public Token Identifier;
-        public AstNode Enclosing;
+        public readonly Token Identifier;
+        public readonly AstNode Enclosing;
+        public readonly bool IsCall;
 
-        public AstAccessorNode(Token identifier, AstNode enclosing)
+        public AstAccessorNode(Token identifier, AstNode enclosing, bool isCall = false)
         {
             this.Identifier = identifier;
             this.Enclosing = enclosing;
+            this.IsCall = isCall;
         }
     }
 }

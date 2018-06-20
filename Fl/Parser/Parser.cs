@@ -899,7 +899,7 @@ namespace Fl.Parser
                 else if (this.Match(TokenType.Dot))
                 {
                     this.Consume();
-                    accessor = new AstAccessorNode(this.Consume(TokenType.Identifier), accessor);
+                    accessor = new AstAccessorNode(this.Consume(TokenType.Identifier), accessor, this.Match(TokenType.LeftParen));
                 }
                 else break;
             }
@@ -1197,7 +1197,7 @@ namespace Fl.Parser
                 else if (this.Match(TokenType.Dot))
                 {
                     this.Consume();
-                    primary = new AstAccessorNode(this.Consume(TokenType.Identifier), primary);
+                    primary = new AstAccessorNode(this.Consume(TokenType.Identifier), primary, this.Match(TokenType.LeftParen));
                 }
                 else
                 {

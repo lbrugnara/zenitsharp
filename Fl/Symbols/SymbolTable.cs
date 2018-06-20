@@ -72,6 +72,8 @@ namespace Fl.Symbols
         /// <inheritdoc/>
         public Symbol GetSymbol(string name) => this.scopes.Peek().GetSymbol(name);
 
+        public Symbol TryGetSymbol(string name) => this.scopes.Peek().TryGetSymbol(name);
+
         #endregion
     }
 }

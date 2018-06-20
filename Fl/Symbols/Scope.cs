@@ -111,14 +111,16 @@ namespace Fl.Symbols
 
         public bool HasSymbol(string name) => this.Symbols.ContainsKey(name) || (this.Parent != null && this.Parent.HasSymbol(name)) || (this.Global != null && this.Global.HasSymbol(name));
 
-        public Symbol GetSymbol(string name) =>
+        public Symbol GetSymbol(string name) => this.TryGetSymbol(name) ?? throw new SymbolException($"Symbol {name} is not defined in current scope");
+
+        public Symbol TryGetSymbol(string name) =>
             this.Symbols.ContainsKey(name)
             ? this.Symbols[name]
             : this.Parent != null && this.Parent.HasSymbol(name)
-                ? this.Parent.GetSymbol(name)
+                ? this.Parent.TryGetSymbol(name)
                 : this.Global != null && this.Global.HasSymbol(name)
-                    ? this.Global.GetSymbol(name)
-                    : throw new SymbolException($"Symbol {name} is not defined in current scope");
+                    ? this.Global.TryGetSymbol(name)
+                    : null;
 
         #endregion
     }

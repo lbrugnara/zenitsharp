@@ -24,6 +24,13 @@ namespace Fl.Symbols.Types
             this.Parameters = new List<Type>();
         }
 
+        public Function(Type returnType, params Type[] parametersTypes)
+            : base("func")
+        {
+            this.Parameters = parametersTypes?.ToList() ?? new List<Type>();
+            this.Return = returnType ?? throw new System.ArgumentNullException(nameof(returnType), "Return type cannot be null");
+        }
+
         /// <summary>
         /// Define a new parameter type
         /// </summary>
