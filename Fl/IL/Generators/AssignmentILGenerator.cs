@@ -4,7 +4,7 @@
 using Fl.IL.Instructions;
 using Fl.IL.Instructions.Exceptions;
 using Fl.IL.Instructions.Operands;
-using Fl.Parser;
+using Fl.Syntax;
 using Fl.Ast;
 
 namespace Fl.IL.Generators

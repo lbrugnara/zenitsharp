@@ -1,5 +1,5 @@
-﻿using Fl.Parser;
-using Fl.Symbols.Exceptions;
+﻿using Fl.Syntax;
+using Fl.Semantics.Exceptions;
 
 namespace Fl.Engine.Symbols.Types
 {

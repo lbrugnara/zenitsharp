@@ -3,9 +3,8 @@
 
 using Fl.IL;
 using Fl.IL.VM;
-using Fl.Parser;
-using Fl.Symbols;
-using Fl.TypeChecking;
+using Fl.Syntax;
+using Fl.Semantics;
 using System;
 
 namespace Fl
@@ -15,7 +14,7 @@ namespace Fl
         public ILProgram Compile(string source)
         {
             var lexer = new Lexer(source);
-            var parser = new Parser.Parser();
+            var parser = new Parser();
 
             // Lexical analysis and Parsing 
             var ast = parser.Parse(lexer.Tokenize());
@@ -26,7 +25,7 @@ namespace Fl
                 throw new Exception(string.Join("\n", errors));
 
             // Resolve symbols
-            var symbolResolver = new SymbolResolver();
+            var symbolResolver = new SymbolBinder();
             symbolResolver.Resolve(ast);
 
             // Type checking

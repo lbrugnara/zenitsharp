@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using Fl.Parser;
+using Fl.Syntax;
 
 namespace Fl.Ast
 {

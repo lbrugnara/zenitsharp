@@ -2,7 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using System.Collections.Generic;
-using Fl.Parser;
+using Fl.Syntax;
 
 namespace Fl.Ast
 {
