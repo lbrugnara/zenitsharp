@@ -79,8 +79,12 @@ namespace Fl.Syntax
         Colon,
 
         // More keywords
+        Class,
         Function,
         Package,
-        New
+        New,
+
+        // Access modifiers
+        AccessModifier
     }
 }

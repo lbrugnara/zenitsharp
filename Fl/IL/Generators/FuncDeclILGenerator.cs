@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace Fl.IL.Generators
 {
-    class FuncDeclILGenerator : INodeVisitor<ILGenerator, AstFuncDeclNode, Operand>
+    class FuncDeclILGenerator : INodeVisitor<ILGenerator, AstFunctionNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstFuncDeclNode funcdecl)
+        public Operand Visit(ILGenerator generator, AstFunctionNode funcdecl)
         {
             generator.PushFragment(funcdecl.Name, FragmentType.Function);
             funcdecl.Parameters.Parameters.ForEach(p => generator.Emmit(new LocalInstruction(generator.SymbolTable.NewSymbol(p.Value.ToString(), OperandType.Auto))));

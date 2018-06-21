@@ -1,0 +1,15 @@
+﻿using Fl.Ast;
+using Fl.Semantics.Symbols;
+using Fl.Semantics.Types;
+using System;
+
+namespace Fl.Semantics.Binders
+{
+    class #Name#SymbolBinder : INodeVisitor<SymbolBinderVisitor, Ast#Name#Node>
+    {
+        public void Visit(SymbolBinderVisitor binder, Ast#Name#Node node)
+        {
+			// TODO: Implement #Name# binder
+        }
+    }
+}

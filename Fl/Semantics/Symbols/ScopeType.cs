@@ -28,6 +28,11 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Represents a package block
         /// </summary>
-        Package
+        Package,
+
+        /// <summary>
+        /// Represents a class block
+        /// </summary>
+        Class
     }
 }

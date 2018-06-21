@@ -28,7 +28,7 @@ namespace Fl.Semantics.Binders
         protected void VarDefinitionNode(SymbolBinderVisitor visitor, AstVarDefinitionNode vardecl)
         {
             // Get the variable type from the declaration or assume an anonymous type
-            var lhsType = TypeHelper.FromToken(vardecl.VarType.TypeToken) ?? visitor.Inferrer.NewAnonymousType();
+            var lhsType = TypeHelper.FromToken(vardecl.VarType.Name) ?? visitor.Inferrer.NewAnonymousType();
 
             var isAssumedType = visitor.Inferrer.IsTypeAssumption(lhsType);
 

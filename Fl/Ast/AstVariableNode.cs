@@ -6,10 +6,10 @@ namespace Fl.Ast
 {
     public abstract class AstVariableNode : AstNode
     {
-        public AstVariableTypeNode VarType { get; }
+        public AstTypeNode VarType { get; }
         
 
-        public AstVariableNode(AstVariableTypeNode variableType)
+        public AstVariableNode(AstTypeNode variableType)
         {
             this.VarType = variableType;
         }

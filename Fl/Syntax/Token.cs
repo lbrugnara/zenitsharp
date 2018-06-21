@@ -9,5 +9,10 @@ namespace Fl.Syntax
         public object Value;
         public int Line;
         public int Col;
+
+        public override string ToString()
+        {
+            return $"{this.Value}: {this.Type} (L:{this.Line},C:{this.Col})";
+        }
     }
 }

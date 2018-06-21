@@ -7,22 +7,22 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Binders
 {
-    class FuncDeclSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstFuncDeclNode>
+    class ClassMethodSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstClassMethodNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstFuncDeclNode funcdecl)
+        public void Visit(SymbolBinderVisitor visitor, AstClassMethodNode method)
         {
             // Create the function symbol
             var funcType = new Function();
-            var funcSymbol = new Symbol(funcdecl.Name, funcType);
+            var funcSymbol = new Symbol(method.Name, funcType);
 
             // Register it in the current scope
             visitor.SymbolTable.AddSymbol(funcSymbol);
 
             // Change the current scope to be the function's scope
-            visitor.SymbolTable.EnterScope(ScopeType.Function, funcdecl.Name);
+            visitor.SymbolTable.EnterScope(ScopeType.Function, method.Name);
 
             // Process the parameters
-            funcdecl.Parameters.Parameters.ForEach(p => {
+            method.Parameters.Parameters.ForEach(p => {
 
                 // TODO: Type hinting needs to change this
                 // By now, function's parameters are just declared
@@ -41,7 +41,7 @@ namespace Fl.Semantics.Binders
             });
 
             // Visit the function's body
-            funcdecl.Body.ForEach(s => s.Visit(visitor));
+            method.Body.ForEach(s => s.Visit(visitor));
 
             // Get the return symbol
             var retsym = visitor.SymbolTable.GetSymbol("@ret");

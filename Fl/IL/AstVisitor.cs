@@ -89,7 +89,7 @@ namespace Fl.IL
                     return this.continueILGenerator.Visit(this.generator, cont);
                 case AstCallableNode call:
                     return this.callILGenerator.Visit(this.generator, call);
-                case AstFuncDeclNode func:
+                case AstFunctionNode func:
                     return this.funcDeclILGenerator.Visit(this.generator, func);
                 case AstTupleNode t:
                     return this.tupleILGenerator.Visit(this.generator, t);

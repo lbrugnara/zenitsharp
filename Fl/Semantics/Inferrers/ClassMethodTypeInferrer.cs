@@ -9,28 +9,28 @@ using System.Linq;
 
 namespace Fl.Semantics.Inferrers
 {
-    class FuncDeclTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstFuncDeclNode, InferredType>
+    class ClassMethodTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstClassMethodNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstFuncDeclNode funcdecl)
+        public InferredType Visit(TypeInferrerVisitor visitor, AstClassMethodNode method)
         {
-            var functionSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Name);
+            var functionSymbol = visitor.SymbolTable.GetSymbol(method.Name);
             Function functionType = functionSymbol.Type as Function;
 
             // Enter the requested function's block
-            visitor.SymbolTable.EnterScope(ScopeType.Function, funcdecl.Name);
+            visitor.SymbolTable.EnterScope(ScopeType.Function, method.Name);
 
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
 
-            parametersSymbols.AddRange(funcdecl.Parameters.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Value.ToString())));
+            parametersSymbols.AddRange(method.Parameters.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Value.ToString())));
 
             // Get the return symbol and assign a temporal type
             var retSymbol = visitor.SymbolTable.GetSymbol("@ret");
 
             // Visit the function's body
-            var statements = funcdecl.Body.Select(s => (node: s, inferred: s.Visit(visitor))).ToList();
+            var statements = method.Body.Select(s => (node: s, inferred: s.Visit(visitor))).ToList();
 
-            if (funcdecl.IsLambda)
+            if (method.IsLambda)
             {
                 // If there's a lambda, the return type should be already populated by the lambda's body expression
                 // and that should be reflected on the @ret symbol
@@ -52,7 +52,7 @@ namespace Fl.Semantics.Inferrers
                 else if (returnTypes.Count() == 0)
                     visitor.Inferrer.MakeConclusion(Void.Instance, retSymbol.Type);
                 else
-                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes)}) in function {funcdecl.Name}");
+                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes)}) in function {method.Name}");
             }
 
             // Leave the function's scope

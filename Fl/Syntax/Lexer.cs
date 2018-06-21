@@ -48,9 +48,13 @@ namespace Fl.Syntax
             { "continue", TokenType.Continue },
             { "return", TokenType.Return },
             { "ret", TokenType.Return },
+            { "class", TokenType.Class },
             { "fn", TokenType.Function },
             { "package", TokenType.Package },
-            { "new", TokenType.New }
+            { "new", TokenType.New },
+            { "private", TokenType.AccessModifier },
+            { "protected", TokenType.AccessModifier },
+            { "public", TokenType.AccessModifier }
         };
 
         #endregion

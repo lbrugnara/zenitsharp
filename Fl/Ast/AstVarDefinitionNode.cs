@@ -11,7 +11,7 @@ namespace Fl.Ast
     {
         public List<Tuple<Token, AstNode>> VarDefinitions { get; }
 
-        public AstVarDefinitionNode(AstVariableTypeNode variableType, List<Tuple<Token, AstNode>> vardefs)
+        public AstVarDefinitionNode(AstTypeNode variableType, List<Tuple<Token, AstNode>> vardefs)
             : base(variableType)
         {
             this.VarDefinitions = vardefs;

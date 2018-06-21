@@ -6,11 +6,11 @@ using Fl.Syntax;
 
 namespace Fl.Ast
 {
-    public class AstFuncDeclNode : AstNode
+    public class AstFunctionNode : AstNode
     {
         private Token identifier;
 
-        public AstFuncDeclNode(Token name, AstParametersNode parameters, List<AstNode> body, bool isAnonymous, bool isLambda)
+        public AstFunctionNode(Token name, AstParametersNode parameters, List<AstNode> body, bool isAnonymous, bool isLambda)
         {
             this.identifier = name;
             this.Parameters = parameters;

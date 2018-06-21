@@ -315,6 +315,10 @@ namespace Fl.Syntax
             {
                 return this.FuncDeclaration();
             }
+            else if (this.Match(TokenType.Class))
+            {
+                return this.ClassDeclaration();
+            }
             return this.Statement();
         }
 
@@ -339,7 +343,7 @@ namespace Fl.Syntax
         // implicit_var_declaration -> VAR ( IDENTIFIER '=' expression | var_destructuring )';'
         private AstVariableNode ImplicitVarDeclaration()
         {
-            AstVariableTypeNode variableType = new AstVariableTypeNode(this.Consume(TokenType.Variable));
+            AstTypeNode variableType = new AstTypeNode(this.Consume(TokenType.Variable));
 
             // If there is a left parent present, it is a destructuring declaration
             if (this.IsDestructuring())
@@ -358,7 +362,7 @@ namespace Fl.Syntax
         {
             // Get the variable type
             Token varType = this.Consume(TokenType.Identifier);
-            AstVariableTypeNode variableType = new AstVariableTypeNode(varType);
+            AstTypeNode variableType = new AstTypeNode(varType);
 
             // If it contains a left bracket, it is an array variable
             if (this.Match(TokenType.LeftBracket))
@@ -369,7 +373,7 @@ namespace Fl.Syntax
                     dimensions.Add(this.Consume(TokenType.LeftBracket));
                     dimensions.Add(this.Consume(TokenType.RightBracket));
                 }
-                variableType = new AstVariableTypeNode(varType, dimensions);
+                variableType = new AstTypeNode(varType, dimensions);
             }
 
             // If there is a left parent present, it is a destructuring declaration
@@ -403,7 +407,7 @@ namespace Fl.Syntax
 
         // Rule: 
         // var_destructuring -> '(' ( ',' | IDENTIFIER )+ ')' '=' expression
-        private AstVarDestructuringNode VarDestructuring(AstVariableTypeNode varType)
+        private AstVarDestructuringNode VarDestructuring(AstTypeNode varType)
         {
             List<Token> tokens = new List<Token>();
 
@@ -436,7 +440,7 @@ namespace Fl.Syntax
         }
 
         // Rule:
-        // constant_declaration -> CONST IDENTIFIER IDENTIFIER '=' expression ( ',' IDENTIFIER '=' expression )* ) ';'
+        // constant_declaration -> 'const' IDENTIFIER? IDENTIFIER '=' expression ( ',' IDENTIFIER '=' expression )* ) ';'
         private AstConstantNode ConstDeclaration()
         {
             // Consume the keyword
@@ -463,8 +467,164 @@ namespace Fl.Syntax
         }
 
         // Rule:
-        // func_declaration -> "fn" IDENTIFIER "(" func_params? ")" "{" declaration* "}"
-        private AstFuncDeclNode FuncDeclaration()
+        // func_declaration -> 'fn' IDENTIFIER ( '(' func_params? ')' '{' declaration* '}' | ( '(' func_params? ')' )? '=>' expression )
+        private AstFunctionNode FuncDeclaration()
+        {
+            this.Consume(TokenType.Function);
+
+            Token name = this.Consume(TokenType.Identifier);
+
+            AstParametersNode parameters = null;
+
+            // If it is not a lambda function, the '(' func_params? ')' part is required
+            if (this.Peek().Type != TokenType.RightArrow)
+            {
+                this.Consume(TokenType.LeftParen);
+                parameters = this.FuncParameters();
+                this.Consume(TokenType.RightParen);
+            }
+
+            if (this.Peek().Type == TokenType.RightArrow)
+            {
+                // RightArrow followed by brace doesn't make sense here, expression is the only accepted node
+                this.Consume(TokenType.RightArrow);
+
+                var f = new AstFunctionNode(name, parameters ?? new AstParametersNode(new List<Token>()), new List<AstNode>() { this.Expression() }, false, true);
+
+                if (this.Match(TokenType.Semicolon))
+                    this.Consume(TokenType.Semicolon);
+
+                return f;
+            }
+
+            List<AstNode> decls = new List<AstNode>();
+            this.Consume(TokenType.LeftBrace);
+            while (!this.Match(TokenType.RightBrace))
+            {
+                decls.Add(this.Declaration());
+            }
+            this.Consume(TokenType.RightBrace);
+
+            return new AstFunctionNode(name, parameters, decls, false, false);
+        }
+
+        // Rule:
+        // func_params -> IDENTIFIER ( "," IDENTIFIER )*
+        private AstParametersNode FuncParameters()
+        {
+            List<Token> parameters = new List<Token>();
+            while (this.Match(TokenType.Identifier))
+            {
+                parameters.Add(this.Consume(TokenType.Identifier));
+                if (this.Match(TokenType.Comma))
+                    this.Consume();
+            }
+            return new AstParametersNode(parameters);
+        }
+
+        // Rule:
+        // class_declaration -> 'class' IDENTIFIER '{' class_body? '}'
+        //
+        // class_body   -> class_property
+        //	            | class_constant
+        //	            | class_method
+        //
+        // access_modifier -> ( 'public' | 'protected' | 'private' )
+        private AstClassNode ClassDeclaration()
+        {
+            var classToken = this.Consume(TokenType.Class);
+            var className = this.Consume(TokenType.Identifier);
+
+            this.Consume(TokenType.LeftBrace);
+
+            var properties = new List<AstClassPropertyNode>();
+            var constants = new List<AstClassConstantNode>();
+            var methods = new List<AstClassMethodNode>();
+
+            while (true)
+            {
+                Token accessModifier = null;
+
+                if (this.Match(TokenType.AccessModifier))
+                    accessModifier = this.Consume();
+
+                if (this.IsClassPropertyDeclaration())
+                {
+                    properties.Add(this.ClassProperty(accessModifier));
+                }
+                else if (this.Match(TokenType.Constant))
+                {
+                    constants.Add(this.ClassConstant(accessModifier));
+                }
+                else if (this.Match(TokenType.Function))
+                {
+                    methods.Add(this.ClassMethod(accessModifier));
+                }
+                else break;
+            }
+
+            this.Consume(TokenType.RightBrace);
+
+            return new AstClassNode(className, properties, constants, methods);
+        }
+
+        // Rule: (TODO: getter and setter for class_property, because of that the class_field indirection)
+        // class_property -> class_field
+        //
+        // class_field -> access_modifier? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
+        private AstClassPropertyNode ClassProperty(Token accessModifier)
+        {
+            // Get the variable type
+            Token varType = this.Consume(TokenType.Identifier);
+            AstTypeNode variableType = new AstTypeNode(varType);
+
+            // If it contains a left bracket, it is an array variable
+            if (this.Match(TokenType.LeftBracket))
+            {
+                List<Token> dimensions = new List<Token>();
+                while (this.Match(TokenType.LeftBracket))
+                {
+                    dimensions.Add(this.Consume(TokenType.LeftBracket));
+                    dimensions.Add(this.Consume(TokenType.RightBracket));
+                }
+                variableType = new AstTypeNode(varType, dimensions);
+            }
+
+            var name = this.Consume(TokenType.Identifier);
+
+            AstNode definition = null;
+
+            if (this.Match(TokenType.Assignment) && this.Consume(TokenType.Assignment) != null)
+                definition = this.Expression();
+
+            this.Consume(TokenType.Semicolon);
+
+            // If not, it is a simple typed var definition
+            return new AstClassPropertyNode(name, accessModifier, variableType, definition);
+        }
+
+        // Rule:
+        // class_constant -> access_modifier? 'const' IDENTIFIER IDENTIFIER '=' expression ';'
+        private AstClassConstantNode ClassConstant(Token accessModifier)
+        {
+            // Consume the keyword
+            this.Consume(TokenType.Constant);
+
+            // Get the constant type if present
+            Token type = this.Consume(TokenType.Identifier);
+
+            Token identifier = this.Consume(TokenType.Identifier);
+            this.Consume(TokenType.Assignment, "A constant value needs to be defined when declared.");
+            AstNode expression = this.Expression();
+
+            this.Consume(TokenType.Semicolon);
+
+            return new AstClassConstantNode(identifier, accessModifier, type, expression);
+        }
+
+        // Rule:
+        // class_method -> access_modifier? func_declaration
+        private AstClassMethodNode ClassMethod(Token accessModifier)
         {
             this.Consume(TokenType.Function);
 
@@ -481,7 +641,7 @@ namespace Fl.Syntax
                 // RightArrow followed by brace doesn't make sense here, expression is the only accepted node
                 this.Consume(TokenType.RightArrow);
 
-                var f = new AstFuncDeclNode(name, parameters, new List<AstNode>() { this.Expression() }, false, true);
+                var f = new AstClassMethodNode(name, accessModifier, parameters, new List<AstNode>() { this.Expression() }, true);
 
                 if (this.Match(TokenType.Semicolon))
                     this.Consume(TokenType.Semicolon);
@@ -497,21 +657,7 @@ namespace Fl.Syntax
             }
             this.Consume(TokenType.RightBrace);
 
-            return new AstFuncDeclNode(name, parameters, decls, false, false);
-        }
-
-        // Rule:
-        // func_params -> IDENTIFIER ( "," IDENTIFIER )*
-        private AstParametersNode FuncParameters()
-        {
-            List<Token> parameters = new List<Token>();
-            while (this.Match(TokenType.Identifier))
-            {
-                parameters.Add(this.Consume(TokenType.Identifier));
-                if (this.Match(TokenType.Comma))
-                    this.Consume();
-            }
-            return new AstParametersNode(parameters);
+            return new AstClassMethodNode(name, accessModifier, parameters, decls, false);
         }
 
         // Rule:
@@ -839,12 +985,12 @@ namespace Fl.Syntax
 
         // Rule:
         // lambda_expression -> lambda_params '=>' ( block | expression )
-        private AstFuncDeclNode LambdaExpression()
+        private AstFunctionNode LambdaExpression()
         {
             AstParametersNode lambdaParams = this.LambdaParams();
             var arrow = this.Consume(TokenType.RightArrow);
             AstNode expr = this.Match(TokenType.LeftBrace) ? this.Block() : this.Expression();
-            return new AstFuncDeclNode(arrow, lambdaParams, new List<AstNode>() { expr }, true, true);
+            return new AstFunctionNode(arrow, lambdaParams, new List<AstNode>() { expr }, true, true);
         }
 
         // Rule:
@@ -1298,6 +1444,22 @@ namespace Fl.Syntax
         #endregion
 
         #region Parser lookahead helpers
+
+        private bool IsClassPropertyDeclaration()
+        {
+            if (this.Match(TokenType.Identifier))
+            {
+                // identifier identifier ( '=' expression )?
+                if (this.MatchFrom(1, TokenType.Identifier))
+                    return true;
+
+                // identifier ( '[' ']' )+ identifier ( '=' expression )?
+                int dimensions = this.CountRepeatedMatchesFrom(1, TokenType.LeftBracket, TokenType.RightBracket);
+                return dimensions > 0 && this.MatchFrom(dimensions + 1, TokenType.Identifier);
+            }
+
+            return false;
+        }
 
         private bool IsVarDeclaration()
         {

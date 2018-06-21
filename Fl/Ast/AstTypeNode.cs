@@ -6,14 +6,14 @@ using Fl.Syntax;
 
 namespace Fl.Ast
 {
-    public class AstVariableTypeNode : AstNode
+    public class AstTypeNode : AstNode
     {
-        public Token TypeToken { get; }
+        public Token Name { get; }
         public List<Token> Dimensions { get; }
 
-        public AstVariableTypeNode(Token type, List<Token> dimensions = null)
+        public AstTypeNode(Token type, List<Token> dimensions = null)
         {
-            this.TypeToken = type;
+            this.Name = type;
             this.Dimensions = dimensions;
         }
     }

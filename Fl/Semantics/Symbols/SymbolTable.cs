@@ -10,7 +10,7 @@ namespace Fl.Semantics.Symbols
     public class SymbolTable : ISymbolTable
     {
         /// <summary>
-        /// An stack to keep track of nested scopes
+        /// Keep track of the scope chain
         /// </summary>
         private readonly Stack<Scope> scopes;
 
@@ -40,6 +40,22 @@ namespace Fl.Semantics.Symbols
         /// <param name="type">Type of the scope to get/create</param>
         /// <param name="uid">ID of the scope to get/create</param>
         public void EnterScope(ScopeType type, string uid) => this.scopes.Push(this.scopes.Peek().GetOrCreateNestedScope(type, uid));
+
+        public void EnterClassScope(string className)
+        {
+            if (this.CurrentScope.IsPackage)
+            {
+                // TODO: Do something with the Package
+            }
+            if (this.CurrentScope.IsClass)
+            {
+                // TODO: Do something with the Class
+            }
+            else
+            {
+                this.scopes.Push(this.Global.GetOrCreateNestedScope(ScopeType.Class, className));
+            }
+        }
 
         /// <summary>
         /// Enter to the function's scope, chain it to the stack of scopes, and make it the current 

@@ -10,12 +10,13 @@ program	-> declaration*
 declaration	-> func_declaration 
 			| variable_declaration
 			| constant_declaration
+			| class_declaration
 			| statement
             ;
 
 
 (* Function *)
-func_declaration -> 'fn' IDENTIFIER '(' func_params? ')' '{' declaration* '}'
+func_declaration -> 'fn' IDENTIFIER ( '(' func_params? ')' '{' declaration* '}' | ( '(' func_params? ')' )? '=>' expression )
                  ;
 
 
@@ -46,9 +47,32 @@ typed_var_definition -> IDENTIFIER ( '=' expression ( ',' typed_var_definition )
 
 
 (* Constant declaration *)
-constant_declaration -> CONST IDENTIFIER IDENTIFIER '=' expression ( ',' IDENTIFIER '=' expression )* ) ';'
+constant_declaration -> 'const' IDENTIFIER? IDENTIFIER '=' expression ( ',' IDENTIFIER '=' expression )* ) ';'
                      ;
 
+(* Class declaration *)
+access_modifier -> ( 'public' | 'protected' | 'private' )
+				;
+
+class_declaration -> 'class' IDENTIFIER '{' class_body? '}'
+				  ;
+
+class_body -> class_property
+			| class_constant
+			| class_method
+			;
+
+class_property -> class_field
+				;
+
+class_field -> access_modifier? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
+			;
+
+class_constant -> access_modifier? 'const' IDENTIFIER IDENTIFIER '=' expression ';'
+				;
+
+class_method ->  access_modifier? func_declaration
+			 ;
 
 (* Statements *)
 statement	-> expression_statement

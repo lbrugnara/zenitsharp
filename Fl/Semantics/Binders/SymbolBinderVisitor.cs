@@ -25,9 +25,13 @@ namespace Fl.Semantics.Binders
         private ContinueSymbolBinder continueSymbolResolver;
         private ReturnSymbolBinder returnSymbolResolver;
         private CallableSymbolBinder callSymbolResolver;
-        private FuncDeclSymbolBinder funcDeclSymbolResolver;
+        private FunctionSymbolBinder funcDeclSymbolResolver;
         private TupleSymbolBinder tupleSymbolResolver;
         private NullCoalescingSymbolBinder nullCoalescingSymbolResolver;
+        private ClassSymbolBinder classSymbolBinder;
+        private ClassPropertySymbolBinder classPropertySymbolBinder;
+        private ClassConstantSymbolBinder classConstantSymbolBinder;
+        private ClassMethodSymbolBinder classMethodSymbolBinder;
 
         public SymbolBinderVisitor(SymbolTable symtable, TypeInferrer inferrer)
         {
@@ -48,10 +52,14 @@ namespace Fl.Semantics.Binders
             this.breakSymbolResolver = new BreakSymbolBinder();
             this.continueSymbolResolver = new ContinueSymbolBinder();
             this.callSymbolResolver = new CallableSymbolBinder();
-            this.funcDeclSymbolResolver = new FuncDeclSymbolBinder();
+            this.funcDeclSymbolResolver = new FunctionSymbolBinder();
             this.tupleSymbolResolver = new TupleSymbolBinder();
             this.returnSymbolResolver = new ReturnSymbolBinder();
             this.nullCoalescingSymbolResolver = new NullCoalescingSymbolBinder();
+            this.classSymbolBinder = new ClassSymbolBinder();
+            this.classPropertySymbolBinder = new ClassPropertySymbolBinder();
+            this.classConstantSymbolBinder = new ClassConstantSymbolBinder();
+            this.classMethodSymbolBinder = new ClassMethodSymbolBinder();
         }
 
         /// <summary>
@@ -127,7 +135,7 @@ namespace Fl.Semantics.Binders
                     this.callSymbolResolver.Visit(this, call);
                     break;
 
-                case AstFuncDeclNode func:
+                case AstFunctionNode func:
                     this.funcDeclSymbolResolver.Visit(this, func);
                     break;
 
@@ -141,6 +149,22 @@ namespace Fl.Semantics.Binders
 
                 case AstNullCoalescingNode nc:
                     this.nullCoalescingSymbolResolver.Visit(this, nc);
+                    break;
+
+                case AstClassNode cn:
+                    this.classSymbolBinder.Visit(this, cn);
+                    break;
+
+                case AstClassPropertyNode cpn:
+                    this.classPropertySymbolBinder.Visit(this, cpn);
+                    break;
+
+                case AstClassConstantNode ccn:
+                    this.classConstantSymbolBinder.Visit(this, ccn);
+                    break;
+
+                case AstClassMethodNode cmn:
+                    this.classMethodSymbolBinder.Visit(this, cmn);
                     break;
 
                 case AstNoOpNode np:

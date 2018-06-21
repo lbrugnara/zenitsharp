@@ -90,6 +90,22 @@ namespace Fl.Semantics.Symbols
             }
         }
 
+        public bool IsPackage
+        {
+            get
+            {
+                return this.Type == ScopeType.Package || Parent != null && Parent.IsPackage;
+            }
+        }
+
+        public bool IsClass
+        {
+            get
+            {
+                return this.Type == ScopeType.Class || Parent != null && Parent.IsClass;
+            }
+        }
+
         #region ISymbolTable implementation
 
         public void AddSymbol(Symbol symbol)
