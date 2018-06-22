@@ -30,8 +30,11 @@ namespace Fl.Semantics
             this.SymbolTable.AddSymbol(std);*/
 
             var intClass = new Class();
-            intClass.Methods.NewSymbol("toStr", new Function(String.Instance));
+            
             this.SymbolTable.NewSymbol("int", intClass);
+            this.SymbolTable.EnterClassScope("int");
+            this.SymbolTable.NewSymbol("toStr", new Function(String.Instance));
+            this.SymbolTable.LeaveScope();
         }
 
         public void Resolve(AstNode node)

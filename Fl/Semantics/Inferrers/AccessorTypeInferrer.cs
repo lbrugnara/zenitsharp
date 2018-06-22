@@ -25,14 +25,14 @@ namespace Fl.Semantics.Inferrers
                 {                    
                     symtable = encsym as ISymbolTable;
                 }
-                else if (encsym.Type is Class || visitor.SymbolTable.TryGetSymbol(encsym.Type.Name)?.Type is Class)
+                else if (encsym.Type is Class clasz)
                 {
-                    // Find the Class type
-                    var clasz = encsym.Type as Class ?? visitor.SymbolTable.TryGetSymbol(encsym.Type.Name)?.Type as Class;
-
-                    symtable = clasz.Methods.HasSymbol(accessor.Identifier.Value.ToString())
-                            ? clasz.Methods
-                            : clasz.Properties;
+                    // Find the Class scope
+                    symtable = visitor.SymbolTable.Global.GetNestedScope(ScopeType.Class, encsym.Name);
+                }
+                else if (visitor.SymbolTable.TryGetSymbol(encsym.Type.Name)?.Type is Class)
+                {
+                    symtable = visitor.SymbolTable.Global.GetNestedScope(ScopeType.Class, encsym.Type.Name);
                 }
             }
 

@@ -16,7 +16,7 @@ namespace Fl.Ast
 
         public AstClassConstantNode(Token name, Token accessModifier, Token type, AstNode definition)
         {
-            this.Name = Name;
+            this.Name = name;
             this.AccessModifier = accessModifier;
             this.Type = type;
             this.Definition = definition;

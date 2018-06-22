@@ -82,6 +82,21 @@ namespace Fl.Semantics.Symbols
             return scope;
         }
 
+        public Scope GetNestedScope(ScopeType type, string uid)
+        {
+            Scope scope = null;
+
+            if (!this.Children.ContainsKey(uid))
+                throw new System.Exception($"Scope {uid} ({type}) does not exist");
+            
+            scope = this.Children[uid];
+
+            if (scope.Type != type)
+                throw new ScopeException($"Expecting scope {uid} to be of type {type} but it has type {scope.Type}");
+
+            return scope;
+        }
+
         public bool IsFunction
         {
             get

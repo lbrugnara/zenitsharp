@@ -7,21 +7,9 @@ namespace Fl.Semantics.Types
 {
     public class Class : Struct
     {
-        public Scope Methods { get; set; }
-        public Scope Properties { get; set; }
-
         public Class()
             : base("class")
         {
-            this.Methods = new Scope(ScopeType.Common, "@methods");
-            this.Properties = new Scope(ScopeType.Common, "@properties");
-        }
-
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj) 
-                && this.Methods.Equals((obj as Class).Methods)
-                && this.Properties.Equals((obj as Class).Properties);
         }
 
         public static bool operator ==(Class type1, Type type2)
