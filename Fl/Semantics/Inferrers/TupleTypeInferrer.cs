@@ -11,9 +11,8 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, AstTupleNode node)
         {
-            var inferredTypes = node.Items?.Select(i => i.Visit(visitor));
-            // TODO: Handle tuple type
-            return new InferredType(new Tuple(inferredTypes.Select(it => it.Type).ToArray()));
+            var inferredTypes = node.Items?.Select(i => i?.Visit(visitor));
+            return new InferredType(new Tuple(inferredTypes.Select(it => it?.Type).ToArray()));
         }
     }
 }

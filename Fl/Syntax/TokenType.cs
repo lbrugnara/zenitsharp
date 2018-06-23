@@ -85,6 +85,7 @@ namespace Fl.Syntax
         New,
 
         // Access modifiers
-        AccessModifier
+        AccessModifier,
+        Static
     }
 }

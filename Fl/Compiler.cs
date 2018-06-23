@@ -13,24 +13,11 @@ namespace Fl
     {
         public ILProgram Compile(string source)
         {
-            var lexer = new Lexer(source);
-            var parser = new Parser();
+            var syntacticAnalysis = new SyntacticAnalysis();
+            var ast = syntacticAnalysis.Run(source);
 
-            // Lexical analysis and Parsing 
-            var ast = parser.Parse(lexer.Tokenize());
-
-            var errors = parser.ParsingErrors;
-
-            if (errors.Count > 0)
-                throw new Exception(string.Join("\n", errors));
-
-            // Resolve symbols
-            var symbolResolver = new SymbolBinder();
-            symbolResolver.Resolve(ast);
-
-            // Type checking
-            var tc = new TypeChecker(symbolResolver.SymbolTable, symbolResolver.TypeInferrer);
-            tc.Check(ast);
+            var semanticAnalysis = new SemanticAnalysis();
+            semanticAnalysis.Run(ast);
 
             // Generate IL program
             var ilGenerator = new ILGenerator();

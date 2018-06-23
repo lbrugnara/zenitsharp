@@ -47,6 +47,9 @@ namespace Fl.Semantics.Checkers
             {
                 var declaration = vardestnode.Variables[i];
 
+                if (declaration == null)
+                    continue;
+
                 // Get the variable type from the declaration
                 var lhsType = checker.SymbolTable.GetSymbol(declaration.Value.ToString()).Type;
                 var rhsType = (initType.Type as Tuple).Types[i];

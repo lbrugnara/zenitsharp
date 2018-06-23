@@ -10,14 +10,16 @@ namespace Fl.Ast
     {
         public Token Identifier { get; }
         public Token AccessModifier { get; }
+        public Token StorageType { get; }
         public AstParametersNode Parameters { get; }
         public List<AstNode> Body { get; }
         public bool IsLambda { get; }
 
-        public AstClassMethodNode(Token name, Token accessModifier, AstParametersNode parameters, List<AstNode> body, bool isLambda)
+        public AstClassMethodNode(Token name, Token accessModifier, Token storageModifier, AstParametersNode parameters, List<AstNode> body, bool isLambda)
         {
             this.Identifier = name;
             this.AccessModifier = accessModifier;
+            this.StorageType = storageModifier;
             this.Parameters = parameters;
             this.Body = body;
             this.IsLambda = isLambda;

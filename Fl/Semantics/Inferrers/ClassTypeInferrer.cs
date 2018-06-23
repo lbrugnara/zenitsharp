@@ -9,7 +9,16 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor inferrer, AstClassNode node)
         {
-            // TODO: Implement Class inferrer
+            inferrer.SymbolTable.EnterClassScope(node.Name.Value.ToString());
+
+            node.Properties.ForEach(propertyNode => propertyNode.Visit(inferrer));
+
+            node.Constants.ForEach(constantInfo => constantInfo.Visit(inferrer));
+
+            node.Methods.ForEach(methodInfo => methodInfo.Visit(inferrer));
+
+            inferrer.SymbolTable.LeaveScope();
+
             return new InferredType(inferrer.SymbolTable.Global.GetSymbol(node.Name.Value.ToString()).Type);
         }
     }

@@ -5,6 +5,7 @@ using Fl.Semantics;
 using Fl.Ast;
 using System.Linq;
 using Fl.Semantics.Types;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Checkers
 {
@@ -12,9 +13,15 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, AstClassMethodNode method)
         {
-            // TODO
-            var funcsym = checker.SymbolTable.GetSymbol(method.Name);
-            return new CheckedType(funcsym.Type, funcsym);
+            var methodSymbol = checker.SymbolTable.GetSymbol(method.Name);
+
+            checker.SymbolTable.EnterScope(ScopeType.Function, method.Name);
+
+            method.Body.ForEach(s => s.Visit(checker));
+
+            checker.SymbolTable.LeaveScope();
+
+            return new CheckedType(methodSymbol.Type, methodSymbol);
         }
     }
 }

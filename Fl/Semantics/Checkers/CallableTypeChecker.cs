@@ -14,10 +14,13 @@ namespace Fl.Semantics.Checkers
 
             node.Arguments.Expressions.ForEach(a => a.Visit(checker));
 
-            if (!(target.Type is Function))
-                throw new System.Exception($"Symbol {target.Symbol.Name} is not a function ({target.Type})");
+            if (target.Type is Function f1)
+                return new CheckedType(f1.Return);
 
-            return new CheckedType((target.Type as Function).Return);
+            if (target.Type is ClassMethod cm && cm.Type is Function f2)
+                return new CheckedType(f2.Return);
+
+            throw new System.Exception($"Symbol {target.Symbol.Name} is not a function ({target.Type})");
         }
     }
 }

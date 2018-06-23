@@ -13,10 +13,11 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, AstClassMethodNode method)
         {
-            var functionSymbol = visitor.SymbolTable.GetSymbol(method.Name);
-            Function functionType = functionSymbol.Type as Function;
+            // Get the method symbol and type
+            var methodSymbol = visitor.SymbolTable.GetSymbol(method.Name);
+            Function methodType = (methodSymbol.Type as ClassMethod).Type as Function;
 
-            // Enter the requested function's block
+            // Enter the requested method's block
             visitor.SymbolTable.EnterScope(ScopeType.Function, method.Name);
 
             // Grab all the parameters' symbols
@@ -27,12 +28,12 @@ namespace Fl.Semantics.Inferrers
             // Get the return symbol and assign a temporal type
             var retSymbol = visitor.SymbolTable.GetSymbol("@ret");
 
-            // Visit the function's body
+            // Visit the method's body
             var statements = method.Body.Select(s => (node: s, inferred: s.Visit(visitor))).ToList();
 
             if (method.IsLambda)
             {
-                // If there's a lambda, the return type should be already populated by the lambda's body expression
+                // If method is a lambda, the return type should be already populated by the lambda's body expression
                 // and that should be reflected on the @ret symbol
                 var lambdaReturnExpr = statements.Select(s => s.inferred).Last();
 
@@ -52,19 +53,19 @@ namespace Fl.Semantics.Inferrers
                 else if (returnTypes.Count() == 0)
                     visitor.Inferrer.MakeConclusion(Void.Instance, retSymbol.Type);
                 else
-                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes)}) in function {method.Name}");
+                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes)}) in method {method.Name}");
             }
 
-            // Leave the function's scope
+            // Leave the method's scope
             visitor.SymbolTable.LeaveScope();
 
-            // The inferred function type is a complex type, it might contain assumptions for parameters' types or return type
+            // The inferred method type is a complex type, it might contain assumptions for parameters' types or return type
             // if that is the case, make this inferred type an assumption
-            if (visitor.Inferrer.IsTypeAssumption(functionType))
-                visitor.Inferrer.AssumeSymbolTypeAs(functionSymbol, functionType);
+            if (visitor.Inferrer.IsTypeAssumption(methodType))
+                visitor.Inferrer.AssumeSymbolTypeAs(methodSymbol, methodType);
 
-            // Return inferred function type
-            return new InferredType(functionType, functionSymbol);
+            // Return inferred method type
+            return new InferredType(methodType, methodSymbol);
         }
     }
 }

@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Semantics.Exceptions;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
@@ -41,6 +42,9 @@ namespace Fl.Semantics.Inferrers
                 // If it is a variable definition, get the right-hand side type info
                 var rhs = declaration.Item2?.Visit(visitor);
 
+                if (visitor.Inferrer.IsTypeAssumption(lhs.Type) && rhs.Type == Null.Instance)
+                    throw new SymbolException($"Implicitly-typed variable '{lhs.Name}' needs to be initialized");
+
                 // Check types to see if we can unify them
                 visitor.Inferrer.MakeConclusion(lhs.Type, rhs.Type);
             }
@@ -58,6 +62,9 @@ namespace Fl.Semantics.Inferrers
             for (int i=0; i < vardestnode.Variables.Count; i++)
             {
                 var declaration = vardestnode.Variables[i];
+
+                if (declaration == null)
+                    continue;
 
                 // Symbol should be already resolved here
                 var lhs = visitor.SymbolTable.GetSymbol(declaration.Value.ToString());

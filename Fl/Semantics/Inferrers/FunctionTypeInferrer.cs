@@ -32,7 +32,7 @@ namespace Fl.Semantics.Inferrers
 
             if (funcdecl.IsLambda)
             {
-                // If there's a lambda, the return type should be already populated by the lambda's body expression
+                // If function is a lambda, the return type should be already populated by the lambda's body expression
                 // and that should be reflected on the @ret symbol
                 var lambdaReturnExpr = statements.Select(s => s.inferred).Last();
 

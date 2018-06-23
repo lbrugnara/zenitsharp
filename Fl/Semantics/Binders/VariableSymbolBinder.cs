@@ -25,12 +25,12 @@ namespace Fl.Semantics.Binders
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected void VarDefinitionNode(SymbolBinderVisitor visitor, AstVarDefinitionNode vardecl)
+        protected void VarDefinitionNode(SymbolBinderVisitor binder, AstVarDefinitionNode vardecl)
         {
             // Get the variable type from the declaration or assume an anonymous type
-            var lhsType = TypeHelper.FromToken(vardecl.VarType.Name) ?? visitor.Inferrer.NewAnonymousType();
+            var lhsType = SymbolHelper.GetType(binder.SymbolTable, vardecl.VarType.Name) ?? binder.Inferrer.NewAnonymousType();
 
-            var isAssumedType = visitor.Inferrer.IsTypeAssumption(lhsType);
+            var isAssumedType = binder.Inferrer.IsTypeAssumption(lhsType);
 
             foreach (var declaration in vardecl.VarDefinitions)
             {
@@ -38,18 +38,18 @@ namespace Fl.Semantics.Binders
                 var variableName = declaration.Item1.Value.ToString();
 
                 // Check if the symbol is already defined
-                if (visitor.SymbolTable.HasSymbol(variableName))
+                if (binder.SymbolTable.HasSymbol(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // Create the new symbol for the variable
-                var symbol = visitor.SymbolTable.NewSymbol(variableName, lhsType);
+                var symbol = binder.SymbolTable.NewSymbol(variableName, lhsType);
 
                 // If it is a type assumption, register the symbol under that assumption
                 if (isAssumedType)
-                    visitor.Inferrer.AssumeSymbolTypeAs(symbol, lhsType);
+                    binder.Inferrer.AssumeSymbolTypeAs(symbol, lhsType);
 
                 // If it is a variable definition, visit the right-hand side expression
-                declaration.Item2?.Visit(visitor);
+                declaration.Item2?.Visit(binder);
             }
         }
 
@@ -59,6 +59,9 @@ namespace Fl.Semantics.Binders
 
             foreach (var declaration in destrnode.Variables)
             {
+                if (declaration == null)
+                    continue;
+
                 // Get the identifier name
                 var variableName = declaration.Value.ToString();
 

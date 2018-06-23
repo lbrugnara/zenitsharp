@@ -52,6 +52,7 @@ namespace Fl.Syntax
             { "fn", TokenType.Function },
             { "package", TokenType.Package },
             { "new", TokenType.New },
+            { "static", TokenType.Static },
             { "private", TokenType.AccessModifier },
             { "protected", TokenType.AccessModifier },
             { "public", TokenType.AccessModifier }
@@ -61,18 +62,16 @@ namespace Fl.Syntax
 
         #region Constructor
 
-        public Lexer(string source)
+        public Lexer()
         {
-            this.source = source;
-            this.pointer = 0;
-            this.line = 1;
-            this.col = 0;
         }
 
         #endregion
 
-        public List<Token> Tokenize()
+        public List<Token> Tokenize(string source)
         {
+            this.source = source;
+
             this.Reset();
 
             var tokens = new List<Token>();

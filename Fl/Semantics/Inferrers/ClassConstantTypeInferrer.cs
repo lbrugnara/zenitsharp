@@ -9,8 +9,19 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor inferrer, AstClassConstantNode node)
         {
-            // TODO: Implement ClassConstant inferrer
-            return null;
+            // Get the constant symbol
+            var constant = inferrer.SymbolTable.GetSymbol(node.Name.Value.ToString());
+
+            // Get the inferred type of the right-hand side expression and make the conclusions
+            var defInferredType = node.Definition.Visit(inferrer);
+
+            // Use the ClassProperty.Type type in the inference process
+            inferrer.Inferrer.MakeConclusion((constant.Type as ClassProperty).Type, defInferredType.Type);
+
+            // TODO: By now return the ClassProperty, as the result does not need to be used,
+            // but if in the future we support multiple constant declaration, we need to review
+            // this, as we would want the ClassProperty.Type type
+            return new InferredType(constant.Type, constant);
         }
     }
 }

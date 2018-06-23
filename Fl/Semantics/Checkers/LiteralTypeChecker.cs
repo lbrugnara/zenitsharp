@@ -11,7 +11,7 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, AstLiteralNode literal)
         {
-            return new CheckedType(TypeHelper.FromToken(literal.Literal));
+            return new CheckedType(SymbolHelper.GetType(checker.SymbolTable, literal.Literal));
         }
     }
 }

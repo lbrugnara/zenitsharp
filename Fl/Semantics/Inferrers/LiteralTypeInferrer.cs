@@ -9,9 +9,9 @@ namespace Fl.Semantics.Inferrers
 {
     class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstLiteralNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstLiteralNode literal)
+        public InferredType Visit(TypeInferrerVisitor inferrer, AstLiteralNode literal)
         {
-            return new InferredType(TypeHelper.FromToken(literal.Literal));
+            return new InferredType(SymbolHelper.GetType(inferrer.SymbolTable, literal.Literal));
         }
     }
 }

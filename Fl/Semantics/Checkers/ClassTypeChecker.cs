@@ -7,7 +7,16 @@ namespace Fl.Semantics.Inferrers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, AstClassNode node)
         {
-            // TODO: Implement Class Checker
+            checker.SymbolTable.EnterClassScope(node.Name.Value.ToString());
+
+            node.Properties.ForEach(propertyNode => propertyNode.Visit(checker));
+
+            node.Constants.ForEach(constantInfo => constantInfo.Visit(checker));
+
+            node.Methods.ForEach(methodInfo => methodInfo.Visit(checker));
+
+            checker.SymbolTable.LeaveScope();
+
             return new CheckedType(checker.SymbolTable.Global.GetSymbol(node.Name.Value.ToString()).Type);
         }
     }

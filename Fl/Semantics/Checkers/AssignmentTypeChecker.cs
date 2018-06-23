@@ -12,8 +12,10 @@ namespace Fl.Semantics.Checkers
         {
             if (node is AstVariableAssignmentNode)
                 return MakeVariableAssignment(node as AstVariableAssignmentNode, checker);
+            if (node is AstDestructuringAssignmentNode)
+                return this.MakeDestructuringAssignment(node as AstDestructuringAssignmentNode, checker);
 
-            throw new AstWalkerException($"Invalid variable assifnment of type {node.GetType().FullName}");
+            throw new AstWalkerException($"Invalid variable assignment of type {node.GetType().FullName}");
         }
 
         private CheckedType MakeVariableAssignment(AstVariableAssignmentNode node, TypeCheckerVisitor checker)
@@ -22,11 +24,35 @@ namespace Fl.Semantics.Checkers
             var rightHandSide = node.Expression.Visit(checker);
 
             if (!leftHandSide.Type.IsAssignableFrom(rightHandSide.Type))
-                throw new System.Exception($"Cannot convert type {rightHandSide} to {leftHandSide}");
+                throw new System.Exception($"Cannot convert from {rightHandSide} to {leftHandSide}");
 
             leftHandSide.Symbol = null;
 
             return leftHandSide;
+        }
+
+        private CheckedType MakeDestructuringAssignment(AstDestructuringAssignmentNode node, TypeCheckerVisitor checker)
+        {
+            var tupleCheckedType = node.Variables.Visit(checker);
+            var exprCheckedType = node.Expression.Visit(checker);
+
+            var tupleTypes = tupleCheckedType.Type as Tuple;
+            var exprTypes = exprCheckedType.Type as Tuple;
+
+            for (int i = 0; i < tupleTypes.Count; i++)
+            {
+                var varType = tupleTypes.Types[i];
+
+                if (varType == null)
+                    continue;
+
+                var exprType = exprTypes.Types[i];
+
+                if (!varType.IsAssignableFrom(exprType))
+                    throw new System.Exception($"Cannot convert from {varType} to {exprType}");
+            }
+
+            return exprCheckedType;
         }
     }
 }

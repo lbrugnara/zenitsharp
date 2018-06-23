@@ -4,12 +4,30 @@
 using Fl.Semantics.Types;
 using Fl.Syntax;
 using Fl.Semantics.Exceptions;
+using System;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Types
 {
-    public class TypeHelper
+    public class SymbolHelper
     {
-        internal static Type FromToken(Token token)
+        internal static AccessModifier GetAccessModifier(Token token)
+        {
+            if (token == null)
+                return AccessModifier.Public;
+
+            return System.Enum.Parse<AccessModifier>(token.Value.ToString(), true);
+        }
+
+        internal static StorageType GetStorageType(Token token, StorageType def = StorageType.Var)
+        {
+            if (token == null)
+                return def;
+
+            return System.Enum.Parse<StorageType>(token.Value.ToString(), true);
+        }
+
+        internal static Type GetType(SymbolTable symtable, Token token)
         {
             if (token.Type == TokenType.Identifier)
             {
@@ -39,8 +57,7 @@ namespace Fl.Semantics.Types
                 else if (val == Null.Instance.ToString())
                     return Null.Instance;
 
-                // TODO: Fix this once custom types are implemented
-                throw new SymbolException($"Unrecognized identifier {token.Type}");
+                return symtable.GetSymbol(val).Type;
             }
 
             switch (token.Type)

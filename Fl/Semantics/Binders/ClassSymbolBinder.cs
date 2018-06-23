@@ -9,18 +9,28 @@ namespace Fl.Semantics.Binders
     {
         public void Visit(SymbolBinderVisitor binder, AstClassNode node)
         {
-            var classType = new Class();
-
             // Define the class in the global scope
+            var classType = new Class();
             var classSymbol = binder.SymbolTable.Global.NewSymbol(node.Name.Value.ToString(), classType);
 
             binder.SymbolTable.EnterClassScope(classSymbol.Name);
 
-            node.Properties.ForEach(propertyNode => propertyNode.Visit(binder));
+            node.Properties.ForEach(propertyNode => {
+                propertyNode.Visit(binder);
+                var propertyName = propertyNode.Name.Value.ToString();
+                classType.Properties[propertyName] = binder.SymbolTable.GetSymbol(propertyName).Type as ClassProperty ?? throw new System.Exception($"Property type is not {typeof(ClassProperty).FullName}");
+            });
 
-            node.Constants.ForEach(constantInfo => constantInfo.Visit(binder));
+            node.Constants.ForEach(constantNode => {
+                constantNode.Visit(binder);
+                var constantName = constantNode.Name.Value.ToString();
+                classType.Properties[constantName] = binder.SymbolTable.GetSymbol(constantName).Type as ClassProperty ?? throw new System.Exception($"Constant type is not {typeof(ClassProperty).FullName}");
+            });
 
-            node.Methods.ForEach(methodInfo => methodInfo.Visit(binder));
+            node.Methods.ForEach(methodNode => {
+                methodNode.Visit(binder);
+                classType.Methods[methodNode.Name] = binder.SymbolTable.GetSymbol(methodNode.Name).Type as ClassMethod ?? throw new System.Exception($"Method type is not {typeof(ClassMethod).FullName}");
+            });
 
             binder.SymbolTable.LeaveScope();
         }

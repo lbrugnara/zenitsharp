@@ -541,26 +541,20 @@ namespace Fl.Syntax
             var constants = new List<AstClassConstantNode>();
             var methods = new List<AstClassMethodNode>();
 
-            while (true)
+            while (!this.Match(TokenType.RightBrace))
             {
-                Token accessModifier = null;
-
-                if (this.Match(TokenType.AccessModifier))
-                    accessModifier = this.Consume();
-
                 if (this.IsClassPropertyDeclaration())
                 {
-                    properties.Add(this.ClassProperty(accessModifier));
+                    properties.Add(this.ClassProperty());
                 }
-                else if (this.Match(TokenType.Constant))
+                else if (this.IsClassConstantDeclaration())
                 {
-                    constants.Add(this.ClassConstant(accessModifier));
+                    constants.Add(this.ClassConstant());
                 }
-                else if (this.Match(TokenType.Function))
+                else if (this.IsClassMethodDeclaration())
                 {
-                    methods.Add(this.ClassMethod(accessModifier));
+                    methods.Add(this.ClassMethod());
                 }
-                else break;
             }
 
             this.Consume(TokenType.RightBrace);
@@ -571,9 +565,15 @@ namespace Fl.Syntax
         // Rule: (TODO: getter and setter for class_property, because of that the class_field indirection)
         // class_property -> class_field
         //
-        // class_field -> access_modifier? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
-        private AstClassPropertyNode ClassProperty(Token accessModifier)
+        // class_field -> access_modifier? 'static'? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
+        private AstClassPropertyNode ClassProperty()
         {
+            // Check access modifier
+            Token accessModifier = this.Match(TokenType.AccessModifier) ? this.Consume() : null;
+
+            // Check static modifier
+            Token staticModifier = this.Match(TokenType.Static) ? this.Consume() : null;
+
             // Get the variable type
             Token varType = this.Consume(TokenType.Identifier);
             AstTypeNode variableType = new AstTypeNode(varType);
@@ -600,13 +600,16 @@ namespace Fl.Syntax
             this.Consume(TokenType.Semicolon);
 
             // If not, it is a simple typed var definition
-            return new AstClassPropertyNode(name, accessModifier, variableType, definition);
+            return new AstClassPropertyNode(name, accessModifier, staticModifier, variableType, definition);
         }
 
         // Rule:
         // class_constant -> access_modifier? 'const' IDENTIFIER IDENTIFIER '=' expression ';'
-        private AstClassConstantNode ClassConstant(Token accessModifier)
+        private AstClassConstantNode ClassConstant()
         {
+            // Check access modifier
+            Token accessModifier = this.Match(TokenType.AccessModifier) ? this.Consume() : null;
+
             // Consume the keyword
             this.Consume(TokenType.Constant);
 
@@ -623,9 +626,15 @@ namespace Fl.Syntax
         }
 
         // Rule:
-        // class_method -> access_modifier? func_declaration
-        private AstClassMethodNode ClassMethod(Token accessModifier)
+        // class_method -> access_modifier? 'static'? func_declaration
+        private AstClassMethodNode ClassMethod()
         {
+            // Check access modifier
+            Token accessModifier = this.Match(TokenType.AccessModifier) ? this.Consume() : null;
+
+            // Check static modifier
+            Token staticModifier = this.Match(TokenType.Static) ? this.Consume(TokenType.Static) : null;
+
             this.Consume(TokenType.Function);
 
             Token name = this.Consume(TokenType.Identifier);
@@ -641,7 +650,7 @@ namespace Fl.Syntax
                 // RightArrow followed by brace doesn't make sense here, expression is the only accepted node
                 this.Consume(TokenType.RightArrow);
 
-                var f = new AstClassMethodNode(name, accessModifier, parameters, new List<AstNode>() { this.Expression() }, true);
+                var f = new AstClassMethodNode(name, accessModifier, staticModifier, parameters, new List<AstNode>() { this.Expression() }, true);
 
                 if (this.Match(TokenType.Semicolon))
                     this.Consume(TokenType.Semicolon);
@@ -657,7 +666,7 @@ namespace Fl.Syntax
             }
             this.Consume(TokenType.RightBrace);
 
-            return new AstClassMethodNode(name, accessModifier, parameters, decls, false);
+            return new AstClassMethodNode(name, accessModifier, staticModifier, parameters, decls, false);
         }
 
         // Rule:
@@ -1447,18 +1456,49 @@ namespace Fl.Syntax
 
         private bool IsClassPropertyDeclaration()
         {
-            if (this.Match(TokenType.Identifier))
+            int offset = 0;
+
+            if (this.Match(TokenType.AccessModifier))
+                offset++;
+
+            if (this.MatchFrom(offset ,TokenType.Static))
+                offset++;
+
+            if (this.MatchFrom(offset, TokenType.Identifier))
             {
                 // identifier identifier ( '=' expression )?
-                if (this.MatchFrom(1, TokenType.Identifier))
+                if (this.MatchFrom(offset+1, TokenType.Identifier))
                     return true;
 
                 // identifier ( '[' ']' )+ identifier ( '=' expression )?
-                int dimensions = this.CountRepeatedMatchesFrom(1, TokenType.LeftBracket, TokenType.RightBracket);
-                return dimensions > 0 && this.MatchFrom(dimensions + 1, TokenType.Identifier);
+                int dimensions = this.CountRepeatedMatchesFrom(offset + 1, TokenType.LeftBracket, TokenType.RightBracket);
+                return dimensions > 0 && this.MatchFrom(dimensions + offset + 1, TokenType.Identifier);
             }
 
             return false;
+        }
+
+        private bool IsClassConstantDeclaration()
+        {
+            int offset = 0;
+
+            if (this.Match(TokenType.AccessModifier))
+                offset++;
+
+            return this.MatchFrom(offset, TokenType.Constant);
+        }
+
+        private bool IsClassMethodDeclaration()
+        {
+            int offset = 0;
+
+            if (this.Match(TokenType.AccessModifier))
+                offset++;
+
+            if (this.MatchFrom(offset, TokenType.Static))
+                offset++;
+
+            return this.MatchFrom(offset, TokenType.Function);
         }
 
         private bool IsVarDeclaration()
@@ -1505,7 +1545,7 @@ namespace Fl.Syntax
                 for (int i=0; i < this.tokens.Count; i++)
                 {
                     var t = this.PeekFrom(i);
-                    if (t == null || t.Type == TokenType.Assignment)
+                    if (t == null || t.Type == TokenType.Assignment || t.Type == TokenType.Semicolon)
                         break;
                     if (t.Type == TokenType.Comma)
                         return true;

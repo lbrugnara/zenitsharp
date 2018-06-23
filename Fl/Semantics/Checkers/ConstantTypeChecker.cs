@@ -4,6 +4,7 @@
 using Fl.Semantics;
 using Fl.Ast;
 using Fl.Semantics.Types;
+using Fl.Semantics.Exceptions;
 
 namespace Fl.Semantics.Checkers
 {
@@ -22,7 +23,7 @@ namespace Fl.Semantics.Checkers
                 var rhsType = declaration.Item2.Visit(checker);
 
                 if (!lhsType.Type.IsAssignableFrom(rhsType.Type))
-                    throw new System.Exception($"Cannot convert {rhsType.Type} to {lhsType.Type}");
+                    throw new SymbolException($"Cannot assign type {rhsType.Type} to constant of type {lhsType.Type}");
 
             }
 

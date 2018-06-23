@@ -6,6 +6,8 @@ using Fl.Ast;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
 using Fl.Semantics;
+using System;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
@@ -19,17 +21,38 @@ namespace Fl.Semantics.Inferrers
             // If the inferred type is an anonymous type, it means the target symbol's type has not
             // been defined yet, we need to infer the function type
             if (inferredInfo.Type is Anonymous)
-                return this.CallableAnonymous(visitor, node, inferredInfo);
+                return this.InferFromAnonymousCall(visitor, node, inferredInfo);
 
             // If the inferred type is a Function, we have more information about the target, we can infer
             // both parameter and arguments types
             if (inferredInfo.Type is Function)
-                    return this.CallableFunction(visitor, node, inferredInfo);
+                return this.InferFromFunctionCall(visitor, node, inferredInfo.Type as Function);
+
+            if (inferredInfo.Type is ClassMethod cm)
+            {
+                if (cm.StorageType != StorageType.Static)
+                    throw new System.Exception($"An object is required to call non-static method {inferredInfo.Symbol}");
+
+                return this.InferFromFunctionCall(visitor, node, cm.Type as Function);
+            }
+
+            if (inferredInfo.Type is Class c)
+                return this.InferFromConstructorCall(visitor, node, inferredInfo);
 
             throw new System.Exception($"Cannot invoke a non-function object");
         }
 
-        private InferredType CallableAnonymous(TypeInferrerVisitor visitor, AstCallableNode node, InferredType inferred)
+        private InferredType InferFromConstructorCall(TypeInferrerVisitor visitor, AstCallableNode node, InferredType inferredInfo)
+        {
+            Class classType = inferredInfo.Type as Class;
+
+            var classScope = visitor.SymbolTable.Global.GetNestedScope(ScopeType.Class, inferredInfo.Symbol.Name);
+
+            // TODO: Implement ClassInstance
+            return inferredInfo;                
+        }
+
+        private InferredType InferFromAnonymousCall(TypeInferrerVisitor visitor, AstCallableNode node, InferredType inferred)
         {
             // The function we need to infer here is a Function type
             Function funcType = new Function();
@@ -57,11 +80,8 @@ namespace Fl.Semantics.Inferrers
             return new InferredType(rettype);
         }
 
-        private InferredType CallableFunction(TypeInferrerVisitor visitor, AstCallableNode node, InferredType inferred)
+        private InferredType InferFromFunctionCall(TypeInferrerVisitor visitor, AstCallableNode node, Function funcType)
         {
-            // It is always a Function type
-            var funcType = inferred.Type as Function;
-
             // Check parameters count
             // TODO: This is not needed to be here
             if (funcType.Parameters.Count != node.Arguments.Expressions.Count)

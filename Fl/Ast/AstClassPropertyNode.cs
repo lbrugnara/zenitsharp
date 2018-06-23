@@ -9,13 +9,15 @@ namespace Fl.Ast
     {
         public Token Name { get; }
         public Token AccessModifier { get; }
+        public Token StorageType { get; }
         public AstTypeNode Type { get; }
         public AstNode Definition { get; }
 
-        public AstClassPropertyNode(Token name, Token accessModifier, AstTypeNode type, AstNode definition)
+        public AstClassPropertyNode(Token name, Token accessModifier, Token storageModifier, AstTypeNode type, AstNode definition)
         {
             this.Name = name;
             this.AccessModifier = accessModifier;
+            this.StorageType = storageModifier;
             this.Type = type;
             this.Definition = definition;
         }

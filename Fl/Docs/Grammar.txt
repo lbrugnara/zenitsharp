@@ -65,13 +65,13 @@ class_body -> class_property
 class_property -> class_field
 				;
 
-class_field -> access_modifier? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
+class_field -> access_modifier? 'static'? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
 			;
 
 class_constant -> access_modifier? 'const' IDENTIFIER IDENTIFIER '=' expression ';'
 				;
 
-class_method ->  access_modifier? func_declaration
+class_method ->  access_modifier? 'static'? func_declaration
 			 ;
 
 (* Statements *)

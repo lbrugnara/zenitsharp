@@ -2,7 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
@@ -12,9 +11,11 @@ namespace Fl.Semantics.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, AstAssignmentNode node)
         {
             if (node is AstVariableAssignmentNode)
-                return MakeVariableAssignment(node as AstVariableAssignmentNode, visitor);
+                return this.MakeVariableAssignment(node as AstVariableAssignmentNode, visitor);
+            if (node is AstDestructuringAssignmentNode)
+                return this.MakeDestructuringAssignment(node as AstDestructuringAssignmentNode, visitor);
 
-            throw new AstWalkerException($"Invalid variable assifnment of type {node.GetType().FullName}");
+            throw new AstWalkerException($"Invalid variable assignment of type {node.GetType().FullName}");
         }
 
         private InferredType MakeVariableAssignment(AstVariableAssignmentNode node, TypeInferrerVisitor visitor)
@@ -24,6 +25,29 @@ namespace Fl.Semantics.Inferrers
 
             // Make conclusions about the types if possible
             return new InferredType(visitor.Inferrer.MakeConclusion(leftHandSide.Type, rightHandSide.Type));
+        }
+
+        private InferredType MakeDestructuringAssignment(AstDestructuringAssignmentNode node, TypeInferrerVisitor visitor)
+        {
+            var tupleInferredType = node.Variables.Visit(visitor);
+            var exprInferredType = node.Expression.Visit(visitor);
+
+            var tupleTypes = tupleInferredType.Type as Tuple;
+            var exprTypes = exprInferredType.Type as Tuple;
+
+            for (int i=0; i < tupleTypes.Count; i++)
+            {
+                var varType = tupleTypes.Types[i];
+
+                if (varType == null)
+                    continue;
+
+                var exprType = exprTypes.Types[i];
+
+                visitor.Inferrer.MakeConclusion(varType, exprType);
+            }
+
+            return exprInferredType;
         }
     }
 }

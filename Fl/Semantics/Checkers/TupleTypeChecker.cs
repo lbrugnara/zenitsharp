@@ -11,8 +11,7 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, AstTupleNode node)
         {
-            var types = node.Items?.Select(i => i.Visit(checker).Type);
-            // TODO: Handle tuple type
+            var types = node.Items?.Select(i => i?.Visit(checker)?.Type);
             return new CheckedType(new Tuple(types.ToArray()));
         }
     }

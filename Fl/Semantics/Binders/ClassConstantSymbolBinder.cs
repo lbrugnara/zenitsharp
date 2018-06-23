@@ -18,7 +18,8 @@ namespace Fl.Semantics.Binders
                 throw new SymbolException($"Symbol {constantName} is already defined.");
 
             // Get the constant type from the declaration or assume an anonymous type
-            var lhsType = TypeHelper.FromToken(node.Type) ?? binder.Inferrer.NewAnonymousType();
+            var type = SymbolHelper.GetType(binder.SymbolTable, node.Type) ?? binder.Inferrer.NewAnonymousType();
+            var lhsType = new ClassProperty(type, SymbolHelper.GetAccessModifier(node.AccessModifier), StorageType.Const);
 
             // Create the new symbol for the property
             var symbol = binder.SymbolTable.NewSymbol(constantName, lhsType);
