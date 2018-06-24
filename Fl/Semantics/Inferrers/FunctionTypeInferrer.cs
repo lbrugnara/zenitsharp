@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Fl.Semantics.Inferrers
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
 
-            parametersSymbols.AddRange(funcdecl.Parameters.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Value.ToString())));
+            parametersSymbols.AddRange(funcdecl.Parameters.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value.ToString())));
 
             // Get the return symbol and assign a temporal type
             var retSymbol = visitor.SymbolTable.GetSymbol("@ret");
@@ -36,23 +37,11 @@ namespace Fl.Semantics.Inferrers
                 // and that should be reflected on the @ret symbol
                 var lambdaReturnExpr = statements.Select(s => s.inferred).Last();
 
+                if (lambdaReturnExpr.Type is Function f && f.Return == functionType.Return)
+                    throw new SymbolException("The function can not be returned to itself");
+
                 // Try to unify these types
                 visitor.Inferrer.MakeConclusion(lambdaReturnExpr.Type, retSymbol.Type);
-            }
-            else
-            {
-                // If it has a body, get all the AstReturnNode, and check that all the returned types are same
-                // TODO: This needs to get the common ancestor type (union)
-                var returnTypesNode = statements.Where(t => t.node is AstReturnNode).ToList();
-
-                var returnTypes = returnTypesNode.Select(t => t.inferred).Distinct().ToList();
-
-                if (returnTypes.Count() == 1)
-                    visitor.Inferrer.MakeConclusion(returnTypes.First().Type, retSymbol.Type);
-                else if (returnTypes.Count() == 0)
-                    visitor.Inferrer.MakeConclusion(Void.Instance, retSymbol.Type);
-                else
-                    throw new System.Exception($"Unexpected multiple return types ({string.Join(", ", returnTypes)}) in function {funcdecl.Name}");
             }
 
             // Leave the function's scope

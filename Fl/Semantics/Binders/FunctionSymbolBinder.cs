@@ -23,21 +23,18 @@ namespace Fl.Semantics.Binders
 
             // Process the parameters
             funcdecl.Parameters.Parameters.ForEach(p => {
+                // Define the symbol in the current scope (method's scope)
+                var type = p.SymbolInfo.Type == null ? visitor.Inferrer.NewAnonymousType() : SymbolHelper.GetType(visitor.SymbolTable, p.SymbolInfo.Type);
 
-                // TODO: Type hinting needs to change this
-                // By now, function's parameters are just declared
-                // without type, assume anonymous types for all of them,
-                // create their symbols and define them in the current scope 
-                // (function's scope)
-                var type = visitor.Inferrer.NewAnonymousType();
-
-                // Update the function's type
+                // Update the method's type
                 funcType.DefineParameterType(type);
 
-                // Define the symbol in the current scope (function's scope)
-                // TODO: Fix storage once parameters support storage modification
-                var symbol = new Symbol(p.Value.ToString(), type, Access.Public, Storage.Immutable);
-                visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);
+                var storage = SymbolHelper.GetStorage(p.SymbolInfo.Mutability);
+                var symbol = new Symbol(p.Name.Value.ToString(), type, Access.Public, storage);
+
+                if (visitor.Inferrer.IsTypeAssumption(type))
+                    visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);
+
                 visitor.SymbolTable.AddSymbol(symbol);
             });
 

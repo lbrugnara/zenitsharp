@@ -15,7 +15,7 @@ namespace Fl.IL.Generators
         public Operand Visit(ILGenerator generator, AstFunctionNode funcdecl)
         {
             generator.PushFragment(funcdecl.Name, FragmentType.Function);
-            funcdecl.Parameters.Parameters.ForEach(p => generator.Emmit(new LocalInstruction(generator.SymbolTable.NewSymbol(p.Value.ToString(), OperandType.Auto))));
+            funcdecl.Parameters.Parameters.ForEach(p => generator.Emmit(new LocalInstruction(generator.SymbolTable.NewSymbol(p.Name.Value.ToString(), OperandType.Auto))));
             funcdecl.Body.ForEach(s => s.Visit(generator));
             if (!funcdecl.Body.Any(n => n is AstReturnNode))
                 generator.Emmit(new ReturnInstruction());

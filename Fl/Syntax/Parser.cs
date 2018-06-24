@@ -391,7 +391,7 @@ namespace Fl.Syntax
         }
 
         // Rule: 
-        // typed_var_definition -> IDENTIFIER ( '=' expression ( ',' typed_var_definition )* )?
+        // typed_var_definition -> IDENTIFIER ( '=' expression )? ( ',' typed_var_definition )*
         private List<Tuple<Token, AstNode>> TypedVarDefinition()
         {
             List<Tuple<Token, AstNode>> vars = new List<Tuple<Token, AstNode>>();
@@ -473,7 +473,7 @@ namespace Fl.Syntax
         }
 
         // Rule:
-        // func_declaration -> 'fn' IDENTIFIER ( '(' func_params? ')' '{' declaration* '}' | ( '(' func_params? ')' )? '=>' expression )
+        // func_declaration -> 'fn' IDENTIFIER '(' func_params? ')' ( '{' declaration* '}' | '=>' expression )
         private AstFunctionNode FuncDeclaration()
         {
             this.Consume(TokenType.Function);
@@ -482,20 +482,16 @@ namespace Fl.Syntax
 
             AstParametersNode parameters = null;
 
-            // If it is not a lambda function, the '(' func_params? ')' part is required
-            if (this.Peek().Type != TokenType.RightArrow)
-            {
-                this.Consume(TokenType.LeftParen);
-                parameters = this.FuncParameters();
-                this.Consume(TokenType.RightParen);
-            }
+            this.Consume(TokenType.LeftParen);
+            parameters = this.FuncParameters();
+            this.Consume(TokenType.RightParen);
 
             if (this.Peek().Type == TokenType.RightArrow)
             {
                 // RightArrow followed by brace doesn't make sense here, expression is the only accepted node
                 this.Consume(TokenType.RightArrow);
 
-                var f = new AstFunctionNode(name, parameters ?? new AstParametersNode(new List<Token>()), new List<AstNode>() { this.Expression() }, false, true);
+                var f = new AstFunctionNode(name, parameters ?? new AstParametersNode(new List<Parameter>()), new List<AstNode>() { this.Expression() }, false, true);
 
                 if (this.Match(TokenType.Semicolon))
                     this.Consume(TokenType.Semicolon);
@@ -515,17 +511,30 @@ namespace Fl.Syntax
         }
 
         // Rule:
-        // func_params -> IDENTIFIER ( "," IDENTIFIER )*
+        // func_params -> func_param_declaration ( ',' func_param_declaration )*
         private AstParametersNode FuncParameters()
         {
-            List<Token> parameters = new List<Token>();
-            while (this.Match(TokenType.Identifier))
+            var parameters = new List<Parameter>();
+            while (this.MatchAny(TokenType.Mutable, TokenType.Identifier))
             {
-                parameters.Add(this.Consume(TokenType.Identifier));
+                parameters.Add(this.FuncParameter());
                 if (this.Match(TokenType.Comma))
                     this.Consume();
             }
             return new AstParametersNode(parameters);
+        }
+
+        // Rule:
+        // func_param_declaration -> 'mut'? IDENTIFIER? IDENTIFIER
+        //private 
+        private Parameter FuncParameter()
+        {
+            Token mutability = this.Match(TokenType.Mutable) ? this.Consume() : null;
+            // The type is present if we find IDENTIFIER IDENTIFIER
+            Token type = this.PeekFrom(1).Type != TokenType.Identifier ? null : this.Consume();
+            Token name = this.Consume(TokenType.Identifier);
+
+            return new Parameter(name, new SymbolInformation(type, mutability, null));
         }
 
         // Rule:
@@ -1002,15 +1011,16 @@ namespace Fl.Syntax
         {
             AstParametersNode lambdaParams = this.LambdaParams();
             var arrow = this.Consume(TokenType.RightArrow);
-            AstNode expr = this.Match(TokenType.LeftBrace) ? this.Block() : this.Expression();
-            return new AstFunctionNode(arrow, lambdaParams, new List<AstNode>() { expr }, true, true);
+            var isBlock = this.Match(TokenType.LeftBrace);
+            AstNode expr = isBlock ? this.Block() : this.Expression();
+            return new AstFunctionNode(arrow, lambdaParams, new List<AstNode>() { expr }, true, !isBlock);
         }
 
         // Rule:
         // lambda_params -> '(' func_params ')' | func_params
         private AstParametersNode LambdaParams()
         {
-            List<Token> parameters = new List<Token>();
+            var parameters = new List<Parameter>();
 
             // Lambda params could be wrapped between parenthesis
             bool parenthesis = false;
@@ -1022,9 +1032,9 @@ namespace Fl.Syntax
             }
 
             // Consume the identifiers separated by commas
-            while (this.Match(TokenType.Identifier))
+            while (this.MatchAny(TokenType.Mutable, TokenType.Identifier))
             {
-                parameters.Add(this.Consume(TokenType.Identifier));
+                parameters.Add(this.FuncParameter());
                 if (this.Match(TokenType.Comma))
                     this.Consume();
             }
@@ -1160,7 +1170,7 @@ namespace Fl.Syntax
             }
 
             // Try to parse a lambda expression
-            if (this.MatchLambda())
+            if (this.IsLambdaExpression())
                 return this.LambdaExpression();
 
             if (this.IsDestructuring())
@@ -1525,7 +1535,7 @@ namespace Fl.Syntax
             if (this.MatchFrom(offset, TokenType.Identifier))
             {
                 // identifier identifier ( '=' expression )?
-                if (this.MatchFrom(offset + 1, TokenType.Identifier))
+                if (this.MatchFrom(offset + 1, TokenType.Identifier) && this.MatchAnyFrom(offset + 2, TokenType.Assignment, TokenType.Semicolon))
                     return true;
 
                 // identifier ( '[' ']' )+ identifier ( '=' expression )?
@@ -1566,8 +1576,22 @@ namespace Fl.Syntax
                 && this.MatchAnyFrom(1, TokenType.Dot, TokenType.LeftParen, TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign);
         }
 
-        private bool MatchLambda()
+        private bool IsLambdaExpression()
         {
+            if (this.Match(TokenType.RightArrow))
+                return true;
+
+            bool needsParent = this.Match(TokenType.LeftParen);
+            int offset = needsParent ? 1 : 0;
+
+            while (this.MatchAnyFrom(offset, TokenType.Mutable, TokenType.Identifier, TokenType.Comma))
+                offset++;
+
+            if (needsParent && this.MatchFrom(offset, TokenType.RightParen))
+                offset++;
+
+            return this.MatchFrom(offset, TokenType.RightArrow);
+
             // =>
             bool arrow = this.Match(TokenType.RightArrow);
             // a =>

@@ -5,6 +5,7 @@ using Fl.Semantics.Exceptions;
 using Fl.Ast;
 using Fl.Semantics.Types;
 using System.Linq;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
@@ -15,28 +16,36 @@ namespace Fl.Semantics.Inferrers
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-//            var ret = visitor.SymbolTable.GetSymbol("@ret");
+            var returnSymbol = visitor.SymbolTable.GetSymbol("@ret");
+
+            Type type = null;
+            Symbol symbol = null;
+
+            var returnInferredType = rnode.ReturnTuple?.Visit(visitor);
 
             // void
-            if (rnode.ReturnTuple == null)
-                return new InferredType(Void.Instance);
+            if (returnInferredType == null)
+                type = Void.Instance;
+            else
+                type = returnInferredType?.Type;
 
-            var tupleType = rnode.ReturnTuple.Visit(visitor);
-
-            if (tupleType.Symbol != null)
-                return tupleType;
-
-            // Literal tuple
-            var tupleTypes = (tupleType.Type as Tuple).Types;
+            symbol = returnInferredType?.Symbol;
 
             // Just one lement is like
             //  return 1;
             //  return 2;
             //  etc
-            if (tupleTypes.Count == 1)
-                return new InferredType(tupleTypes.First());
+            if ((type is Tuple t) && t.Types.Count == 1)
+                type = t.Types.First();
 
-            return tupleType;
+            var callingFunctionType = visitor.SymbolTable.CurrentScope.Parent.GetSymbol(visitor.SymbolTable.CurrentScope.Uid).Type as Function;
+
+            if (type is Function f && f.Return == callingFunctionType.Return)
+                throw new SymbolException("The function can not be returned to itself");
+
+            visitor.Inferrer.MakeConclusion(type, returnSymbol.Type);
+
+            return new InferredType(type, symbol);
         }
     }
 }

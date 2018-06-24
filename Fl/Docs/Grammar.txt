@@ -16,13 +16,15 @@ declaration	-> func_declaration
 
 
 (* Function *)
-func_declaration -> 'fn' IDENTIFIER ( '(' func_params? ')' '{' declaration* '}' | ( '(' func_params? ')' )? '=>' expression )
+func_declaration -> 'fn' IDENTIFIER '(' func_params? ')' ( '{' declaration* '}' | '=>' expression )
                  ;
 
 
-func_params -> IDENTIFIER ( ',' IDENTIFIER )*
+func_params -> func_param_declaration ( ',' func_param_declaration )*
             ;
 
+func_param_declaration -> 'mut'? IDENTIFIER? IDENTIFIER
+					    ;
 
 (* Variable Declaration *)
 variable_declaration -> 'mut'? ( implicit_var_declaration | typed_var_declaration )
