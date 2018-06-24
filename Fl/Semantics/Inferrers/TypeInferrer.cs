@@ -127,12 +127,6 @@ namespace Fl.Semantics.Inferrers
             if (t is Tuple tt)
                 return tt.Types.Any(this.IsTypeAssumption);
 
-            if (t is ClassProperty cp)
-                return this.IsTypeAssumption(cp.Type);
-
-            if (t is ClassMethod cm)
-                return this.IsTypeAssumption(cm.Type);
-
             // TODO: This may change based on the Class type
             if (t is Class c)
                 return false;
@@ -175,14 +169,6 @@ namespace Fl.Semantics.Inferrers
             else if (type is Tuple t)
             {
                 t.Types.ToList().ForEach(paramType => this.AssumeSymbolTypeAs(symbol, paramType));
-            }
-            else if (type is ClassProperty cp)
-            {
-                this.AssumeSymbolTypeAs(symbol, cp.Type);
-            }
-            else if (type is ClassMethod cm)
-            {
-                this.AssumeSymbolTypeAs(symbol, cm.Type);
             }
             else
             {
@@ -229,10 +215,6 @@ namespace Fl.Semantics.Inferrers
                 this.UpdateFunctionType(f, prevType, newType);
             else if (complexType is Tuple tu)
                 this.UpdateTupleType(tu, prevType, newType);
-            else if (complexType is ClassProperty cp)
-                this.UpdateClassPropertyType(cp, prevType, newType);
-            else if (complexType is ClassMethod cm)
-                this.UpdateFunctionType(cm.Type, prevType, newType);
         }
 
         /// <summary>
@@ -277,14 +259,6 @@ namespace Fl.Semantics.Inferrers
                 else if (t.Types[i] == prevType)
                     t.Types[i] = newType;
             }
-        }
-
-        private void UpdateClassPropertyType(ClassProperty cp, Anonymous prevType, Type newType)
-        {
-            if (this.IsComplexType(cp.Type))
-                this.UpdateComplexType(cp.Type, prevType, newType);
-            else
-                cp.SetType(newType);
         }
 
         /// <summary>

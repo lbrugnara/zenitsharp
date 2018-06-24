@@ -12,25 +12,27 @@ namespace Fl.Semantics.Binders
             // Define the class in the global scope
             var className = node.Name.Value.ToString();
             var classType = new Class(className);
-            var classSymbol = binder.SymbolTable.Global.NewSymbol(className, classType);
+            var classSymbol = binder.SymbolTable.Global.NewSymbol(className, classType, Access.Public, Storage.Constant);
 
             binder.SymbolTable.EnterClassScope(classSymbol.Name);
 
             node.Properties.ForEach(propertyNode => {
                 propertyNode.Visit(binder);
                 var propertyName = propertyNode.Name.Value.ToString();
-                classType.Properties[propertyName] = binder.SymbolTable.GetSymbol(propertyName).Type as ClassProperty ?? throw new System.Exception($"Property type is not {typeof(ClassProperty).FullName}");
+                classType.Properties[propertyName] = binder.SymbolTable.GetSymbol(propertyName).Type;
             });
 
             node.Constants.ForEach(constantNode => {
                 constantNode.Visit(binder);
                 var constantName = constantNode.Name.Value.ToString();
-                classType.Properties[constantName] = binder.SymbolTable.GetSymbol(constantName).Type as ClassProperty ?? throw new System.Exception($"Constant type is not {typeof(ClassProperty).FullName}");
+                classType.Properties[constantName] = binder.SymbolTable.GetSymbol(constantName).Type;
             });
 
             node.Methods.ForEach(methodNode => {
                 methodNode.Visit(binder);
-                classType.Methods[methodNode.Name] = binder.SymbolTable.GetSymbol(methodNode.Name).Type as ClassMethod ?? throw new System.Exception($"Method type is not {typeof(ClassMethod).FullName}");
+                var method = binder.SymbolTable.GetSymbol(methodNode.Name).Type as Method ?? throw new System.Exception($"Method type is not {typeof(Function).FullName}");
+                method.SetDefiningClass(classType);
+                classType.Methods[methodNode.Name] = method;
             });
 
             binder.SymbolTable.LeaveScope();

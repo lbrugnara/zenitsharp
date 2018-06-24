@@ -1,5 +1,6 @@
 ﻿using Fl.Ast;
 using Fl.Semantics.Exceptions;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 using System;
 using System.Collections.Generic;
@@ -17,15 +18,13 @@ namespace Fl.Semantics.Binders
             if (binder.SymbolTable.HasSymbol(propertyName))
                 throw new SymbolException($"Symbol {propertyName} is already defined.");
 
-            // Get the property type, access modifier, and storage type
-            var type = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, node.Type.Name);
-            var accessMod = SymbolHelper.GetAccessModifier(node.AccessModifier);
-
             // Create the property type
-            var propertyType = new ClassProperty(type, accessMod, StorageType.Variable);
+            var propertyType = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, node.SymbolInfo.Type);
 
             // Create the new symbol for the property
-            var symbol = binder.SymbolTable.NewSymbol(propertyName, propertyType);
+            var access = SymbolHelper.GetAccess(node.SymbolInfo.Access);
+            var storage = SymbolHelper.GetStorage(node.SymbolInfo.Mutability);
+            var symbol = binder.SymbolTable.NewSymbol(propertyName, propertyType, access, storage);
 
             // If it is a type assumption, register the symbol under that assumption
             if (binder.Inferrer.IsTypeAssumption(propertyType))

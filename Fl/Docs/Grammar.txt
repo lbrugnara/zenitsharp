@@ -25,9 +25,8 @@ func_params -> IDENTIFIER ( ',' IDENTIFIER )*
 
 
 (* Variable Declaration *)
-variable_declaration -> implicit_var_declaration 
-					 | typed_var_declaration
-                     ;
+variable_declaration -> 'mut'? ( implicit_var_declaration | typed_var_declaration )
+					  ;
 
 
 implicit_var_declaration -> VAR ( IDENTIFIER '=' expression | var_destructuring ) ';'
@@ -65,7 +64,7 @@ class_body -> class_property
 class_property -> class_field
 				;
 
-class_field -> access_modifier? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
+class_field -> access_modifier? 'mut'? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
 			;
 
 class_constant -> access_modifier? 'const' IDENTIFIER IDENTIFIER '=' expression ';'

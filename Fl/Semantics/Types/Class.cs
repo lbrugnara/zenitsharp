@@ -10,17 +10,17 @@ namespace Fl.Semantics.Types
 {
     public class Class : Struct
     {
-        public Dictionary<string, ClassProperty> Properties { get; }
-        public Dictionary<string, ClassMethod> Methods { get; }
+        public Dictionary<string, Type> Properties { get; }
+        public Dictionary<string, Function> Methods { get; }
 
-        public string Name { get; }
+        public string ClassName { get; }
 
         public Class(string name)
             : base("class")
         {
-            this.Name = name ?? throw new ArgumentNullException(nameof(name));
-            this.Properties = new Dictionary<string, ClassProperty>();
-            this.Methods = new Dictionary<string, ClassMethod>();
+            this.ClassName = name ?? throw new ArgumentNullException(nameof(name));
+            this.Properties = new Dictionary<string, Type>();
+            this.Methods = new Dictionary<string, Function>();
         }
 
         public static bool operator ==(Class type1, Type type2)
@@ -52,7 +52,7 @@ namespace Fl.Semantics.Types
 
         public override string ToString()
         {
-            return $"{base.ToString()}({this.Name})";
+            return $"{base.ToString()}({this.ClassName})";
         }
     }
 }

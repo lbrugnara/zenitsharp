@@ -16,7 +16,7 @@ namespace Fl.Semantics.Types
 
         public override string ToString()
         {
-            return this.Class.Name;
+            return this.Class.ClassName;
         }
     }
 }

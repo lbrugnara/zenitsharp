@@ -28,9 +28,9 @@ namespace Fl.Semantics.Inferrers
             if (inferredInfo.Type is Function)
                 return this.InferFromFunctionCall(visitor, node, inferredInfo.Type as Function);
 
-            if (inferredInfo.Type is ClassMethod cm)
+            /*if (inferredInfo.Type is ClassMethod cm)
                 return this.InferFromFunctionCall(visitor, node, cm.Type as Function);
-
+            */
             if (inferredInfo.Type is Class c)
                 return this.InferFromConstructorCall(visitor, node, inferredInfo);
 

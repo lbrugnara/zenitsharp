@@ -15,7 +15,7 @@ namespace Fl.Semantics.Inferrers
         {
             // Get the method symbol and type
             var methodSymbol = visitor.SymbolTable.GetSymbol(method.Name);
-            Function methodType = (methodSymbol.Type as ClassMethod).Type as Function;
+            Function methodType = methodSymbol.Type as Function;
 
             // Enter the requested method's block
             visitor.SymbolTable.EnterScope(ScopeType.Function, method.Name);

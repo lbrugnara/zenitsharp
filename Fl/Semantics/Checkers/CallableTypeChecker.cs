@@ -17,8 +17,8 @@ namespace Fl.Semantics.Checkers
             if (target.Type is Function f1)
                 return new CheckedType(f1.Return);
 
-            if (target.Type is ClassMethod cm && cm.Type is Function f2)
-                return new CheckedType(f2.Return);
+            /*if (target.Type is ClassMethod cm && cm.Type is Function f2)
+                return new CheckedType(f2.Return);*/
 
             if (target.Type is Class c)
                 return new CheckedType(new ClassInstance(c));

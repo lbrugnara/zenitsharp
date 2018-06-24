@@ -20,8 +20,21 @@ namespace Fl.Semantics.Checkers
 
         private CheckedType MakeVariableAssignment(AstVariableAssignmentNode node, TypeCheckerVisitor checker)
         {
+            if (node.Accessor.Enclosing != null)
+            {
+                var enc = node.Accessor.Enclosing.Visit(checker);
+
+                if (enc.Type is Class c)
+                    throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{node.Accessor.Identifier.Value}'");
+            }
+
             var leftHandSide = node.Accessor.Visit(checker);
             var rightHandSide = node.Expression.Visit(checker);
+
+            if (leftHandSide.Symbol.Storage == Symbols.Storage.Immutable)
+                throw new System.Exception($"Cannot change immutable {leftHandSide.Type} '{leftHandSide.Symbol.Name}'");
+            else if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
+                throw new System.Exception($"Cannot change value of constant {leftHandSide.Type.Name} '{leftHandSide.Symbol.Name}'");
 
             if (!leftHandSide.Type.IsAssignableFrom(rightHandSide.Type))
                 throw new System.Exception($"Cannot convert from {rightHandSide.Type} to {leftHandSide.Type}");
@@ -45,6 +58,23 @@ namespace Fl.Semantics.Checkers
 
                 if (varType == null)
                     continue;
+
+                var varnode = node.Variables.Items[i];
+
+                if (varnode is AstAccessorNode accessor && accessor.Enclosing != null)
+                {
+                    var enc = accessor.Enclosing.Visit(checker);
+
+                    if (enc.Type is Class c)
+                        throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{accessor.Identifier.Value}'");
+                }
+
+                var leftHandSide = varnode.Visit(checker);
+
+                if (leftHandSide.Symbol.Storage == Symbols.Storage.Immutable)
+                    throw new System.Exception($"Cannot change immutable {leftHandSide.Type} '{leftHandSide.Symbol.Name}'");
+                else if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
+                    throw new System.Exception($"Cannot change value of constant {leftHandSide.Type.Name} '{leftHandSide.Symbol.Name}'");
 
                 var exprType = exprTypes.Types[i];
 

@@ -18,11 +18,22 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         public virtual Type Type { get; set; }
 
+        /// <summary>
+        /// Symbol's access level
+        /// </summary>
+        public Access Access { get; set; }
 
-        public Symbol(string name, Type type)
+        /// <summary>
+        /// Symbol's storage type
+        /// </summary>
+        public Storage Storage { get; set; }
+
+        public Symbol(string name, Type type, Access access, Storage storage)
         {
             this.Name = name;
             this.Type = type;
+            this.Access = access;
+            this.Storage = storage;
         }
 
         protected Symbol(string name)
@@ -32,7 +43,7 @@ namespace Fl.Semantics.Symbols
 
         public override string ToString()
         {
-            return $"{this.Name}: {this.Type}";
+            return $"{this.Access.ToKeyword()} {this.Storage.ToKeyword()} {this.Name}: {this.Type}";
         }
     }
 }

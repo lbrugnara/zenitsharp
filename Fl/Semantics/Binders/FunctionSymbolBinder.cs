@@ -13,7 +13,7 @@ namespace Fl.Semantics.Binders
         {
             // Create the function symbol
             var funcType = new Function();
-            var funcSymbol = new Symbol(funcdecl.Name, funcType);
+            var funcSymbol = new Symbol(funcdecl.Name, funcType, Access.Public, Storage.Constant);
 
             // Register it in the current scope
             visitor.SymbolTable.AddSymbol(funcSymbol);
@@ -35,7 +35,8 @@ namespace Fl.Semantics.Binders
                 funcType.DefineParameterType(type);
 
                 // Define the symbol in the current scope (function's scope)
-                var symbol = new Symbol(p.Value.ToString(), type);
+                // TODO: Fix storage once parameters support storage modification
+                var symbol = new Symbol(p.Value.ToString(), type, Access.Public, Storage.Immutable);
                 visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);
                 visitor.SymbolTable.AddSymbol(symbol);
             });

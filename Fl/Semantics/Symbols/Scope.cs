@@ -49,7 +49,7 @@ namespace Fl.Semantics.Symbols
             this.Children = new Dictionary<string, Scope>();
 
             if (type == ScopeType.Function)
-                this.NewSymbol("@ret", null);
+                this.NewSymbol("@ret", null, Access.Public, Storage.Mutable);
         }
 
         public Scope(ScopeType type, string uid, Scope global, Scope parent = null)
@@ -131,12 +131,12 @@ namespace Fl.Semantics.Symbols
             this.Symbols[symbol.Name] = symbol;
         }
 
-        public Symbol NewSymbol(string name, Type type)
+        public Symbol NewSymbol(string name, Type type, Access access, Storage storage)
         {
             if (this.Symbols.ContainsKey(name))
                 throw new SymbolException($"Symbol {name} is already defined in current scope");
 
-            var symbol = new Symbol(name, type);
+            var symbol = new Symbol(name, type, access, storage);
             this.Symbols[name] = symbol;
             return symbol;
         }

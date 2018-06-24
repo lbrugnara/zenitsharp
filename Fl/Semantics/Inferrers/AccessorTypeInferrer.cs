@@ -24,11 +24,6 @@ namespace Fl.Semantics.Inferrers
 
                 Type type = symbol.Type;
 
-                // If we are in a class scope, access to the members must reflect the underlying type
-                // and not the ClassMethod or ClassProperty access
-                if (inferrer.SymbolTable.CurrentScope.IsClass)
-                    type = this.GetInstanceMemberType(symbol.Type);
-
                 // Return the inferred type information for this symbol
                 return new InferredType(type, symbol);
             }
@@ -61,7 +56,7 @@ namespace Fl.Semantics.Inferrers
 
             if (encsym.Type is ClassInstance classInstance)
                 // Find the Class scope
-                symtable = inferrer.SymbolTable.Global.GetNestedScope(ScopeType.Class, classInstance.Class.Name);
+                symtable = inferrer.SymbolTable.Global.GetNestedScope(ScopeType.Class, classInstance.Class.ClassName);
             else if (inferrer.SymbolTable.TryGetSymbol(encsym.Type.Name)?.Type is Class)
                 symtable = inferrer.SymbolTable.Global.GetNestedScope(ScopeType.Class, encsym.Type.Name);
             else
@@ -72,20 +67,7 @@ namespace Fl.Semantics.Inferrers
             // Either case, we are talking about an instance of a class or an instance of a primitive type, 
             // because of that we need to return the type of the member, and not just the ClassProperty or ClassMethod
             // type.
-            return new InferredType(this.GetInstanceMemberType(symbol.Type), symbol);
-        }
-
-        // If the type is a Class member, we get the actual member type and not the ClassMethod or ClassProperty 
-        // instance
-        private Type GetInstanceMemberType(Type type)
-        {
-            if (type is ClassMethod)
-                return (type as ClassMethod).Type;
-
-            if (type is ClassProperty)
-                return (type as ClassProperty).Type;
-
-            return type;
+            return new InferredType(symbol.Type, symbol);
         }
     }
 }

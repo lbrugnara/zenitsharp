@@ -11,7 +11,7 @@ namespace Fl.Ast
         public List<Token> Variables { get; }
         public AstNode DestructInit { get; }
 
-        public AstVarDestructuringNode(AstTypeNode variableType, List<Token> variables, AstNode destructInit)
+        public AstVarDestructuringNode(SymbolInformation variableType, List<Token> variables, AstNode destructInit)
             : base(variableType)
         {
             this.Variables = variables;

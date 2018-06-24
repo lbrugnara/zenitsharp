@@ -10,15 +10,13 @@ namespace Fl.Ast
     public class AstClassConstantNode : AstNode
     {
         public Token Name { get; }
-        public Token AccessModifier { get; }
-        public Token Type { get; }
+        public SymbolInformation SymbolInfo { get; }
         public AstNode Definition { get; }
 
-        public AstClassConstantNode(Token name, Token accessModifier, Token type, AstNode definition)
+        public AstClassConstantNode(Token name, SymbolInformation modifiers, AstNode definition)
         {
             this.Name = name;
-            this.AccessModifier = accessModifier;
-            this.Type = type;
+            this.SymbolInfo = modifiers;
             this.Definition = definition;
         }
     }

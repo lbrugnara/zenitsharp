@@ -13,11 +13,11 @@ namespace Fl.Semantics.Binders
         public void Visit(SymbolBinderVisitor visitor, AstClassMethodNode method)
         {
             // Get the access modifier, and the storage type for the method declaration
-            var accessMod = SymbolHelper.GetAccessModifier(method.AccessModifier);
+            var accessMod = SymbolHelper.GetAccess(method.SymbolInfo.Access);
 
             // Create the type and the symbol
-            var methodType = new ClassMethod(new Function(), accessMod, StorageType.Const);
-            var methodSymbol = new Symbol(method.Name, methodType);
+            var methodType = new Method();
+            var methodSymbol = new Symbol(method.Name, methodType, accessMod, Storage.Constant);
 
             // Register it in the current scope
             visitor.SymbolTable.AddSymbol(methodSymbol);
@@ -36,10 +36,11 @@ namespace Fl.Semantics.Binders
                 var type = visitor.Inferrer.NewAnonymousType();
 
                 // Update the method's type
-                methodType.Type.DefineParameterType(type);
+                methodType.DefineParameterType(type);
 
                 // Define the symbol in the current scope (method's scope)
-                var symbol = new Symbol(p.Value.ToString(), type);
+                // TODO: Fix storage once parameters support storage modification
+                var symbol = new Symbol(p.Value.ToString(), type, Access.Public, Storage.Immutable);
                 visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);
                 visitor.SymbolTable.AddSymbol(symbol);
             });
@@ -54,7 +55,7 @@ namespace Fl.Semantics.Binders
             var rettype = visitor.Inferrer.NewAnonymousType();
 
             // Update the method's type
-            methodType.Type.SetReturnType(rettype);
+            methodType.SetReturnType(rettype);
 
             // Update the @ret symbol
             retsym.Type = rettype;

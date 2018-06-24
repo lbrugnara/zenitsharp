@@ -14,12 +14,9 @@ namespace Fl.Semantics.Inferrers
 
             // If the right-hand side is present, get the type
             var rhs = node.Definition?.Visit(checker);
-
-            // Use the ClassProperty.Type property in the type checking
-            var lhsType = (property.Type as ClassProperty).Type;
             
-            if (rhs != null && !lhsType.IsAssignableFrom(rhs.Type))
-                throw new SymbolException($"Cannot assign type {rhs.Type} to variable of type {lhsType}");
+            if (rhs != null && !property.Type.IsAssignableFrom(rhs.Type))
+                throw new SymbolException($"Cannot assign type {rhs.Type} to variable of type {property.Type}");
 
             // TODO: By now return the ClassProperty, as the result does not need to be used,
             // but if in the future we support multiple property declaration, we need to review

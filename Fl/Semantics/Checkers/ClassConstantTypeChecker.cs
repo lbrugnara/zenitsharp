@@ -12,14 +12,11 @@ namespace Fl.Semantics.Inferrers
             // Get the constant symbol
             var constant = checker.SymbolTable.GetSymbol(node.Name.Value.ToString());
 
-            // Use the ClassProperty.Type property in the type checking
-            var lhsType = (constant.Type as ClassProperty).Type;
-
             // Get the right-hand side expression's type
             var rhs = node.Definition.Visit(checker);            
 
-            if (!lhsType.IsAssignableFrom(rhs.Type))
-                throw new SymbolException($"Cannot assign type {rhs.Type} to constant of type {lhsType}");
+            if (!constant.Type.IsAssignableFrom(rhs.Type))
+                throw new SymbolException($"Cannot assign type {rhs.Type} to constant of type {constant.Type}");
 
             // TODO: By now return the ClassProperty, as the result does not need to be used,
             // but if in the future we support multiple constant declaration, we need to review

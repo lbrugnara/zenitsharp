@@ -17,7 +17,7 @@ namespace Fl.Semantics.Inferrers
 
             // Use the ClassProperty.Type property in the inference
             if (defInferredType != null)
-                inferrer.Inferrer.MakeConclusion((property.Type as ClassProperty).Type, defInferredType.Type);
+                inferrer.Inferrer.MakeConclusion(property.Type, defInferredType.Type);
 
             // TODO: By now return the ClassProperty, as the result does not need to be used,
             // but if in the future we support multiple property declaration, we need to review

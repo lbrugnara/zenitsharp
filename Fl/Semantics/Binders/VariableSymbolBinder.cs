@@ -3,6 +3,7 @@
 
 using Fl.Ast;
 using Fl.Semantics.Exceptions;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Binders
@@ -28,7 +29,7 @@ namespace Fl.Semantics.Binders
         protected void VarDefinitionNode(SymbolBinderVisitor binder, AstVarDefinitionNode vardecl)
         {
             // Get the variable type from the declaration or assume an anonymous type
-            var lhsType = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, vardecl.VarType.Name);
+            var lhsType = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, vardecl.SymbolInfo.Type);
 
             var isAssumedType = binder.Inferrer.IsTypeAssumption(lhsType);
 
@@ -42,7 +43,8 @@ namespace Fl.Semantics.Binders
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // Create the new symbol for the variable
-                var symbol = binder.SymbolTable.NewSymbol(variableName, lhsType);
+                var storage = SymbolHelper.GetStorage(vardecl.SymbolInfo.Mutability);
+                var symbol = binder.SymbolTable.NewSymbol(variableName, lhsType, Access.Public, storage);
 
                 // If it is a type assumption, register the symbol under that assumption
                 if (isAssumedType)
@@ -72,7 +74,8 @@ namespace Fl.Semantics.Binders
                 var lhsType = visitor.Inferrer.NewAnonymousType();
 
                 // Create the new symbol for the variable
-                var symbol = visitor.SymbolTable.NewSymbol(variableName, lhsType);
+                var storage = SymbolHelper.GetStorage(destrnode.SymbolInfo.Mutability);
+                var symbol = visitor.SymbolTable.NewSymbol(variableName, lhsType, Access.Public, storage);
 
                 // Register the symbol under that assumption
                 visitor.Inferrer.AssumeSymbolTypeAs(symbol, lhsType);

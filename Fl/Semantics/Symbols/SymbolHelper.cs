@@ -12,20 +12,31 @@ namespace Fl.Semantics.Types
 {
     public class SymbolHelper
     {
-        internal static AccessModifier GetAccessModifier(Token token)
+        internal static Access GetAccess(Token token)
         {
             if (token == null)
-                return AccessModifier.Public;
+                return Access.Public;
 
-            return System.Enum.Parse<AccessModifier>(token.Value.ToString(), true);
+            return System.Enum.Parse<Access>(token.Value.ToString(), true);
         }
 
-        internal static StorageType GetStorageType(Token token, StorageType def = StorageType.Variable)
+        internal static Storage GetStorage(Token token, Storage def = Storage.Immutable)
         {
             if (token == null)
                 return def;
 
-            return System.Enum.Parse<StorageType>(token.Value.ToString(), true);
+            var str = token.Value.ToString();
+
+            switch (str)
+            {
+                case "mut":
+                    return Storage.Mutable;
+
+                case "const":
+                    return Storage.Constant;
+            }
+
+            throw new Exception($"Unhandled storage type {str}");
         }
 
         internal static Type GetType(SymbolTable symtable, Token token)

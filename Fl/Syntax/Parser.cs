@@ -323,11 +323,11 @@ namespace Fl.Syntax
         }
 
         // Rule:
-        // variable_declaration -> ( implicit_var_declaration | typed_var_declaration ) ';'
+        // variable_declaration -> 'mut'? ( implicit_var_declaration | typed_var_declaration ) ';'
         private AstVariableNode VarDeclaration()
         {
             AstVariableNode variable = null;
-            if (this.Match(TokenType.Variable))
+            if (this.Match(TokenType.Variable) || this.Match(TokenType.Mutable, TokenType.Variable))
             {
                 variable = this.ImplicitVarDeclaration();
             }
@@ -343,7 +343,11 @@ namespace Fl.Syntax
         // implicit_var_declaration -> VAR ( IDENTIFIER '=' expression | var_destructuring )';'
         private AstVariableNode ImplicitVarDeclaration()
         {
-            AstTypeNode variableType = new AstTypeNode(this.Consume(TokenType.Variable));
+            // Get the symbol information
+            Token mutability = this.Match(TokenType.Mutable) ? this.Consume() : null;
+            Token type = this.Consume(TokenType.Variable);
+
+            SymbolInformation variableType = new SymbolInformation(type, mutability, null);
 
             // If there is a left parent present, it is a destructuring declaration
             if (this.IsDestructuring())
@@ -360,9 +364,11 @@ namespace Fl.Syntax
         // typed_var_declaration -> IDENTIFIER ( '[' ']' )* ( typed_var_definition | var_destructuring ) ';'
         private AstVariableNode TypedVarDeclaration()
         {
-            // Get the variable type
-            Token varType = this.Consume(TokenType.Identifier);
-            AstTypeNode variableType = new AstTypeNode(varType);
+            // Get the symbol information
+            Token mutability = this.Match(TokenType.Mutable) ? this.Consume() : null;
+            Token type = this.Consume(TokenType.Identifier);
+
+            SymbolInformation variableType = new SymbolInformation(type, mutability, null);
 
             // If it contains a left bracket, it is an array variable
             if (this.Match(TokenType.LeftBracket))
@@ -373,7 +379,7 @@ namespace Fl.Syntax
                     dimensions.Add(this.Consume(TokenType.LeftBracket));
                     dimensions.Add(this.Consume(TokenType.RightBracket));
                 }
-                variableType = new AstTypeNode(varType, dimensions);
+                variableType = new SymbolInformation(type, mutability, null, dimensions);
             }
 
             // If there is a left parent present, it is a destructuring declaration
@@ -407,7 +413,7 @@ namespace Fl.Syntax
 
         // Rule: 
         // var_destructuring -> '(' ( ',' | IDENTIFIER )+ ')' '=' expression
-        private AstVarDestructuringNode VarDestructuring(AstTypeNode varType)
+        private AstVarDestructuringNode VarDestructuring(SymbolInformation varType)
         {
             List<Token> tokens = new List<Token>();
 
@@ -566,18 +572,15 @@ namespace Fl.Syntax
         // Rule: (TODO: getter and setter for class_property, because of that the class_field indirection)
         // class_property -> class_field
         //
-        // class_field -> access_modifier? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
+        // class_field -> access_modifier? 'mut' IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
         private AstClassPropertyNode ClassProperty()
         {
-            // Check access modifier
+            // Get symbol information
             Token accessModifier = this.Match(TokenType.AccessModifier) ? this.Consume() : null;
+            Token mutability = this.Match(TokenType.Mutable) ? this.Consume() : null;
+            Token type = this.Consume(TokenType.Identifier);
 
-            // Check static modifier
-            //Token mutable = this.Match(TokenType.Mutable) ? this.Consume() : null;
-
-            // Get the variable type
-            Token varType = this.Consume(TokenType.Identifier);
-            AstTypeNode variableType = new AstTypeNode(varType);
+            SymbolInformation variableType = new SymbolInformation(type, mutability, accessModifier);
 
             // If it contains a left bracket, it is an array variable
             if (this.Match(TokenType.LeftBracket))
@@ -588,7 +591,7 @@ namespace Fl.Syntax
                     dimensions.Add(this.Consume(TokenType.LeftBracket));
                     dimensions.Add(this.Consume(TokenType.RightBracket));
                 }
-                variableType = new AstTypeNode(varType, dimensions);
+                variableType = new SymbolInformation(type, mutability, accessModifier, dimensions);
             }
 
             var name = this.Consume(TokenType.Identifier);
@@ -601,7 +604,7 @@ namespace Fl.Syntax
             this.Consume(TokenType.Semicolon);
 
             // If not, it is a simple typed var definition
-            return new AstClassPropertyNode(name, accessModifier, variableType, definition);
+            return new AstClassPropertyNode(name, variableType, definition);
         }
 
         // Rule:
@@ -617,13 +620,15 @@ namespace Fl.Syntax
             // Get the constant type if present
             Token type = this.Consume(TokenType.Identifier);
 
+            var modifiers = new SymbolInformation(type, null, accessModifier);
+
             Token identifier = this.Consume(TokenType.Identifier);
             this.Consume(TokenType.Assignment, "A constant value needs to be defined when declared.");
             AstNode expression = this.Expression();
 
             this.Consume(TokenType.Semicolon);
 
-            return new AstClassConstantNode(identifier, accessModifier, type, expression);
+            return new AstClassConstantNode(identifier, modifiers, expression);
         }
 
         // Rule:
@@ -632,11 +637,9 @@ namespace Fl.Syntax
         {
             // Check access modifier
             Token accessModifier = this.Match(TokenType.AccessModifier) ? this.Consume() : null;
+            Token type = this.Consume(TokenType.Function);
 
-            // Check static modifier
-            // Token mutable = this.Match(TokenType.Mutable) ? this.Consume(TokenType.Mutable) : null;
-
-            this.Consume(TokenType.Function);
+            var modifiers = new SymbolInformation(type, null, accessModifier);
 
             Token name = this.Consume(TokenType.Identifier);
 
@@ -651,7 +654,7 @@ namespace Fl.Syntax
                 // RightArrow followed by brace doesn't make sense here, expression is the only accepted node
                 this.Consume(TokenType.RightArrow);
 
-                var f = new AstClassMethodNode(name, accessModifier, parameters, new List<AstNode>() { this.Expression() }, true);
+                var f = new AstClassMethodNode(name, modifiers, parameters, new List<AstNode>() { this.Expression() }, true);
 
                 if (this.Match(TokenType.Semicolon))
                     this.Consume(TokenType.Semicolon);
@@ -667,7 +670,7 @@ namespace Fl.Syntax
             }
             this.Consume(TokenType.RightBrace);
 
-            return new AstClassMethodNode(name, accessModifier, parameters, decls, false);
+            return new AstClassMethodNode(name, modifiers, parameters, decls, false);
         }
 
         // Rule:
@@ -1462,8 +1465,8 @@ namespace Fl.Syntax
             if (this.Match(TokenType.AccessModifier))
                 offset++;
 
-            /*if (this.MatchFrom(offset ,TokenType.Mutable))
-                offset++;*/
+            if (this.MatchFrom(offset ,TokenType.Mutable))
+                offset++;
 
             if (this.MatchFrom(offset, TokenType.Identifier))
             {
@@ -1501,15 +1504,17 @@ namespace Fl.Syntax
 
         private bool IsVarDeclaration()
         {
+            var offset = this.Match(TokenType.Mutable) ? 1 : 0;
+
             // 'var' identifier ( '=' expression )?
-            if (this.Match(TokenType.Variable))
+            if (this.MatchFrom(offset, TokenType.Variable))
                 return true;
 
-            if (this.Match(TokenType.Identifier, TokenType.LeftParen, TokenType.Identifier))
+            if (this.MatchFrom(offset, TokenType.Identifier, TokenType.LeftParen, TokenType.Identifier))
             {
                 // identifier (identifier, identifier, ..., identifier) '='
-                int decls = this.CountRepeatedMatchesFrom(2, TokenType.Identifier, TokenType.Comma);
-                if (this.MatchFrom(decls+1, TokenType.Identifier, TokenType.RightParen, TokenType.Assignment))
+                int decls = this.CountRepeatedMatchesFrom(offset + 2, TokenType.Identifier, TokenType.Comma);
+                if (this.MatchFrom(offset + decls + 1, TokenType.Identifier, TokenType.RightParen, TokenType.Assignment))
                     return true;
 
                 /*// identifier ( '[' ']' )+ (identifier, identifier, ..., identifier)
@@ -1517,15 +1522,15 @@ namespace Fl.Syntax
                 return dimensions > 0 && MatchFrom(dimensions + 1, TokenType.Identifier);*/
             }
 
-            if (this.Match(TokenType.Identifier))
+            if (this.MatchFrom(offset, TokenType.Identifier))
             {
                 // identifier identifier ( '=' expression )?
-                if (this.MatchFrom(1, TokenType.Identifier))
+                if (this.MatchFrom(offset + 1, TokenType.Identifier))
                     return true;
 
                 // identifier ( '[' ']' )+ identifier ( '=' expression )?
-                int dimensions = this.CountRepeatedMatchesFrom(1, TokenType.LeftBracket, TokenType.RightBracket);
-                return dimensions > 0 && this.MatchFrom(dimensions + 1, TokenType.Identifier);
+                int dimensions = this.CountRepeatedMatchesFrom(offset + 1, TokenType.LeftBracket, TokenType.RightBracket);
+                return dimensions > 0 && this.MatchFrom(offset + dimensions + 1, TokenType.Identifier);
             }
 
             return false;

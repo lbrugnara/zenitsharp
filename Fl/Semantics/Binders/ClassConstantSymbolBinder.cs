@@ -18,11 +18,10 @@ namespace Fl.Semantics.Binders
                 throw new SymbolException($"Symbol {constantName} is already defined.");
 
             // Get the constant type from the declaration or assume an anonymous type
-            var type = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, node.Type);
-            var lhsType = new ClassProperty(type, SymbolHelper.GetAccessModifier(node.AccessModifier), StorageType.Const);
+            var lhsType = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, node.SymbolInfo.Type);
 
             // Create the new symbol for the property
-            var symbol = binder.SymbolTable.NewSymbol(constantName, lhsType);
+            var symbol = binder.SymbolTable.NewSymbol(constantName, lhsType, SymbolHelper.GetAccess(node.SymbolInfo.Access), Storage.Constant);
 
             // If it is a type assumption, register the symbol under that assumption
             if (binder.Inferrer.IsTypeAssumption(lhsType))

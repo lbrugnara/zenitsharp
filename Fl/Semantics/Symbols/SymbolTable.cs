@@ -80,7 +80,7 @@ namespace Fl.Semantics.Symbols
         public void AddSymbol(Symbol symbol) => this.scopes.Peek().AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, Type type) => this.scopes.Peek().NewSymbol(name, type);
+        public Symbol NewSymbol(string name, Type type, Access access, Storage storage) => this.scopes.Peek().NewSymbol(name, type, access, storage);
 
         /// <inheritdoc/>
         public bool HasSymbol(string name) => this.scopes.Peek().HasSymbol(name);

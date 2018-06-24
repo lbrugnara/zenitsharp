@@ -9,15 +9,15 @@ namespace Fl.Ast
     public class AstClassMethodNode : AstNode
     {
         public Token Identifier { get; }
-        public Token AccessModifier { get; }
+        public SymbolInformation SymbolInfo { get; }
         public AstParametersNode Parameters { get; }
         public List<AstNode> Body { get; }
         public bool IsLambda { get; }
 
-        public AstClassMethodNode(Token name, Token accessModifier, AstParametersNode parameters, List<AstNode> body, bool isLambda)
+        public AstClassMethodNode(Token name, SymbolInformation modifiers, AstParametersNode parameters, List<AstNode> body, bool isLambda)
         {
             this.Identifier = name;
-            this.AccessModifier = accessModifier;
+            this.SymbolInfo = modifiers;
             this.Parameters = parameters;
             this.Body = body;
             this.IsLambda = isLambda;

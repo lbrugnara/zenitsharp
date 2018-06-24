@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Binders
@@ -26,7 +27,7 @@ namespace Fl.Semantics.Binders
                 var constantName = declaration.Item1.Value.ToString();                
 
                 // Create the new symbol
-                var symbol = binder.SymbolTable.NewSymbol(constantName, type);
+                var symbol = binder.SymbolTable.NewSymbol(constantName, type, Access.Public, Storage.Constant);
 
                 // Register under the assumption of having an anonymous type, if needed
                 if (typeAssumption)

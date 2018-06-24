@@ -39,7 +39,7 @@ namespace Fl.IL.Generators
                 var rhs = declaration.Item2?.Visit(generator);
 
                 // Get the variable type from the declaration
-                var type = OperandType.FromToken(vardecl.VarType.Name);
+                var type = OperandType.FromToken(vardecl.SymbolInfo.Type);
 
                 if (type == OperandType.Auto)
                 {

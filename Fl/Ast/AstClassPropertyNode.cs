@@ -8,15 +8,13 @@ namespace Fl.Ast
     public class AstClassPropertyNode : AstNode
     {
         public Token Name { get; }
-        public Token AccessModifier { get; }
-        public AstTypeNode Type { get; }
+        public SymbolInformation SymbolInfo { get; }
         public AstNode Definition { get; }
 
-        public AstClassPropertyNode(Token name, Token accessModifier, AstTypeNode type, AstNode definition)
+        public AstClassPropertyNode(Token name, SymbolInformation symbolModifiers, AstNode definition)
         {
             this.Name = name;
-            this.AccessModifier = accessModifier;
-            this.Type = type;
+            this.SymbolInfo = symbolModifiers;
             this.Definition = definition;
         }
     }
