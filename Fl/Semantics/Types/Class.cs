@@ -13,9 +13,12 @@ namespace Fl.Semantics.Types
         public Dictionary<string, ClassProperty> Properties { get; }
         public Dictionary<string, ClassMethod> Methods { get; }
 
-        public Class()
+        public string Name { get; }
+
+        public Class(string name)
             : base("class")
         {
+            this.Name = name ?? throw new ArgumentNullException(nameof(name));
             this.Properties = new Dictionary<string, ClassProperty>();
             this.Methods = new Dictionary<string, ClassMethod>();
         }
@@ -45,6 +48,11 @@ namespace Fl.Semantics.Types
         public override bool IsAssignableFrom(Type type)
         {
             return this.Equals(type);
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()}({this.Name})";
         }
     }
 }

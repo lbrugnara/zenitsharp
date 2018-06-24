@@ -6,6 +6,7 @@ using Fl.Syntax;
 using Fl.Semantics.Exceptions;
 using System;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Inferrers;
 
 namespace Fl.Semantics.Types
 {
@@ -19,7 +20,7 @@ namespace Fl.Semantics.Types
             return System.Enum.Parse<AccessModifier>(token.Value.ToString(), true);
         }
 
-        internal static StorageType GetStorageType(Token token, StorageType def = StorageType.Var)
+        internal static StorageType GetStorageType(Token token, StorageType def = StorageType.Variable)
         {
             if (token == null)
                 return def;
@@ -29,6 +30,11 @@ namespace Fl.Semantics.Types
 
         internal static Type GetType(SymbolTable symtable, Token token)
         {
+            return GetType(symtable, null, token);
+        }
+
+        internal static Type GetType(SymbolTable symtable, TypeInferrer inferrer, Token token)
+        {
             if (token.Type == TokenType.Identifier)
             {
                 string val = token.Value.ToString();
@@ -36,26 +42,30 @@ namespace Fl.Semantics.Types
                 if (val == Bool.Instance.ToString())
                     return Bool.Instance;
 
-                else if (val == Char.Instance.ToString())
+                if (val == Char.Instance.ToString())
                     return Char.Instance;
 
-                else if (val == Int.Instance.ToString())
+                if (val == Int.Instance.ToString())
                     return Int.Instance;
 
-                else if (val == Float.Instance.ToString())
+                if (val == Float.Instance.ToString())
                     return Float.Instance;
 
-                else if (val == Double.Instance.ToString())
+                if (val == Double.Instance.ToString())
                     return Double.Instance;
 
-                else if (val == Decimal.Instance.ToString())
+                if (val == Decimal.Instance.ToString())
                     return Decimal.Instance;
 
-                else if (val == String.Instance.ToString())
+                if (val == String.Instance.ToString())
                     return String.Instance;
 
-                else if (val == Null.Instance.ToString())
+                if (val == Null.Instance.ToString())
                     return Null.Instance;
+
+                // Support complex types:
+                if (val == "func" || val == "tuple")
+                    return inferrer?.NewAnonymousType();
 
                 return symtable.GetSymbol(val).Type;
             }
@@ -87,7 +97,7 @@ namespace Fl.Semantics.Types
                     return Null.Instance;
 
                 case TokenType.Variable:
-                    return null; // Auto
+                    return inferrer?.NewAnonymousType(); // Auto
             }
 
             throw new SymbolException($"Unrecognized literal {token.Type}");

@@ -29,12 +29,7 @@ namespace Fl.Semantics.Inferrers
                 return this.InferFromFunctionCall(visitor, node, inferredInfo.Type as Function);
 
             if (inferredInfo.Type is ClassMethod cm)
-            {
-                if (cm.StorageType != StorageType.Static)
-                    throw new System.Exception($"An object is required to call non-static method {inferredInfo.Symbol}");
-
                 return this.InferFromFunctionCall(visitor, node, cm.Type as Function);
-            }
 
             if (inferredInfo.Type is Class c)
                 return this.InferFromConstructorCall(visitor, node, inferredInfo);
@@ -46,10 +41,11 @@ namespace Fl.Semantics.Inferrers
         {
             Class classType = inferredInfo.Type as Class;
 
-            var classScope = visitor.SymbolTable.Global.GetNestedScope(ScopeType.Class, inferredInfo.Symbol.Name);
+            /*var classScope = visitor.SymbolTable.Global.GetNestedScope(ScopeType.Class, inferredInfo.Symbol.Name);
 
-            // TODO: Implement ClassInstance
-            return inferredInfo;                
+            var ctorSymbol = classScope.TryGetSymbol(inferredInfo.Symbol.Name);*/
+
+            return new InferredType(new ClassInstance(classType));
         }
 
         private InferredType InferFromAnonymousCall(TypeInferrerVisitor visitor, AstCallableNode node, InferredType inferred)

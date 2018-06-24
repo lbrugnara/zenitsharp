@@ -555,6 +555,7 @@ namespace Fl.Syntax
                 {
                     methods.Add(this.ClassMethod());
                 }
+                else throw new ParserException($"Unexpected '{this.Peek().Value}' in class declaration");
             }
 
             this.Consume(TokenType.RightBrace);
@@ -565,14 +566,14 @@ namespace Fl.Syntax
         // Rule: (TODO: getter and setter for class_property, because of that the class_field indirection)
         // class_property -> class_field
         //
-        // class_field -> access_modifier? 'static'? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
+        // class_field -> access_modifier? IDENTIFIER ( '[' ']' )* IDENTIFIER ( '=' expression )? ';'
         private AstClassPropertyNode ClassProperty()
         {
             // Check access modifier
             Token accessModifier = this.Match(TokenType.AccessModifier) ? this.Consume() : null;
 
             // Check static modifier
-            Token staticModifier = this.Match(TokenType.Static) ? this.Consume() : null;
+            //Token mutable = this.Match(TokenType.Mutable) ? this.Consume() : null;
 
             // Get the variable type
             Token varType = this.Consume(TokenType.Identifier);
@@ -600,7 +601,7 @@ namespace Fl.Syntax
             this.Consume(TokenType.Semicolon);
 
             // If not, it is a simple typed var definition
-            return new AstClassPropertyNode(name, accessModifier, staticModifier, variableType, definition);
+            return new AstClassPropertyNode(name, accessModifier, variableType, definition);
         }
 
         // Rule:
@@ -626,14 +627,14 @@ namespace Fl.Syntax
         }
 
         // Rule:
-        // class_method -> access_modifier? 'static'? func_declaration
+        // class_method -> access_modifier? func_declaration
         private AstClassMethodNode ClassMethod()
         {
             // Check access modifier
             Token accessModifier = this.Match(TokenType.AccessModifier) ? this.Consume() : null;
 
             // Check static modifier
-            Token staticModifier = this.Match(TokenType.Static) ? this.Consume(TokenType.Static) : null;
+            // Token mutable = this.Match(TokenType.Mutable) ? this.Consume(TokenType.Mutable) : null;
 
             this.Consume(TokenType.Function);
 
@@ -650,7 +651,7 @@ namespace Fl.Syntax
                 // RightArrow followed by brace doesn't make sense here, expression is the only accepted node
                 this.Consume(TokenType.RightArrow);
 
-                var f = new AstClassMethodNode(name, accessModifier, staticModifier, parameters, new List<AstNode>() { this.Expression() }, true);
+                var f = new AstClassMethodNode(name, accessModifier, parameters, new List<AstNode>() { this.Expression() }, true);
 
                 if (this.Match(TokenType.Semicolon))
                     this.Consume(TokenType.Semicolon);
@@ -666,7 +667,7 @@ namespace Fl.Syntax
             }
             this.Consume(TokenType.RightBrace);
 
-            return new AstClassMethodNode(name, accessModifier, staticModifier, parameters, decls, false);
+            return new AstClassMethodNode(name, accessModifier, parameters, decls, false);
         }
 
         // Rule:
@@ -1461,8 +1462,8 @@ namespace Fl.Syntax
             if (this.Match(TokenType.AccessModifier))
                 offset++;
 
-            if (this.MatchFrom(offset ,TokenType.Static))
-                offset++;
+            /*if (this.MatchFrom(offset ,TokenType.Mutable))
+                offset++;*/
 
             if (this.MatchFrom(offset, TokenType.Identifier))
             {
@@ -1493,9 +1494,6 @@ namespace Fl.Syntax
             int offset = 0;
 
             if (this.Match(TokenType.AccessModifier))
-                offset++;
-
-            if (this.MatchFrom(offset, TokenType.Static))
                 offset++;
 
             return this.MatchFrom(offset, TokenType.Function);

@@ -28,7 +28,7 @@ namespace Fl.Semantics.Binders
         protected void VarDefinitionNode(SymbolBinderVisitor binder, AstVarDefinitionNode vardecl)
         {
             // Get the variable type from the declaration or assume an anonymous type
-            var lhsType = SymbolHelper.GetType(binder.SymbolTable, vardecl.VarType.Name) ?? binder.Inferrer.NewAnonymousType();
+            var lhsType = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, vardecl.VarType.Name);
 
             var isAssumedType = binder.Inferrer.IsTypeAssumption(lhsType);
 

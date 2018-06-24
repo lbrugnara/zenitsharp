@@ -18,12 +18,11 @@ namespace Fl.Semantics.Binders
                 throw new SymbolException($"Symbol {propertyName} is already defined.");
 
             // Get the property type, access modifier, and storage type
-            var type = SymbolHelper.GetType(binder.SymbolTable, node.Type.Name) ?? binder.Inferrer.NewAnonymousType();
+            var type = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, node.Type.Name);
             var accessMod = SymbolHelper.GetAccessModifier(node.AccessModifier);
-            var storageType = SymbolHelper.GetStorageType(node.StorageType);
 
             // Create the property type
-            var propertyType = new ClassProperty(type, accessMod, storageType);
+            var propertyType = new ClassProperty(type, accessMod, StorageType.Variable);
 
             // Create the new symbol for the property
             var symbol = binder.SymbolTable.NewSymbol(propertyName, propertyType);

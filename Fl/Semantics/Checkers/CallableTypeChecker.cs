@@ -20,6 +20,9 @@ namespace Fl.Semantics.Checkers
             if (target.Type is ClassMethod cm && cm.Type is Function f2)
                 return new CheckedType(f2.Return);
 
+            if (target.Type is Class c)
+                return new CheckedType(new ClassInstance(c));
+
             throw new System.Exception($"Symbol {target.Symbol.Name} is not a function ({target.Type})");
         }
     }

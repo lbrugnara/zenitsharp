@@ -14,7 +14,7 @@ namespace Fl.Semantics.Binders
 
             // Get the constant's type or assume it if not present
             if (constdec.Type != null)
-                type = SymbolHelper.GetType(binder.SymbolTable, constdec.Type) ?? binder.Inferrer.NewAnonymousType();
+                type = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, constdec.Type);
             else
                 type = binder.Inferrer.NewAnonymousType();
 

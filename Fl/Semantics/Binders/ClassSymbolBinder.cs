@@ -10,8 +10,9 @@ namespace Fl.Semantics.Binders
         public void Visit(SymbolBinderVisitor binder, AstClassNode node)
         {
             // Define the class in the global scope
-            var classType = new Class();
-            var classSymbol = binder.SymbolTable.Global.NewSymbol(node.Name.Value.ToString(), classType);
+            var className = node.Name.Value.ToString();
+            var classType = new Class(className);
+            var classSymbol = binder.SymbolTable.Global.NewSymbol(className, classType);
 
             binder.SymbolTable.EnterClassScope(classSymbol.Name);
 

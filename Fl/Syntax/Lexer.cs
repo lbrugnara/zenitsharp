@@ -52,7 +52,7 @@ namespace Fl.Syntax
             { "fn", TokenType.Function },
             { "package", TokenType.Package },
             { "new", TokenType.New },
-            { "static", TokenType.Static },
+            { "mut", TokenType.Mutable },
             { "private", TokenType.AccessModifier },
             { "protected", TokenType.AccessModifier },
             { "public", TokenType.AccessModifier }

@@ -6,8 +6,7 @@ namespace Fl.Semantics.Types
 {
     public enum StorageType
     {
-        Var,
-        Const,
-        Static
+        Variable,
+        Const
     }
 }

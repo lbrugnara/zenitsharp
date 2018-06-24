@@ -16,6 +16,7 @@ namespace Fl.Syntax
         String,
         Identifier,
         Variable,
+        Mutable,
         Constant,
         Null,
 
@@ -85,7 +86,6 @@ namespace Fl.Syntax
         New,
 
         // Access modifiers
-        AccessModifier,
-        Static
+        AccessModifier
     }
 }

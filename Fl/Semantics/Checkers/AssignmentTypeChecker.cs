@@ -24,7 +24,7 @@ namespace Fl.Semantics.Checkers
             var rightHandSide = node.Expression.Visit(checker);
 
             if (!leftHandSide.Type.IsAssignableFrom(rightHandSide.Type))
-                throw new System.Exception($"Cannot convert from {rightHandSide} to {leftHandSide}");
+                throw new System.Exception($"Cannot convert from {rightHandSide.Type} to {leftHandSide.Type}");
 
             leftHandSide.Symbol = null;
 

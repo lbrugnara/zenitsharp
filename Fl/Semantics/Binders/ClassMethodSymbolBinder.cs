@@ -14,14 +14,9 @@ namespace Fl.Semantics.Binders
         {
             // Get the access modifier, and the storage type for the method declaration
             var accessMod = SymbolHelper.GetAccessModifier(method.AccessModifier);
-            var storageType = SymbolHelper.GetStorageType(method.StorageType, StorageType.Const);
-
-            // Methods can have just constant, or static storage type
-            if (storageType != StorageType.Const && storageType != StorageType.Static)
-                throw new SymbolException($"Storage type {storageType} is not supported in method declaration");
 
             // Create the type and the symbol
-            var methodType = new ClassMethod(new Function(), accessMod, storageType);
+            var methodType = new ClassMethod(new Function(), accessMod, StorageType.Const);
             var methodSymbol = new Symbol(method.Name, methodType);
 
             // Register it in the current scope
