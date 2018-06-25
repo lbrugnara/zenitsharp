@@ -36,12 +36,27 @@ namespace Fl.Semantics.Inferrers
             //  return 2;
             //  etc
             if ((type is Tuple t) && t.Types.Count == 1)
-                type = t.Types.First();
+                type = t.Types.First();            
 
-            var callingFunctionType = visitor.SymbolTable.CurrentScope.Parent.GetSymbol(visitor.SymbolTable.CurrentScope.Uid).Type as Function;
+            // TODO: We cannot infer recursive declarations, use this checks by now
+            if (type is Function f)
+            {
+                var callingFunctionType = visitor.SymbolTable.CurrentScope.Parent.GetSymbol(visitor.SymbolTable.CurrentScope.Uid).Type as Function;
 
-            if (type is Function f && f.Return == callingFunctionType.Return)
-                throw new SymbolException("The function can not be returned to itself");
+                if (f.Return == callingFunctionType.Return)
+                    throw new SymbolException($"Function '{visitor.SymbolTable.CurrentScope.Uid}' cannot return its own type.");
+
+                Scope s = visitor.SymbolTable.CurrentScope.Parent;
+                while (s.IsFunction)
+                {
+                    var ctype = s.Parent.GetSymbol(s.Uid).Type as Function;
+
+                    if (f.Return == ctype.Return)
+                        throw new SymbolException($"Function '{visitor.SymbolTable.CurrentScope.Uid}' cannot return enclosing function '{s.Uid}' type.");
+
+                    s = s.Parent;
+                }
+            }
 
             visitor.Inferrer.MakeConclusion(type, returnSymbol.Type);
 
