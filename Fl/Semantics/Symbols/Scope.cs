@@ -167,7 +167,7 @@ namespace Fl.Semantics.Symbols
             return symbol;
         }
 
-        public bool HasSymbol(string name) => this.Symbols.ContainsKey(name) || (this.Parent != null && this.Parent.HasSymbol(name)) || (this.Global != null && this.Global.HasSymbol(name));
+        public bool HasSymbol(string name) => this.Symbols.ContainsKey(name) || (this.Parent != null && this.Parent.HasSymbol(name)) || (this.Type != ScopeType.Global && this.Global != null && this.Global.HasSymbol(name));
 
         public Symbol GetSymbol(string name) => this.TryGetSymbol(name) ?? throw new SymbolException($"Symbol {name} is not defined in current scope");
 

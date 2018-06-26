@@ -122,7 +122,7 @@ namespace Fl.Semantics.Inferrers
 
             // Complex type
             if (t is Function ft)
-                return ft.Parameters.Any(p => this.IsTypeAssumption(p)) || this.IsTypeAssumption(ft.Return);
+                return ft.Parameters.Any(p => this.IsTypeAssumption(p)) || !ft.IsCircularReference && this.IsTypeAssumption(ft.Return);
 
             if (t is Tuple tt)
                 return tt.Types.Any(this.IsTypeAssumption);
@@ -164,7 +164,10 @@ namespace Fl.Semantics.Inferrers
             if (type is Function f)
             {
                 f.Parameters.ToList().ForEach(paramType => this.AssumeSymbolTypeAs(symbol, paramType));
-                this.AssumeSymbolTypeAs(symbol, f.Return);
+
+                // Assume Return type just if it is not equals to 'f' (circular reference)
+                if (!f.IsCircularReference)
+                    this.AssumeSymbolTypeAs(symbol, f.Return);
             }
             else if (type is Tuple t)
             {
@@ -235,6 +238,10 @@ namespace Fl.Semantics.Inferrers
                     f.Parameters[i] = newType;
             }
 
+            // If 'f' is a circular reference, do not touch Return property
+            if (f.IsCircularReference)
+                return;
+            
             // If return type is a complex type, infer it as a complex type, otherwise just updated the value
             if (this.IsComplexType(f.Return))
                 this.UpdateComplexType(f.Return, prevType, newType);
