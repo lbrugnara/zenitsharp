@@ -1,5 +1,5 @@
 ﻿using Fl.Ast;
-using Fl.Semantics.Binders;
+using Fl.Semantics.Resolvers;
 using Fl.Semantics.Checkers;
 using Fl.Semantics.Inferrers;
 using Fl.Semantics.Symbols;
@@ -13,7 +13,7 @@ namespace Fl.Semantics
     {
         private TypeInferrer typeInferrer;
         private SymbolTable symbolTable;
-        private SymbolBinderVisitor binder;
+        private SymbolResolverVisitor resolver;
         private TypeInferrerVisitor inferrer;
         private TypeCheckerVisitor checker;
 
@@ -22,7 +22,7 @@ namespace Fl.Semantics
             this.typeInferrer = new TypeInferrer();
             this.symbolTable = new SymbolTable();
 
-            this.binder = new SymbolBinderVisitor(this.symbolTable, this.typeInferrer);
+            this.resolver = new SymbolResolverVisitor(this.symbolTable, this.typeInferrer);
             this.inferrer = new TypeInferrerVisitor(this.symbolTable, this.typeInferrer);
             this.checker = new TypeCheckerVisitor(this.symbolTable);
 
@@ -36,7 +36,7 @@ namespace Fl.Semantics
 
         public SymbolTable Run(AstNode ast)
         {
-            this.binder.Visit(ast);
+            this.resolver.Visit(ast);
             this.inferrer.Visit(ast);
             this.checker.Visit(ast);
 

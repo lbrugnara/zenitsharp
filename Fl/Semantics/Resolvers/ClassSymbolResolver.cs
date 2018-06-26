@@ -1,14 +1,18 @@
 ﻿using Fl.Ast;
+using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 using System;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class ClassSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstClassNode>
+    class ClassSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstClassNode>
     {
-        public void Visit(SymbolBinderVisitor binder, AstClassNode node)
+        public void Visit(SymbolResolverVisitor binder, AstClassNode node)
         {
+            if (!binder.SymbolTable.CurrentScope.IsGlobal && !binder.SymbolTable.CurrentScope.IsPackage)
+                throw new SymbolException($"Cannot define a class within a {binder.SymbolTable.CurrentScope.Type.ToString().ToLower()}");
+
             // Define the class in the global scope
             var className = node.Name.Value.ToString();
             var classType = new Class(className);

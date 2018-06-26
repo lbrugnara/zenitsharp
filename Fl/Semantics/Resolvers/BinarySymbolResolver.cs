@@ -4,11 +4,11 @@
 
 using Fl.Ast;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class BinarySymbolBinder : INodeVisitor<SymbolBinderVisitor, AstBinaryNode>
+    class BinarySymbolResolver : INodeVisitor<SymbolResolverVisitor, AstBinaryNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstBinaryNode binary)
+        public void Visit(SymbolResolverVisitor visitor, AstBinaryNode binary)
         {
             binary.Left.Visit(visitor);
             binary.Right.Visit(visitor);

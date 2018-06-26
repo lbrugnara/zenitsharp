@@ -4,11 +4,11 @@ using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 using System;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class ClassConstantSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstClassConstantNode>
+    class ClassConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstClassConstantNode>
     {
-        public void Visit(SymbolBinderVisitor binder, AstClassConstantNode node)
+        public void Visit(SymbolResolverVisitor binder, AstClassConstantNode node)
         {
             // Get the constant name
             var constantName = node.Name.Value.ToString();

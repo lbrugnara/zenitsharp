@@ -5,11 +5,11 @@ using Fl.Ast;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class ConstantSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstConstantNode>
+    class ConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstConstantNode>
     {
-        public void Visit(SymbolBinderVisitor binder, AstConstantNode constdec)
+        public void Visit(SymbolResolverVisitor binder, AstConstantNode constdec)
         {            
             Type type = null;
 

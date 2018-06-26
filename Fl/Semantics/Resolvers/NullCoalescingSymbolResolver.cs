@@ -4,11 +4,11 @@
 
 using Fl.Ast;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class NullCoalescingSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstNullCoalescingNode>
+    class NullCoalescingSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstNullCoalescingNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstNullCoalescingNode nullc)
+        public void Visit(SymbolResolverVisitor visitor, AstNullCoalescingNode nullc)
         {
             nullc.Left.Visit(visitor);
             nullc.Right.Visit(visitor);

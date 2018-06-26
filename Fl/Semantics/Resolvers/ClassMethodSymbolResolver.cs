@@ -6,11 +6,11 @@ using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class ClassMethodSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstClassMethodNode>
+    class ClassMethodSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstClassMethodNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstClassMethodNode method)
+        public void Visit(SymbolResolverVisitor visitor, AstClassMethodNode method)
         {
             // Get the access modifier, and the storage type for the method declaration
             var accessMod = SymbolHelper.GetAccess(method.SymbolInfo.Access);

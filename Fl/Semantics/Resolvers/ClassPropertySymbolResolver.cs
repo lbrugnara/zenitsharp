@@ -5,11 +5,11 @@ using Fl.Semantics.Types;
 using System;
 using System.Collections.Generic;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class ClassPropertySymbolBinder : INodeVisitor<SymbolBinderVisitor, AstClassPropertyNode>
+    class ClassPropertySymbolResolver : INodeVisitor<SymbolResolverVisitor, AstClassPropertyNode>
     {
-        public void Visit(SymbolBinderVisitor binder, AstClassPropertyNode node)
+        public void Visit(SymbolResolverVisitor binder, AstClassPropertyNode node)
         {
             // Get the property name
             var propertyName = node.Name.Value.ToString();

@@ -4,11 +4,11 @@
 
 using Fl.Ast;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    public class CallableSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstCallableNode>
+    public class CallableSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstCallableNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstCallableNode node)
+        public void Visit(SymbolResolverVisitor visitor, AstCallableNode node)
         {
             node.Callable.Visit(visitor);
             node.Arguments.Expressions.ForEach(e => e.Visit(visitor));

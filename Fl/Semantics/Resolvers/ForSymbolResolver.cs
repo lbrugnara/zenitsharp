@@ -4,11 +4,11 @@
 using Fl.Ast;
 using Fl.Semantics.Symbols;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class ForSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstForNode>
+    class ForSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstForNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstForNode fornode)
+        public void Visit(SymbolResolverVisitor visitor, AstForNode fornode)
         {
             // Create a new block to contain the for's initialization
             visitor.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");

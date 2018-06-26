@@ -5,61 +5,61 @@ using Fl.Ast;
 using Fl.Semantics.Inferrers;
 using Fl.Semantics.Symbols;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    public class SymbolBinderVisitor : IAstWalker
+    public class SymbolResolverVisitor : IAstWalker
     {
-        private UnarySymbolBinder unarySymbolResolver;
-        private BinarySymbolBinder binarySymbolResolver;
-        private AssignmentSymbolBinder assignmentSymbolResolver;
-        private ConstantSymbolBinder constantSymbolResolver;
-        private VariableSymbolBinder variableSymbolResolver;
-        private BlockSymbolBinder blockSymbolResolver;
-        private DeclarationSymbolBinder declarationSymbolResolver;
-        private LiteralSymbolBinder literalSymbolResolver;
-        private AccessorSymbolBinder accessorSymbolResolver;
-        private IfSymbolBinder ifSymbolResolver;
-        private WhileSymbolBinder whileSymbolResolver;
-        private ForSymbolBinder forSymbolResolver;
-        private BreakSymbolBinder breakSymbolResolver;
-        private ContinueSymbolBinder continueSymbolResolver;
-        private ReturnSymbolBinder returnSymbolResolver;
-        private CallableSymbolBinder callSymbolResolver;
-        private FunctionSymbolBinder funcDeclSymbolResolver;
-        private TupleSymbolBinder tupleSymbolResolver;
-        private NullCoalescingSymbolBinder nullCoalescingSymbolResolver;
-        private ClassSymbolBinder classSymbolBinder;
-        private ClassPropertySymbolBinder classPropertySymbolBinder;
-        private ClassConstantSymbolBinder classConstantSymbolBinder;
-        private ClassMethodSymbolBinder classMethodSymbolBinder;
+        private UnarySymbolResolver unarySymbolResolver;
+        private BinarySymbolResolver binarySymbolResolver;
+        private AssignmentSymbolResolver assignmentSymbolResolver;
+        private ConstantSymbolResolver constantSymbolResolver;
+        private VariableSymbolResolver variableSymbolResolver;
+        private BlockSymbolResolver blockSymbolResolver;
+        private DeclarationSymbolResolver declarationSymbolResolver;
+        private LiteralSymbolResolver literalSymbolResolver;
+        private AccessorSymbolResolver accessorSymbolResolver;
+        private IfSymbolResolver ifSymbolResolver;
+        private WhileSymbolResolver whileSymbolResolver;
+        private ForSymbolResolver forSymbolResolver;
+        private BreakSymbolResolver breakSymbolResolver;
+        private ContinueSymbolResolver continueSymbolResolver;
+        private ReturnSymbolResolver returnSymbolResolver;
+        private CallableSymbolResolver callSymbolResolver;
+        private FunctionSymbolResolver funcDeclSymbolResolver;
+        private TupleSymbolResolver tupleSymbolResolver;
+        private NullCoalescingSymbolResolver nullCoalescingSymbolResolver;
+        private ClassSymbolResolver classSymbolResolver;
+        private ClassPropertySymbolResolver classPropertySymbolResolver;
+        private ClassConstantSymbolResolver classConstantSymbolResolver;
+        private ClassMethodSymbolResolver classMethodSymbolResolver;
 
-        public SymbolBinderVisitor(SymbolTable symtable, TypeInferrer inferrer)
+        public SymbolResolverVisitor(SymbolTable symtable, TypeInferrer inferrer)
         {
             this.SymbolTable = symtable;
             this.Inferrer = inferrer;
-            this.unarySymbolResolver = new UnarySymbolBinder();
-            this.binarySymbolResolver = new BinarySymbolBinder();
-            this.assignmentSymbolResolver = new AssignmentSymbolBinder();
-            this.constantSymbolResolver = new ConstantSymbolBinder();
-            this.variableSymbolResolver = new VariableSymbolBinder();
-            this.blockSymbolResolver = new BlockSymbolBinder();
-            this.declarationSymbolResolver = new DeclarationSymbolBinder();
-            this.literalSymbolResolver = new LiteralSymbolBinder();
-            this.accessorSymbolResolver = new AccessorSymbolBinder();
-            this.ifSymbolResolver = new IfSymbolBinder();
-            this.whileSymbolResolver = new WhileSymbolBinder();
-            this.forSymbolResolver = new ForSymbolBinder();
-            this.breakSymbolResolver = new BreakSymbolBinder();
-            this.continueSymbolResolver = new ContinueSymbolBinder();
-            this.callSymbolResolver = new CallableSymbolBinder();
-            this.funcDeclSymbolResolver = new FunctionSymbolBinder();
-            this.tupleSymbolResolver = new TupleSymbolBinder();
-            this.returnSymbolResolver = new ReturnSymbolBinder();
-            this.nullCoalescingSymbolResolver = new NullCoalescingSymbolBinder();
-            this.classSymbolBinder = new ClassSymbolBinder();
-            this.classPropertySymbolBinder = new ClassPropertySymbolBinder();
-            this.classConstantSymbolBinder = new ClassConstantSymbolBinder();
-            this.classMethodSymbolBinder = new ClassMethodSymbolBinder();
+            this.unarySymbolResolver = new UnarySymbolResolver();
+            this.binarySymbolResolver = new BinarySymbolResolver();
+            this.assignmentSymbolResolver = new AssignmentSymbolResolver();
+            this.constantSymbolResolver = new ConstantSymbolResolver();
+            this.variableSymbolResolver = new VariableSymbolResolver();
+            this.blockSymbolResolver = new BlockSymbolResolver();
+            this.declarationSymbolResolver = new DeclarationSymbolResolver();
+            this.literalSymbolResolver = new LiteralSymbolResolver();
+            this.accessorSymbolResolver = new AccessorSymbolResolver();
+            this.ifSymbolResolver = new IfSymbolResolver();
+            this.whileSymbolResolver = new WhileSymbolResolver();
+            this.forSymbolResolver = new ForSymbolResolver();
+            this.breakSymbolResolver = new BreakSymbolResolver();
+            this.continueSymbolResolver = new ContinueSymbolResolver();
+            this.callSymbolResolver = new CallableSymbolResolver();
+            this.funcDeclSymbolResolver = new FunctionSymbolResolver();
+            this.tupleSymbolResolver = new TupleSymbolResolver();
+            this.returnSymbolResolver = new ReturnSymbolResolver();
+            this.nullCoalescingSymbolResolver = new NullCoalescingSymbolResolver();
+            this.classSymbolResolver = new ClassSymbolResolver();
+            this.classPropertySymbolResolver = new ClassPropertySymbolResolver();
+            this.classConstantSymbolResolver = new ClassConstantSymbolResolver();
+            this.classMethodSymbolResolver = new ClassMethodSymbolResolver();
         }
 
         /// <summary>
@@ -152,19 +152,19 @@ namespace Fl.Semantics.Binders
                     break;
 
                 case AstClassNode cn:
-                    this.classSymbolBinder.Visit(this, cn);
+                    this.classSymbolResolver.Visit(this, cn);
                     break;
 
                 case AstClassPropertyNode cpn:
-                    this.classPropertySymbolBinder.Visit(this, cpn);
+                    this.classPropertySymbolResolver.Visit(this, cpn);
                     break;
 
                 case AstClassConstantNode ccn:
-                    this.classConstantSymbolBinder.Visit(this, ccn);
+                    this.classConstantSymbolResolver.Visit(this, ccn);
                     break;
 
                 case AstClassMethodNode cmn:
-                    this.classMethodSymbolBinder.Visit(this, cmn);
+                    this.classMethodSymbolResolver.Visit(this, cmn);
                     break;
 
                 case AstNoOpNode np:

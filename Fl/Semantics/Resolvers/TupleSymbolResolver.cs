@@ -4,11 +4,11 @@
 
 using Fl.Ast;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class TupleSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstTupleNode>
+    class TupleSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstTupleNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstTupleNode node)
+        public void Visit(SymbolResolverVisitor visitor, AstTupleNode node)
         {
             node.Items?.ForEach(item => item.Visit(visitor));
         }

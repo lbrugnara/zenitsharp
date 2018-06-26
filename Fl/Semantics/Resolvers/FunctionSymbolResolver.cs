@@ -5,11 +5,11 @@ using Fl.Ast;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class FunctionSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstFunctionNode>
+    class FunctionSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstFunctionNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstFunctionNode funcdecl)
+        public void Visit(SymbolResolverVisitor visitor, AstFunctionNode funcdecl)
         {
             // Create the function symbol
             var funcType = new Function();

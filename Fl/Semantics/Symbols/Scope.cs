@@ -50,6 +50,8 @@ namespace Fl.Semantics.Symbols
 
             if (type == ScopeType.Function)
                 this.NewSymbol("@ret", null, Access.Public, Storage.Mutable);
+            else if (type == ScopeType.Global)
+                this.Global = this;
         }
 
         public Scope(ScopeType type, string uid, Scope global, Scope parent = null)
@@ -95,6 +97,30 @@ namespace Fl.Semantics.Symbols
                 throw new ScopeException($"Expecting scope {uid} to be of type {type} but it has type {scope.Type}");
 
             return scope;
+        }
+
+        public bool IsGlobal
+        {
+            get
+            {
+                if (this.Type == ScopeType.Global)
+                    return true;
+
+                var scope = this.Parent ?? this.Global;
+
+                while (scope != null)
+                {
+                    if (scope.Type == ScopeType.Global)
+                        return true;
+
+                    if (scope.IsFunction || scope.IsPackage || scope.IsClass)
+                        return false;
+
+                    scope = scope.Parent ?? scope.Global;
+                }
+
+                return this.Type == ScopeType.Global || Parent != null && Global != Parent && Parent.IsGlobal;
+            }
         }
 
         public bool IsFunction

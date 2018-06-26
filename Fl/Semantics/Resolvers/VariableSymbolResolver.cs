@@ -6,11 +6,11 @@ using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class VariableSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstVariableNode>
+    class VariableSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstVariableNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstVariableNode vardecl)
+        public void Visit(SymbolResolverVisitor visitor, AstVariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -26,7 +26,7 @@ namespace Fl.Semantics.Binders
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected void VarDefinitionNode(SymbolBinderVisitor binder, AstVarDefinitionNode vardecl)
+        protected void VarDefinitionNode(SymbolResolverVisitor binder, AstVarDefinitionNode vardecl)
         {
             // Get the variable type from the declaration or assume an anonymous type
             var lhsType = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, vardecl.SymbolInfo.Type);
@@ -55,7 +55,7 @@ namespace Fl.Semantics.Binders
             }
         }
 
-        protected void VarDestructuringNode(SymbolBinderVisitor visitor, AstVarDestructuringNode destrnode)
+        protected void VarDestructuringNode(SymbolResolverVisitor visitor, AstVarDestructuringNode destrnode)
         {
             destrnode.DestructInit.Visit(visitor);
 

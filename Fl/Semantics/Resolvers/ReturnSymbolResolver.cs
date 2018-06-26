@@ -5,11 +5,11 @@
 using Fl.Semantics.Exceptions;
 using Fl.Ast;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class ReturnSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstReturnNode>
+    class ReturnSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstReturnNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstReturnNode rnode)
+        public void Visit(SymbolResolverVisitor visitor, AstReturnNode rnode)
         {
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");

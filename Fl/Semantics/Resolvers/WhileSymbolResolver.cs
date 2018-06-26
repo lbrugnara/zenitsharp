@@ -4,11 +4,11 @@
 using Fl.Ast;
 using Fl.Semantics.Symbols;
 
-namespace Fl.Semantics.Binders
+namespace Fl.Semantics.Resolvers
 {
-    class WhileSymbolBinder : INodeVisitor<SymbolBinderVisitor, AstWhileNode>
+    class WhileSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstWhileNode>
     {
-        public void Visit(SymbolBinderVisitor visitor, AstWhileNode wnode)
+        public void Visit(SymbolResolverVisitor visitor, AstWhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             visitor.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
