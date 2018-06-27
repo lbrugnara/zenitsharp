@@ -43,18 +43,23 @@ namespace Fl.Semantics.Types
         /// <param name="ret"></param>
         public void SetReturnType(Type ret) => this.Return = ret;
 
-        public bool IsCircularReference
+        public bool IsCircularReference => this.HasCircularReferenceWith(this.Return);
+
+        protected bool HasCircularReferenceWith(Type type)
         {
-            get
-            {
-                if (this.Return is Function && this.GetHashCode() == this.Return?.GetHashCode())
+            if (type is Function functype)
+                if (this.GetHashCode() == functype.GetHashCode())
                     return true;
+                else
+                    return this.HasCircularReferenceWith(functype.Return);
 
-                if (this.Return is Tuple tuple && tuple.Types.Any(t => t is Function f && this.GetHashCode() == f.GetHashCode()))
+            if (type is Tuple tuptype)
+                if (tuptype.Types.Any(t => this.HasCircularReferenceWith(t)))
                     return true;
+                else
+                    return false;
 
-                return false;
-            }
+            return false;
         }
 
         public override bool Equals(object obj)
@@ -84,7 +89,7 @@ namespace Fl.Semantics.Types
             return !(type1 == type2);
         }
 
-        public override string ToString()
+        public override string ToSafeString(List<(Type type, string safestr)> safeTypes)
         {
             var parameters = this.Parameters
                             .Select(s => s?.ToString() ?? "?")
@@ -92,32 +97,27 @@ namespace Fl.Semantics.Types
 
             var str = base.ToString() + "(" + string.Join(", ", parameters) + $"):";
 
-            if (this.IsCircularReference)
+            str += " ";
+            if (safeTypes.Any(st => st.type == this.Return))
             {
-                if (this.Return is Tuple tuple)
-                {
-                    var tupleTypes = new List<string>();
-                    tuple.Types.ForEach(t =>
-                    {
-                        if (t == this)
-                            tupleTypes.Add(str + "<circular reference>");
-                        else
-                            tupleTypes.Add(t.ToString());
-                    });
-
-                    str += $" tuple({string.Join(", ", tupleTypes)})";
-                }
-                else
-                {
-                    str += "<circular reference>";
-                }
+                str += safeTypes.First(st => st.type == this.Return).safestr;
+            }
+            else if (this.Return is Struct stype)
+            {
+                safeTypes.Add((this, "...<cyclic func ref>"));
+                str += stype.ToSafeString(safeTypes);
             }
             else
             {
-                str += " " + this.Return?.ToString() ?? "?";
+                str += this.Return?.ToString() ?? "?";
             }
 
             return str;
+        }
+
+        public override string ToString()
+        {
+            return this.ToSafeString(new List<(Type type, string safestr)>());
         }
 
         public override bool IsAssignableFrom(Type type)

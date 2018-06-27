@@ -42,9 +42,25 @@ namespace Fl.Semantics.Types
             return !(type1 == type2);
         }
 
+        public override string ToSafeString(List<(Type type, string safestr)> safeTypes)
+        {
+            var types = this.Types.Select(t =>
+            {
+                if (safeTypes.Any(st => st.type == t))
+                    return safeTypes.First(st => st.type == t).safestr;
+
+                if (t is Struct stype)
+                    return stype.ToSafeString(safeTypes);
+
+                return t.ToString() ?? "?";
+            });
+
+            return base.ToString() + "(" + string.Join(", ", types) + ")";
+        }
+
         public override string ToString()
         {
-            return base.ToString() + "(" + string.Join(", ", this.Types) + ")";
+            return this.ToSafeString(new List<(Type type, string safestr)>());
         }
 
         public override bool IsAssignableFrom(Type type)

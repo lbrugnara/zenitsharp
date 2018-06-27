@@ -38,6 +38,7 @@ namespace Fl.Semantics
         {
             this.resolver.Visit(ast);
 
+            // If there are unresolved classes, throw an exception
             this.symbolTable.ThrowIfUnresolved();
 
             this.inferrer.Visit(ast);

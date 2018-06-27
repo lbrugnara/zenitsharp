@@ -37,9 +37,6 @@ namespace Fl.Semantics.Inferrers
                 // and that should be reflected on the @ret symbol
                 var lambdaReturnExpr = statements.Select(s => s.inferred).Last();
 
-                if (lambdaReturnExpr.Type is Function f && f.Return == functionType.Return)
-                    throw new SymbolException("The function can not be returned to itself");
-
                 // Try to unify these types
                 visitor.Inferrer.MakeConclusion(lambdaReturnExpr.Type, retSymbol.Type);
             }
