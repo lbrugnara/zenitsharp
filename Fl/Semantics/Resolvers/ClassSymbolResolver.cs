@@ -16,7 +16,7 @@ namespace Fl.Semantics.Resolvers
             // Define the class in the global scope
             var className = node.Name.Value.ToString();
             var classType = new Class(className);
-            var classSymbol = binder.SymbolTable.Global.NewSymbol(className, classType, Access.Public, Storage.Constant);
+            var classSymbol = binder.SymbolTable.NewClassSymbol(className, classType, Access.Public);
 
             binder.SymbolTable.EnterClassScope(classSymbol.Name);
 

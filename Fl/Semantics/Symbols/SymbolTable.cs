@@ -3,7 +3,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Fl.Semantics.Exceptions;
 using Fl.Semantics.Types;
+using Fl.Syntax;
 
 namespace Fl.Semantics.Symbols
 {
@@ -14,18 +16,21 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         private readonly Stack<Scope> scopes;
 
+        private readonly Dictionary<string, List<Token>> unresolved;
+
         public SymbolTable()
         {
             this.scopes = new Stack<Scope>();
 
             // Create the initial scope (Global)
             this.scopes.Push(new Scope(ScopeType.Global, "global"));
+            this.unresolved = new Dictionary<string, List<Token>>();
         }
 
         /// <summary>
         /// Global scope is the first created (last in the stack) scope
         /// </summary>
-        public Scope Global => this.scopes.Last();
+        private Scope Global => this.scopes.Last();
 
         /// <summary>
         /// Current scope is the latest added one
@@ -55,6 +60,20 @@ namespace Fl.Semantics.Symbols
             {
                 this.scopes.Push(this.Global.GetOrCreateNestedScope(ScopeType.Class, className));
             }
+        }
+
+        public Scope GetClassScope(string className)
+        {
+            if (this.CurrentScope.IsPackage)
+            {
+                // TODO: Do something with the Package
+            }
+            if (this.CurrentScope.IsClass)
+            {
+                // TODO: Do something with the Class
+            }
+
+            return this.Global.GetNestedScope(ScopeType.Class, className);
         }
 
         /// <summary>
@@ -91,5 +110,49 @@ namespace Fl.Semantics.Symbols
         public Symbol TryGetSymbol(string name) => this.scopes.Peek().TryGetSymbol(name);
 
         #endregion
+
+        public Symbol NewClassSymbol(string className, Class clasz, Access access)
+        {
+            if (this.unresolved.ContainsKey(className))
+                this.unresolved.Remove(className);
+
+            Scope scope = this.Global;
+
+            if (this.CurrentScope.IsPackage)
+            {
+                // TODO: Do something with the Package
+            }
+            if (this.CurrentScope.IsClass)
+            {
+                // TODO: Do something with the Class
+            }
+
+            return scope.NewSymbol(className, clasz, access, Storage.Constant);
+        }
+
+        public void AddUnresolvedType(string name, Token info)
+        {
+            if (!this.unresolved.ContainsKey(name))
+                this.unresolved[name] = new List<Token>();
+            this.unresolved[name].Add(info);
+        }
+
+        public void ThrowIfUnresolved()
+        {
+            if (this.unresolved.Count == 0)
+                return;
+
+            var errors = new List<string>();
+
+            foreach (var type in this.unresolved)
+            {
+                var name = type.Key;
+                var tokens = type.Value;
+
+                tokens.ForEach(token => errors.Add($"Type '{name}' is not defined in line {token.Line}:{token.Col}"));
+            }
+
+            throw new SymbolException(string.Join("\n", errors));
+        }
     }
 }

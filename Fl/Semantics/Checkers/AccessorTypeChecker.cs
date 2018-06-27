@@ -45,7 +45,7 @@ namespace Fl.Semantics.Checkers
             if (encsym.Type is Class clasz)
             {
                 // Find the Class scope
-                symbol = checker.SymbolTable.Global.GetNestedScope(ScopeType.Class, encsym.Name).GetSymbol(symbolName);
+                symbol = checker.SymbolTable.GetClassScope(encsym.Name).GetSymbol(symbolName);
                 return new CheckedType(symbol.Type, symbol);
             }
 
@@ -56,9 +56,9 @@ namespace Fl.Semantics.Checkers
 
             if (encsym.Type is ClassInstance classInstance)
                 // Find the Class scope
-                symtable = checker.SymbolTable.Global.GetNestedScope(ScopeType.Class, classInstance.Class.ClassName);
+                symtable = checker.SymbolTable.GetClassScope(classInstance.Class.ClassName);
             else if (checker.SymbolTable.TryGetSymbol(encsym.Type.Name)?.Type is Class)
-                symtable = checker.SymbolTable.Global.GetNestedScope(ScopeType.Class, encsym.Type.Name);
+                symtable = checker.SymbolTable.GetClassScope(encsym.Type.Name);
             else
                 throw new SymbolException($"Unhandled accessor type {encsym}");
 

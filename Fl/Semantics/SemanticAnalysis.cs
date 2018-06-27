@@ -37,6 +37,9 @@ namespace Fl.Semantics
         public SymbolTable Run(AstNode ast)
         {
             this.resolver.Visit(ast);
+
+            this.symbolTable.ThrowIfUnresolved();
+
             this.inferrer.Visit(ast);
             this.checker.Visit(ast);
 

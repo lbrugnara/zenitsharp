@@ -78,7 +78,12 @@ namespace Fl.Semantics.Types
                 if (val == "func" || val == "tuple")
                     return inferrer?.NewAnonymousType();
 
-                return symtable.GetSymbol(val).Type;
+                if (symtable.HasSymbol(val))
+                    return symtable.GetSymbol(val).Type;
+
+                var type = new ClassInstance(new Class(val));
+                symtable.AddUnresolvedType(type.Class.ClassName, token);
+                return type;
             }
 
             switch (token.Type)

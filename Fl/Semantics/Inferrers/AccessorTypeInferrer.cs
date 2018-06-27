@@ -45,7 +45,7 @@ namespace Fl.Semantics.Inferrers
             if (encsym.Type is Class clasz)
             {
                 // Find the Class scope
-                symbol = inferrer.SymbolTable.Global.GetNestedScope(ScopeType.Class, encsym.Name).GetSymbol(symbolName);
+                symbol = inferrer.SymbolTable.GetClassScope(encsym.Name).GetSymbol(symbolName);
                 return new InferredType(symbol.Type, symbol);
             }
 
@@ -56,9 +56,9 @@ namespace Fl.Semantics.Inferrers
 
             if (encsym.Type is ClassInstance classInstance)
                 // Find the Class scope
-                symtable = inferrer.SymbolTable.Global.GetNestedScope(ScopeType.Class, classInstance.Class.ClassName);
+                symtable = inferrer.SymbolTable.GetClassScope(classInstance.Class.ClassName);
             else if (inferrer.SymbolTable.TryGetSymbol(encsym.Type.Name)?.Type is Class)
-                symtable = inferrer.SymbolTable.Global.GetNestedScope(ScopeType.Class, encsym.Type.Name);
+                symtable = inferrer.SymbolTable.GetClassScope(encsym.Type.Name);
             else
                 throw new SymbolException($"Unhandled accessor type {encsym}");
 
