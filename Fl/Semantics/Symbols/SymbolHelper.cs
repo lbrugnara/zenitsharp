@@ -79,7 +79,12 @@ namespace Fl.Semantics.Types
                     return inferrer?.NewAnonymousType();
 
                 if (symtable.HasSymbol(val))
-                    return symtable.GetSymbol(val).Type;
+                {
+                    var stype = symtable.GetSymbol(val).Type;
+                    if (stype is Class ctype)
+                        return new ClassInstance(ctype);
+                    return stype;
+                }
 
                 var type = new ClassInstance(new Class(val));
                 symtable.AddUnresolvedType(type.Class.ClassName, token);

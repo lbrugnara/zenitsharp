@@ -10,6 +10,7 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, AstUnaryNode unary)
         {
+            // TODO: Check Prefix/Postfix increment
             return unary.Left.Visit(checker);
         }
     }

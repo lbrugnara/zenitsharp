@@ -10,6 +10,7 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, AstUnaryNode unary)
         {
+            // TODO: Check Prefix/Postfix increment
             return unary.Left.Visit(visitor);
         }
     }
