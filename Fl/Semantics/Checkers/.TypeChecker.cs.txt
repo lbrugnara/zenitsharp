@@ -1,7 +1,7 @@
 ﻿using Fl.Ast;
 using Fl.Semantics.Checkers;
 
-namespace Fl.Semantics.Inferrers
+namespace Fl.Semantics.Checkers
 {
     class #Name#TypeChecker : INodeVisitor<TypeCheckerVisitor, Ast#Name#Node, CheckedType>
     {

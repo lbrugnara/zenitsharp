@@ -13,10 +13,22 @@ namespace FlInterpreter
         {
             while (true)
             {
-                Console.Write(">>> ");
                 try
                 {
-                    string line = Console.ReadLine();
+                    string line = "";
+                    while (true)
+                    {
+                        Console.Write(line == "" ? ">>> " : "  | ");
+                        string tmp = Console.ReadLine();
+
+                        if (string.IsNullOrEmpty(tmp))
+                        {
+                            Console.WriteLine(" <- ");
+                            break;
+                        }
+
+                        line += tmp;
+                    }
 
                     var compiler = new Compiler();
                     var ilProgram = compiler.Compile(line);

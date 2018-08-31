@@ -18,7 +18,11 @@ namespace Fl.Syntax
 
         public AstNode Run(string source)
         {
-            var ast = this.parser.Parse(this.lexer.Tokenize(source));
+            var tokens = this.lexer.Tokenize(source);
+
+            // tokens.ForEach(t => System.Diagnostics.Trace.WriteLine($"{t.Type}('{t.Value}') {t.Line}:{t.Col}"));
+
+            var ast = this.parser.Parse(tokens);
 
             var errors = parser.ParsingErrors;
 

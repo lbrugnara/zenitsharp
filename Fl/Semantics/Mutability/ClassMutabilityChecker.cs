@@ -1,11 +1,11 @@
 ﻿using Fl.Ast;
 using Fl.Semantics.Checkers;
 
-namespace Fl.Semantics.Checkers
+namespace Fl.Semantics.Mutability
 {
-    class ClassTypeChecker : INodeVisitor<TypeCheckerVisitor, AstClassNode, CheckedType>
+    class ClassMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstClassNode, MutabilityCheckResult>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstClassNode node)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstClassNode node)
         {
             checker.SymbolTable.EnterClassScope(node.Name.Value.ToString());
 
@@ -17,7 +17,7 @@ namespace Fl.Semantics.Checkers
 
             checker.SymbolTable.LeaveScope();
 
-            return new CheckedType(checker.SymbolTable.GetSymbol(node.Name.Value.ToString()).Type);
+            return new MutabilityCheckResult(checker.SymbolTable.GetSymbol(node.Name.Value.ToString()));
         }
     }
 }

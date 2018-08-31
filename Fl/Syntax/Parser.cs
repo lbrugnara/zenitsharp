@@ -1186,7 +1186,7 @@ namespace Fl.Syntax
                     {
                         Token assignmentop = this.Consume();
                         AstNode expression = this.Expression();
-                        return new AstDestructuringAssignmentNode(lvalue, assignmentop, expression);
+                        return new AstDestructuringAssignmentNode(lvalue, assignmentop, expression as AstTupleNode);
                     }
                 }
                 catch

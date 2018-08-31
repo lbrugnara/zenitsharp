@@ -76,6 +76,20 @@ namespace Fl.Semantics.Symbols
             return this.Global.GetNestedScope(ScopeType.Class, className);
         }
 
+        public Scope GetFunctionScope(string funcName)
+        {
+            if (this.CurrentScope.IsPackage)
+            {
+                // TODO: Do something with the Package
+            }
+            if (this.CurrentScope.IsClass)
+            {
+                // TODO: Do something with the Class
+            }
+
+            return this.Global.GetNestedScope(ScopeType.Function, funcName);
+        }
+
         /// <summary>
         /// Enter to the function's scope, chain it to the stack of scopes, and make it the current 
         /// executing scope

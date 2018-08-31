@@ -3,7 +3,7 @@ using Fl.Semantics.Checkers;
 using Fl.Semantics.Exceptions;
 using Fl.Semantics.Types;
 
-namespace Fl.Semantics.Inferrers
+namespace Fl.Semantics.Checkers
 {
     class ClassConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, AstClassConstantNode, CheckedType>
     {

@@ -4,6 +4,7 @@
 using Fl.Semantics.Exceptions;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Fl.Semantics.Symbols
 {
@@ -166,6 +167,8 @@ namespace Fl.Semantics.Symbols
             this.Symbols[name] = symbol;
             return symbol;
         }
+
+        public List<Symbol> GetAllSymbol() => this.Symbols.Values.ToList();
 
         public bool HasSymbol(string name) => this.Symbols.ContainsKey(name) || (this.Parent != null && this.Parent.HasSymbol(name)) || (this.Type != ScopeType.Global && this.Global != null && this.Global.HasSymbol(name));
 

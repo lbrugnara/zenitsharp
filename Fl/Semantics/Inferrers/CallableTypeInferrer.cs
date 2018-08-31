@@ -3,11 +3,6 @@
 
 using Fl.Semantics.Types;
 using Fl.Ast;
-using Fl.Semantics.Types;
-using System.Collections.Generic;
-using Fl.Semantics;
-using System;
-using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {

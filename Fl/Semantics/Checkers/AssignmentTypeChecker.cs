@@ -31,9 +31,7 @@ namespace Fl.Semantics.Checkers
             var leftHandSide = node.Accessor.Visit(checker);
             var rightHandSide = node.Expression.Visit(checker);
 
-            if (leftHandSide.Symbol.Storage == Symbols.Storage.Immutable)
-                throw new System.Exception($"Cannot change immutable {leftHandSide.Type} '{leftHandSide.Symbol.Name}'");
-            else if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
+            if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
                 throw new System.Exception($"Cannot change value of constant {leftHandSide.Type.Name} '{leftHandSide.Symbol.Name}'");
 
             if (!leftHandSide.Type.IsAssignableFrom(rightHandSide.Type))
@@ -71,9 +69,7 @@ namespace Fl.Semantics.Checkers
 
                 var leftHandSide = varnode.Visit(checker);
 
-                if (leftHandSide.Symbol.Storage == Symbols.Storage.Immutable)
-                    throw new System.Exception($"Cannot change immutable {leftHandSide.Type} '{leftHandSide.Symbol.Name}'");
-                else if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
+                if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
                     throw new System.Exception($"Cannot change value of constant {leftHandSide.Type.Name} '{leftHandSide.Symbol.Name}'");
 
                 var exprType = exprTypes.Types[i];

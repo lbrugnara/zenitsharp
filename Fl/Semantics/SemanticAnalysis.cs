@@ -6,6 +6,7 @@ using Fl.Semantics.Symbols;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Fl.Semantics.Mutability;
 
 namespace Fl.Semantics
 {
@@ -16,6 +17,7 @@ namespace Fl.Semantics
         private SymbolResolverVisitor resolver;
         private TypeInferrerVisitor inferrer;
         private TypeCheckerVisitor checker;
+        private MutabilityCheckerVisitor mutabilityChecker;
 
         public SemanticAnalysis()
         {
@@ -25,6 +27,7 @@ namespace Fl.Semantics
             this.resolver = new SymbolResolverVisitor(this.symbolTable, this.typeInferrer);
             this.inferrer = new TypeInferrerVisitor(this.symbolTable, this.typeInferrer);
             this.checker = new TypeCheckerVisitor(this.symbolTable);
+            this.mutabilityChecker = new MutabilityCheckerVisitor(this.symbolTable);
 
             /*var intClass = new Class();
 
@@ -43,6 +46,7 @@ namespace Fl.Semantics
 
             this.inferrer.Visit(ast);
             this.checker.Visit(ast);
+            this.mutabilityChecker.Visit(ast);
 
             return this.symbolTable;
         }
