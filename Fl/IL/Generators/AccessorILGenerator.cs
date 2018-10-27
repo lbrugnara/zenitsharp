@@ -7,19 +7,19 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class AccessorILGenerator : INodeVisitor<ILGenerator, AstAccessorNode, Operand>
+    class AccessorILGenerator : INodeVisitor<ILGenerator, AccessorNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstAccessorNode accessor)
+        public Operand Visit(ILGenerator generator, AccessorNode accessor)
         {
-            string currentIdentifier = accessor.Identifier.Value.ToString();
+            string currentIdentifier = accessor.Target.Value;
 
             // If current ID is the root member (or the only accessed one) return its symbol
-            if (accessor.Enclosing == null)
+            if (accessor.Parent == null)
                 // If the symbol is not defined, create a new one that is not resolved yet (it could be a symbol that is not yet defined)
                 return generator.SymbolTable.GetSymbol(currentIdentifier) ?? new SymbolOperand(currentIdentifier, OperandType.Auto, generator.SymbolTable.CurrentBlock.Name, false);
 
-            // If not, resolve its parrent...
-            Operand parent = accessor.Enclosing.Visit(generator);
+            // If not, resolve its parent...
+            Operand parent = accessor.Parent.Visit(generator);
 
             // ... add current ID as accessor's member of parent
             parent.AddMember(new SymbolOperand(currentIdentifier));

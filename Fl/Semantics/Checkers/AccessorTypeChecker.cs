@@ -8,16 +8,16 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class AccessorTypeChecker : INodeVisitor<TypeCheckerVisitor, AstAccessorNode, CheckedType>
+    class AccessorTypeChecker : INodeVisitor<TypeCheckerVisitor, AccessorNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstAccessorNode accessor)
+        public CheckedType Visit(TypeCheckerVisitor checker, AccessorNode accessor)
         {
             Symbol symbol = null;
-            string symbolName = accessor.Identifier.Value.ToString();
+            string symbolName = accessor.Target.Value;
 
             // If this is the end of the accessor path, get the symbol in the current
             // scope and return its information
-            if (accessor.Enclosing == null)
+            if (accessor.Parent == null)
             {
                 // Get accessed symbol that must be defined in the symtable's scope
                 symbol = checker.SymbolTable.GetSymbol(symbolName);
@@ -30,7 +30,7 @@ namespace Fl.Semantics.Checkers
 
             // If the accessed member has an eclosing accessor node, visit
             // it to get the enclosing symbol's type
-            var encsym = accessor.Enclosing.Visit(checker).Symbol;
+            var encsym = accessor.Parent.Visit(checker).Symbol;
 
             // If the enclosing symbol implements ISymbolTable we will search for 
             // the symbol within the enclosing scope

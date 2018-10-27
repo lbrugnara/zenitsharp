@@ -16,7 +16,7 @@ namespace Fl.Syntax
             this.parser = new Parser();
         }
 
-        public AstNode Run(string source)
+        public Node Run(string source)
         {
             var tokens = this.lexer.Tokenize(source);
 

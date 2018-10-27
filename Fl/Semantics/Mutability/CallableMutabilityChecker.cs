@@ -6,12 +6,12 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {
-    public class CallableMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstCallableNode, MutabilityCheckResult>
+    public class CallableMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, CallableNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstCallableNode node)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, CallableNode node)
         {
-            var target = node.Callable.Visit(checker);
-            var funcScope = checker.SymbolTable.GetFunctionScope(target.Symbol.Name);
+            var target = node.Target.Visit(checker);
+            //var funcScope = checker.SymbolTable.GetFunctionScope(target.Symbol.Name);
 
             node.Arguments.Expressions.ForEach(a => a.Visit(checker));
 

@@ -6,11 +6,11 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class DeclarationTypeChecker : INodeVisitor<TypeCheckerVisitor, AstDeclarationNode, CheckedType>
+    class DeclarationTypeChecker : INodeVisitor<TypeCheckerVisitor, DeclarationNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstDeclarationNode decls)
+        public CheckedType Visit(TypeCheckerVisitor checker, DeclarationNode decls)
         {
-            foreach (AstNode statement in decls.Statements)
+            foreach (Node statement in decls.Statements)
                 statement.Visit(checker);
 
             return null;

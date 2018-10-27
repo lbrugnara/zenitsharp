@@ -6,9 +6,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class NullCoalescingTypeChecker : INodeVisitor<TypeCheckerVisitor, AstNullCoalescingNode, CheckedType>
+    class NullCoalescingTypeChecker : INodeVisitor<TypeCheckerVisitor, NullCoalescingNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstNullCoalescingNode nullc)
+        public CheckedType Visit(TypeCheckerVisitor checker, NullCoalescingNode nullc)
         {
             var left = nullc.Left.Visit(checker);
             var right = nullc.Right.Visit(checker);

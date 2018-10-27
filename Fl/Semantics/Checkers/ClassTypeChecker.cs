@@ -3,11 +3,11 @@ using Fl.Semantics.Checkers;
 
 namespace Fl.Semantics.Checkers
 {
-    class ClassTypeChecker : INodeVisitor<TypeCheckerVisitor, AstClassNode, CheckedType>
+    class ClassTypeChecker : INodeVisitor<TypeCheckerVisitor, ClassNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstClassNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, ClassNode node)
         {
-            checker.SymbolTable.EnterClassScope(node.Name.Value.ToString());
+            checker.SymbolTable.EnterClassScope(node.Name.Value);
 
             node.Properties.ForEach(propertyNode => propertyNode.Visit(checker));
 
@@ -17,7 +17,7 @@ namespace Fl.Semantics.Checkers
 
             checker.SymbolTable.LeaveScope();
 
-            return new CheckedType(checker.SymbolTable.GetSymbol(node.Name.Value.ToString()).Type);
+            return new CheckedType(checker.SymbolTable.GetSymbol(node.Name.Value).Type);
         }
     }
 }

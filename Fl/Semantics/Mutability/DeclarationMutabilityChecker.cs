@@ -6,11 +6,11 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {
-    class DeclarationMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstDeclarationNode, MutabilityCheckResult>
+    class DeclarationMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, DeclarationNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstDeclarationNode decls)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, DeclarationNode decls)
         {
-            foreach (AstNode statement in decls.Statements)
+            foreach (Node statement in decls.Statements)
                 statement.Visit(checker);
 
             return null;

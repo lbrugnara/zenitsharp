@@ -8,12 +8,12 @@ using Fl.Semantics.Exceptions;
 
 namespace Fl.Semantics.Mutability
 {
-    class ConstantMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstConstantNode, MutabilityCheckResult>
+    class ConstantMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, ConstantNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstConstantNode constdec)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, ConstantNode constdec)
         {
-            foreach (var declaration in constdec.Constants)
-                declaration.Item2.Visit(checker);
+            foreach (var definition in constdec.Definitions)
+                definition.Right.Visit(checker);
 
             return null;
         }

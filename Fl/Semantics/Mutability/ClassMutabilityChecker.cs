@@ -3,11 +3,11 @@ using Fl.Semantics.Checkers;
 
 namespace Fl.Semantics.Mutability
 {
-    class ClassMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstClassNode, MutabilityCheckResult>
+    class ClassMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, ClassNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstClassNode node)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, ClassNode node)
         {
-            checker.SymbolTable.EnterClassScope(node.Name.Value.ToString());
+            checker.SymbolTable.EnterClassScope(node.Name.Value);
 
             node.Properties.ForEach(propertyNode => propertyNode.Visit(checker));
 
@@ -17,7 +17,7 @@ namespace Fl.Semantics.Mutability
 
             checker.SymbolTable.LeaveScope();
 
-            return new MutabilityCheckResult(checker.SymbolTable.GetSymbol(node.Name.Value.ToString()));
+            return new MutabilityCheckResult(checker.SymbolTable.GetSymbol(node.Name.Value));
         }
     }
 }

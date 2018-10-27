@@ -7,14 +7,14 @@ using Fl.Ast;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ReturnSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstReturnNode>
+    class ReturnSymbolResolver : INodeVisitor<SymbolResolverVisitor, ReturnNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstReturnNode rnode)
+        public void Visit(SymbolResolverVisitor visitor, ReturnNode rnode)
         {
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            rnode.ReturnTuple?.Visit(visitor);
+            rnode.Expression?.Visit(visitor);
         }
     }
 }

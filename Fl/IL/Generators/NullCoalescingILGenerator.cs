@@ -8,9 +8,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class NullCoalescingILGenerator : INodeVisitor<ILGenerator, AstNullCoalescingNode, Operand>
+    class NullCoalescingILGenerator : INodeVisitor<ILGenerator, NullCoalescingNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstNullCoalescingNode nullc)
+        public Operand Visit(ILGenerator generator, NullCoalescingNode nullc)
         {
             SymbolOperand retval = generator.SymbolTable.NewTempSymbol(OperandType.Auto, "retval");
             generator.Emmit(new VarInstruction(retval, null));

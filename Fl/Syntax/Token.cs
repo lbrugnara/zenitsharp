@@ -6,7 +6,7 @@ namespace Fl.Syntax
     public class Token
     {
         public TokenType Type;
-        public object Value;
+        public string Value;
         public int Line;
         public int Col;
 

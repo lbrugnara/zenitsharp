@@ -9,9 +9,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Mutability
 {
-    class ClassMethodMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstClassMethodNode, MutabilityCheckResult>
+    class ClassMethodMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, ClassMethodNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstClassMethodNode method)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, ClassMethodNode method)
         {
             checker.SymbolTable.EnterScope(ScopeType.Function, method.Name);
 

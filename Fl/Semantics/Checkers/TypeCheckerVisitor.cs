@@ -66,81 +66,81 @@ namespace Fl.Semantics.Checkers
         /// </summary>
         public SymbolTable SymbolTable { get; private set; }
 
-        public CheckedType Visit(AstNode node)
+        public CheckedType Visit(Node node)
         {
             object n = node;
             switch (n)
             {
-                case AstUnaryNode u:
+                case UnaryNode u:
                     return this.unaryTypeChecker.Visit(this, u);
 
-                case AstBinaryNode b:
+                case BinaryNode b:
                     return this.binaryTypeChecker.Visit(this, b);
 
-                case AstAssignmentNode a:
+                case AssignmentNode a:
                     return this.assignmentTypeChecker.Visit(this, a);
 
-                case AstConstantNode c:
+                case ConstantNode c:
                     return this.constantTypeChecker.Visit(this, c);
 
-                case AstVariableNode v:
+                case VariableNode v:
                     return this.variableTypeChecker.Visit(this, v);
 
-                case AstBlockNode bl:
+                case BlockNode bl:
                     return this.blockTypeChecker.Visit(this, bl);
 
-                case AstDeclarationNode d:
+                case DeclarationNode d:
                     return this.declarationTypeChecker.Visit(this, d);
 
-                case AstLiteralNode l:
+                case LiteralNode l:
                     return this.literalTypeChecker.Visit(this, l);
 
-                case AstAccessorNode ivk:
+                case AccessorNode ivk:
                     return this.accessorTypeChecker.Visit(this, ivk);
 
-                case AstIfNode i:
+                case IfNode i:
                     return this.ifTypeChecker.Visit(this, i);
 
-                case AstWhileNode w:
+                case WhileNode w:
                     return this.whileTypeChecker.Visit(this, w);
 
-                case AstForNode f:
+                case ForNode f:
                     return this.forTypeChecker.Visit(this, f);
 
-                case AstBreakNode brk:
+                case BreakNode brk:
                     return this.breakTypeChecker.Visit(this, brk);
 
-                case AstContinueNode cont:
+                case ContinueNode cont:
                     return this.continueTypeChecker.Visit(this, cont);
 
-                case AstCallableNode call:
+                case CallableNode call:
                     return this.callTypeChecker.Visit(this, call);
 
-                case AstFunctionNode func:
+                case FunctionNode func:
                     return this.funcDeclTypeChecker.Visit(this, func);
 
-                case AstTupleNode t:
+                case TupleNode t:
                     return this.tupleTypeChecker.Visit(this, t);
 
-                case AstReturnNode ret:
+                case ReturnNode ret:
                     return this.returnTypeChecker.Visit(this, ret);
 
-                case AstNullCoalescingNode nc:
+                case NullCoalescingNode nc:
                     return this.nullCoalescingTypeChecker.Visit(this, nc);
 
-                case AstClassNode cn:
+                case ClassNode cn:
                     return this.classTypeChecker.Visit(this, cn);
 
-                case AstClassPropertyNode cpn:
+                case ClassPropertyNode cpn:
                     return this.classPropertyTypeChecker.Visit(this, cpn);
 
-                case AstClassConstantNode ccn:
+                case ClassConstantNode ccn:
                     return this.classConstantTypeChecker.Visit(this, ccn);
 
-                case AstClassMethodNode cmn:
+                case ClassMethodNode cmn:
                     return this.classMethodTypeChecker.Visit(this, cmn);
 
-                case AstNoOpNode np:
+                case NoOpNode np:
                     return null;
             }
             throw new AstWalkerException($"Unhandled type {node.GetType()}");

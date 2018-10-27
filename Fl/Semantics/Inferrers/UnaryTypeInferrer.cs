@@ -6,9 +6,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class UnaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstUnaryNode, InferredType>
+    class UnaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, UnaryNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstUnaryNode unary)
+        public InferredType Visit(TypeInferrerVisitor visitor, UnaryNode unary)
         {
             // TODO: Check Prefix/Postfix increment
             return unary.Left.Visit(visitor);

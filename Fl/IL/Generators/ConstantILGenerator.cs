@@ -8,14 +8,14 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class ConstantILGenerator : INodeVisitor<ILGenerator, AstConstantNode, Operand>
+    class ConstantILGenerator : INodeVisitor<ILGenerator, ConstantNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstConstantNode constdec)
+        public Operand Visit(ILGenerator generator, ConstantNode constdec)
         {
-            foreach (var declaration in constdec.Constants)
+            foreach (var definition in constdec.Definitions)
             {
                 // Get the identifier name
-                var constantName = declaration.Item1.Value.ToString();
+                var constantName = definition.Left.Value;
 
                 // Get the constant's type
                 /*var type = OperandType.FromToken(constdec.Type);

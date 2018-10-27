@@ -9,9 +9,9 @@ using System.Linq;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ClassMethodTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstClassMethodNode, InferredType>
+    class ClassMethodTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassMethodNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstClassMethodNode method)
+        public InferredType Visit(TypeInferrerVisitor visitor, ClassMethodNode method)
         {
             // Get the method symbol and type
             var methodSymbol = visitor.SymbolTable.GetSymbol(method.Name);
@@ -23,7 +23,7 @@ namespace Fl.Semantics.Inferrers
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
 
-            parametersSymbols.AddRange(method.Parameters.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value.ToString())));
+            parametersSymbols.AddRange(method.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value)));
 
             // Get the return symbol and assign a temporal type
             var retSymbol = visitor.SymbolTable.GetSymbol("@ret");

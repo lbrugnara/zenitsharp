@@ -5,12 +5,12 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ClassPropertyTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstClassPropertyNode, InferredType>
+    class ClassPropertyTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassPropertyNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor inferrer, AstClassPropertyNode node)
+        public InferredType Visit(TypeInferrerVisitor inferrer, ClassPropertyNode node)
         {
             // Get the property symbol
-            var property = inferrer.SymbolTable.GetSymbol(node.Name.Value.ToString());
+            var property = inferrer.SymbolTable.GetSymbol(node.Name.Value);
 
             // If the right-hand side is present, get the inferred type and make the conclusions
             var defInferredType = node.Definition?.Visit(inferrer);

@@ -7,9 +7,9 @@ using Fl.Semantics;
 
 namespace Fl.Semantics.Checkers
 {
-    class LiteralTypeChecker : INodeVisitor<TypeCheckerVisitor, AstLiteralNode, CheckedType>
+    class LiteralTypeChecker : INodeVisitor<TypeCheckerVisitor, LiteralNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstLiteralNode literal)
+        public CheckedType Visit(TypeCheckerVisitor checker, LiteralNode literal)
         {
             return new CheckedType(SymbolHelper.GetType(checker.SymbolTable, literal.Literal));
         }

@@ -8,9 +8,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Checkers
 {
-    class IfTypeChecker : INodeVisitor<TypeCheckerVisitor, AstIfNode, CheckedType>
+    class IfTypeChecker : INodeVisitor<TypeCheckerVisitor, IfNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstIfNode ifnode)
+        public CheckedType Visit(TypeCheckerVisitor checker, IfNode ifnode)
         {
             var conditionType = ifnode.Condition.Visit(checker);
 

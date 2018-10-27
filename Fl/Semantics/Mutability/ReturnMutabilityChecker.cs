@@ -9,11 +9,11 @@ using System.Linq;
 
 namespace Fl.Semantics.Mutability
 {
-    class ReturnMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstReturnNode, MutabilityCheckResult>
+    class ReturnMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, ReturnNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstReturnNode rnode)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, ReturnNode rnode)
         {
-            var result = rnode.ReturnTuple?.Visit(checker);
+            var result = rnode.Expression?.Visit(checker);
             return result != null ? new MutabilityCheckResult(result.Symbol) : null;
         }
     }

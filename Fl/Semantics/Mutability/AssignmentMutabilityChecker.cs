@@ -6,22 +6,22 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {
-    class AssignmentMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstAssignmentNode, MutabilityCheckResult>
+    class AssignmentMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AssignmentNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstAssignmentNode node)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AssignmentNode node)
         {
-            if (node is AstVariableAssignmentNode)
-                return CheckVariableAssignment(node as AstVariableAssignmentNode, checker);
-            if (node is AstDestructuringAssignmentNode)
-                return this.CheckDestructuringAssignment(node as AstDestructuringAssignmentNode, checker);
+            if (node is VariableAssignmentNode)
+                return CheckVariableAssignment(node as VariableAssignmentNode, checker);
+            if (node is DestructuringAssignmentNode)
+                return this.CheckDestructuringAssignment(node as DestructuringAssignmentNode, checker);
 
             throw new AstWalkerException($"Invalid variable assignment of type {node.GetType().FullName}");
         }
 
-        private MutabilityCheckResult CheckVariableAssignment(AstVariableAssignmentNode node, MutabilityCheckerVisitor checker)
+        private MutabilityCheckResult CheckVariableAssignment(VariableAssignmentNode node, MutabilityCheckerVisitor checker)
         {
             var leftHandSide = node.Accessor.Visit(checker);
-            var rightHandSide = node.Expression.Visit(checker);
+            var rightHandSide = node.Right.Visit(checker);
 
             /*if (leftHandSide.Symbol.Storage == Symbols.Storage.Immutable)
                 throw new System.Exception($"Cannot change value of immutable variable {leftHandSide.Symbol.Name} '{leftHandSide.Symbol.Name}'");*/
@@ -29,16 +29,16 @@ namespace Fl.Semantics.Mutability
             return leftHandSide;
         }
 
-        private MutabilityCheckResult CheckDestructuringAssignment(AstDestructuringAssignmentNode node, MutabilityCheckerVisitor checker)
+        private MutabilityCheckResult CheckDestructuringAssignment(DestructuringAssignmentNode node, MutabilityCheckerVisitor checker)
         {
-            for (int i = 0; i < node.Expression.Items.Count; i++)
+            for (int i = 0; i < node.Right.Items.Count; i++)
             {
-                var varType = node.Expression.Items[i];
+                var varType = node.Right.Items[i];
 
                 if (varType == null)
                     continue;
 
-                var varnode = node.Variables.Items[i];
+                var varnode = node.Left.Items[i];
 
                 var leftHandSide = varnode.Visit(checker);
 

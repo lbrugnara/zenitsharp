@@ -5,14 +5,14 @@
 namespace Fl.Ast
 {
     public interface INodeVisitor<W, N>
-        where N : AstNode
+        where N : Node
         where W : IAstWalker
     {
         void Visit(W walker, N node);
     }
 
     public interface INodeVisitor<W, N, R> 
-        where N : AstNode 
+        where N : Node 
         where R : class 
         where W : IAstWalker<R>
     {

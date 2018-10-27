@@ -8,9 +8,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassMethodSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstClassMethodNode>
+    class ClassMethodSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassMethodNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstClassMethodNode method)
+        public void Visit(SymbolResolverVisitor visitor, ClassMethodNode method)
         {
             // Get the access modifier, and the storage type for the method declaration
             var accessMod = SymbolHelper.GetAccess(method.SymbolInfo.Access);
@@ -26,7 +26,7 @@ namespace Fl.Semantics.Resolvers
             visitor.SymbolTable.EnterScope(ScopeType.Function, method.Name);
 
             // Process the parameters
-            method.Parameters.Parameters.ForEach(p => {
+            method.Parameters.ForEach(p => {
                 // Define the symbol in the current scope (method's scope)
                 var type = p.SymbolInfo.Type == null ? visitor.Inferrer.NewAnonymousType() : SymbolHelper.GetType(visitor.SymbolTable, p.SymbolInfo.Type);
                 
@@ -34,7 +34,7 @@ namespace Fl.Semantics.Resolvers
                 methodType.DefineParameterType(type);
 
                 var storage = SymbolHelper.GetStorage(p.SymbolInfo.Mutability);
-                var symbol = new Symbol(p.Name.Value.ToString(), type, Access.Public, storage);
+                var symbol = new Symbol(p.Name.Value, type, Access.Public, storage);
 
                 if (visitor.Inferrer.IsTypeAssumption(type))
                     visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);

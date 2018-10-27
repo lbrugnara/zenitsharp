@@ -7,40 +7,40 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class VariableTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstVariableNode, InferredType>
+    class VariableTypeInferrer : INodeVisitor<TypeInferrerVisitor, VariableNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstVariableNode vardecl)
+        public InferredType Visit(TypeInferrerVisitor visitor, VariableNode vardecl)
         {
             switch (vardecl)
             {
-                case AstVarDefinitionNode vardefnode:
+                case VariableDefinitionNode vardefnode:
                     return VarDefinitionNode(visitor, vardefnode);
 
-                case AstVarDestructuringNode vardestnode:
+                case VariableDestructuringNode vardestnode:
                     return VarDestructuringNode(visitor, vardestnode);
             }
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected InferredType VarDefinitionNode(TypeInferrerVisitor visitor, AstVarDefinitionNode vardecl)
+        protected InferredType VarDefinitionNode(TypeInferrerVisitor visitor, VariableDefinitionNode vardecl)
         {
             // Get the variable type from the declaration
             InferredType inferredType = null;
 
-            foreach (var declaration in vardecl.VarDefinitions)
+            foreach (var definition in vardecl.Definitions)
             {
                 // Symbol should be already resolved here
-                var lhs = visitor.SymbolTable.GetSymbol(declaration.Item1.Value.ToString());
+                var lhs = visitor.SymbolTable.GetSymbol(definition.Left.Value);
 
                 if (inferredType == null)
                     inferredType = new InferredType(lhs.Type);
 
                 // If the rhs is null, continue, is just a declaration
-                if (declaration.Item2 == null)
+                if (definition.Right == null)
                     continue;
 
                 // If it is a variable definition, get the right-hand side type info
-                var rhs = declaration.Item2?.Visit(visitor);
+                var rhs = definition.Right?.Visit(visitor);
 
                 if (visitor.Inferrer.IsTypeAssumption(lhs.Type) && rhs.Type == Null.Instance)
                     throw new SymbolException($"Implicitly-typed variable '{lhs.Name}' needs to be initialized");
@@ -52,22 +52,22 @@ namespace Fl.Semantics.Inferrers
             return inferredType;
         }
 
-        protected InferredType VarDestructuringNode(TypeInferrerVisitor visitor, AstVarDestructuringNode vardestnode)
+        protected InferredType VarDestructuringNode(TypeInferrerVisitor visitor, VariableDestructuringNode destructuringNode)
         {
-            var initType = vardestnode.DestructInit.Visit(visitor);
+            var initType = destructuringNode.Right.Visit(visitor);
 
             // Get the variable type from the declaration
             InferredType inferredType = new InferredType(initType.Type);
 
-            for (int i=0; i < vardestnode.Variables.Count; i++)
+            for (int i=0; i < destructuringNode.Left.Count; i++)
             {
-                var declaration = vardestnode.Variables[i];
+                var declaration = destructuringNode.Left[i];
 
                 if (declaration == null)
                     continue;
 
                 // Symbol should be already resolved here
-                var lhs = visitor.SymbolTable.GetSymbol(declaration.Value.ToString());
+                var lhs = visitor.SymbolTable.GetSymbol(declaration.Value);
 
                 // If it is a variable definition, get the right-hand side type info
                 var rhsType = (initType.Type as Tuple).Types[i];

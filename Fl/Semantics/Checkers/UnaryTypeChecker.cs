@@ -6,9 +6,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class UnaryTypeChecker : INodeVisitor<TypeCheckerVisitor, AstUnaryNode, CheckedType>
+    class UnaryTypeChecker : INodeVisitor<TypeCheckerVisitor, UnaryNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstUnaryNode unary)
+        public CheckedType Visit(TypeCheckerVisitor checker, UnaryNode unary)
         {
             // TODO: Check Prefix/Postfix increment
             return unary.Left.Visit(checker);

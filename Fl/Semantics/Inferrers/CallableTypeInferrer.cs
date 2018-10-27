@@ -6,12 +6,12 @@ using Fl.Ast;
 
 namespace Fl.Semantics.Inferrers
 {
-    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstCallableNode, InferredType>
+    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, CallableNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstCallableNode node)
+        public InferredType Visit(TypeInferrerVisitor visitor, CallableNode node)
         {
             // Get the callable inferred type (and symbol)
-            var inferredInfo = node.Callable.Visit(visitor);
+            var inferredInfo = node.Target.Visit(visitor);
 
             // If the inferred type is an anonymous type, it means the target symbol's type has not
             // been defined yet, we need to infer the function type
@@ -32,7 +32,7 @@ namespace Fl.Semantics.Inferrers
             throw new System.Exception($"Cannot invoke a non-function object");
         }
 
-        private InferredType InferFromConstructorCall(TypeInferrerVisitor visitor, AstCallableNode node, InferredType inferredInfo)
+        private InferredType InferFromConstructorCall(TypeInferrerVisitor visitor, CallableNode node, InferredType inferredInfo)
         {
             Class classType = inferredInfo.Type as Class;
 
@@ -43,7 +43,7 @@ namespace Fl.Semantics.Inferrers
             return new InferredType(new ClassInstance(classType));
         }
 
-        private InferredType InferFromAnonymousCall(TypeInferrerVisitor visitor, AstCallableNode node, InferredType inferred)
+        private InferredType InferFromAnonymousCall(TypeInferrerVisitor visitor, CallableNode node, InferredType inferred)
         {
             // The function we need to infer here is a Function type
             Function funcType = new Function();
@@ -71,7 +71,7 @@ namespace Fl.Semantics.Inferrers
             return new InferredType(rettype);
         }
 
-        private InferredType InferFromFunctionCall(TypeInferrerVisitor visitor, AstCallableNode node, Function funcType)
+        private InferredType InferFromFunctionCall(TypeInferrerVisitor visitor, CallableNode node, Function funcType)
         {
             // Check parameters count
             // TODO: This is not needed to be here

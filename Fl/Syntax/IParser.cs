@@ -8,6 +8,6 @@ namespace Fl.Syntax
 {
     public interface IParser
     {
-        AstNode Parse(List<Token> tokens);
+        Node Parse(List<Token> tokens);
     }
 }

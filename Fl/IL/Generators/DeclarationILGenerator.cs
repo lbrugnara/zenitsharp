@@ -6,11 +6,11 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class DeclarationILGenerator : INodeVisitor<ILGenerator, AstDeclarationNode, Operand>
+    class DeclarationILGenerator : INodeVisitor<ILGenerator, DeclarationNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstDeclarationNode decls)
+        public Operand Visit(ILGenerator generator, DeclarationNode decls)
         {
-            foreach (AstNode statement in decls.Statements)
+            foreach (Node statement in decls.Statements)
             {
                 statement.Visit(generator);
             }

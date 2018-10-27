@@ -6,9 +6,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ContinueTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstContinueNode, InferredType>
+    class ContinueTypeInferrer : INodeVisitor<TypeInferrerVisitor, ContinueNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstContinueNode cnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, ContinueNode cnode)
         {
             return null;
         }

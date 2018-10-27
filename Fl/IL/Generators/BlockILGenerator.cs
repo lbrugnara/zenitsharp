@@ -6,12 +6,12 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class BlockILGenerator : INodeVisitor<ILGenerator, AstBlockNode, Operand>
+    class BlockILGenerator : INodeVisitor<ILGenerator, BlockNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstBlockNode node)
+        public Operand Visit(ILGenerator generator, BlockNode node)
         {
             generator.EnterBlock(BlockType.Common);
-            foreach (AstNode statement in node.Statements)
+            foreach (Node statement in node.Statements)
             {
                 statement.Visit(generator);
             }

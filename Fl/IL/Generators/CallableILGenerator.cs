@@ -10,11 +10,11 @@ using System.Linq;
 
 namespace Fl.IL.Generators
 {
-    public class CallableILGenerator : INodeVisitor<ILGenerator, AstCallableNode, Operand>
+    public class CallableILGenerator : INodeVisitor<ILGenerator, CallableNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstCallableNode node)
+        public Operand Visit(ILGenerator generator, CallableNode node)
         {
-            Operand target = node.Callable.Visit(generator);
+            Operand target = node.Target.Visit(generator);
 
             // Generate the "param" instructions
             List<ParamInstruction> parameters = node.Arguments.Expressions.Select(a => new ParamInstruction(a.Visit(generator))).ToList();

@@ -8,9 +8,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Mutability
 {
-    class IfMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstIfNode, MutabilityCheckResult>
+    class IfMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, IfNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstIfNode ifnode)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, IfNode ifnode)
         {
             ifnode.Condition.Visit(checker);
 

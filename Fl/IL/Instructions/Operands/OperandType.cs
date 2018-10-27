@@ -42,7 +42,7 @@ namespace Fl.Engine.Symbols.Types
         internal static OperandType FromToken(Token token)
         {
             if (token.Type == TokenType.Identifier)
-                return new OperandType(token.Value.ToString());
+                return new OperandType(token.Value);
 
             switch (token.Type)
             {

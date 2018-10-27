@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class ForTypeChecker : INodeVisitor<TypeCheckerVisitor, AstForNode, CheckedType>
+    class ForTypeChecker : INodeVisitor<TypeCheckerVisitor, ForNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstForNode fornode)
+        public CheckedType Visit(TypeCheckerVisitor checker, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
             checker.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");

@@ -6,13 +6,13 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class BlockSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstBlockNode>
+    class BlockSymbolResolver : INodeVisitor<SymbolResolverVisitor, BlockNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstBlockNode node)
+        public void Visit(SymbolResolverVisitor visitor, BlockNode node)
         {
             visitor.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
 
-            foreach (AstNode statement in node.Statements)
+            foreach (Node statement in node.Statements)
                 statement.Visit(visitor);
 
             visitor.SymbolTable.LeaveScope();

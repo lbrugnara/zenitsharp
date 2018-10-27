@@ -67,81 +67,81 @@ namespace Fl.Semantics.Mutability
         /// </summary>
         public SymbolTable SymbolTable { get; private set; }
 
-        public MutabilityCheckResult Visit(AstNode node)
+        public MutabilityCheckResult Visit(Node node)
         {
             object n = node;
             switch (n)
             {
-                case AstUnaryNode u:
+                case UnaryNode u:
                     return this.unaryMutabilityChecker.Visit(this, u);
 
-                case AstBinaryNode b:
+                case BinaryNode b:
                     return this.binaryMutabilityChecker.Visit(this, b);
 
-                case AstAssignmentNode a:
+                case AssignmentNode a:
                     return this.assignmentMutabilityChecker.Visit(this, a);
 
-                case AstConstantNode c:
+                case ConstantNode c:
                     return this.constantMutabilityChecker.Visit(this, c);
 
-                case AstVariableNode v:
+                case VariableNode v:
                     return this.variableMutabilityChecker.Visit(this, v);
 
-                case AstBlockNode bl:
+                case BlockNode bl:
                     return this.blockMutabilityChecker.Visit(this, bl);
 
-                case AstDeclarationNode d:
+                case DeclarationNode d:
                     return this.declarationMutabilityChecker.Visit(this, d);
 
-                case AstLiteralNode l:
+                case LiteralNode l:
                     return this.literalMutabilityChecker.Visit(this, l);
 
-                case AstAccessorNode ivk:
+                case AccessorNode ivk:
                     return this.accessorMutabilityChecker.Visit(this, ivk);
 
-                case AstIfNode i:
+                case IfNode i:
                     return this.ifMutabilityChecker.Visit(this, i);
 
-                case AstWhileNode w:
+                case WhileNode w:
                     return this.whileMutabilityChecker.Visit(this, w);
 
-                case AstForNode f:
+                case ForNode f:
                     return this.forMutabilityChecker.Visit(this, f);
 
-                case AstBreakNode brk:
+                case BreakNode brk:
                     return this.breakMutabilityChecker.Visit(this, brk);
 
-                case AstContinueNode cont:
+                case ContinueNode cont:
                     return this.continueMutabilityChecker.Visit(this, cont);
 
-                case AstCallableNode call:
+                case CallableNode call:
                     return this.callMutabilityChecker.Visit(this, call);
 
-                case AstFunctionNode func:
+                case FunctionNode func:
                     return this.funcDeclMutabilityChecker.Visit(this, func);
 
-                case AstTupleNode t:
+                case TupleNode t:
                     return this.tupleMutabilityChecker.Visit(this, t);
 
-                case AstReturnNode ret:
+                case ReturnNode ret:
                     return this.returnMutabilityChecker.Visit(this, ret);
 
-                case AstNullCoalescingNode nc:
+                case NullCoalescingNode nc:
                     return this.nullCoalescingMutabilityChecker.Visit(this, nc);
 
-                case AstClassNode cn:
+                case ClassNode cn:
                     return this.classMutabilityChecker.Visit(this, cn);
 
-                case AstClassPropertyNode cpn:
+                case ClassPropertyNode cpn:
                     return this.classPropertyMutabilityChecker.Visit(this, cpn);
 
-                case AstClassConstantNode ccn:
+                case ClassConstantNode ccn:
                     return this.classConstantMutabilityChecker.Visit(this, ccn);
 
-                case AstClassMethodNode cmn:
+                case ClassMethodNode cmn:
                     return this.classMethodMutabilityChecker.Visit(this, cmn);
 
-                case AstNoOpNode np:
+                case NoOpNode np:
                     return null;
             }
             throw new AstWalkerException($"Unhandled type {node.GetType()}");

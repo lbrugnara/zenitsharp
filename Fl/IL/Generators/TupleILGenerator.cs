@@ -6,9 +6,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class TupleILGenerator : INodeVisitor<ILGenerator, AstTupleNode, Operand>
+    class TupleILGenerator : INodeVisitor<ILGenerator, TupleNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstTupleNode node)
+        public Operand Visit(ILGenerator generator, TupleNode node)
         {
             if (node.Items.Count > 0)
             {

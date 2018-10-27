@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace Fl.Semantics.Checkers
 {
-    class TupleTypeChecker : INodeVisitor<TypeCheckerVisitor, AstTupleNode, CheckedType>
+    class TupleTypeChecker : INodeVisitor<TypeCheckerVisitor, TupleNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstTupleNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, TupleNode node)
         {
             var types = node.Items?.Select(i => i?.Visit(checker)?.Type);
             return new CheckedType(new Tuple(types.ToArray()));

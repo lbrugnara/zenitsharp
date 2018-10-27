@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstForNode, InferredType>
+    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, ForNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstForNode fornode)
+        public InferredType Visit(TypeInferrerVisitor visitor, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
             visitor.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");

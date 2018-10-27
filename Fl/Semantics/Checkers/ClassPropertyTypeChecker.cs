@@ -5,12 +5,12 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class ClassPropertyTypeChecker : INodeVisitor<TypeCheckerVisitor, AstClassPropertyNode, CheckedType>
+    class ClassPropertyTypeChecker : INodeVisitor<TypeCheckerVisitor, ClassPropertyNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstClassPropertyNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, ClassPropertyNode node)
         {
             // Get the property symbol
-            var property = checker.SymbolTable.GetSymbol(node.Name.Value.ToString());
+            var property = checker.SymbolTable.GetSymbol(node.Name.Value);
 
             // If the right-hand side is present, get the type
             var rhs = node.Definition?.Visit(checker);

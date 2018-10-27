@@ -9,16 +9,16 @@ using System.Linq;
 
 namespace Fl.Semantics.Checkers
 {
-    class ReturnTypeChecker : INodeVisitor<TypeCheckerVisitor, AstReturnNode, CheckedType>
+    class ReturnTypeChecker : INodeVisitor<TypeCheckerVisitor, ReturnNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstReturnNode rnode)
+        public CheckedType Visit(TypeCheckerVisitor checker, ReturnNode rnode)
         {
             if (!checker.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
             var returnSymbol = checker.SymbolTable.GetSymbol("@ret");
 
-            var checkedType = rnode.ReturnTuple?.Visit(checker);
+            var checkedType = rnode.Expression?.Visit(checker);
 
             if (checkedType == null)
                 if (returnSymbol.Type == Void.Instance)

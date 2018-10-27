@@ -8,13 +8,13 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Checkers
 {
-    class BlockTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBlockNode, CheckedType>
+    class BlockTypeChecker : INodeVisitor<TypeCheckerVisitor, BlockNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstBlockNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, BlockNode node)
         {
             checker.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
 
-            foreach (AstNode statement in node.Statements)
+            foreach (Node statement in node.Statements)
                 statement.Visit(checker);
 
             checker.SymbolTable.LeaveScope();

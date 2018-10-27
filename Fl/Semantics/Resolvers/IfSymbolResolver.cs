@@ -6,9 +6,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class IfSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstIfNode>
+    class IfSymbolResolver : INodeVisitor<SymbolResolverVisitor, IfNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstIfNode ifnode)
+        public void Visit(SymbolResolverVisitor visitor, IfNode ifnode)
         {
             // Generate the condition and check the result, using exitPoint
             // as the destination if the condition is true

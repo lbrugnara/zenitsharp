@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class WhileTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstWhileNode, InferredType>
+    class WhileTypeInferrer : INodeVisitor<TypeInferrerVisitor, WhileNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstWhileNode wnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             visitor.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");

@@ -9,9 +9,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Checkers
 {
-    class ClassMethodTypeChecker : INodeVisitor<TypeCheckerVisitor, AstClassMethodNode, CheckedType>
+    class ClassMethodTypeChecker : INodeVisitor<TypeCheckerVisitor, ClassMethodNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstClassMethodNode method)
+        public CheckedType Visit(TypeCheckerVisitor checker, ClassMethodNode method)
         {
             var methodSymbol = checker.SymbolTable.GetSymbol(method.Name);
 

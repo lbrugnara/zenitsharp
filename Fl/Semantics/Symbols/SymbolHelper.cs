@@ -17,7 +17,7 @@ namespace Fl.Semantics.Types
             if (token == null)
                 return Access.Public;
 
-            return System.Enum.Parse<Access>(token.Value.ToString(), true);
+            return System.Enum.Parse<Access>(token.Value, true);
         }
 
         internal static Storage GetStorage(Token token, Storage def = Storage.Immutable)
@@ -25,7 +25,7 @@ namespace Fl.Semantics.Types
             if (token == null)
                 return def;
 
-            var str = token.Value.ToString();
+            var str = token.Value;
 
             switch (str)
             {
@@ -48,45 +48,43 @@ namespace Fl.Semantics.Types
         {
             if (token.Type == TokenType.Identifier)
             {
-                string val = token.Value.ToString();
-
-                if (val == Bool.Instance.ToString())
+                if (token.Value == Bool.Instance.ToString())
                     return Bool.Instance;
 
-                if (val == Char.Instance.ToString())
+                if (token.Value == Char.Instance.ToString())
                     return Char.Instance;
 
-                if (val == Int.Instance.ToString())
+                if (token.Value == Int.Instance.ToString())
                     return Int.Instance;
 
-                if (val == Float.Instance.ToString())
+                if (token.Value == Float.Instance.ToString())
                     return Float.Instance;
 
-                if (val == Double.Instance.ToString())
+                if (token.Value == Double.Instance.ToString())
                     return Double.Instance;
 
-                if (val == Decimal.Instance.ToString())
+                if (token.Value == Decimal.Instance.ToString())
                     return Decimal.Instance;
 
-                if (val == String.Instance.ToString())
+                if (token.Value == String.Instance.ToString())
                     return String.Instance;
 
-                if (val == Null.Instance.ToString())
+                if (token.Value == Null.Instance.ToString())
                     return Null.Instance;
 
                 // Support complex types:
-                if (val == "func" || val == "tuple")
+                if (token.Value == "func" || token.Value == "tuple")
                     return inferrer?.NewAnonymousType();
 
-                if (symtable.HasSymbol(val))
+                if (symtable.HasSymbol(token.Value))
                 {
-                    var stype = symtable.GetSymbol(val).Type;
+                    var stype = symtable.GetSymbol(token.Value).Type;
                     if (stype is Class ctype)
                         return new ClassInstance(ctype);
                     return stype;
                 }
 
-                var type = new ClassInstance(new Class(val));
+                var type = new ClassInstance(new Class(token.Value));
                 symtable.AddUnresolvedType(type.Class.ClassName, token);
                 return type;
             }

@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class BreakILGenerator : INodeVisitor<ILGenerator, AstBreakNode, Operand>
+    class BreakILGenerator : INodeVisitor<ILGenerator, BreakNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstBreakNode wnode)
+        public Operand Visit(ILGenerator generator, BreakNode wnode)
         {
             var loopBlock = generator.SymbolTable.GetLoopBlock();
             generator.Emmit(new GotoInstruction(loopBlock.ExitPoint));

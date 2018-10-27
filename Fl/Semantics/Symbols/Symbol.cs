@@ -5,7 +5,6 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Symbols
 {
-
     public class Symbol
     {
         /// <summary>

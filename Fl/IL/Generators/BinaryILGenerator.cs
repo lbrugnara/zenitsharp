@@ -9,9 +9,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class BinaryILGenerator : INodeVisitor<ILGenerator, AstBinaryNode, Operand>
+    class BinaryILGenerator : INodeVisitor<ILGenerator, BinaryNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstBinaryNode binary)
+        public Operand Visit(ILGenerator generator, BinaryNode binary)
         {
             Operand left = binary.Left.Visit(generator);
             Operand right = binary.Right.Visit(generator);

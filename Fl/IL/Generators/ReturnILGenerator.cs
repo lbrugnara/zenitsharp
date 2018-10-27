@@ -8,14 +8,14 @@ using Fl.Semantics.Exceptions;
 
 namespace Fl.IL.Generators
 {
-    class ReturnILGenerator : INodeVisitor<ILGenerator, AstReturnNode, Operand>
+    class ReturnILGenerator : INodeVisitor<ILGenerator, ReturnNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstReturnNode rnode)
+        public Operand Visit(ILGenerator generator, ReturnNode rnode)
         {
             if (!generator.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            Operand expr = rnode.ReturnTuple?.Visit(generator);
+            Operand expr = rnode.Expression?.Visit(generator);
             generator.Emmit(new ReturnInstruction(expr));
             return null;
         }

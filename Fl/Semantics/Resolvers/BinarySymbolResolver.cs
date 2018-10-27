@@ -6,9 +6,9 @@ using Fl.Ast;
 
 namespace Fl.Semantics.Resolvers
 {
-    class BinarySymbolResolver : INodeVisitor<SymbolResolverVisitor, AstBinaryNode>
+    class BinarySymbolResolver : INodeVisitor<SymbolResolverVisitor, BinaryNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstBinaryNode binary)
+        public void Visit(SymbolResolverVisitor visitor, BinaryNode binary)
         {
             binary.Left.Visit(visitor);
             binary.Right.Visit(visitor);

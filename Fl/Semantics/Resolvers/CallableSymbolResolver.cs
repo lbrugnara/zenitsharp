@@ -6,11 +6,11 @@ using Fl.Ast;
 
 namespace Fl.Semantics.Resolvers
 {
-    public class CallableSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstCallableNode>
+    public class CallableSymbolResolver : INodeVisitor<SymbolResolverVisitor, CallableNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstCallableNode node)
+        public void Visit(SymbolResolverVisitor visitor, CallableNode node)
         {
-            node.Callable.Visit(visitor);
+            node.Target.Visit(visitor);
             node.Arguments.Expressions.ForEach(e => e.Visit(visitor));
         }
     }

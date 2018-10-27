@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class ContinueILGenerator : INodeVisitor<ILGenerator, AstContinueNode, Operand>
+    class ContinueILGenerator : INodeVisitor<ILGenerator, ContinueNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstContinueNode cnode)
+        public Operand Visit(ILGenerator generator, ContinueNode cnode)
         {
             var loopBlock = generator.SymbolTable.GetLoopBlock();
             generator.Emmit(new GotoInstruction(loopBlock.EntryPoint));

@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {
-    class BreakMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstBreakNode, MutabilityCheckResult>
+    class BreakMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, BreakNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstBreakNode wnode)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, BreakNode wnode)
         {
             var nbreak = wnode.Number.Visit(checker);
 

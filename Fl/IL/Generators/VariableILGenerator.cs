@@ -9,37 +9,37 @@ using Fl.Semantics.Exceptions;
 
 namespace Fl.IL.Generators
 {
-    class VariableILGenerator : INodeVisitor<ILGenerator, AstVariableNode, Operand>
+    class VariableILGenerator : INodeVisitor<ILGenerator, VariableNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstVariableNode vardecl)
+        public Operand Visit(ILGenerator generator, VariableNode vardecl)
         {
             switch (vardecl)
             {
-                case AstVarDefinitionNode vardefnode:
+                case VariableDefinitionNode vardefnode:
                     return VarDefinitionNode(generator, vardefnode);
 
-                case AstVarDestructuringNode vardestnode:
+                case VariableDestructuringNode vardestnode:
                     return VarDestructuringNode(generator, vardestnode);
             }
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected Operand VarDefinitionNode(ILGenerator generator, AstVarDefinitionNode vardecl)
+        protected Operand VarDefinitionNode(ILGenerator generator, VariableDefinitionNode vardecl)
         {
-            foreach (var declaration in vardecl.VarDefinitions)
+            foreach (var definition in vardecl.Definitions)
             {
                 // Get the identifier name
-                var variableName = declaration.Item1.Value.ToString();
+                var variableName = definition.Left.Value;
 
                 // Check if the symbol is already defined
                 if (generator.SymbolTable.SymbolIsDefinedInBlock(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // If it is a variable definition, emmit the code to resolve the right-hand side
-                var rhs = declaration.Item2?.Visit(generator);
+                var rhs = definition.Right?.Visit(generator);
 
                 // Get the variable type from the declaration
-                var type = OperandType.FromToken(vardecl.SymbolInfo.Type);
+                var type = OperandType.FromToken(vardecl.Information.Type);
 
                 if (type == OperandType.Auto)
                 {
@@ -59,7 +59,7 @@ namespace Fl.IL.Generators
             return null;
         }
 
-        protected Operand VarDestructuringNode(ILGenerator generator, AstVarDestructuringNode vardestnode)
+        protected Operand VarDestructuringNode(ILGenerator generator, VariableDestructuringNode vardestnode)
         {
             // Get the variable type
             //TypeResolver typeresolver = TypeResolver.GetTypeResolverFromToken(vardestnode.VarType.TypeToken);

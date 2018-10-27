@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class LiteralILGenerator : INodeVisitor<ILGenerator, AstLiteralNode, Operand>
+    class LiteralILGenerator : INodeVisitor<ILGenerator, LiteralNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstLiteralNode literal)
+        public Operand Visit(ILGenerator generator, LiteralNode literal)
         {
             // Take the raw value
             var value = literal.Literal.Value;

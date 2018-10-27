@@ -8,16 +8,16 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class AccessorTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstAccessorNode, InferredType>
+    class AccessorTypeInferrer : INodeVisitor<TypeInferrerVisitor, AccessorNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor inferrer, AstAccessorNode accessor)
+        public InferredType Visit(TypeInferrerVisitor inferrer, AccessorNode accessor)
         {
             Symbol symbol = null;
-            string symbolName = accessor.Identifier.Value.ToString();
+            string symbolName = accessor.Target.Value;
 
             // If this is the end of the accessor path, get the symbol in the current
             // scope and return its information
-            if (accessor.Enclosing == null)
+            if (accessor.Parent == null)
             {
                 // Get accessed symbol that must be defined in the symtable's scope
                 symbol = inferrer.SymbolTable.GetSymbol(symbolName);
@@ -30,7 +30,7 @@ namespace Fl.Semantics.Inferrers
 
             // If the accessed member has an eclosing accessor node, visit
             // it to get the enclosing symbol's type
-            var encsym = accessor.Enclosing.Visit(inferrer).Symbol;
+            var encsym = accessor.Parent.Visit(inferrer).Symbol;
 
             // If the enclosing symbol implements ISymbolTable we will search for 
             // the symbol within the enclosing scope

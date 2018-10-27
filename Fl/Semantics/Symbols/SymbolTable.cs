@@ -110,10 +110,12 @@ namespace Fl.Semantics.Symbols
         #region ISymbolTable implementation
 
         /// <inheritdoc/>
-        public void AddSymbol(Symbol symbol) => this.scopes.Peek().AddSymbol(symbol);
+        public void AddSymbol(Symbol symbol) 
+            => this.scopes.Peek().AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, Type type, Access access, Storage storage) => this.scopes.Peek().NewSymbol(name, type, access, storage);
+        public Symbol NewSymbol(string name, Type type, Access access, Storage storage) 
+            => this.scopes.Peek().NewSymbol(name, type, access, storage);
 
         /// <inheritdoc/>
         public bool HasSymbol(string name) => this.scopes.Peek().HasSymbol(name);

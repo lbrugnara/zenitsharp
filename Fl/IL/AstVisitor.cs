@@ -54,50 +54,50 @@ namespace Fl.IL
             this.nullCoalescingILGenerator = new NullCoalescingILGenerator();
         }
 
-        public Operand Visit(AstNode node)
+        public Operand Visit(Node node)
         {
             object n = node;
             switch (n)
             {
-                case AstUnaryNode u:
+                case UnaryNode u:
                     return this.unaryILGenerator.Visit(this.generator, u);
-                case AstBinaryNode b:
+                case BinaryNode b:
                     return this.binaryILGenerator.Visit(this.generator, b);
-                case AstAssignmentNode a:
+                case AssignmentNode a:
                     return this.assignmentILGenerator.Visit(this.generator, a);
-                case AstConstantNode c:
+                case ConstantNode c:
                     return this.constantILGenerator.Visit(this.generator, c);
-                case AstVariableNode v:
+                case VariableNode v:
                     return this.variableILGenerator.Visit(this.generator, v);
-                case AstBlockNode bl:
+                case BlockNode bl:
                     return this.blockILGenerator.Visit(this.generator, bl);
-                case AstDeclarationNode d:
+                case DeclarationNode d:
                     return this.declarationILGenerator.Visit(this.generator, d);
-                case AstLiteralNode l:
+                case LiteralNode l:
                     return this.literalILGenerator.Visit(this.generator, l);
-                case AstAccessorNode ivk:
+                case AccessorNode ivk:
                     return this.accessorILGenerator.Visit(this.generator, ivk);
-                case AstIfNode i:
+                case IfNode i:
                     return this.ifILGenerator.Visit(this.generator, i);
-                case AstWhileNode w:
+                case WhileNode w:
                     return this.whileILGenerator.Visit(this.generator, w);
-                case AstForNode f:
+                case ForNode f:
                     return this.forILGenerator.Visit(this.generator, f);
-                case AstBreakNode brk:
+                case BreakNode brk:
                     return this.breakILGenerator.Visit(this.generator, brk);
-                case AstContinueNode cont:
+                case ContinueNode cont:
                     return this.continueILGenerator.Visit(this.generator, cont);
-                case AstCallableNode call:
+                case CallableNode call:
                     return this.callILGenerator.Visit(this.generator, call);
-                case AstFunctionNode func:
+                case FunctionNode func:
                     return this.funcDeclILGenerator.Visit(this.generator, func);
-                case AstTupleNode t:
+                case TupleNode t:
                     return this.tupleILGenerator.Visit(this.generator, t);
-                case AstReturnNode ret:
+                case ReturnNode ret:
                     return this.returnILGenerator.Visit(this.generator, ret);
-                case AstNullCoalescingNode nc:
+                case NullCoalescingNode nc:
                     return this.nullCoalescingILGenerator.Visit(this.generator, nc);
-                case AstNoOpNode np:
+                case NoOpNode np:
                     return null;
             }
             throw new AstWalkerException($"Unhandled type {node.GetType()}");

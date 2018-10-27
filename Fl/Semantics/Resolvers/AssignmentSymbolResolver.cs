@@ -6,26 +6,26 @@ using Fl.Ast;
 
 namespace Fl.Semantics.Resolvers
 {
-    class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstAssignmentNode>
+    class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AssignmentNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstAssignmentNode node)
+        public void Visit(SymbolResolverVisitor visitor, AssignmentNode node)
         {
-            if (node is AstVariableAssignmentNode)
-                this.MakeVariableAssignment(node as AstVariableAssignmentNode, visitor);
-            else if (node is AstDestructuringAssignmentNode)
-                this.MakeDestructuringAssignment(node as AstDestructuringAssignmentNode, visitor);
+            if (node is VariableAssignmentNode)
+                this.MakeVariableAssignment(node as VariableAssignmentNode, visitor);
+            else if (node is DestructuringAssignmentNode)
+                this.MakeDestructuringAssignment(node as DestructuringAssignmentNode, visitor);
         }
 
-        private void MakeVariableAssignment(AstVariableAssignmentNode node, SymbolResolverVisitor visitor)
+        private void MakeVariableAssignment(VariableAssignmentNode node, SymbolResolverVisitor visitor)
         {
             node.Accessor.Visit(visitor);
-            node.Expression.Visit(visitor);
+            node.Right.Visit(visitor);
         }
 
-        private void MakeDestructuringAssignment(AstDestructuringAssignmentNode node, SymbolResolverVisitor visitor)
+        private void MakeDestructuringAssignment(DestructuringAssignmentNode node, SymbolResolverVisitor visitor)
         {
-            node.Variables.Visit(visitor);
-            node.Expression.Visit(visitor);
+            node.Left.Visit(visitor);
+            node.Right.Visit(visitor);
         }
     }
 }

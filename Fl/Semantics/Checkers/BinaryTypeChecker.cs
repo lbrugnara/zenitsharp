@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class BinaryTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBinaryNode, CheckedType>
+    class BinaryTypeChecker : INodeVisitor<TypeCheckerVisitor, BinaryNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstBinaryNode binary)
+        public CheckedType Visit(TypeCheckerVisitor checker, BinaryNode binary)
         {
             var left = binary.Left.Visit(checker);
             var right = binary.Right.Visit(checker);

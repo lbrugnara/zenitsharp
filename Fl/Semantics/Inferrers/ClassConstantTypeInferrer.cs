@@ -5,12 +5,12 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ClassConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstClassConstantNode, InferredType>
+    class ClassConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassConstantNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor inferrer, AstClassConstantNode node)
+        public InferredType Visit(TypeInferrerVisitor inferrer, ClassConstantNode node)
         {
             // Get the constant symbol
-            var constant = inferrer.SymbolTable.GetSymbol(node.Name.Value.ToString());
+            var constant = inferrer.SymbolTable.GetSymbol(node.Name.Value);
 
             // Get the inferred type of the right-hand side expression and make the conclusions
             var defInferredType = node.Definition.Visit(inferrer);

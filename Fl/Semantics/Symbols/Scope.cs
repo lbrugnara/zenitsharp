@@ -170,9 +170,13 @@ namespace Fl.Semantics.Symbols
 
         public List<Symbol> GetAllSymbol() => this.Symbols.Values.ToList();
 
-        public bool HasSymbol(string name) => this.Symbols.ContainsKey(name) || (this.Parent != null && this.Parent.HasSymbol(name)) || (this.Type != ScopeType.Global && this.Global != null && this.Global.HasSymbol(name));
+        public bool HasSymbol(string name) 
+            => this.Symbols.ContainsKey(name) 
+            || (this.Parent != null && this.Parent.HasSymbol(name)) 
+            || (this.Type != ScopeType.Global && this.Global != null && this.Global.HasSymbol(name));
 
-        public Symbol GetSymbol(string name) => this.TryGetSymbol(name) ?? throw new SymbolException($"Symbol {name} is not defined in current scope");
+        public Symbol GetSymbol(string name) 
+            => this.TryGetSymbol(name) ?? throw new SymbolException($"Symbol {name} is not defined in current scope");
 
         public Symbol TryGetSymbol(string name) =>
             this.Symbols.ContainsKey(name)

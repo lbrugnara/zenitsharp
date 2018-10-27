@@ -48,16 +48,14 @@ namespace Fl.Semantics.Types
         protected bool HasCircularReferenceWith(Type type)
         {
             if (type is Function functype)
+            {
                 if (this.GetHashCode() == functype.GetHashCode())
                     return true;
-                else
-                    return this.HasCircularReferenceWith(functype.Return);
+                return this.HasCircularReferenceWith(functype.Return);
+            }
 
             if (type is Tuple tuptype)
-                if (tuptype.Types.Any(t => this.HasCircularReferenceWith(t)))
-                    return true;
-                else
-                    return false;
+                return tuptype.Types.Any(t => this.HasCircularReferenceWith(t));
 
             return false;
         }

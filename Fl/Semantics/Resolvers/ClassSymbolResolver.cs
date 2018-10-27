@@ -6,15 +6,15 @@ using System;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstClassNode>
+    class ClassSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassNode>
     {
-        public void Visit(SymbolResolverVisitor binder, AstClassNode node)
+        public void Visit(SymbolResolverVisitor binder, ClassNode node)
         {
             if (!binder.SymbolTable.CurrentScope.IsGlobal && !binder.SymbolTable.CurrentScope.IsPackage)
                 throw new SymbolException($"Cannot define a class within a {binder.SymbolTable.CurrentScope.Type.ToString().ToLower()}");
 
             // Define the class in the global scope
-            var className = node.Name.Value.ToString();
+            var className = node.Name.Value;
             var classType = new Class(className);
             var classSymbol = binder.SymbolTable.NewClassSymbol(className, classType, Access.Public);
 
@@ -22,13 +22,13 @@ namespace Fl.Semantics.Resolvers
 
             node.Properties.ForEach(propertyNode => {
                 propertyNode.Visit(binder);
-                var propertyName = propertyNode.Name.Value.ToString();
+                var propertyName = propertyNode.Name.Value;
                 classType.Properties[propertyName] = binder.SymbolTable.GetSymbol(propertyName).Type;
             });
 
             node.Constants.ForEach(constantNode => {
                 constantNode.Visit(binder);
-                var constantName = constantNode.Name.Value.ToString();
+                var constantName = constantNode.Name.Value;
                 classType.Properties[constantName] = binder.SymbolTable.GetSymbol(constantName).Type;
             });
 

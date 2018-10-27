@@ -9,9 +9,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class UnaryILGenerator : INodeVisitor<ILGenerator, AstUnaryNode, Operand>
+    class UnaryILGenerator : INodeVisitor<ILGenerator, UnaryNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstUnaryNode unary)
+        public Operand Visit(ILGenerator generator, UnaryNode unary)
         {
             // Generate the operand from the child
             var operand = unary.Left.Visit(generator);
@@ -31,19 +31,19 @@ namespace Fl.IL.Generators
                     unaryInstruction = new NegInstruction(tmpsymbol, operand);
                     break;
                 case TokenType.Increment:
-                    if (!(operand is SymbolOperand) || !(unary.Left is AstAccessorNode))
+                    if (!(operand is SymbolOperand) || !(unary.Left is AccessorNode))
                         throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
 
-                    if (unary is AstUnaryPostfixNode)
+                    if (unary is UnaryPostfixNode)
                         unaryInstruction = new PostIncInstruction(tmpsymbol, operand as SymbolOperand);
                     else
                         unaryInstruction = new PreIncInstruction(tmpsymbol, operand as SymbolOperand);
                     break;
                 case TokenType.Decrement:
-                    if (!(operand is SymbolOperand) || !(unary.Left is AstAccessorNode))
+                    if (!(operand is SymbolOperand) || !(unary.Left is AccessorNode))
                         throw new AstWalkerException($"The operand of an increment/decrement operator must be a variable");
 
-                    if (unary is AstUnaryPostfixNode)
+                    if (unary is UnaryPostfixNode)
                         unaryInstruction = new PostDecInstruction(tmpsymbol, operand as SymbolOperand);
                     else
                         unaryInstruction = new PreDecInstruction(tmpsymbol, operand as SymbolOperand);

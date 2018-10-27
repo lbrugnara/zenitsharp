@@ -6,11 +6,11 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    public class CallableTypeChecker : INodeVisitor<TypeCheckerVisitor, AstCallableNode, CheckedType>
+    public class CallableTypeChecker : INodeVisitor<TypeCheckerVisitor, CallableNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstCallableNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, CallableNode node)
         {
-            var target = node.Callable.Visit(checker);
+            var target = node.Target.Visit(checker);
 
             node.Arguments.Expressions.ForEach(a => a.Visit(checker));
 

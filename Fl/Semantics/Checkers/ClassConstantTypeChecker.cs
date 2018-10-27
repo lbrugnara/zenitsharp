@@ -5,12 +5,12 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class ClassConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, AstClassConstantNode, CheckedType>
+    class ClassConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, ClassConstantNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstClassConstantNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, ClassConstantNode node)
         {
             // Get the constant symbol
-            var constant = checker.SymbolTable.GetSymbol(node.Name.Value.ToString());
+            var constant = checker.SymbolTable.GetSymbol(node.Name.Value);
 
             // Get the right-hand side expression's type
             var rhs = node.Definition.Visit(checker);            

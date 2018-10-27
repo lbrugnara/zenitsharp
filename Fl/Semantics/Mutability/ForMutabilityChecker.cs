@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {
-    class ForMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstForNode, MutabilityCheckResult>
+    class ForMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, ForNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstForNode fornode)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
             checker.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");

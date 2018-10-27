@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {
-    class WhileMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstWhileNode, MutabilityCheckResult>
+    class WhileMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, WhileNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstWhileNode wnode)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             checker.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");

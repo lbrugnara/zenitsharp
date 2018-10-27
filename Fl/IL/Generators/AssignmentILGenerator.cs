@@ -9,26 +9,26 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class AssignmentILGenerator : INodeVisitor<ILGenerator, AstAssignmentNode, Operand>
+    class AssignmentILGenerator : INodeVisitor<ILGenerator, AssignmentNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstAssignmentNode node)
+        public Operand Visit(ILGenerator generator, AssignmentNode node)
         {
-            if (node is AstVariableAssignmentNode)
-                return MakeVariableAssignment(node as AstVariableAssignmentNode, generator);
+            if (node is VariableAssignmentNode)
+                return MakeVariableAssignment(node as VariableAssignmentNode, generator);
 
             return null;
         }
 
-        private Operand MakeVariableAssignment(AstVariableAssignmentNode node, ILGenerator generator)
+        private Operand MakeVariableAssignment(VariableAssignmentNode node, ILGenerator generator)
         {
             SymbolOperand leftHandSide = node.Accessor.Visit(generator) as SymbolOperand;
-            Operand rightHandSide = node.Expression.Visit(generator);
+            Operand rightHandSide = node.Right.Visit(generator);
 
             // If right-hand side exists and has a type, do some type checking
             /*if (rightHandSide.Type != leftHandSide.Type)
                 throw new AstWalkerException($"Cannot convert {rightHandSide.Type} to {leftHandSide.Type} ('{leftHandSide.Name}')");*/
 
-            if (node.AssignmentOp.Type == TokenType.Assignment)
+            if (node.Operator.Type == TokenType.Assignment)
             {
                 generator.Emmit(new StoreInstruction(leftHandSide, rightHandSide));
                 return leftHandSide;
@@ -36,7 +36,7 @@ namespace Fl.IL.Generators
 
 
             Instruction instr = null;
-            switch (node.AssignmentOp.Type)
+            switch (node.Operator.Type)
             {
                 case TokenType.IncrementAndAssign:
                     instr = new AddInstruction(leftHandSide, leftHandSide, rightHandSide);
@@ -51,7 +51,7 @@ namespace Fl.IL.Generators
                     instr = new DivInstruction(leftHandSide, leftHandSide, rightHandSide);
                     break;
                 default:
-                    throw new InvalidInstructionException($"Unsupported operation: {node.AssignmentOp.Value} ({node.AssignmentOp.Type})");
+                    throw new InvalidInstructionException($"Unsupported operation: {node.Operator.Value} ({node.Operator.Type})");
             }
 
             generator.Emmit(instr);

@@ -6,9 +6,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ForSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstForNode>
+    class ForSymbolResolver : INodeVisitor<SymbolResolverVisitor, ForNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstForNode fornode)
+        public void Visit(SymbolResolverVisitor visitor, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
             visitor.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");

@@ -7,19 +7,19 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstConstantNode, InferredType>
+    class ConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, ConstantNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstConstantNode constdec)
+        public InferredType Visit(TypeInferrerVisitor visitor, ConstantNode constdec)
         {
             Type lhsType = null;
 
-            foreach (var declaration in constdec.Constants)
+            foreach (var definition in constdec.Definitions)
             {
                 if (lhsType == null)
-                    lhsType = visitor.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type;
+                    lhsType = visitor.SymbolTable.GetSymbol(definition.Left.Value).Type;
 
                 // Get the right-hand side operand (a must for a constant)
-                var rhs = declaration.Item2.Visit(visitor);
+                var rhs = definition.Right.Visit(visitor);
 
                 visitor.Inferrer.MakeConclusion(lhsType, rhs.Type);
             }

@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class FunctionSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstFunctionNode>
+    class FunctionSymbolResolver : INodeVisitor<SymbolResolverVisitor, FunctionNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstFunctionNode funcdecl)
+        public void Visit(SymbolResolverVisitor visitor, FunctionNode funcdecl)
         {
             // Create the function symbol
             var funcType = new Function();
@@ -22,15 +22,15 @@ namespace Fl.Semantics.Resolvers
             visitor.SymbolTable.EnterScope(ScopeType.Function, funcdecl.Name);
 
             // Process the parameters
-            funcdecl.Parameters.Parameters.ForEach(p => {
+            funcdecl.Parameters.ForEach(parameter => {
                 // Define the symbol in the current scope (method's scope)
-                var type = p.SymbolInfo.Type == null ? visitor.Inferrer.NewAnonymousType() : SymbolHelper.GetType(visitor.SymbolTable, p.SymbolInfo.Type);
+                var type = parameter.SymbolInfo.Type == null ? visitor.Inferrer.NewAnonymousType() : SymbolHelper.GetType(visitor.SymbolTable, parameter.SymbolInfo.Type);
 
                 // Update the method's type
                 funcType.DefineParameterType(type);
 
-                var storage = SymbolHelper.GetStorage(p.SymbolInfo.Mutability);
-                var symbol = new Symbol(p.Name.Value.ToString(), type, Access.Public, storage);
+                var storage = SymbolHelper.GetStorage(parameter.SymbolInfo.Mutability);
+                var symbol = new Symbol(parameter.Name.Value, type, Access.Public, storage);
 
                 if (visitor.Inferrer.IsTypeAssumption(type))
                     visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);

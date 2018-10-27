@@ -6,30 +6,30 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class AssignmentTypeChecker : INodeVisitor<TypeCheckerVisitor, AstAssignmentNode, CheckedType>
+    class AssignmentTypeChecker : INodeVisitor<TypeCheckerVisitor, AssignmentNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstAssignmentNode node)
+        public CheckedType Visit(TypeCheckerVisitor checker, AssignmentNode node)
         {
-            if (node is AstVariableAssignmentNode)
-                return MakeVariableAssignment(node as AstVariableAssignmentNode, checker);
-            if (node is AstDestructuringAssignmentNode)
-                return this.MakeDestructuringAssignment(node as AstDestructuringAssignmentNode, checker);
+            if (node is VariableAssignmentNode)
+                return MakeVariableAssignment(node as VariableAssignmentNode, checker);
+            if (node is DestructuringAssignmentNode)
+                return this.MakeDestructuringAssignment(node as DestructuringAssignmentNode, checker);
 
             throw new AstWalkerException($"Invalid variable assignment of type {node.GetType().FullName}");
         }
 
-        private CheckedType MakeVariableAssignment(AstVariableAssignmentNode node, TypeCheckerVisitor checker)
+        private CheckedType MakeVariableAssignment(VariableAssignmentNode node, TypeCheckerVisitor checker)
         {
-            if (node.Accessor.Enclosing != null)
+            if (node.Accessor.Parent != null)
             {
-                var enc = node.Accessor.Enclosing.Visit(checker);
+                var enc = node.Accessor.Parent.Visit(checker);
 
                 if (enc.Type is Class c)
-                    throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{node.Accessor.Identifier.Value}'");
+                    throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{node.Accessor.Target.Value}'");
             }
 
             var leftHandSide = node.Accessor.Visit(checker);
-            var rightHandSide = node.Expression.Visit(checker);
+            var rightHandSide = node.Right.Visit(checker);
 
             if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
                 throw new System.Exception($"Cannot change value of constant {leftHandSide.Type.Name} '{leftHandSide.Symbol.Name}'");
@@ -42,10 +42,10 @@ namespace Fl.Semantics.Checkers
             return leftHandSide;
         }
 
-        private CheckedType MakeDestructuringAssignment(AstDestructuringAssignmentNode node, TypeCheckerVisitor checker)
+        private CheckedType MakeDestructuringAssignment(DestructuringAssignmentNode node, TypeCheckerVisitor checker)
         {
-            var tupleCheckedType = node.Variables.Visit(checker);
-            var exprCheckedType = node.Expression.Visit(checker);
+            var tupleCheckedType = node.Left.Visit(checker);
+            var exprCheckedType = node.Right.Visit(checker);
 
             var tupleTypes = tupleCheckedType.Type as Tuple;
             var exprTypes = exprCheckedType.Type as Tuple;
@@ -57,14 +57,14 @@ namespace Fl.Semantics.Checkers
                 if (varType == null)
                     continue;
 
-                var varnode = node.Variables.Items[i];
+                var varnode = node.Left.Items[i];
 
-                if (varnode is AstAccessorNode accessor && accessor.Enclosing != null)
+                if (varnode is AccessorNode accessor && accessor.Parent != null)
                 {
-                    var enc = accessor.Enclosing.Visit(checker);
+                    var enc = accessor.Parent.Visit(checker);
 
                     if (enc.Type is Class c)
-                        throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{accessor.Identifier.Value}'");
+                        throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{accessor.Target.Value}'");
                 }
 
                 var leftHandSide = varnode.Visit(checker);

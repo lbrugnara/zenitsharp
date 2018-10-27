@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class ForILGenerator : INodeVisitor<ILGenerator, AstForNode, Operand>
+    class ForILGenerator : INodeVisitor<ILGenerator, ForNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstForNode fornode)
+        public Operand Visit(ILGenerator generator, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
             generator.EnterBlock(BlockType.Common);

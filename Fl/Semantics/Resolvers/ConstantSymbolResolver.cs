@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstConstantNode>
+    class ConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ConstantNode>
     {
-        public void Visit(SymbolResolverVisitor binder, AstConstantNode constdec)
+        public void Visit(SymbolResolverVisitor binder, ConstantNode constdec)
         {            
             Type type = null;
 
@@ -21,10 +21,10 @@ namespace Fl.Semantics.Resolvers
 
             var typeAssumption = binder.Inferrer.IsTypeAssumption(type);
 
-            foreach (var declaration in constdec.Constants)
+            foreach (var definition in constdec.Definitions)
             {
                 // Get the identifier name
-                var constantName = declaration.Item1.Value.ToString();                
+                var constantName = definition.Left.Value;
 
                 // Create the new symbol
                 var symbol = binder.SymbolTable.NewSymbol(constantName, type, Access.Public, Storage.Constant);
@@ -34,7 +34,7 @@ namespace Fl.Semantics.Resolvers
                     binder.Inferrer.AssumeSymbolTypeAs(symbol, type);
 
                 // Get the right-hand side operand (a must for a constant)
-                declaration.Item2.Visit(binder);                
+                definition.Right.Visit(binder);                
 
             }
         }

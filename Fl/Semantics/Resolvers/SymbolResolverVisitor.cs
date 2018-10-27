@@ -69,105 +69,105 @@ namespace Fl.Semantics.Resolvers
 
         public TypeInferrer Inferrer { get; private set; }
 
-        public void Visit(AstNode node)
+        public void Visit(Node node)
         {
             object n = node;
 
             switch (n)
             {
-                case AstUnaryNode u:
+                case UnaryNode u:
                     this.unarySymbolResolver.Visit(this, u);
                     break;
 
-                case AstBinaryNode b:
+                case BinaryNode b:
                     this.binarySymbolResolver.Visit(this, b);
                     break;
 
-                case AstAssignmentNode a:
+                case AssignmentNode a:
                     this.assignmentSymbolResolver.Visit(this, a);
                     break;
 
-                case AstConstantNode c:
+                case ConstantNode c:
                     this.constantSymbolResolver.Visit(this, c);
                     break;
 
-                case AstVariableNode v:
+                case VariableNode v:
                     this.variableSymbolResolver.Visit(this, v);
                     break;
 
-                case AstBlockNode bl:
+                case BlockNode bl:
                     this.blockSymbolResolver.Visit(this, bl);
                     break;
 
-                case AstDeclarationNode d:
+                case DeclarationNode d:
                     this.declarationSymbolResolver.Visit(this, d);
                     break;
 
-                case AstLiteralNode l:
+                case LiteralNode l:
                     this.literalSymbolResolver.Visit(this, l);
                     break;
 
-                case AstAccessorNode ivk:
+                case AccessorNode ivk:
                     this.accessorSymbolResolver.Visit(this, ivk);
                     break;
 
-                case AstIfNode i:
+                case IfNode i:
                     this.ifSymbolResolver.Visit(this, i);
                     break;
 
-                case AstWhileNode w:
+                case WhileNode w:
                     this.whileSymbolResolver.Visit(this, w);
                     break;
 
-                case AstForNode f:
+                case ForNode f:
                     this.forSymbolResolver.Visit(this, f);
                     break;
 
-                case AstBreakNode brk:
+                case BreakNode brk:
                     this.breakSymbolResolver.Visit(this, brk);
                     break;
 
-                case AstContinueNode cont:
+                case ContinueNode cont:
                     this.continueSymbolResolver.Visit(this, cont);
                     break;
 
-                case AstCallableNode call:
+                case CallableNode call:
                     this.callSymbolResolver.Visit(this, call);
                     break;
 
-                case AstFunctionNode func:
+                case FunctionNode func:
                     this.funcDeclSymbolResolver.Visit(this, func);
                     break;
 
-                case AstTupleNode t:
+                case TupleNode t:
                     this.tupleSymbolResolver.Visit(this, t);
                     break;
 
-                case AstReturnNode ret:
+                case ReturnNode ret:
                     this.returnSymbolResolver.Visit(this, ret);
                     break;
 
-                case AstNullCoalescingNode nc:
+                case NullCoalescingNode nc:
                     this.nullCoalescingSymbolResolver.Visit(this, nc);
                     break;
 
-                case AstClassNode cn:
+                case ClassNode cn:
                     this.classSymbolResolver.Visit(this, cn);
                     break;
 
-                case AstClassPropertyNode cpn:
+                case ClassPropertyNode cpn:
                     this.classPropertySymbolResolver.Visit(this, cpn);
                     break;
 
-                case AstClassConstantNode ccn:
+                case ClassConstantNode ccn:
                     this.classConstantSymbolResolver.Visit(this, ccn);
                     break;
 
-                case AstClassMethodNode cmn:
+                case ClassMethodNode cmn:
                     this.classMethodSymbolResolver.Visit(this, cmn);
                     break;
 
-                case AstNoOpNode np:
+                case NoOpNode np:
                     break;
 
                 default:

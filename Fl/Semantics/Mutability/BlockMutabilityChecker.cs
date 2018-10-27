@@ -8,13 +8,13 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Mutability
 {
-    class BlockMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstBlockNode, MutabilityCheckResult>
+    class BlockMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, BlockNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstBlockNode node)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, BlockNode node)
         {
             checker.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
 
-            foreach (AstNode statement in node.Statements)
+            foreach (Node statement in node.Statements)
                 statement.Visit(checker);
 
             checker.SymbolTable.LeaveScope();

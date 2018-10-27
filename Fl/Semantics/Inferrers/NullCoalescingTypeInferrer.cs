@@ -6,9 +6,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class NullCoalescingTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstNullCoalescingNode, InferredType>
+    class NullCoalescingTypeInferrer : INodeVisitor<TypeInferrerVisitor, NullCoalescingNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstNullCoalescingNode nullc)
+        public InferredType Visit(TypeInferrerVisitor visitor, NullCoalescingNode nullc)
         {
             var left = nullc.Left.Visit(visitor);
             var right = nullc.Right.Visit(visitor);

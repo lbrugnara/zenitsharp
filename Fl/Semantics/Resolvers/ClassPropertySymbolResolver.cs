@@ -7,12 +7,12 @@ using System.Collections.Generic;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassPropertySymbolResolver : INodeVisitor<SymbolResolverVisitor, AstClassPropertyNode>
+    class ClassPropertySymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassPropertyNode>
     {
-        public void Visit(SymbolResolverVisitor binder, AstClassPropertyNode node)
+        public void Visit(SymbolResolverVisitor binder, ClassPropertyNode node)
         {
             // Get the property name
-            var propertyName = node.Name.Value.ToString();
+            var propertyName = node.Name.Value;
 
             // Check if the symbol is already defined
             if (binder.SymbolTable.HasSymbol(propertyName))

@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class IfILGenerator : INodeVisitor<ILGenerator, AstIfNode, Operand>
+    class IfILGenerator : INodeVisitor<ILGenerator, IfNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstIfNode ifnode)
+        public Operand Visit(ILGenerator generator, IfNode ifnode)
         {
             // Get a (non-resolved) label to skip the if
             var thenExitPoint = generator.ProgramBuilder.NewLabel();

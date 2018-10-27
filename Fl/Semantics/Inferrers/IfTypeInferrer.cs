@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstIfNode, InferredType>
+    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, IfNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstIfNode ifnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, IfNode ifnode)
         {
             var conditionType = ifnode.Condition.Visit(visitor);
 

@@ -8,19 +8,19 @@ using Fl.Semantics.Exceptions;
 
 namespace Fl.Semantics.Checkers
 {
-    class ConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, AstConstantNode, CheckedType>
+    class ConstantTypeChecker : INodeVisitor<TypeCheckerVisitor, ConstantNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstConstantNode constdec)
+        public CheckedType Visit(TypeCheckerVisitor checker, ConstantNode constdec)
         {
             CheckedType lhsType = null;
 
-            foreach (var declaration in constdec.Constants)
+            foreach (var definition in constdec.Definitions)
             {
                 if (lhsType == null)
-                    lhsType = new CheckedType(checker.SymbolTable.GetSymbol(declaration.Item1.Value.ToString()).Type);
+                    lhsType = new CheckedType(checker.SymbolTable.GetSymbol(definition.Left.Value).Type);
 
                 // Get the right-hand side operand (a must for a constant)
-                var rhsType = declaration.Item2.Visit(checker);
+                var rhsType = definition.Right.Visit(checker);
 
                 if (!lhsType.Type.IsAssignableFrom(rhsType.Type))
                     throw new SymbolException($"Cannot assign type {rhsType.Type} to constant of type {lhsType.Type}");

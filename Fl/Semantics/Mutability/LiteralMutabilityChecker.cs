@@ -7,9 +7,9 @@ using Fl.Semantics;
 
 namespace Fl.Semantics.Mutability
 {
-    class LiteralMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstLiteralNode, MutabilityCheckResult>
+    class LiteralMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, LiteralNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstLiteralNode literal)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, LiteralNode literal)
         {
             return null;
         }

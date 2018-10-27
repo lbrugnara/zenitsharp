@@ -8,12 +8,12 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {
-    class AccessorMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstAccessorNode, MutabilityCheckResult>
+    class AccessorMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AccessorNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstAccessorNode accessor)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AccessorNode accessor)
         {
-            var id = accessor.Identifier.Value.ToString();
-            var enclosing = accessor.Enclosing?.Visit(checker);
+            var id = accessor.Target.Value;
+            var enclosing = accessor.Parent?.Visit(checker);
 
             var symtable = (enclosing?.Symbol as ISymbolTable) ?? checker.SymbolTable;
 

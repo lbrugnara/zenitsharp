@@ -5,11 +5,11 @@ using Fl.Ast;
 
 namespace Fl.Semantics.Resolvers
 {
-    class AccessorSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstAccessorNode>
+    class AccessorSymbolResolver : INodeVisitor<SymbolResolverVisitor, AccessorNode>
     {
-        public void Visit(SymbolResolverVisitor visitor, AstAccessorNode accessor)
+        public void Visit(SymbolResolverVisitor visitor, AccessorNode accessor)
         {
-            accessor.Enclosing?.Visit(visitor);
+            accessor.Parent?.Visit(visitor);
         }
     }
 }

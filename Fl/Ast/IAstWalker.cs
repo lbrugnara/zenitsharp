@@ -6,11 +6,11 @@ namespace Fl.Ast
 {
     public interface IAstWalker
     {
-        void Visit(AstNode node);
+        void Visit(Node node);
     }
 
     public interface IAstWalker<T> where T : class
     {
-        T Visit(AstNode node);
+        T Visit(Node node);
     }
 }

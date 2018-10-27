@@ -68,81 +68,81 @@ namespace Fl.Semantics.Inferrers
 
         public TypeInferrer Inferrer { get; private set; }
 
-        public InferredType Visit(AstNode node)
+        public InferredType Visit(Node node)
         {
             object n = node;
             switch (n)
             {
-                case AstUnaryNode u:
+                case UnaryNode u:
                     return this.unaryTypeInferrer.Visit(this, u);
 
-                case AstBinaryNode b:
+                case BinaryNode b:
                     return this.binaryTypeInferrer.Visit(this, b);
 
-                case AstAssignmentNode a:
+                case AssignmentNode a:
                     return this.assignmentTypeInferrer.Visit(this, a);
 
-                case AstConstantNode c:
+                case ConstantNode c:
                     return this.constantTypeInferrer.Visit(this, c);
 
-                case AstVariableNode v:
+                case VariableNode v:
                     return this.variableTypeInferrer.Visit(this, v);
 
-                case AstBlockNode bl:
+                case BlockNode bl:
                     return this.blockTypeInferrer.Visit(this, bl);
 
-                case AstDeclarationNode d:
+                case DeclarationNode d:
                     return this.declarationTypeInferrer.Visit(this, d);
 
-                case AstLiteralNode l:
+                case LiteralNode l:
                     return this.literalTypeInferrer.Visit(this, l);
 
-                case AstAccessorNode ivk:
+                case AccessorNode ivk:
                     return this.accessorTypeInferrer.Visit(this, ivk);
 
-                case AstIfNode i:
+                case IfNode i:
                     return this.ifTypeInferrer.Visit(this, i);
 
-                case AstWhileNode w:
+                case WhileNode w:
                     return this.whileTypeInferrer.Visit(this, w);
 
-                case AstForNode f:
+                case ForNode f:
                     return this.forTypeInferrer.Visit(this, f);
 
-                case AstBreakNode brk:
+                case BreakNode brk:
                     return this.breakTypeInferrer.Visit(this, brk);
 
-                case AstContinueNode cont:
+                case ContinueNode cont:
                     return this.continueTypeInferrer.Visit(this, cont);
 
-                case AstCallableNode call:
+                case CallableNode call:
                     return this.callTypeInferrer.Visit(this, call);
 
-                case AstFunctionNode func:
+                case FunctionNode func:
                     return this.funcDeclTypeInferrer.Visit(this, func);
 
-                case AstTupleNode t:
+                case TupleNode t:
                     return this.tupleTypeInferrer.Visit(this, t);
 
-                case AstReturnNode ret:
+                case ReturnNode ret:
                     return this.returnTypeInferrer.Visit(this, ret);
 
-                case AstNullCoalescingNode nc:
+                case NullCoalescingNode nc:
                     return this.nullCoalescingTypeInferrer.Visit(this, nc);
 
-                case AstClassNode cn:
+                case ClassNode cn:
                     return this.classTypeInferrer.Visit(this, cn);
 
-                case AstClassPropertyNode cpn:
+                case ClassPropertyNode cpn:
                     return this.classPropertyTypeInferrer.Visit(this, cpn);
 
-                case AstClassConstantNode ccn:
+                case ClassConstantNode ccn:
                     return this.classConstantTypeInferrer.Visit(this, ccn);
 
-                case AstClassMethodNode cmn:
+                case ClassMethodNode cmn:
                     return this.classMethodTypeInferrer.Visit(this, cmn);
 
-                case AstNoOpNode np:
+                case NoOpNode np:
                     return null;
             }
             throw new AstWalkerException($"Unhandled type {node.GetType()}");

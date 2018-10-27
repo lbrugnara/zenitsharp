@@ -6,9 +6,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {
-    class UnaryMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstUnaryNode, MutabilityCheckResult>
+    class UnaryMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, UnaryNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstUnaryNode unary)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, UnaryNode unary)
         {
             // TODO: Check Prefix/Postfix increment
             return unary.Left.Visit(checker);

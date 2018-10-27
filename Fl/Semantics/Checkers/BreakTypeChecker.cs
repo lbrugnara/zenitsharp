@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {
-    class BreakTypeChecker : INodeVisitor<TypeCheckerVisitor, AstBreakNode, CheckedType>
+    class BreakTypeChecker : INodeVisitor<TypeCheckerVisitor, BreakNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstBreakNode wnode)
+        public CheckedType Visit(TypeCheckerVisitor checker, BreakNode wnode)
         {
             var nbreak = wnode.Number.Visit(checker);
 

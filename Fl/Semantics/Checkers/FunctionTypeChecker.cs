@@ -9,9 +9,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Checkers
 {
-    class FunctionTypeChecker : INodeVisitor<TypeCheckerVisitor, AstFunctionNode, CheckedType>
+    class FunctionTypeChecker : INodeVisitor<TypeCheckerVisitor, FunctionNode, CheckedType>
     {
-        public CheckedType Visit(TypeCheckerVisitor checker, AstFunctionNode funcdecl)
+        public CheckedType Visit(TypeCheckerVisitor checker, FunctionNode funcdecl)
         {
             var funcsym = checker.SymbolTable.GetSymbol(funcdecl.Name);
 

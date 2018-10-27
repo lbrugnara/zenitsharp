@@ -7,13 +7,13 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
-    class BlockTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBlockNode, InferredType>
+    class BlockTypeInferrer : INodeVisitor<TypeInferrerVisitor, BlockNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstBlockNode node)
+        public InferredType Visit(TypeInferrerVisitor visitor, BlockNode node)
         {
             visitor.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
 
-            foreach (AstNode statement in node.Statements)
+            foreach (Node statement in node.Statements)
                 statement.Visit(visitor);
 
             visitor.SymbolTable.LeaveScope();

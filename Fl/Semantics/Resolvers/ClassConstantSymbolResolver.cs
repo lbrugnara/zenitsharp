@@ -6,12 +6,12 @@ using System;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, AstClassConstantNode>
+    class ClassConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassConstantNode>
     {
-        public void Visit(SymbolResolverVisitor binder, AstClassConstantNode node)
+        public void Visit(SymbolResolverVisitor binder, ClassConstantNode node)
         {
             // Get the constant name
-            var constantName = node.Name.Value.ToString();
+            var constantName = node.Name.Value;
 
             // Check if the symbol is already defined
             if (binder.SymbolTable.HasSymbol(constantName))

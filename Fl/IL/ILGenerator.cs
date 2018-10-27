@@ -84,7 +84,7 @@ namespace Fl.IL
             return i;
         }
 
-        public ILProgram Build(AstNode node)
+        public ILProgram Build(Node node)
         {
             this.Visit(node);
             while (this.Labels.Any())
@@ -92,7 +92,7 @@ namespace Fl.IL
             return this.ProgramBuilder.Build();
         }
 
-        public Operand Visit(AstNode node)
+        public Operand Visit(Node node)
         {
             return this.astVisitor.Visit(node);
         }

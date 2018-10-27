@@ -7,32 +7,32 @@ using Fl.Semantics.Exceptions;
 
 namespace Fl.Semantics.Mutability
 {
-    class VariableMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstVariableNode, MutabilityCheckResult>
+    class VariableMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, VariableNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstVariableNode vardecl)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, VariableNode vardecl)
         {
             switch (vardecl)
             {
-                case AstVarDefinitionNode vardefnode:
+                case VariableDefinitionNode vardefnode:
                     return VarDefinitionNode(checker, vardefnode);
 
-                case AstVarDestructuringNode vardestnode:
+                case VariableDestructuringNode vardestnode:
                     return VarDestructuringNode(checker, vardestnode);
             }
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected MutabilityCheckResult VarDefinitionNode(MutabilityCheckerVisitor checker, AstVarDefinitionNode vardecl)
+        protected MutabilityCheckResult VarDefinitionNode(MutabilityCheckerVisitor checker, VariableDefinitionNode vardecl)
         {
-            foreach (var declaration in vardecl.VarDefinitions)
-                declaration.Item2?.Visit(checker);
+            foreach (var definition in vardecl.Definitions)
+                definition.Right?.Visit(checker);
 
             return null;
         }
 
-        protected MutabilityCheckResult VarDestructuringNode(MutabilityCheckerVisitor checker, AstVarDestructuringNode vardestnode)
+        protected MutabilityCheckResult VarDestructuringNode(MutabilityCheckerVisitor checker, VariableDestructuringNode vardestnode)
         {
-            vardestnode.DestructInit.Visit(checker);
+            vardestnode.Right.Visit(checker);
 
             return null;
         }

@@ -9,9 +9,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ReturnTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstReturnNode, InferredType>
+    class ReturnTypeInferrer : INodeVisitor<TypeInferrerVisitor, ReturnNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstReturnNode rnode)
+        public InferredType Visit(TypeInferrerVisitor visitor, ReturnNode rnode)
         {
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
@@ -21,7 +21,7 @@ namespace Fl.Semantics.Inferrers
             Type type = null;
             Symbol symbol = null;
 
-            var returnInferredType = rnode.ReturnTuple?.Visit(visitor);
+            var returnInferredType = rnode.Expression?.Visit(visitor);
 
             // void
             if (returnInferredType == null)

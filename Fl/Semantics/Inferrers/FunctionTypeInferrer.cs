@@ -10,9 +10,9 @@ using System.Linq;
 
 namespace Fl.Semantics.Inferrers
 {
-    class FunctionTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstFunctionNode, InferredType>
+    class FunctionTypeInferrer : INodeVisitor<TypeInferrerVisitor, FunctionNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstFunctionNode funcdecl)
+        public InferredType Visit(TypeInferrerVisitor visitor, FunctionNode funcdecl)
         {
             var functionSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Name);
             Function functionType = functionSymbol.Type as Function;
@@ -23,7 +23,7 @@ namespace Fl.Semantics.Inferrers
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
 
-            parametersSymbols.AddRange(funcdecl.Parameters.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value.ToString())));
+            parametersSymbols.AddRange(funcdecl.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value)));
 
             // Get the return symbol and assign a temporal type
             var retSymbol = visitor.SymbolTable.GetSymbol("@ret");

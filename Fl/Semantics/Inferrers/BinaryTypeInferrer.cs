@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class BinaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstBinaryNode, InferredType>
+    class BinaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, BinaryNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstBinaryNode binary)
+        public InferredType Visit(TypeInferrerVisitor visitor, BinaryNode binary)
         {
             var left = binary.Left.Visit(visitor);
             var right = binary.Right.Visit(visitor);

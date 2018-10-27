@@ -6,11 +6,11 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class DeclarationTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstDeclarationNode, InferredType>
+    class DeclarationTypeInferrer : INodeVisitor<TypeInferrerVisitor, DeclarationNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AstDeclarationNode decls)
+        public InferredType Visit(TypeInferrerVisitor visitor, DeclarationNode decls)
         {
-            foreach (AstNode statement in decls.Statements)
+            foreach (Node statement in decls.Statements)
                 statement.Visit(visitor);
 
             return null;

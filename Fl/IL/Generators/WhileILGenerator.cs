@@ -7,9 +7,9 @@ using Fl.Ast;
 
 namespace Fl.IL.Generators
 {
-    class WhileILGenerator : INodeVisitor<ILGenerator, AstWhileNode, Operand>
+    class WhileILGenerator : INodeVisitor<ILGenerator, WhileNode, Operand>
     {
-        public Operand Visit(ILGenerator generator, AstWhileNode wnode)
+        public Operand Visit(ILGenerator generator, WhileNode wnode)
         {
             // Generate the goto to re-test the condition (the destination is the next instruction: eblock)
             Label entryPoint = generator.ProgramBuilder.NewLabel();

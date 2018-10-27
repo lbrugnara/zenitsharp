@@ -196,7 +196,12 @@ namespace Fl.Syntax
             return t;
         }
 
-        private Token BuildToken(TokenType type, object value, int line, int col)
+        private Token BuildToken(TokenType type, char value, int line, int col)
+        {
+            return this.BuildToken(type, value.ToString(), line, col);
+        }
+
+        private Token BuildToken(TokenType type, string value, int line, int col)
         {
             return new Token()
             {
@@ -476,7 +481,7 @@ namespace Fl.Syntax
             while (this.HasInput())
             {
                 c = this.Peek();
-                if (!char.IsLetterOrDigit(c) && c != '_')
+                if (!char.IsLetterOrDigit(c) && c != '_' && c != '$')
                     break;
                 val += this.Consume();
             }

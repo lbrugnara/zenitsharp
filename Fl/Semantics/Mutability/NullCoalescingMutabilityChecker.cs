@@ -6,9 +6,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {
-    class NullCoalescingMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstNullCoalescingNode, MutabilityCheckResult>
+    class NullCoalescingMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, NullCoalescingNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstNullCoalescingNode nullc)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, NullCoalescingNode nullc)
         {
             var lefths = nullc.Left.Visit(checker);
             var righths = nullc.Right.Visit(checker);

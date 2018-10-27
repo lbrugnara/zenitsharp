@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, AstLiteralNode, InferredType>
+    class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, LiteralNode, InferredType>
     {
-        public InferredType Visit(TypeInferrerVisitor inferrer, AstLiteralNode literal)
+        public InferredType Visit(TypeInferrerVisitor inferrer, LiteralNode literal)
         {
             return new InferredType(SymbolHelper.GetType(inferrer.SymbolTable, literal.Literal));
         }

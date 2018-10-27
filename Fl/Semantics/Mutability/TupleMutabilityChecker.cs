@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace Fl.Semantics.Mutability
 {
-    class TupleMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, AstTupleNode, MutabilityCheckResult>
+    class TupleMutabilityChecker : INodeVisitor<MutabilityCheckerVisitor, TupleNode, MutabilityCheckResult>
     {
-        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, AstTupleNode node)
+        public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, TupleNode node)
         {
             node.Items?.Select(i => i?.Visit(checker));
             return null;
