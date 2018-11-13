@@ -8,7 +8,6 @@ using System.Linq;
 
 namespace Fl.Semantics.Symbols
 {
-
     public class Scope : ISymbolTable
     {
         /// <summary>
@@ -19,7 +18,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Type of the current scope
         /// </summary>
-        public ScopeType Type { get; }
+        public virtual ScopeType Type { get; set; }
 
         /// <summary>
         /// Contains symbols defined in this scope
@@ -29,41 +28,59 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Reference to the Global scope
         /// </summary>
-        public Scope Global { get; private set; }
+        protected Scope Global { get; set; }
 
         /// <summary>
         /// If present, reference to the parent scope
         /// </summary>
-        public Scope Parent { get; private set; }
+        protected Scope Parent { get; set; }
 
         /// <summary>
         /// scope's children
         /// </summary>
-        private Dictionary<string, Scope> Children { get; }
+        protected Dictionary<string, Scope> Children { get; }
 
-
-        public Scope(ScopeType type, string uid)
+        /// <summary>
+        /// This constructor creates an instance that represents the Global scope, as caller
+        /// is not providing a prent scope
+        /// </summary>
+        /// <param name="uid">Scope's UID</param>
+        public Scope(string uid)
         {
             this.Uid = uid;
-            this.Type = type;
+            this.Type = ScopeType.Global;
             this.Symbols = new Dictionary<string, Symbol>();
-            this.Children = new Dictionary<string, Scope>();
-
-            if (type == ScopeType.Function)
-                this.NewSymbol("@ret", null, Access.Public, Storage.Mutable);
-            else if (type == ScopeType.Global)
-                this.Global = this;
+            this.Children = new Dictionary<string, Scope>();            
         }
 
-        public Scope(ScopeType type, string uid, Scope global, Scope parent = null)
-            : this(type, uid)
+        /// <summary>
+        /// If the parent scope is present, caller is creating a Common scope.
+        /// We navigate through the chain to get a reference to the global scope
+        /// </summary>
+        /// <param name="uid">Scope's UID</param>
+        /// <param name="parent">Parent scope of the new instance</param>
+        public Scope(string uid, Scope parent)
+            : this(uid)
         {
-            this.Global = global;
-            if (parent != global)
-                this.Parent = parent;
+            this.Type = ScopeType.Common;
+            this.Parent = parent;
+
+            var current = parent;
+            while (current.Parent != null)
+                current = parent.Parent;
+
+            this.Global = current;
         }
 
-
+        /// <summary>
+        /// If the scope with the specified type and UID exists as a child of the current scope, that instance
+        /// is returned.
+        /// In case the requested scope does not exist, this method creates a new one, saves it as a child, and returns
+        /// the new nested scope
+        /// </summary>
+        /// <param name="type">Child scope's type</param>
+        /// <param name="uid">Child scope's UID</param>
+        /// <returns>The child scope with the specified type and UID</returns>
         public Scope GetOrCreateNestedScope(ScopeType type, string uid)
         {
             Scope scope = null;
@@ -77,7 +94,18 @@ namespace Fl.Semantics.Symbols
             }
             else
             {
-                scope = new Scope(type, uid, this.Global, this);
+                switch (type)
+                {
+                    case ScopeType.Function:
+                        scope = new FunctionScope(uid, this);
+                        break;
+                    case ScopeType.Class:
+                        scope = new ClassScope(uid, this);
+                        break;
+                    default:
+                        scope = new Scope(uid, this);
+                        break;
+                }                
 
                 this.Children[uid] = scope;
             }
@@ -85,12 +113,19 @@ namespace Fl.Semantics.Symbols
             return scope;
         }
 
+        /// <summary>
+        /// This method returns (if exists) a child scope with the requested type and UID.
+        /// If the child does not exist or the type missmatches, this method throws an ScopeException
+        /// </summary>
+        /// <param name="type">Child scope's type</param>
+        /// <param name="uid">Child scope's UID</param>
+        /// <returns>The child scope with the specified type and UID</returns>
         public Scope GetNestedScope(ScopeType type, string uid)
         {
             Scope scope = null;
 
             if (!this.Children.ContainsKey(uid))
-                throw new System.Exception($"Scope {uid} ({type}) does not exist");
+                throw new ScopeException($"Scope {uid} ({type}) does not exist");
             
             scope = this.Children[uid];
 
@@ -100,6 +135,11 @@ namespace Fl.Semantics.Symbols
             return scope;
         }
 
+        /// <summary>
+        /// Returns true if the chain scope refers to the Global scope.
+        /// If in the chain there is a function, package, or class scope, this function returns false,
+        /// true otherwise
+        /// </summary>
         public bool IsGlobal
         {
             get
@@ -124,27 +164,93 @@ namespace Fl.Semantics.Symbols
             }
         }
 
+        /// <summary>
+        /// Returns true if the current scope or an ancestor is a Function scope
+        /// </summary>
         public bool IsFunction
         {
             get
             {
-                return this.Type == ScopeType.Function || Parent != null && Parent.IsFunction;
+                if (this.Type == ScopeType.Function)
+                    return true;
+
+                if (this.Parent == null)
+                    return false;
+
+                var scope = this.Parent;
+
+                while (scope != null)
+                {
+                    if (scope.Type == ScopeType.Function)
+                        return true;
+
+                    if (scope.IsPackage || scope.IsClass)
+                        return false;
+
+                    scope = scope.Parent;
+                }
+
+                return false;
             }
         }
 
+        /// <summary>
+        /// Returns true if the current scope or an ancestor is a Package scope
+        /// </summary>
         public bool IsPackage
         {
             get
             {
-                return this.Type == ScopeType.Package || Parent != null && Parent.IsPackage;
+                if (this.Type == ScopeType.Package)
+                    return true;
+
+                if (this.Parent == null)
+                    return false;
+
+                var scope = this.Parent;
+
+                while (scope != null)
+                {
+                    if (scope.Type == ScopeType.Package)
+                        return true;
+
+                    if (scope.IsFunction || scope.IsClass)
+                        return false;
+
+                    scope = scope.Parent;
+                }
+
+                return false;
             }
         }
 
+        /// <summary>
+        /// Returns true if the current scope or an ancestor is a Class scope
+        /// </summary>
         public bool IsClass
         {
             get
             {
-                return this.Type == ScopeType.Class || Parent != null && Parent.IsClass;
+                if (this.Type == ScopeType.Class)
+                    return true;
+
+                if (this.Parent == null)
+                    return false;
+
+                var scope = this.Parent;
+
+                while (scope != null)
+                {
+                    if (scope.Type == ScopeType.Class)
+                        return true;
+
+                    if (scope.IsFunction || scope.IsPackage)
+                        return false;
+
+                    scope = scope.Parent;
+                }
+
+                return false;
             }
         }
 
@@ -158,22 +264,20 @@ namespace Fl.Semantics.Symbols
             this.Symbols[symbol.Name] = symbol;
         }
 
-        public Symbol NewSymbol(string name, Type type, Access access, Storage storage)
+        public Symbol CreateSymbol(string name, Type type, Access access, Storage storage)
         {
             if (this.Symbols.ContainsKey(name))
                 throw new SymbolException($"Symbol {name} is already defined in current scope");
 
-            var symbol = new Symbol(name, type, access, storage);
-            this.Symbols[name] = symbol;
-            return symbol;
+            return this.Symbols[name] = new Symbol(name, type, access, storage);
         }
 
-        public List<Symbol> GetAllSymbol() => this.Symbols.Values.ToList();
+        public List<Symbol> GetAllSymbols() => this.Symbols.Values.ToList();
 
         public bool HasSymbol(string name) 
             => this.Symbols.ContainsKey(name) 
-            || (this.Parent != null && this.Parent.HasSymbol(name)) 
-            || (this.Type != ScopeType.Global && this.Global != null && this.Global.HasSymbol(name));
+            || (this.Parent != null && this.Parent.HasSymbol(name))/* 
+            || (this.Type != ScopeType.Global && this.Global != null && this.Global.HasSymbol(name))*/;
 
         public Symbol GetSymbol(string name) 
             => this.TryGetSymbol(name) ?? throw new SymbolException($"Symbol {name} is not defined in current scope");
@@ -183,9 +287,9 @@ namespace Fl.Semantics.Symbols
             ? this.Symbols[name]
             : this.Parent != null && this.Parent.HasSymbol(name)
                 ? this.Parent.TryGetSymbol(name)
-                : this.Global != null && this.Global.HasSymbol(name)
+                : /*this.Global != null && this.Global.HasSymbol(name)
                     ? this.Global.TryGetSymbol(name)
-                    : null;
+                    :*/ null;
 
         #endregion
     }

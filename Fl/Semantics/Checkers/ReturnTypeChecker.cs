@@ -16,7 +16,7 @@ namespace Fl.Semantics.Checkers
             if (!checker.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            var returnSymbol = checker.SymbolTable.GetSymbol("@ret");
+            var returnSymbol = (checker.SymbolTable.CurrentScope as FunctionScope).ReturnSymbol;
 
             var checkedType = rnode.Expression?.Visit(checker);
 

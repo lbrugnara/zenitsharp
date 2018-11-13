@@ -16,7 +16,7 @@ namespace Fl.Semantics.Inferrers
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            var returnSymbol = visitor.SymbolTable.GetSymbol("@ret");
+            var returnSymbol = (visitor.SymbolTable.CurrentScope as FunctionScope).ReturnSymbol;
 
             Type type = null;
             Symbol symbol = null;

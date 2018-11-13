@@ -18,15 +18,12 @@ namespace Fl.Semantics.Inferrers
             Function methodType = methodSymbol.Type as Function;
 
             // Enter the requested method's block
-            visitor.SymbolTable.EnterScope(ScopeType.Function, method.Name);
+            var functionScope = visitor.SymbolTable.EnterFunctionScope(method.Name);
 
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
 
             parametersSymbols.AddRange(method.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value)));
-
-            // Get the return symbol and assign a temporal type
-            var retSymbol = visitor.SymbolTable.GetSymbol("@ret");
 
             // Visit the method's body
             var statements = method.Body.Select(s => (node: s, inferred: s.Visit(visitor))).ToList();
@@ -38,7 +35,7 @@ namespace Fl.Semantics.Inferrers
                 var lambdaReturnExpr = statements.Select(s => s.inferred).Last();
 
                 // Try to unify these types
-                visitor.Inferrer.MakeConclusion(lambdaReturnExpr.Type, retSymbol.Type);
+                visitor.Inferrer.MakeConclusion(lambdaReturnExpr.Type, functionScope.ReturnSymbol.Type);
             }
 
             // Leave the method's scope

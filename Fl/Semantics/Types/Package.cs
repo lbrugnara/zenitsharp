@@ -7,17 +7,17 @@ namespace Fl.Semantics.Types
 {
     public class Package : Struct
     {
-        /// <summary>
+  /*      /// <summary>
         /// Contains symbols defined in this package
         /// </summary>
         private Scope Scope { get; }
-
+*/
         public Package(string name, Scope global)
             : base(name)
         {
-            this.Scope = new Scope(ScopeType.Package, name, global);
+            //this.Scope = new Scope(ScopeType.Package, name, global);
         }
-
+        /*
         #region ISymbolTable implementation
 
         /// <inheritdoc/>
@@ -41,6 +41,6 @@ namespace Fl.Semantics.Types
             //this.Scope.AddSymbol(pkg);
 
             return pkg;
-        }
+        }*/
     }
 }

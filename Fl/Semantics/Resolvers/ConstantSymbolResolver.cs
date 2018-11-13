@@ -27,7 +27,7 @@ namespace Fl.Semantics.Resolvers
                 var constantName = definition.Left.Value;
 
                 // Create the new symbol
-                var symbol = binder.SymbolTable.NewSymbol(constantName, type, Access.Public, Storage.Constant);
+                var symbol = binder.SymbolTable.CreateSymbol(constantName, type, Access.Public, Storage.Constant);
 
                 // Register under the assumption of having an anonymous type, if needed
                 if (typeAssumption)

@@ -12,41 +12,44 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor visitor, ClassMethodNode method)
         {
+            var classScope = visitor.SymbolTable.CurrentScope as ClassScope;
+
+            if (classScope == null)
+                throw new SymbolException($"Current scope is not a class scope ({visitor.SymbolTable.CurrentScope.GetType().Name})");
+
             // Get the access modifier, and the storage type for the method declaration
             var accessMod = SymbolHelper.GetAccess(method.SymbolInfo.Access);
 
             // Create the type and the symbol
             var methodType = new Method();
-            var methodSymbol = new Symbol(method.Name, methodType, accessMod, Storage.Constant);
 
             // Register it in the current scope
-            visitor.SymbolTable.AddSymbol(methodSymbol);
+            var methodSymbol = classScope.CreateMethod(method.Name, methodType, accessMod);
 
             // Change the current scope to be the method's scope
-            visitor.SymbolTable.EnterScope(ScopeType.Function, method.Name);
+            var methodScope = visitor.SymbolTable.EnterFunctionScope(method.Name);
 
             // Process the parameters
             method.Parameters.ForEach(p => {
                 // Define the symbol in the current scope (method's scope)
-                var type = p.SymbolInfo.Type == null ? visitor.Inferrer.NewAnonymousType() : SymbolHelper.GetType(visitor.SymbolTable, p.SymbolInfo.Type);
+                var type = p.SymbolInfo.Type == null 
+                            ? visitor.Inferrer.NewAnonymousType() 
+                            : SymbolHelper.GetType(visitor.SymbolTable, p.SymbolInfo.Type);
                 
                 // Update the method's type
                 methodType.DefineParameterType(type);
 
+                // Update function's scope with the parameter definition
                 var storage = SymbolHelper.GetStorage(p.SymbolInfo.Mutability);
-                var symbol = new Symbol(p.Name.Value, type, Access.Public, storage);
+                var symbol = methodScope.CreateParameter(p.Name.Value, type, Access.Public, storage);
 
+                // Update parameter-anonymous type if the type is an assumed type
                 if (visitor.Inferrer.IsTypeAssumption(type))
                     visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);
-
-                visitor.SymbolTable.AddSymbol(symbol);
             });
 
             // Visit the method's body
             method.Body.ForEach(s => s.Visit(visitor));
-
-            // Get the return symbol
-            var retsym = visitor.SymbolTable.GetSymbol("@ret");
 
             // Assume the method's return type
             var rettype = visitor.Inferrer.NewAnonymousType();
@@ -55,8 +58,8 @@ namespace Fl.Semantics.Resolvers
             methodType.SetReturnType(rettype);
 
             // Update the @ret symbol
-            retsym.Type = rettype;
-            visitor.Inferrer.AssumeSymbolTypeAs(retsym, rettype);
+            methodScope.ReturnSymbol.Type = rettype;
+            visitor.Inferrer.AssumeSymbolTypeAs(methodScope.ReturnSymbol, rettype);
 
             // At this point, the method's type is an assumed type, register
             // the method's symbol under that assumption

@@ -23,7 +23,7 @@ namespace Fl.Semantics.Symbols
             this.scopes = new Stack<Scope>();
 
             // Create the initial scope (Global)
-            this.scopes.Push(new Scope(ScopeType.Global, "global"));
+            this.scopes.Push(new Scope("global"));
             this.unresolved = new Dictionary<string, List<Token>>();
         }
 
@@ -44,10 +44,23 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="type">Type of the scope to get/create</param>
         /// <param name="uid">ID of the scope to get/create</param>
-        public void EnterScope(ScopeType type, string uid) => this.scopes.Push(this.scopes.Peek().GetOrCreateNestedScope(type, uid));
-
-        public void EnterClassScope(string className)
+        public Scope EnterScope(ScopeType type, string uid)
         {
+            var scope = this.scopes.Peek().GetOrCreateNestedScope(type, uid);
+            this.scopes.Push(scope);
+            return scope;
+        }
+
+        public FunctionScope EnterFunctionScope(string uid)
+        {
+            var scope = this.scopes.Peek().GetOrCreateNestedScope(ScopeType.Function, uid) as FunctionScope;
+            this.scopes.Push(scope);
+            return scope;
+        }
+
+        public ClassScope EnterClassScope(string className)
+        {
+            ClassScope scope = null;
             if (this.CurrentScope.IsPackage)
             {
                 // TODO: Do something with the Package
@@ -58,8 +71,10 @@ namespace Fl.Semantics.Symbols
             }
             else
             {
-                this.scopes.Push(this.Global.GetOrCreateNestedScope(ScopeType.Class, className));
+                scope = this.Global.GetOrCreateNestedScope(ScopeType.Class, className) as ClassScope;
+                this.scopes.Push(scope);
             }
+            return scope;
         }
 
         public Scope GetClassScope(string className)
@@ -114,8 +129,8 @@ namespace Fl.Semantics.Symbols
             => this.scopes.Peek().AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol NewSymbol(string name, Type type, Access access, Storage storage) 
-            => this.scopes.Peek().NewSymbol(name, type, access, storage);
+        public Symbol CreateSymbol(string name, Type type, Access access, Storage storage) 
+            => this.scopes.Peek().CreateSymbol(name, type, access, storage);
 
         /// <inheritdoc/>
         public bool HasSymbol(string name) => this.scopes.Peek().HasSymbol(name);
@@ -143,7 +158,7 @@ namespace Fl.Semantics.Symbols
                 // TODO: Do something with the Class
             }
 
-            return scope.NewSymbol(className, clasz, access, Storage.Constant);
+            return scope.CreateSymbol(className, clasz, access, Storage.Constant);
         }
 
         public void AddUnresolvedType(string name, Token info)

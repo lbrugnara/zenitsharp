@@ -11,11 +11,16 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor binder, ClassPropertyNode node)
         {
+            var classScope = binder.SymbolTable.CurrentScope as ClassScope;
+
+            if (classScope == null)
+                throw new SymbolException($"Current scope is not a class scope ({binder.SymbolTable.CurrentScope.GetType().Name})");
+
             // Get the property name
             var propertyName = node.Name.Value;
 
             // Check if the symbol is already defined
-            if (binder.SymbolTable.HasSymbol(propertyName))
+            if (classScope.HasSymbol(propertyName))
                 throw new SymbolException($"Symbol {propertyName} is already defined.");
 
             // Create the property type
@@ -24,7 +29,7 @@ namespace Fl.Semantics.Resolvers
             // Create the new symbol for the property
             var access = SymbolHelper.GetAccess(node.SymbolInfo.Access);
             var storage = SymbolHelper.GetStorage(node.SymbolInfo.Mutability);
-            var symbol = binder.SymbolTable.NewSymbol(propertyName, propertyType, access, storage);
+            var symbol = classScope.CreateProperty(propertyName, propertyType, access, storage);
 
             // If it is a type assumption, register the symbol under that assumption
             if (binder.Inferrer.IsTypeAssumption(propertyType))

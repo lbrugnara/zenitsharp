@@ -44,7 +44,7 @@ namespace Fl.Semantics.Resolvers
 
                 // Create the new symbol for the variable
                 var storage = SymbolHelper.GetStorage(vardecl.Information.Mutability);
-                var symbol = binder.SymbolTable.NewSymbol(variableName, lhsType, Access.Public, storage);
+                var symbol = binder.SymbolTable.CreateSymbol(variableName, lhsType, Access.Public, storage);
 
                 // If it is a type assumption, register the symbol under that assumption
                 if (isAssumedType)
@@ -75,7 +75,7 @@ namespace Fl.Semantics.Resolvers
 
                 // Create the new symbol for the variable
                 var storage = SymbolHelper.GetStorage(destrnode.Information.Mutability);
-                var symbol = visitor.SymbolTable.NewSymbol(variableName, lhsType, Access.Public, storage);
+                var symbol = visitor.SymbolTable.CreateSymbol(variableName, lhsType, Access.Public, storage);
 
                 // Register the symbol under that assumption
                 visitor.Inferrer.AssumeSymbolTypeAs(symbol, lhsType);
