@@ -19,12 +19,6 @@ namespace Fl.Semantics.Types
             this.DefiningClass = clasz;
         }
 
-        public Method(Class clasz, Type returnType, params Type[] parametersTypes)
-            : base(returnType, parametersTypes)
-        {
-            this.DefiningClass = clasz;
-        }
-
         public void SetDefiningClass(Class clasz)
         {
             this.DefiningClass = clasz;

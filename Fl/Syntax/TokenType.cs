@@ -18,7 +18,6 @@ namespace Fl.Syntax
         Variable,
         Mutable,
         Constant,
-        Null,
 
         // Arithmetic Operators
         Addition,

@@ -4,6 +4,7 @@
 
 using Fl.Semantics.Exceptions;
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
@@ -14,7 +15,15 @@ namespace Fl.Semantics.Resolvers
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            rnode.Expression?.Visit(visitor);
+            // If it is an empty return statement, we leave here
+            if (rnode.Expression == null)
+                return;
+
+            // We create the @ret symbol in the current function's scope
+            if (visitor.SymbolTable.CurrentFunctionScope.ReturnSymbol == null)
+                visitor.SymbolTable.CurrentFunctionScope.CreateReturnSymbol();
+
+            rnode.Expression.Visit(visitor);
         }
     }
 }

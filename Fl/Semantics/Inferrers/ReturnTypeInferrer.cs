@@ -16,21 +16,15 @@ namespace Fl.Semantics.Inferrers
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            var returnSymbol = (visitor.SymbolTable.CurrentScope as FunctionScope).ReturnSymbol;
+            // If there's an empty return statement, leave here
+            if (rnode.Expression == null)
+                return null;
 
-            Type type = null;
-            Symbol symbol = null;
-
-            var returnInferredType = rnode.Expression?.Visit(visitor);
-
-            // void
-            if (returnInferredType == null)
-                type = Void.Instance;
-            else
-                type = returnInferredType?.Type;
-
-            symbol = returnInferredType?.Symbol;
-
+            // Infer the return's expression type
+            var returnInferredType = rnode.Expression.Visit(visitor);
+            
+            Type type = returnInferredType.Type;
+            
             // Just one lement is like
             //  return 1;
             //  return 2;
@@ -38,9 +32,23 @@ namespace Fl.Semantics.Inferrers
             if ((type is Tuple t) && t.Types.Count == 1)
                 type = t.Types.First();
 
-            visitor.Inferrer.MakeConclusion(type, returnSymbol.Type);
+            // The current scope is the function's scope. We get a reference to the
+            // return type and we update it if needed
+            var functionScope = visitor.SymbolTable.CurrentFunctionScope;
 
-            return new InferredType(type, symbol);
+            // If the return type has already been populated, we won't change it
+            // again, we assume the first return's expression type is the function's return type
+            if (functionScope.ReturnSymbol.Type == null)
+            {
+                functionScope.UpdateReturnType(type);
+
+                if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.Type))
+                    visitor.Inferrer.AssumeSymbolTypeAs(functionScope.ReturnSymbol, type);
+            }
+
+            // The type we infer from the return expression must honor the @ret symbol's type
+            // as we are "leaving" the function, and the return type must be the first we processed
+            return new InferredType(functionScope.ReturnSymbol.Type, returnInferredType.Symbol);
         }
     }
 }

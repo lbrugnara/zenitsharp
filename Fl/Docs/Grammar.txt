@@ -235,8 +235,7 @@ arguments -> '(' expression_list? ')'
 
 
 primary	-> 'true' 
-		| 'false' 
-		| 'null' 
+		| 'false'
 		| INTEGER 
 		| DOUBLE 
 		| DECIMAL 

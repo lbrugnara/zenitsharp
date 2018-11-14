@@ -51,16 +51,6 @@ namespace Fl.Semantics.Resolvers
             // Visit the function's body
             funcdecl.Body.ForEach(s => s.Visit(visitor));
 
-            // Assume the function's return type
-            var rettype = visitor.Inferrer.NewAnonymousType();
-
-            // Update the function's type (with return type)
-            functionType.SetReturnType(rettype);
-
-            // Update the @ret symbol
-            functionScope.ReturnSymbol.Type = rettype;
-            visitor.Inferrer.AssumeSymbolTypeAs(functionScope.ReturnSymbol, rettype);            
-
             // At this point, the function's type is an assumed type, register
             // the function's symbol under that assumption
             visitor.Inferrer.AssumeSymbolTypeAs(functionSymbol, functionType);

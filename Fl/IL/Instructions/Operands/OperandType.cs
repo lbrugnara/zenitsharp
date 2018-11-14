@@ -70,8 +70,6 @@ namespace Fl.Engine.Symbols.Types
                 case TokenType.Variable:
                     return new OperandType("var");
 
-                case TokenType.Null:
-                    return new OperandType("null");
             }
 
             throw new SymbolException($"Unrecognized literal {token.Type}");

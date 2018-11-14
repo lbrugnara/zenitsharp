@@ -122,7 +122,7 @@ namespace Fl.Semantics.Inferrers
 
             // Complex type
             if (t is Function ft)
-                return ft.Parameters.Any(p => this.IsTypeAssumption(p)) || !ft.IsCircularReference && this.IsTypeAssumption(ft.Return);
+                return ft.Parameters.Any(p => this.IsTypeAssumption(p)) || !ft.IsCircularReference && ft.Return != null && this.IsTypeAssumption(ft.Return);
 
             if (t is Tuple tt)
                 return tt.Types.Any(this.IsTypeAssumption);

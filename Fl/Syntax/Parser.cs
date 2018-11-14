@@ -1450,7 +1450,6 @@ namespace Fl.Syntax
             }
 
             bool isPrimary = this.Match(TokenType.Boolean)
-                                || this.Match(TokenType.Null) 
                                 || this.Match(TokenType.Char)
                                 || this.Match(TokenType.Integer) 
                                 || this.Match(TokenType.Float) 

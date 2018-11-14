@@ -254,6 +254,36 @@ namespace Fl.Semantics.Symbols
             }
         }
 
+        /// <summary>
+        /// Returns true if the current scope or an ancestor is a Function scope
+        /// </summary>
+        public FunctionScope CurrentFunction
+        {
+            get
+            {
+                if (this.Type == ScopeType.Function)
+                    return this as FunctionScope;
+
+                if (this.Parent == null)
+                    throw new ScopeOperationException("Current scope is not a function");
+
+                var scope = this.Parent;
+
+                while (scope != null)
+                {
+                    if (scope.Type == ScopeType.Function)
+                        return scope as FunctionScope;
+
+                    if (scope.IsPackage || scope.IsClass)
+                        break;
+
+                    scope = scope.Parent;
+                }
+
+                throw new ScopeOperationException("Current scope is not a function");
+            }
+        }
+
         #region ISymbolTable implementation
 
         public void AddSymbol(Symbol symbol)

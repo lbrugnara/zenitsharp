@@ -37,6 +37,17 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         public Scope CurrentScope => this.scopes.Peek();
 
+        public FunctionScope CurrentFunctionScope
+        {
+            get
+            {
+                if (!this.InFunction)
+                    throw new ScopeOperationException("Current scope is not a function");
+
+                return this.CurrentScope.CurrentFunction;
+            }
+        }
+
         /// <summary>
         /// Check if there's a child scope in the current scope with the provided UID.
         /// If scope does not exist, create a new scope and chain it to the current scope.

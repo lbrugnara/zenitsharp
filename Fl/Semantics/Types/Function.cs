@@ -24,11 +24,10 @@ namespace Fl.Semantics.Types
             this.Parameters = new List<Type>();
         }
 
-        public Function(Type returnType, params Type[] parametersTypes)
+        public Function(params Type[] parametersTypes)
             : base("func")
         {
             this.Parameters = parametersTypes?.ToList() ?? new List<Type>();
-            this.Return = returnType ?? throw new System.ArgumentNullException(nameof(returnType), "Return type cannot be null");
         }
 
         /// <summary>
@@ -107,7 +106,7 @@ namespace Fl.Semantics.Types
             }
             else
             {
-                str += this.Return?.ToString() ?? "?";
+                str += this.Return?.ToString() ?? "void";
             }
 
             return str;

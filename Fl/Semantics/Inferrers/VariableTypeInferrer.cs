@@ -42,7 +42,7 @@ namespace Fl.Semantics.Inferrers
                 // If it is a variable definition, get the right-hand side type info
                 var rhs = definition.Right?.Visit(visitor);
 
-                if (visitor.Inferrer.IsTypeAssumption(lhs.Type) && rhs.Type == Null.Instance)
+                if (visitor.Inferrer.IsTypeAssumption(lhs.Type) && (rhs == null || rhs.Type == null))
                     throw new SymbolException($"Implicitly-typed variable '{lhs.Name}' needs to be initialized");
 
                 // Check types to see if we can unify them

@@ -69,9 +69,6 @@ namespace Fl.Semantics.Types
                 if (token.Value == String.Instance.ToString())
                     return String.Instance;
 
-                if (token.Value == Null.Instance.ToString())
-                    return Null.Instance;
-
                 // Support complex types:
                 if (token.Value == "func" || token.Value == "tuple")
                     return inferrer?.NewAnonymousType();
@@ -111,9 +108,6 @@ namespace Fl.Semantics.Types
 
                 case TokenType.String:
                     return String.Instance;
-
-                case TokenType.Null:
-                    return Null.Instance;
 
                 case TokenType.Variable:
                     return inferrer?.NewAnonymousType(); // Auto

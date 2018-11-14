@@ -14,7 +14,10 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, FunctionNode funcdecl)
         {
+            // Get the function symbol
             var functionSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Name);
+
+            // Get the function's type we may update at this step
             Function functionType = functionSymbol.Type as Function;
 
             // Enter the requested function's block
@@ -23,7 +26,8 @@ namespace Fl.Semantics.Inferrers
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
 
-            parametersSymbols.AddRange(funcdecl.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value)));
+            // TODO: Infer parameter types
+            // parametersSymbols.AddRange(funcdecl.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value)));
 
             // Visit the function's body
             var statements = funcdecl.Body.Select(s => (node: s, inferred: s.Visit(visitor))).ToList();

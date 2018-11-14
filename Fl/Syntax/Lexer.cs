@@ -35,7 +35,6 @@ namespace Fl.Syntax
         /// </summary>
         private static readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>()
         {
-            { "null", TokenType.Null },
             { "true", TokenType.Boolean },
             { "false", TokenType.Boolean },
             { "var", TokenType.Variable },
