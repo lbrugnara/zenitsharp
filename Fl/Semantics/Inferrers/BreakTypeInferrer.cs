@@ -11,8 +11,7 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, BreakNode wnode)
         {
-            var nbreak = wnode.Number?.Visit(visitor);
-            return nbreak;
+            return wnode.Number?.Visit(visitor);
         }
     }
 }

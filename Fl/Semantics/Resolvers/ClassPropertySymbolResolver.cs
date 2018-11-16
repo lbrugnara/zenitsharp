@@ -33,7 +33,7 @@ namespace Fl.Semantics.Resolvers
 
             // If it is a type assumption, register the symbol under that assumption
             if (binder.Inferrer.IsTypeAssumption(propertyType))
-                binder.Inferrer.AssumeSymbolTypeAs(symbol, propertyType);
+                binder.Inferrer.AddTypeDependency(propertyType, symbol);
 
             // If the property has a definition, visit the right-hand side expression
             node.Definition?.Visit(binder);

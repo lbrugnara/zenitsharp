@@ -46,7 +46,7 @@ namespace Fl.Semantics.Inferrers
                     throw new SymbolException($"Implicitly-typed variable '{lhs.Name}' needs to be initialized");
 
                 // Check types to see if we can unify them
-                visitor.Inferrer.MakeConclusion(lhs.Type, rhs.Type);
+                visitor.Inferrer.InferFromType(lhs.Type, rhs.Type);
             }
 
             return inferredType;
@@ -73,7 +73,7 @@ namespace Fl.Semantics.Inferrers
                 var rhsType = (initType.Type as Tuple).Types[i];
 
                 // Check types to see if we can unify them
-                visitor.Inferrer.MakeConclusion(lhs.Type, rhsType);
+                visitor.Inferrer.InferFromType(lhs.Type, rhsType);
             }
 
             return inferredType;

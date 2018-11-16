@@ -65,7 +65,7 @@ namespace Fl.Semantics.Inferrers
             funcType.SetReturnType(rettype);
 
             // Replace the symbol's anonymous type with the new inferred type
-            visitor.Inferrer.MakeConclusion(funcType, inferred.Symbol.Type);
+            visitor.Inferrer.InferFromType(funcType, inferred.Symbol.Type);
 
             // This invocation will have the function's return type
             return new InferredType(rettype);
@@ -85,7 +85,7 @@ namespace Fl.Semantics.Inferrers
                 var inferredParamType = node.Arguments.Expressions[i].Visit(visitor);
 
                 // If possible, make conclusions about the inferred argument type and the parameter type
-                visitor.Inferrer.MakeConclusion(inferredParamType.Type, funcType.Parameters[i]);
+                visitor.Inferrer.InferFromType(inferredParamType.Type, funcType.Parameters[i]);
             }
 
             // This invocation will have the function's return type

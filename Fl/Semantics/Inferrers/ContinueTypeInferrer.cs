@@ -10,6 +10,7 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, ContinueNode cnode)
         {
+            // continue is an empty statement
             return null;
         }
     }

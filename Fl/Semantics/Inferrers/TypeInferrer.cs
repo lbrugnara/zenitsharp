@@ -13,10 +13,11 @@ namespace Fl.Semantics.Inferrers
     {
         /// <summary>
         /// Assumptions of primitive types. When a complex type is assumed,
-        /// it is broken down in its pirmitive types, and the symbols that have the complex
+        /// it is broken down into its primitive types, and the symbols that have the complex
         /// type are all tied to the complex' primitive types
         /// </summary>
         private readonly Dictionary<Anonymous, List<Symbol>> assumptions;
+
         private readonly SequenceGenerator namegen;
 
         public TypeInferrer()
@@ -32,17 +33,17 @@ namespace Fl.Semantics.Inferrers
         /// Creates a constraint where symbol's type inference depends on the resolution
         /// of the type represented by the Type object
         /// </summary>
-        /// <param name="symbol">Symbol that has the type to be inferred</param>
         /// <param name="type">Type to be inferred</param>
-        public void AssumeSymbolTypeAs(Symbol symbol, Type type)
+        /// <param name="symbol">Symbol that has the type to be inferred</param>
+        public void AddTypeDependency(Type type, Symbol symbol)
         {
             // If type is a primitive type other than anonymous type
             // the constraint is not needed as it is understood that
             // the type is already inferred
             if (type is Anonymous at)
-                this.AssumeSymbolTypeAsAnonymousType(symbol, at);
+                this.AddAnonymousTypeDependency(at, symbol);
             else if (type is Struct ct)
-                this.AssumeSymbolTypeAsAnonymousType(symbol, ct);
+                this.AddComplexTypeDependency(ct, symbol);
 
             // TODO: If we want to be more strict regarding constraint checking, we could allow
             // the following check to detect unnecessary calls to the GenerateConstraint method 
@@ -51,22 +52,9 @@ namespace Fl.Semantics.Inferrers
         }
 
         /// <summary>
-        /// Creates a constraint where symbol's type inference depends on the resolution
-        /// of an anonymous type that is generated to represent symbol's type
-        /// ahead in time
+        /// Create a new anonymous type
         /// </summary>
-        /// <param name="symbol">Symbol to assign the temporal type</param>
-        /// <returns>New type that represents the undefined symbol's type</returns>
-        public Anonymous AssumeSymbolType(Symbol symbol)
-        {
-            var tempType = this.NewAnonymousType();
-            symbol.Type = tempType;
-
-            this.AssumeSymbolTypeAs(symbol, tempType);
-
-            return tempType;
-        }
-
+        /// <returns></returns>
         public Anonymous NewAnonymousType()
         {
             var type = new Anonymous(this.namegen.Generate());
@@ -84,7 +72,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public Type MakeConclusion(Type left, Type right)
+        public Type InferFromType(Type left, Type right)
         {
             // Can't unify null objects
             if (left == null || right == null)
@@ -142,9 +130,9 @@ namespace Fl.Semantics.Inferrers
         /// Add the symbol under the assumption of having an anonymous type defined
         /// by type object
         /// </summary>
-        /// <param name="symbol">Symbol to assume its type</param>
         /// <param name="type">Anonymous type</param>
-        private void AssumeSymbolTypeAsAnonymousType(Symbol symbol, Anonymous type)
+        /// <param name="symbol">Symbol to assume its type</param>
+        private void AddAnonymousTypeDependency(Anonymous type, Symbol symbol)
         {
             if (!this.assumptions.ContainsKey(type))
                 this.assumptions[type] = new List<Symbol>();
@@ -157,21 +145,21 @@ namespace Fl.Semantics.Inferrers
         /// Add the symbol under the assumption of having a complex type where
         /// its primitive parts might be anonymous types
         /// </summary>
-        /// <param name="symbol">Symbol to assume its type</param>
         /// <param name="type">Complex type that might contain anonymous types in its primitives members</param>
-        private void AssumeSymbolTypeAsAnonymousType(Symbol symbol, Struct type)
+        /// <param name="symbol">Symbol to assume its type</param>
+        private void AddComplexTypeDependency(Struct type, Symbol symbol)
         {
             if (type is Function f)
             {
-                f.Parameters.ToList().ForEach(paramType => this.AssumeSymbolTypeAs(symbol, paramType));
+                f.Parameters.ToList().ForEach(paramType => this.AddTypeDependency(paramType, symbol));
 
                 // Assume Return type just if it is not equals to 'f' (circular reference)
                 if (!f.IsCircularReference)
-                    this.AssumeSymbolTypeAs(symbol, f.Return);
+                    this.AddTypeDependency(f.Return, symbol);
             }
             else if (type is Tuple t)
             {
-                t.Types.ToList().ForEach(paramType => this.AssumeSymbolTypeAs(symbol, paramType));
+                t.Types.ToList().ForEach(paramType => this.AddTypeDependency(paramType, symbol));
             }
             else
             {
@@ -319,7 +307,7 @@ namespace Fl.Semantics.Inferrers
 
                 // If the new inferred type is also an anonymous type, generate all the constraints for the new anonymous type
                 if (this.IsTypeAssumption(newType))
-                    this.assumptions[prevAnonType].ForEach(s => this.AssumeSymbolTypeAs(s, newType));
+                    this.assumptions[prevAnonType].ForEach(s => this.AddTypeDependency(newType, s));
 
                 // Remove all the resolved types
                 this.assumptions.Remove(prevAnonType);

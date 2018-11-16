@@ -30,7 +30,7 @@ namespace Fl.Semantics.Resolvers
 
             // If it is a type assumption, register the symbol under that assumption
             if (binder.Inferrer.IsTypeAssumption(lhsType))
-                binder.Inferrer.AssumeSymbolTypeAs(symbol, lhsType);
+                binder.Inferrer.AddTypeDependency(lhsType, symbol);
 
             // Visit the right-hand side expression
             node.Definition.Visit(binder);

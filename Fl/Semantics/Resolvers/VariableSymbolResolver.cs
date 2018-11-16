@@ -48,7 +48,7 @@ namespace Fl.Semantics.Resolvers
 
                 // If it is a type assumption, register the symbol under that assumption
                 if (isAssumedType)
-                    binder.Inferrer.AssumeSymbolTypeAs(symbol, lhsType);
+                    binder.Inferrer.AddTypeDependency(lhsType, symbol);
 
                 // If it is a variable definition, visit the right-hand side expression
                 definition.Right?.Visit(binder);
@@ -78,7 +78,7 @@ namespace Fl.Semantics.Resolvers
                 var symbol = visitor.SymbolTable.CreateSymbol(variableName, lhsType, Access.Public, storage);
 
                 // Register the symbol under that assumption
-                visitor.Inferrer.AssumeSymbolTypeAs(symbol, lhsType);
+                visitor.Inferrer.AddTypeDependency(lhsType, symbol);
             }
         }
     }

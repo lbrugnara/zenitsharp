@@ -24,11 +24,9 @@ namespace Fl.Semantics.Inferrers
             var returnInferredType = rnode.Expression.Visit(visitor);
             
             Type type = returnInferredType.Type;
-            
-            // Just one lement is like
-            //  return 1;
-            //  return 2;
-            //  etc
+
+            // The return statement expects a tuple and if that tuple contains
+            // just one element, we use it as the return's type
             if ((type is Tuple t) && t.Types.Count == 1)
                 type = t.Types.First();
 
@@ -42,8 +40,9 @@ namespace Fl.Semantics.Inferrers
             {
                 functionScope.UpdateReturnType(type);
 
+                // If the @ret type is an assumption, register the symbol under that assumption too
                 if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.Type))
-                    visitor.Inferrer.AssumeSymbolTypeAs(functionScope.ReturnSymbol, type);
+                    visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.Type, functionScope.ReturnSymbol);
             }
 
             // The type we infer from the return expression must honor the @ret symbol's type

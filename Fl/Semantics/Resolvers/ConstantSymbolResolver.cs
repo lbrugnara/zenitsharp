@@ -31,7 +31,7 @@ namespace Fl.Semantics.Resolvers
 
                 // Register under the assumption of having an anonymous type, if needed
                 if (typeAssumption)
-                    binder.Inferrer.AssumeSymbolTypeAs(symbol, type);
+                    binder.Inferrer.AddTypeDependency(type, symbol);
 
                 // Get the right-hand side operand (a must for a constant)
                 definition.Right.Visit(binder);                

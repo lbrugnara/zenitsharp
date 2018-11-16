@@ -15,7 +15,7 @@ namespace Fl.Semantics.Inferrers
             var right = binary.Right.Visit(visitor);
 
             // Make conclusions about the types if possible
-            return new InferredType(visitor.Inferrer.MakeConclusion(left.Type, right.Type));
+            return new InferredType(visitor.Inferrer.InferFromType(left.Type, right.Type));
         }
     }
 }

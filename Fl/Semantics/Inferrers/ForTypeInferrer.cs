@@ -21,7 +21,7 @@ namespace Fl.Semantics.Inferrers
             var conditionType = fornode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.Type);
+            visitor.Inferrer.InferFromType(Bool.Instance, conditionType.Type);
 
             // Emmit the body code
             fornode.Body.Visit(visitor);

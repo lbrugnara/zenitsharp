@@ -14,7 +14,7 @@ namespace Fl.Semantics.Inferrers
             var conditionType = ifnode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.Type);
+            visitor.Inferrer.InferFromType(Bool.Instance, conditionType.Type);
 
             // Add a new common block for the if's boyd
             visitor.SymbolTable.EnterScope(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");

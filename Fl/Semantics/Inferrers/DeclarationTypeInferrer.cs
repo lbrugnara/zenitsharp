@@ -10,8 +10,7 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, DeclarationNode decls)
         {
-            foreach (Node statement in decls.Statements)
-                statement.Visit(visitor);
+            decls.Statements.ForEach(statement => statement.Visit(visitor));
 
             return null;
         }

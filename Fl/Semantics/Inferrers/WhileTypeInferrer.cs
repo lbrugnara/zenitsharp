@@ -18,7 +18,7 @@ namespace Fl.Semantics.Inferrers
             var conditionType = wnode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.MakeConclusion(Bool.Instance, conditionType.Type);
+            visitor.Inferrer.InferFromType(Bool.Instance, conditionType.Type);
 
             // Emmit the body code
             wnode.Body.Visit(visitor);

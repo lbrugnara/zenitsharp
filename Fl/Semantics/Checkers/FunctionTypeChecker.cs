@@ -13,6 +13,8 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, FunctionNode funcdecl)
         {
+            // We just need to enter to the function's scope and run the type-checker through the
+            // function's body
             var funcsym = checker.SymbolTable.GetSymbol(funcdecl.Name);
 
             checker.SymbolTable.EnterScope(ScopeType.Function, funcdecl.Name);

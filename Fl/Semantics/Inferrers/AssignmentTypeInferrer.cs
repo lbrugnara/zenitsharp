@@ -24,7 +24,7 @@ namespace Fl.Semantics.Inferrers
             var rightHandSide = node.Right.Visit(visitor);
 
             // Make conclusions about the types if possible
-            return new InferredType(visitor.Inferrer.MakeConclusion(leftHandSide.Type, rightHandSide.Type));
+            return new InferredType(visitor.Inferrer.InferFromType(leftHandSide.Type, rightHandSide.Type));
         }
 
         private InferredType MakeDestructuringAssignment(DestructuringAssignmentNode node, TypeInferrerVisitor visitor)
@@ -44,7 +44,7 @@ namespace Fl.Semantics.Inferrers
 
                 var exprType = exprTypes.Types[i];
 
-                visitor.Inferrer.MakeConclusion(varType, exprType);
+                visitor.Inferrer.InferFromType(varType, exprType);
             }
 
             return exprInferredType;

@@ -45,7 +45,7 @@ namespace Fl.Semantics.Resolvers
 
                 // Update parameter-anonymous type if the type is an assumed type
                 if (visitor.Inferrer.IsTypeAssumption(type))
-                    visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);
+                    visitor.Inferrer.AddTypeDependency(type, symbol);
             });
 
             // Visit the method's body
@@ -59,11 +59,11 @@ namespace Fl.Semantics.Resolvers
 
             // Update the @ret symbol
             methodScope.ReturnSymbol.Type = rettype;
-            visitor.Inferrer.AssumeSymbolTypeAs(methodScope.ReturnSymbol, rettype);
+            visitor.Inferrer.AddTypeDependency(rettype, methodScope.ReturnSymbol);
 
             // At this point, the method's type is an assumed type, register
             // the method's symbol under that assumption
-            visitor.Inferrer.AssumeSymbolTypeAs(methodSymbol, methodType);
+            visitor.Inferrer.AddTypeDependency(methodType, methodSymbol);
 
             // Restore previous scope
             visitor.SymbolTable.LeaveScope();

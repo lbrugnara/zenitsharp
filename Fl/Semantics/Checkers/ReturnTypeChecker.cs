@@ -26,10 +26,8 @@ namespace Fl.Semantics.Checkers
             // Get the return expression's type
             Type type = checkedType.Type;
 
-            // Just one lement is like
-            //  return 1;
-            //  return 2;
-            //  etc
+            // The return statement expects a tuple and if that tuple contains
+            // just one element, we use it as the return's type
             if ((type is Tuple t) && t.Types.Count == 1)
                 type = t.Types.First();
 

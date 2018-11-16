@@ -12,10 +12,10 @@ namespace Fl.Semantics.Resolvers
         public void Visit(SymbolResolverVisitor visitor, FunctionNode funcdecl)
         {
             // There are 3 components in the function definition:
-            //  Function's type: It is the concrete type that we need to "build" while resolving the symbol. It contains structural information
+            //  Function's type: It is the concrete type that we need to "build" while resolving the symbol. It contains structural information of the function
             //  Function's symbol: Represents the binding of the function to the current scope
-            //  Function's scope: The function's symbol contains information about the binding and the type, we also need an scope to keep the function's body
-            // The symbol and the type are related and saved in the current scope while the FunctionScope is part of the symbol table (a nested scope)
+            //  Function's scope: Track the function's symbols on its own scope
+            // The symbol and the type are related and saved in the current scope while the FunctionScope is a nested scope in the symbol table
 
             // Create the new function type
             var functionType = new Function();
@@ -23,7 +23,7 @@ namespace Fl.Semantics.Resolvers
             // Create the function symbol
             var functionSymbol = new Symbol(funcdecl.Name, functionType, Access.Public, Storage.Constant);
 
-            // Register it in the current scope
+            // Register the function's symbol in the current scope
             visitor.SymbolTable.AddSymbol(functionSymbol);
 
             // Change the current scope to be the function's scope
@@ -31,7 +31,7 @@ namespace Fl.Semantics.Resolvers
 
             // Process the parameters
             funcdecl.Parameters.ForEach(parameter => {
-                // Define the symbol in the current scope (function's scope)
+                // Define the symbol in the function's scope
                 var type = parameter.SymbolInfo.Type == null 
                             ? visitor.Inferrer.NewAnonymousType() 
                             : SymbolHelper.GetType(visitor.SymbolTable, parameter.SymbolInfo.Type);
@@ -45,7 +45,7 @@ namespace Fl.Semantics.Resolvers
 
                 // Update parameter-anonymous type if the type is an assumed type
                 if (visitor.Inferrer.IsTypeAssumption(type))
-                    visitor.Inferrer.AssumeSymbolTypeAs(symbol, type);
+                    visitor.Inferrer.AddTypeDependency(type, symbol);
             });
 
             // Visit the function's body
@@ -53,7 +53,7 @@ namespace Fl.Semantics.Resolvers
 
             // At this point, the function's type is an assumed type, register
             // the function's symbol under that assumption
-            visitor.Inferrer.AssumeSymbolTypeAs(functionSymbol, functionType);
+            visitor.Inferrer.AddTypeDependency(functionType, functionSymbol);
 
             // Restore previous scope
             visitor.SymbolTable.LeaveScope();

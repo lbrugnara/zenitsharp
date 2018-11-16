@@ -35,7 +35,7 @@ namespace Fl.Semantics.Inferrers
                 var lambdaReturnExpr = statements.Select(s => s.inferred).Last();
 
                 // Try to unify these types
-                visitor.Inferrer.MakeConclusion(lambdaReturnExpr.Type, functionScope.ReturnSymbol.Type);
+                visitor.Inferrer.InferFromType(lambdaReturnExpr.Type, functionScope.ReturnSymbol.Type);
             }
 
             // Leave the method's scope
@@ -44,7 +44,7 @@ namespace Fl.Semantics.Inferrers
             // The inferred method type is a complex type, it might contain assumptions for parameters' types or return type
             // if that is the case, make this inferred type an assumption
             if (visitor.Inferrer.IsTypeAssumption(methodType))
-                visitor.Inferrer.AssumeSymbolTypeAs(methodSymbol, methodType);
+                visitor.Inferrer.AddTypeDependency(methodType, methodSymbol);
 
             // Return inferred method type
             return new InferredType(methodType, methodSymbol);

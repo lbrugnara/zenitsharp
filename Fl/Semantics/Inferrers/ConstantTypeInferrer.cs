@@ -15,13 +15,14 @@ namespace Fl.Semantics.Inferrers
 
             foreach (var definition in constdec.Definitions)
             {
+                // Multiple constant definitions in the same statement are all of the same type so take the first
                 if (lhsType == null)
                     lhsType = visitor.SymbolTable.GetSymbol(definition.Left.Value).Type;
 
-                // Get the right-hand side operand (a must for a constant)
+                // Get the right-hand side expression-s type (a must for a constant)
                 var rhs = definition.Right.Visit(visitor);
 
-                visitor.Inferrer.MakeConclusion(lhsType, rhs.Type);
+                visitor.Inferrer.InferFromType(lhsType, rhs.Type);
             }
 
             return new InferredType(lhsType);
