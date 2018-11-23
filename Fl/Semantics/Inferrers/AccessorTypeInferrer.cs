@@ -22,7 +22,7 @@ namespace Fl.Semantics.Inferrers
                 // Get accessed symbol that must be defined in the symtable's scope
                 symbol = inferrer.SymbolTable.GetSymbol(symbolName);
 
-                Type type = symbol.Type;
+                Struct type = symbol.Type;
 
                 // Return the inferred type information for this symbol
                 return new InferredType(type, symbol);

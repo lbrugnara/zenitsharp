@@ -6,20 +6,20 @@ using System.Linq;
 
 namespace Fl.Semantics.Types
 {
-    public class Tuple : Struct
+    public class Tuple : Complex
     {
-        public List<Type> Types { get; set; }
+        public List<Struct> Types { get; set; }
 
         private Tuple()
             : base("tuple")
         {
-            this.Types = new List<Type>();
+            this.Types = new List<Struct>();
         }
 
-        public Tuple(params Type[] types)
+        public Tuple(params Struct[] types)
             : base("tuple")
         {
-            this.Types = types?.ToList() ?? new List<Type>();
+            this.Types = types?.ToList() ?? new List<Struct>();
         }
 
         public override bool Equals(object obj)
@@ -29,7 +29,7 @@ namespace Fl.Semantics.Types
 
         public int Count => this.Types.Count;
 
-        public static bool operator ==(Tuple type1, Type type2)
+        public static bool operator ==(Tuple type1, Struct type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -37,19 +37,19 @@ namespace Fl.Semantics.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Tuple type1, Type type2)
+        public static bool operator !=(Tuple type1, Struct type2)
         {
             return !(type1 == type2);
         }
 
-        public override string ToSafeString(List<(Type type, string safestr)> safeTypes)
+        public override string ToSafeString(List<(Struct type, string safestr)> safeTypes)
         {
             var types = this.Types.Select(t =>
             {
                 if (safeTypes.Any(st => st.type == t))
                     return safeTypes.First(st => st.type == t).safestr;
 
-                if (t is Struct stype)
+                if (t is Complex stype)
                     return stype.ToSafeString(safeTypes);
 
                 return t.ToString() ?? "?";
@@ -60,10 +60,10 @@ namespace Fl.Semantics.Types
 
         public override string ToString()
         {
-            return this.ToSafeString(new List<(Type type, string safestr)>());
+            return this.ToSafeString(new List<(Struct type, string safestr)>());
         }
 
-        public override bool IsAssignableFrom(Type type)
+        public override bool IsAssignableFrom(Struct type)
         {
             return this.Equals(type);
         }

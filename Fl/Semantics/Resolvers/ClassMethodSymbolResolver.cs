@@ -21,7 +21,7 @@ namespace Fl.Semantics.Resolvers
             var accessMod = SymbolHelper.GetAccess(method.SymbolInfo.Access);
 
             // Create the type and the symbol
-            var methodType = new Method();
+            var methodType = new Function();
 
             // Register it in the current scope
             var methodSymbol = classScope.CreateMethod(method.Name, methodType, accessMod);

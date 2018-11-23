@@ -8,10 +8,10 @@ namespace Fl.Semantics.Checkers
 {
     public class CheckedType
     {
-        public Type Type { get; set; }
+        public Struct Type { get; set; }
         public Symbol Symbol { get; set; }
 
-        public CheckedType(Type type, Symbol symbol = null)
+        public CheckedType(Struct type, Symbol symbol = null)
         {
             this.Type = type;
             this.Symbol = symbol;

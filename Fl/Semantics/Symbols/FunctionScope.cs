@@ -30,14 +30,14 @@ namespace Fl.Semantics.Symbols
             );
         }
 
-        public void UpdateReturnType(Type type)
+        public void UpdateReturnType(Struct type)
         {
             this.ReturnSymbol.Type = type ?? throw new System.ArgumentNullException(nameof(type), "Return type cannot be null");
             (this.Parent.GetSymbol(this.Uid).Type as Function)
                 .SetReturnType(type);
         }
 
-        public Symbol CreateParameter(string name, Type type, Access access, Storage storage)
+        public Symbol CreateParameter(string name, Struct type, Access access, Storage storage)
         {
             var symbol = this.CreateSymbol(name, type, access, storage);
             this.Parameters.Add(symbol.Name);

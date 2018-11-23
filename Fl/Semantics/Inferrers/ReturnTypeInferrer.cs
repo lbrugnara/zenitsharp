@@ -23,7 +23,7 @@ namespace Fl.Semantics.Inferrers
             // Infer the return's expression type
             var returnInferredType = rnode.Expression.Visit(visitor);
             
-            Type type = returnInferredType.Type;
+            Struct type = returnInferredType.Type;
 
             // The return statement expects a tuple and if that tuple contains
             // just one element, we use it as the return's type

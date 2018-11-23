@@ -1,0 +1,60 @@
+Variable
+========
+
+Declaration and definition
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A variable declaration (without initialization) has 3 components:
+
+- Storage modifier `mut`:  This is an optional modifier that allows the variable to be assigned more than once. If the keyword is not present, the variable is assumed to be [immutable] and will only be assignable once.
+- Type: The data type name of the variable. For declaration without initialization this component is required
+- A valid name: It is represented by the regex `[a-zA-Z_$][a-zA-Z0-9_$]*`
+
+Example of valid variable declarations are:
+
+```
+int x;
+mut int x2;
+
+string s;
+mut string s2;
+
+float f;
+mut float $f;
+
+double d;
+mut double _d;
+```
+
+When variable initialization happens on the declaration, the data type can be replaced with the keyword `var`. In that case the type will be inferred by the right-hand side expression's value:
+
+```
+var x = 10;
+mut var s = "string here";
+```
+
+Note that `var` cannot be used in variable declarations without initialization:
+
+```
+// The following declarations are invalid
+var x;
+mut var s;
+```
+
+Mutability
+~~~~~~~~~~
+
+By default all variables are [immutable], this means that if you don't specify the `mut` keyword in a variable definition, you won't be able to assign a variable's value more than once:
+
+```
+mut var x = 2;
+
+// These two assignments are valid
+x = 3;
+x = 5;
+
+var s = "string";
+
+// this is not valid
+// s = "other string";
+```

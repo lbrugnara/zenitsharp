@@ -35,14 +35,14 @@ namespace Fl.Semantics.Inferrers
         /// </summary>
         /// <param name="type">Type to be inferred</param>
         /// <param name="symbol">Symbol that has the type to be inferred</param>
-        public void AddTypeDependency(Type type, Symbol symbol)
+        public void AddTypeDependency(Struct type, Symbol symbol)
         {
             // If type is a primitive type other than anonymous type
             // the constraint is not needed as it is understood that
             // the type is already inferred
             if (type is Anonymous at)
                 this.AddAnonymousTypeDependency(at, symbol);
-            else if (type is Struct ct)
+            else if (type is Complex ct)
                 this.AddComplexTypeDependency(ct, symbol);
 
             // TODO: If we want to be more strict regarding constraint checking, we could allow
@@ -72,7 +72,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public Type InferFromType(Type left, Type right)
+        public Struct InferFromType(Struct left, Struct right)
         {
             // Can't unify null objects
             if (left == null || right == null)
@@ -101,12 +101,13 @@ namespace Fl.Semantics.Inferrers
             return left;
         }
 
-        public bool IsTypeAssumption(Type t)
+        public bool IsTypeAssumption(Struct t)
         {
-            // Primitive types are type assumption just
-            // when the type is primitive
             if (t is Primitive)
-                return (t is Anonymous at) ? this.assumptions.ContainsKey(at) : false;
+                return false;
+
+            if (t is Anonymous at)
+                return this.assumptions.ContainsKey(at);
 
             // Complex type
             if (t is Function ft)
@@ -147,7 +148,7 @@ namespace Fl.Semantics.Inferrers
         /// </summary>
         /// <param name="type">Complex type that might contain anonymous types in its primitives members</param>
         /// <param name="symbol">Symbol to assume its type</param>
-        private void AddComplexTypeDependency(Struct type, Symbol symbol)
+        private void AddComplexTypeDependency(Complex type, Symbol symbol)
         {
             if (type is Function f)
             {
@@ -176,7 +177,7 @@ namespace Fl.Semantics.Inferrers
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        private bool IsComplexType(Type t) => t is Struct;
+        private bool IsComplexType(Struct t) => t is Complex;
 
         /// <summary>
         /// Update previous inferred type in a symbol by changing the occurrences to the new
@@ -185,7 +186,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="s">Symbol to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void InferSymbolType(Symbol s, Anonymous prevType, Type newType)
+        private void InferSymbolType(Symbol s, Anonymous prevType, Struct newType)
         {
             if (this.IsComplexType(s.Type))
                 this.UpdateComplexType(s.Type, prevType, newType);
@@ -200,7 +201,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="complexType">Type to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateComplexType(Type complexType, Anonymous prevType, Type newType)
+        private void UpdateComplexType(Struct complexType, Anonymous prevType, Struct newType)
         {
             if (complexType is Function f)
                 this.UpdateFunctionType(f, prevType, newType);
@@ -215,7 +216,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="f">Function type to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateFunctionType(Function f, Anonymous prevType, Type newType)
+        private void UpdateFunctionType(Function f, Anonymous prevType, Struct newType)
         {
             for (int i = 0; i < f.Parameters.Count; i++)
             {
@@ -244,7 +245,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="t">Tuple type to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateTupleType(Tuple t, Anonymous prevType, Type newType)
+        private void UpdateTupleType(Tuple t, Anonymous prevType, Struct newType)
         {
             for (int i = 0; i < t.Types.Count; i++)
             {
@@ -261,7 +262,7 @@ namespace Fl.Semantics.Inferrers
         /// </summary>
         /// <param name="prevType">Previous anonymous type</param>
         /// <param name="newType">New inferred type</param>
-        private void UnifyTypes(Type prevType, Type newType)
+        private void UnifyTypes(Struct prevType, Struct newType)
         {
             if (prevType is Function prevFuncType)
             {

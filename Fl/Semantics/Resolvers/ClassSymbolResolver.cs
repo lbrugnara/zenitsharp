@@ -44,8 +44,8 @@ namespace Fl.Semantics.Resolvers
 
             node.Methods.ForEach(methodNode => {
                 methodNode.Visit(binder);
-                var method = binder.SymbolTable.GetSymbol(methodNode.Name).Type as Method ?? throw new System.Exception($"Method type is not {typeof(Method).FullName}");
-                method.SetDefiningClass(classType);
+                var method = binder.SymbolTable.GetSymbol(methodNode.Name).Type as Function ?? throw new System.Exception($"Method type is not {typeof(Function).FullName}");
+                //method.SetDefiningClass(classType);
                 classType.Methods[methodNode.Name] = method;
             });
 

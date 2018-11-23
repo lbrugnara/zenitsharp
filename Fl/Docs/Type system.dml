@@ -1,0 +1,78 @@
+Type system
+===========
+
+The type hierarchy is thought to get structural typing support by default. The root type is called `struct` and it represents the top-level type where the rest of types inherit from. The next level in the hierarchy contains the `primitive` types, the `complex` types, and the `anonymous` types that correspond to anonymous objects. The third level contains the children of both `primitive` and `complex` types. `primitive`'s children include `char`, `bool`, `int`, `float`, `double`, `decimal`, and `string`. On the `complex` side we have `func`, `tuple`, `class`, and `error`.
+`void` is a special type used for functions that do not return a value. It can't be used in variable or parameter definition. It is just visible to the compiler.
+
+```
+types
+  |-- struct
+  |   |
+  |   |-- anonymous
+  |   |-- primitive
+  |   |   |-- string
+  |   |   |-- decimal
+  |   |   `-- double
+  |   |         `-- float
+  |   |             `-- int
+  |   |                 `-- bool
+  |   |                     `-- char
+  |   `-- complex
+  |       |-- func
+  |       |-- tuple
+  |       |-- class
+  |       `-- error
+  `-- void
+```
+
+Type inference
+~~~~~~~~~~~~~~
+
+Taking as reference the second level in the type system hierarchy there are 3 big groups the type inferrer needs to work with:
+
+1- [Primitive types]: This comprehends the most basic level of inference, and it can be inferred by means of simply processing the `Literal` nodes.
+2- [Complex types]: The next level of inference belongs to the complex types. Here we need to take into consideration the fundamental parts that compound the complex type, which eventually are `primitive` types, and in this process, we need to be careful with the recursive types.
+3- [Anonymous types]: Finallay, the category of the anonymous types simply refers to types that are inferred up to a certain point where we can identify the expected members of a type, but we don't have enough information to specifically reduce all the constraints to a certain type. The decision to make this `anonymous` types work this way is to get both [parametric polymorphism] and [structural typing] support by default.
+
+From the points above we get the following constraints in the type system:
+
+a) All the `anonymous` types will get structural typing support, making them compatible with all the types in the type hierarchy that satisfy the constraints these `anonymous` types impose, including `primitive` and `complex` types.
+b) Both `primitive` and `complex` types, once inferred, provide nominative typing support, which means they are compatible with symbols of the same type or its sub-types, but not with anonymous type even though they might be structural compatible types.
+
+In order to improve the relationship between `anonymous` (structural), and `primitives` and `complex` (nominal) types exposed in [item b)], there needs to be a "bridge" concept that allows us to easily work with the best of both worlds. At the moment of writing this documentation there is no such mechanism, but it is being thought as something similar to an `interface` type that would provide [structural typing] support and would make the [parametric polymorphism] easy to include in the language. This new mechanism would remove one restriction that derives from the previous items, and it is:
+
+- Type annotations are making "impossible" the structural typing support, as once a type annotation is used by the type inference system, it immediately restricts the system to behave like a nominal type system.
+
+
+Primitive types inference
+-------------------------
+
+The way to get the type of a literal value is by means of associating the token type to a type in the hierarchy. This is the most basic functionality of the type inferrer:
+
+```
+    1;          // int
+    1.0;        // double
+    "string";   // string
+```
+
+The type of a symbol can also be explicitly defined, in that case, the type will not be inferred but directly taken from the explicit annotation:
+
+```
+    int a;      // int
+    double d;   // double
+    string s;   // string
+```
+
+The keyword `var` allow us to reduce the keystrokes on variable definitions, but in order to be used, the right-hand side expression must exist. That is because the type system is strict, and we need to know at definition step the specific type of a symbol:
+
+```
+    // var a;       // wrong!
+    var a = 1;      // int
+    var d = 1.0;    // double
+
+    fn someFuncString() => "string";
+
+    var s = someFuncString(); // string
+```
+
+The inference process in `primitive` types is simple and powerful enough to be the foundation of more complex types inference process.

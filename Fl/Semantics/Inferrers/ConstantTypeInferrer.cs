@@ -11,7 +11,7 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, ConstantNode constdec)
         {
-            Type lhsType = null;
+            Struct lhsType = null;
 
             foreach (var definition in constdec.Definitions)
             {

@@ -24,7 +24,7 @@ namespace Fl.Semantics.Checkers
             var checkedType = rnode.Expression.Visit(checker);
 
             // Get the return expression's type
-            Type type = checkedType.Type;
+            Struct type = checkedType.Type;
 
             // The return statement expects a tuple and if that tuple contains
             // just one element, we use it as the return's type

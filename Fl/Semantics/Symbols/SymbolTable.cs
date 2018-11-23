@@ -140,7 +140,7 @@ namespace Fl.Semantics.Symbols
             => this.scopes.Peek().AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol CreateSymbol(string name, Type type, Access access, Storage storage) 
+        public Symbol CreateSymbol(string name, Struct type, Access access, Storage storage) 
             => this.scopes.Peek().CreateSymbol(name, type, access, storage);
 
         /// <inheritdoc/>
