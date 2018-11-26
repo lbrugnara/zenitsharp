@@ -11,7 +11,7 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor binder, ConstantNode constdec)
         {            
-            Struct type = null;
+            Object type = null;
 
             // Get the constant's type or assume it if not present
             if (constdec.Type != null)

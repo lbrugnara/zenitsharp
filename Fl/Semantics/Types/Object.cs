@@ -6,30 +6,26 @@ using System.Collections.Generic;
 
 namespace Fl.Semantics.Types
 {
-    public abstract class Struct
+    public abstract class Object
     {
         public string Name { get; private set; }
 
-        public Dictionary<string, Struct> Properties { get; }
+        public Dictionary<string, Object> Properties { get; }
         public Dictionary<string, Function> Methods { get; }
-        private Struct()
-            : this ("struct")
-        {
-        }
 
-        public Struct(string name)
+        public Object(string name)
         {
             this.Name = name;
-            this.Properties = new Dictionary<string, Struct>();
+            this.Properties = new Dictionary<string, Object>();
             this.Methods = new Dictionary<string, Function>();
         }
 
         public override bool Equals(object obj)
         {
-            return this.Name == (obj as Struct)?.Name;
+            return this.Name == (obj as Object)?.Name;
         }
 
-        public static bool operator ==(Struct type1, Struct type2)
+        public static bool operator ==(Object type1, Object type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -37,7 +33,7 @@ namespace Fl.Semantics.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Struct type1, Struct type2)
+        public static bool operator !=(Object type1, Object type2)
         {
             return !(type1 == type2);
         }
@@ -52,7 +48,7 @@ namespace Fl.Semantics.Types
             return this.Name;
         }
 
-        public virtual bool IsAssignableFrom(Struct type)
+        public virtual bool IsAssignableFrom(Object type)
         {
             return this == type;
         }

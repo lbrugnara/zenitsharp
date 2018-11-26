@@ -23,7 +23,8 @@ namespace Fl.Semantics.Inferrers
             // Grab all the parameters' symbols
             var parametersSymbols = new List<Symbol>();
 
-            parametersSymbols.AddRange(method.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value)));
+            // TODO: Infer parameter types
+            // parametersSymbols.AddRange(method.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value)));
 
             // Visit the method's body
             var statements = method.Body.Select(s => (node: s, inferred: s.Visit(visitor))).ToList();
@@ -32,19 +33,42 @@ namespace Fl.Semantics.Inferrers
             {
                 // If method is a lambda, the return type should be already populated by the lambda's body expression
                 // and that should be reflected on the @ret symbol
-                var lambdaReturnExpr = statements.Select(s => s.inferred).Last();
+                var lambdaExpression = statements.Select(s => s.inferred).Last();
 
-                // Try to unify these types
-                visitor.Inferrer.InferFromType(lambdaReturnExpr.Type, functionScope.ReturnSymbol.Type);
+                // If the expression has a type, and the return symbol is not defined (by now it MUST NOT be defined at this point)
+                // create the @ret symbol and assign the type
+                if (lambdaExpression.Type != null)
+                {
+                    visitor.Inferrer.InferFromType(lambdaExpression.Type, functionScope.ReturnSymbol.Type);
+
+                    // Update the function's return type with the expression type
+                    functionScope.UpdateReturnType(lambdaExpression.Type);
+
+                    // If the type is an assumed type, register the @ret symbol under that assumption
+                    if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.Type))
+                        visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.Type, functionScope.ReturnSymbol);
+                }
+                else
+                {
+                    visitor.Inferrer.InferFromType(Void.Instance, functionScope.ReturnSymbol.Type);
+                }
+            }
+            else if (!statements.OfType<ReturnNode>().Any() && functionScope.ReturnSymbol.Type != Void.Instance)
+            {
+                visitor.Inferrer.InferFromType(Void.Instance, functionScope.ReturnSymbol.Type);
             }
 
-            // Leave the method's scope
-            visitor.SymbolTable.LeaveScope();
+            // If the @ret type is an assumption, register the symbol under that assumption too
+            if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.Type))
+                visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.Type, functionScope.ReturnSymbol);
 
             // The inferred method type is a complex type, it might contain assumptions for parameters' types or return type
             // if that is the case, make this inferred type an assumption
             if (visitor.Inferrer.IsTypeAssumption(methodType))
                 visitor.Inferrer.AddTypeDependency(methodType, methodSymbol);
+
+            // Leave the method's scope
+            visitor.SymbolTable.LeaveScope();
 
             // Return inferred method type
             return new InferredType(methodType, methodSymbol);

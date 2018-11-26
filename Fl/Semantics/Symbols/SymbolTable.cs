@@ -102,7 +102,7 @@ namespace Fl.Semantics.Symbols
             return this.Global.GetNestedScope(ScopeType.Class, className);
         }
 
-        public Scope GetFunctionScope(string funcName)
+        public FunctionScope GetFunctionScope(string funcName)
         {
             if (this.CurrentScope.IsPackage)
             {
@@ -113,7 +113,7 @@ namespace Fl.Semantics.Symbols
                 // TODO: Do something with the Class
             }
 
-            return this.Global.GetNestedScope(ScopeType.Function, funcName);
+            return this.Global.GetNestedScope(ScopeType.Function, funcName) as FunctionScope;
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace Fl.Semantics.Symbols
             => this.scopes.Peek().AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol CreateSymbol(string name, Struct type, Access access, Storage storage) 
+        public Symbol CreateSymbol(string name, Object type, Access access, Storage storage) 
             => this.scopes.Peek().CreateSymbol(name, type, access, storage);
 
         /// <inheritdoc/>

@@ -15,16 +15,7 @@ namespace Fl.Semantics.Resolvers
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            // If it is an empty return statement, we leave here, no need to work with the @ret symbol
-            if (rnode.Expression == null)
-                return;
-
-            // We create the @ret symbol in the current function's scope
-            if (visitor.SymbolTable.CurrentFunctionScope.ReturnSymbol == null)
-                visitor.SymbolTable.CurrentFunctionScope.CreateReturnSymbol();
-
-            // We visit the return's expression
-            rnode.Expression.Visit(visitor);
+            rnode.Expression?.Visit(visitor);
         }
     }
 }

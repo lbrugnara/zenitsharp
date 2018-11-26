@@ -22,7 +22,7 @@ namespace Fl.Semantics.Checkers
                 // Get accessed symbol that must be defined in the symtable's scope
                 symbol = checker.SymbolTable.GetSymbol(symbolName);
 
-                Struct type = symbol.Type;
+                Object type = symbol.Type;
 
                 // Return the type check information for this symbol
                 return new CheckedType(type, symbol);

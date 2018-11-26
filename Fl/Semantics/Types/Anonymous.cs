@@ -1,6 +1,6 @@
 ﻿namespace Fl.Semantics.Types
 {
-    public class Anonymous : Struct
+    public class Anonymous : Object
     {
         private string name;
         
@@ -15,7 +15,7 @@
             return base.Equals(obj) && this.name == (obj as Anonymous).name;
         }
 
-        public static bool operator ==(Anonymous type1, Struct type2)
+        public static bool operator ==(Anonymous type1, Object type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -23,7 +23,7 @@
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Anonymous type1, Struct type2)
+        public static bool operator !=(Anonymous type1, Object type2)
         {
             return !(type1 == type2);
         }
@@ -33,7 +33,7 @@
             return $"{base.ToString()}{this.name}";
         }
 
-        public override bool IsAssignableFrom(Struct type)
+        public override bool IsAssignableFrom(Object type)
         {
             return this.Equals(type);
         }

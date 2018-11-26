@@ -35,7 +35,7 @@ namespace Fl.Semantics.Inferrers
         /// </summary>
         /// <param name="type">Type to be inferred</param>
         /// <param name="symbol">Symbol that has the type to be inferred</param>
-        public void AddTypeDependency(Struct type, Symbol symbol)
+        public void AddTypeDependency(Object type, Symbol symbol)
         {
             // If type is a primitive type other than anonymous type
             // the constraint is not needed as it is understood that
@@ -72,7 +72,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <returns></returns>
-        public Struct InferFromType(Struct left, Struct right)
+        public Object InferFromType(Object left, Object right)
         {
             // Can't unify null objects
             if (left == null || right == null)
@@ -101,9 +101,9 @@ namespace Fl.Semantics.Inferrers
             return left;
         }
 
-        public bool IsTypeAssumption(Struct t)
+        public bool IsTypeAssumption(Object t)
         {
-            if (t is Primitive)
+            if (t is Primitive || t is Void)
                 return false;
 
             if (t is Anonymous at)
@@ -177,7 +177,7 @@ namespace Fl.Semantics.Inferrers
         /// </summary>
         /// <param name="t"></param>
         /// <returns></returns>
-        private bool IsComplexType(Struct t) => t is Complex;
+        private bool IsComplexType(Object t) => t is Complex;
 
         /// <summary>
         /// Update previous inferred type in a symbol by changing the occurrences to the new
@@ -186,7 +186,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="s">Symbol to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void InferSymbolType(Symbol s, Anonymous prevType, Struct newType)
+        private void InferSymbolType(Symbol s, Anonymous prevType, Object newType)
         {
             if (this.IsComplexType(s.Type))
                 this.UpdateComplexType(s.Type, prevType, newType);
@@ -201,7 +201,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="complexType">Type to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateComplexType(Struct complexType, Anonymous prevType, Struct newType)
+        private void UpdateComplexType(Object complexType, Anonymous prevType, Object newType)
         {
             if (complexType is Function f)
                 this.UpdateFunctionType(f, prevType, newType);
@@ -216,7 +216,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="f">Function type to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateFunctionType(Function f, Anonymous prevType, Struct newType)
+        private void UpdateFunctionType(Function f, Anonymous prevType, Object newType)
         {
             for (int i = 0; i < f.Parameters.Count; i++)
             {
@@ -245,7 +245,7 @@ namespace Fl.Semantics.Inferrers
         /// <param name="t">Tuple type to be updated</param>
         /// <param name="prevType">Previous inferred type</param>
         /// <param name="newType">New inferred type</param>
-        private void UpdateTupleType(Tuple t, Anonymous prevType, Struct newType)
+        private void UpdateTupleType(Tuple t, Anonymous prevType, Object newType)
         {
             for (int i = 0; i < t.Types.Count; i++)
             {
@@ -262,7 +262,7 @@ namespace Fl.Semantics.Inferrers
         /// </summary>
         /// <param name="prevType">Previous anonymous type</param>
         /// <param name="newType">New inferred type</param>
-        private void UnifyTypes(Struct prevType, Struct newType)
+        private void UnifyTypes(Object prevType, Object newType)
         {
             if (prevType is Function prevFuncType)
             {

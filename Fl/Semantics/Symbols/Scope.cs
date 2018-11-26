@@ -67,7 +67,7 @@ namespace Fl.Semantics.Symbols
 
             var current = parent;
             while (current.Parent != null)
-                current = parent.Parent;
+                current = current.Parent;
 
             this.Global = current;
         }
@@ -294,7 +294,7 @@ namespace Fl.Semantics.Symbols
             this.Symbols[symbol.Name] = symbol;
         }
 
-        public Symbol CreateSymbol(string name, Struct type, Access access, Storage storage)
+        public Symbol CreateSymbol(string name, Object type, Access access, Storage storage)
         {
             if (this.Symbols.ContainsKey(name))
                 throw new SymbolException($"Symbol {name} is already defined in current scope");

@@ -51,6 +51,10 @@ namespace Fl.Semantics.Resolvers
             // Visit the function's body
             funcdecl.Body.ForEach(s => s.Visit(visitor));
 
+            // Create the return type, anonymous by now
+            functionScope.UpdateReturnType(visitor.Inferrer.NewAnonymousType());
+            visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.Type, functionScope.ReturnSymbol);
+
             // At this point, the function's type is an assumed type, register
             // the function's symbol under that assumption
             visitor.Inferrer.AddTypeDependency(functionType, functionSymbol);

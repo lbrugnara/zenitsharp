@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 namespace Fl.Semantics.Types
 {
-    public abstract class Complex : Struct
+    public abstract class Complex : Object
     {
         public Complex(string name)
             : base(name)
         {
         }
 
-        public virtual string ToSafeString(List<(Struct type, string safestr)> safeTypes)
+        public virtual string ToSafeString(List<(Object type, string safestr)> safeTypes)
         {
             return this.ToString();
         }

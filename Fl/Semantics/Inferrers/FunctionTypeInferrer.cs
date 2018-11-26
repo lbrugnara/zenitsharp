@@ -2,7 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
@@ -47,9 +46,9 @@ namespace Fl.Semantics.Inferrers
 
                 // If the expression has a type, and the return symbol is not defined (by now it MUST NOT be defined at this point)
                 // create the @ret symbol and assign the type
-                if (functionScope.ReturnSymbol == null && lambdaExpression.Type != null)
+                if (lambdaExpression.Type != null)
                 {
-                    visitor.SymbolTable.CurrentFunctionScope.CreateReturnSymbol();
+                    visitor.Inferrer.InferFromType(lambdaExpression.Type, functionScope.ReturnSymbol.Type);
 
                     // Update the function's return type with the expression type
                     functionScope.UpdateReturnType(lambdaExpression.Type);
@@ -57,8 +56,20 @@ namespace Fl.Semantics.Inferrers
                     // If the type is an assumed type, register the @ret symbol under that assumption
                     if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.Type))
                         visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.Type, functionScope.ReturnSymbol);
-                }                
+                }           
+                else
+                {
+                    visitor.Inferrer.InferFromType(Void.Instance, functionScope.ReturnSymbol.Type);
+                }
             }
+            else if (!statements.OfType<ReturnNode>().Any() && functionScope.ReturnSymbol.Type != Void.Instance)
+            {
+                visitor.Inferrer.InferFromType(Void.Instance, functionScope.ReturnSymbol.Type);
+            }
+
+            // If the @ret type is an assumption, register the symbol under that assumption too
+            if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.Type))
+                visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.Type, functionScope.ReturnSymbol);
 
             // The inferred function type is a complex type, it might contain assumptions for parameters' types or return type
             // if that is the case, make this inferred type an assumption

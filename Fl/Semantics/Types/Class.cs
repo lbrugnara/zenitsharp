@@ -18,7 +18,7 @@ namespace Fl.Semantics.Types
             this.ClassName = name ?? throw new ArgumentNullException(nameof(name));
         }
 
-        public static bool operator ==(Class type1, Struct type2)
+        public static bool operator ==(Class type1, Object type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -26,7 +26,7 @@ namespace Fl.Semantics.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Class type1, Struct type2)
+        public static bool operator !=(Class type1, Object type2)
         {
             return !(type1 == type2);
         }
@@ -40,7 +40,7 @@ namespace Fl.Semantics.Types
                     && this.Methods.SequenceEqual(classObj.Methods);
         }
 
-        public override bool IsAssignableFrom(Struct type)
+        public override bool IsAssignableFrom(Object type)
         {
             return this.Equals(type);
         }

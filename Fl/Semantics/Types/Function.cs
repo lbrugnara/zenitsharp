@@ -11,40 +11,40 @@ namespace Fl.Semantics.Types
         /// <summary>
         /// Function's parameters types
         /// </summary>
-        public List<Struct> Parameters { get; private set; }
+        public List<Object> Parameters { get; private set; }
 
         /// <summary>
         /// Function's return type
         /// </summary>
-        public Struct Return { get; private set; }
+        public Object Return { get; private set; }
 
         public Function()
             : base("func")
         {
-            this.Parameters = new List<Struct>();
+            this.Parameters = new List<Object>();
         }
 
-        public Function(params Struct[] parametersTypes)
+        public Function(params Object[] parametersTypes)
             : base("func")
         {
-            this.Parameters = parametersTypes?.ToList() ?? new List<Struct>();
+            this.Parameters = parametersTypes?.ToList() ?? new List<Object>();
         }
 
         /// <summary>
         /// Define a new parameter type
         /// </summary>
         /// <param name="type"></param>
-        public void DefineParameterType(Struct type) => this.Parameters.Add(type);
+        public void DefineParameterType(Object type) => this.Parameters.Add(type);
 
         /// <summary>
         /// Set the return type
         /// </summary>
         /// <param name="ret"></param>
-        public void SetReturnType(Struct ret) => this.Return = ret;
+        public void SetReturnType(Object ret) => this.Return = ret;
 
         public bool IsCircularReference => this.HasCircularReferenceWith(this.Return);
 
-        protected bool HasCircularReferenceWith(Struct type)
+        protected bool HasCircularReferenceWith(Object type)
         {
             if (type is Function functype)
             {
@@ -73,7 +73,7 @@ namespace Fl.Semantics.Types
             return this.Return.GetHashCode() == func.GetHashCode() || this.Return == func.Return;
         }
 
-        public static bool operator ==(Function type1, Struct type2)
+        public static bool operator ==(Function type1, Object type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -81,12 +81,12 @@ namespace Fl.Semantics.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Function type1, Struct type2)
+        public static bool operator !=(Function type1, Object type2)
         {
             return !(type1 == type2);
         }
 
-        public override string ToSafeString(List<(Struct type, string safestr)> safeTypes)
+        public override string ToSafeString(List<(Object type, string safestr)> safeTypes)
         {
             var parameters = this.Parameters
                             .Select(s => s?.ToString() ?? "?")
@@ -114,10 +114,10 @@ namespace Fl.Semantics.Types
 
         public override string ToString()
         {
-            return this.ToSafeString(new List<(Struct type, string safestr)>());
+            return this.ToSafeString(new List<(Object type, string safestr)>());
         }
 
-        public override bool IsAssignableFrom(Struct type)
+        public override bool IsAssignableFrom(Object type)
         {
             return this.Equals(type);
         }

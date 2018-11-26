@@ -15,7 +15,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Type information
         /// </summary>
-        public virtual Struct Type { get; set; }
+        public virtual Object Type { get; set; }
 
         /// <summary>
         /// Symbol's access level
@@ -27,7 +27,7 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         public Storage Storage { get; set; }
 
-        public Symbol(string name, Struct type, Access access, Storage storage)
+        public Symbol(string name, Object type, Access access, Storage storage)
         {
             this.Name = name;
             this.Type = type;

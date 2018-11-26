@@ -39,12 +39,12 @@ namespace Fl.Semantics.Types
             throw new Exception($"Unhandled storage type {str}");
         }
 
-        internal static Struct GetType(SymbolTable symtable, Token token)
+        internal static Object GetType(SymbolTable symtable, Token token)
         {
             return GetType(symtable, null, token);
         }
 
-        internal static Struct GetType(SymbolTable symtable, TypeInferrer inferrer, Token token)
+        internal static Object GetType(SymbolTable symtable, TypeInferrer inferrer, Token token)
         {
             // If the token has a reference to an identifier, the types come from the explicit annotation
             if (token.Type == TokenType.Identifier)
