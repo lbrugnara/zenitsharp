@@ -69,6 +69,13 @@ namespace Fl.Semantics.Symbols
             return scope;
         }
 
+        public ObjectScope EnterObjectScope(string uid)
+        {
+            var scope = this.scopes.Peek().GetOrCreateNestedScope(ScopeType.Object, uid) as ObjectScope;
+            this.scopes.Push(scope);
+            return scope;
+        }
+
         public ClassScope EnterClassScope(string className)
         {
             ClassScope scope = null;
@@ -140,7 +147,7 @@ namespace Fl.Semantics.Symbols
             => this.scopes.Peek().AddSymbol(symbol);
 
         /// <inheritdoc/>
-        public Symbol CreateSymbol(string name, Object type, Access access, Storage storage) 
+        public Symbol CreateSymbol(string name, TypeInfo type, Access access, Storage storage) 
             => this.scopes.Peek().CreateSymbol(name, type, access, storage);
 
         /// <inheritdoc/>
@@ -153,7 +160,7 @@ namespace Fl.Semantics.Symbols
 
         #endregion
 
-        public Symbol NewClassSymbol(string className, Class clasz, Access access)
+        public Symbol NewClassSymbol(string className, TypeInfo clasz, Access access)
         {
             if (this.unresolved.ContainsKey(className))
                 this.unresolved.Remove(className);

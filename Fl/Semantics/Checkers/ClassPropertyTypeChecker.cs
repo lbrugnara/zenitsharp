@@ -15,13 +15,13 @@ namespace Fl.Semantics.Checkers
             // If the right-hand side is present, get the type
             var rhs = node.Definition?.Visit(checker);
             
-            if (rhs != null && !property.Type.IsAssignableFrom(rhs.Type))
-                throw new SymbolException($"Cannot assign type {rhs.Type} to variable of type {property.Type}");
+            if (rhs != null && !property.TypeInfo.Type.IsAssignableFrom(rhs.TypeInfo.Type))
+                throw new SymbolException($"Cannot assign type {rhs.TypeInfo} to variable of type {property.TypeInfo}");
 
             // TODO: By now return the ClassProperty, as the result does not need to be used,
             // but if in the future we support multiple property declaration, we need to review
             // this, as we would want the ClassProperty.Type type
-            return new CheckedType(property.Type, property);
+            return new CheckedType(property.TypeInfo, property);
         }
     }
 }

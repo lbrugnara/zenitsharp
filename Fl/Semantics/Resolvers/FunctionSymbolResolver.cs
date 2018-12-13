@@ -20,8 +20,10 @@ namespace Fl.Semantics.Resolvers
             // Create the new function type
             var functionType = new Function();
 
+            var typeInfo = new TypeInfo(functionType);
+
             // Create the function symbol
-            var functionSymbol = new Symbol(funcdecl.Name, functionType, Access.Public, Storage.Constant);
+            var functionSymbol = new Symbol(funcdecl.Name, typeInfo, Access.Public, Storage.Constant);
 
             // Register the function's symbol in the current scope
             visitor.SymbolTable.AddSymbol(functionSymbol);
@@ -32,20 +34,16 @@ namespace Fl.Semantics.Resolvers
             // Process the parameters
             funcdecl.Parameters.ForEach(parameter => {
                 // Define the symbol in the function's scope
-                var type = parameter.SymbolInfo.Type == null 
-                            ? visitor.Inferrer.NewAnonymousType() 
-                            : SymbolHelper.GetType(visitor.SymbolTable, parameter.SymbolInfo.Type);
+                var paramTypeInfo = parameter.SymbolInfo.Type == null
+                            ? visitor.Inferrer.NewAnonymousType()
+                            : new TypeInfo(SymbolHelper.GetType(visitor.SymbolTable, parameter.SymbolInfo.Type));
 
                 // Update the function's type (with parameter type)
-                functionType.DefineParameterType(type);
+                functionType.DefineParameterType(paramTypeInfo.Type);
 
                 // Update function's scope with the parameter definition
                 var storage = SymbolHelper.GetStorage(parameter.SymbolInfo.Mutability);
-                var symbol = functionScope.CreateParameter(parameter.Name.Value, type, Access.Public, storage);
-
-                // Update parameter-anonymous type if the type is an assumed type
-                if (visitor.Inferrer.IsTypeAssumption(type))
-                    visitor.Inferrer.AddTypeDependency(type, symbol);
+                var symbol = functionScope.CreateParameter(parameter.Name.Value, paramTypeInfo, Access.Public, storage);
             });
 
             // Visit the function's body
@@ -53,11 +51,6 @@ namespace Fl.Semantics.Resolvers
 
             // Create the return type, anonymous by now
             functionScope.UpdateReturnType(visitor.Inferrer.NewAnonymousType());
-            visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.Type, functionScope.ReturnSymbol);
-
-            // At this point, the function's type is an assumed type, register
-            // the function's symbol under that assumption
-            visitor.Inferrer.AddTypeDependency(functionType, functionSymbol);
 
             // Restore previous scope
             visitor.SymbolTable.LeaveScope();

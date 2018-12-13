@@ -46,29 +46,34 @@ namespace Fl.Semantics.Types
 
         internal static Object GetType(SymbolTable symtable, TypeInferrer inferrer, Token token)
         {
+            return GetTypeInfo(symtable, inferrer, token).Type;
+        }
+
+        internal static TypeInfo GetTypeInfo(SymbolTable symtable, TypeInferrer inferrer, Token token)
+        {
             // If the token has a reference to an identifier, the types come from the explicit annotation
             if (token.Type == TokenType.Identifier)
             {
                 if (token.Value == Bool.Instance.ToString())
-                    return Bool.Instance;
+                    return new TypeInfo(Bool.Instance);
 
                 if (token.Value == Char.Instance.ToString())
-                    return Char.Instance;
+                    return new TypeInfo(Char.Instance);
 
                 if (token.Value == Int.Instance.ToString())
-                    return Int.Instance;
+                    return new TypeInfo(Int.Instance);
 
                 if (token.Value == Float.Instance.ToString())
-                    return Float.Instance;
+                    return new TypeInfo(Float.Instance);
 
                 if (token.Value == Double.Instance.ToString())
-                    return Double.Instance;
+                    return new TypeInfo(Double.Instance);
 
                 if (token.Value == Decimal.Instance.ToString())
-                    return Decimal.Instance;
+                    return new TypeInfo(Decimal.Instance);
 
                 if (token.Value == String.Instance.ToString())
-                    return String.Instance;
+                    return new TypeInfo(String.Instance);
 
                 // Support complex types:
                 if (token.Value == "func" || token.Value == "tuple")
@@ -76,15 +81,15 @@ namespace Fl.Semantics.Types
 
                 if (symtable.HasSymbol(token.Value))
                 {
-                    var stype = symtable.GetSymbol(token.Value).Type;
-                    if (stype is Class ctype)
-                        return new ClassInstance(ctype);
-                    return stype;
+                    var typeInfo = symtable.GetSymbol(token.Value).TypeInfo;
+                    if (typeInfo.Type is Class ctype)
+                        return new TypeInfo(new ClassInstance(ctype));
+                    return typeInfo;
                 }
 
                 var type = new ClassInstance(new Class(token.Value));
                 symtable.AddUnresolvedType(type.Class.ClassName, token);
-                return type;
+                return new TypeInfo(type);
             }
 
 
@@ -92,25 +97,25 @@ namespace Fl.Semantics.Types
             switch (token.Type)
             {
                 case TokenType.Boolean:
-                    return Bool.Instance;
+                    return new TypeInfo(Bool.Instance);
 
                 case TokenType.Char:
-                    return Char.Instance;
+                    return new TypeInfo(Char.Instance);
 
                 case TokenType.Integer:
-                    return Int.Instance;
+                    return new TypeInfo(Int.Instance);
 
                 case TokenType.Float:
-                    return Float.Instance;
+                    return new TypeInfo(Float.Instance);
 
                 case TokenType.Double:
-                    return Double.Instance;
+                    return new TypeInfo(Double.Instance);
 
                 case TokenType.Decimal:
-                    return Decimal.Instance;
+                    return new TypeInfo(Decimal.Instance);
 
                 case TokenType.String:
-                    return String.Instance;
+                    return new TypeInfo(String.Instance);
 
                 case TokenType.Variable:
                     return inferrer?.NewAnonymousType(); // Auto

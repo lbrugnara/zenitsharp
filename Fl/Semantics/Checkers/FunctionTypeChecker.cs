@@ -23,7 +23,7 @@ namespace Fl.Semantics.Checkers
 
             checker.SymbolTable.LeaveScope();
 
-            return new CheckedType(funcsym.Type, funcsym);
+            return new CheckedType(funcsym.TypeInfo, funcsym);
         }
     }
 }

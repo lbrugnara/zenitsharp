@@ -16,12 +16,12 @@ namespace Fl.Semantics.Inferrers
             var defInferredType = node.Definition.Visit(inferrer);
 
             // Use the ClassProperty.Type type in the inference process
-            inferrer.Inferrer.InferFromType(constant.Type, defInferredType.Type);
+            inferrer.Inferrer.Unify(constant.TypeInfo, defInferredType.TypeInfo);
 
             // TODO: By now return the ClassProperty, as the result does not need to be used,
             // but if in the future we support multiple constant declaration, we need to review
             // this, as we would want the ClassProperty.Type type
-            return new InferredType(constant.Type, constant);
+            return new InferredType(constant.TypeInfo, constant);
         }
     }
 }

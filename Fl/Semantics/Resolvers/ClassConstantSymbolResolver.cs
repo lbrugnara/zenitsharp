@@ -10,7 +10,7 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor binder, ClassConstantNode node)
         {
-            var classScope = binder.SymbolTable.CurrentScope as ClassScope;
+            /*var classScope = binder.SymbolTable.CurrentScope as ClassScope;
 
             if (classScope == null)
                 throw new SymbolException($"Current scope is not a class scope ({binder.SymbolTable.CurrentScope.GetType().Name})");
@@ -33,7 +33,7 @@ namespace Fl.Semantics.Resolvers
                 binder.Inferrer.AddTypeDependency(lhsType, symbol);
 
             // Visit the right-hand side expression
-            node.Definition.Visit(binder);
+            node.Definition.Visit(binder);*/
         }
     }
 }

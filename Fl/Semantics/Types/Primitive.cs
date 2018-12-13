@@ -9,5 +9,10 @@ namespace Fl.Semantics.Types
             : base(name)
         {
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Primitive && (obj as Primitive).Name == this.Name;
+        }
     }
 }

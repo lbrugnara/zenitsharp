@@ -11,18 +11,32 @@ namespace Fl.Semantics.Types
         public string Name { get; private set; }
 
         public Dictionary<string, Object> Properties { get; }
-        public Dictionary<string, Function> Methods { get; }
+        public Dictionary<string, Function> Functions { get; }
 
         public Object(string name)
         {
             this.Name = name;
             this.Properties = new Dictionary<string, Object>();
-            this.Methods = new Dictionary<string, Function>();
+            this.Functions = new Dictionary<string, Function>();
         }
 
         public override bool Equals(object obj)
         {
-            return this.Name == (obj as Object)?.Name;
+            // Structural check
+            var objectType = obj as Object;
+
+            if (obj == null || objectType == null)
+                return false;
+
+            foreach (var p in this.Properties.Values)
+                if (!objectType.Properties.ContainsValue(p))
+                    return false;
+
+            foreach (var m in this.Functions.Values)
+                if (!objectType.Functions.ContainsValue(m))
+                    return false;
+
+            return true;
         }
 
         public static bool operator ==(Object type1, Object type2)

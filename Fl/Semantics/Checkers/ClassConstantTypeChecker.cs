@@ -15,13 +15,13 @@ namespace Fl.Semantics.Checkers
             // Get the right-hand side expression's type
             var rhs = node.Definition.Visit(checker);            
 
-            if (!constant.Type.IsAssignableFrom(rhs.Type))
-                throw new SymbolException($"Cannot assign type {rhs.Type} to constant of type {constant.Type}");
+            if (!constant.TypeInfo.Type.IsAssignableFrom(rhs.TypeInfo.Type))
+                throw new SymbolException($"Cannot assign type {rhs.TypeInfo} to constant of type {constant.TypeInfo}");
 
             // TODO: By now return the ClassProperty, as the result does not need to be used,
             // but if in the future we support multiple constant declaration, we need to review
             // this, as we would want the ClassProperty.Type type
-            return new CheckedType(constant.Type, constant);            
+            return new CheckedType(constant.TypeInfo, constant);            
         }
     }
 }

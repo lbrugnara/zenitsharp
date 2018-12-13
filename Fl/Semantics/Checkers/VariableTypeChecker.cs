@@ -27,13 +27,13 @@ namespace Fl.Semantics.Checkers
             foreach (var definition in vardecl.Definitions)
             {
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.GetSymbol(definition.Left.Value).Type;
+                var lhsType = checker.SymbolTable.GetSymbol(definition.Left.Value).TypeInfo;
 
                 // If it is a variable definition, get the right-hand side type info
                 var rhs = definition.Right?.Visit(checker);
 
-                if (rhs != null && !lhsType.IsAssignableFrom(rhs.Type))
-                    throw new SymbolException($"Cannot assign type {rhs.Type} to variable of type {lhsType}");
+                if (rhs != null && !lhsType.Type.IsAssignableFrom(rhs.TypeInfo.Type))
+                    throw new SymbolException($"Cannot assign type {rhs.TypeInfo} to variable of type {lhsType}");
             }
 
             return null;
@@ -51,11 +51,11 @@ namespace Fl.Semantics.Checkers
                     continue;
 
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.GetSymbol(declaration.Value).Type;
-                var rhsType = (initType.Type as Tuple).Types[i];
+                var lhsType = checker.SymbolTable.GetSymbol(declaration.Value).TypeInfo;
+                var rhsType = (initType.TypeInfo.Type as Tuple).Types[i];
 
                 // When lhs is "var", take the type from the right hand side expression, or throw if it is not available
-                if (!lhsType.IsAssignableFrom(rhsType))
+                if (!lhsType.Type.IsAssignableFrom(rhsType))
                     throw new SymbolException($"Cannot assign type {rhsType} to variable of type {lhsType}");
             }
 

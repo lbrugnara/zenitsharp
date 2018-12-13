@@ -3,6 +3,7 @@
 
 using Fl.Ast;
 using Fl.Semantics;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
@@ -11,7 +12,7 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor inferrer, LiteralNode literal)
         {
-            return new InferredType(SymbolHelper.GetType(inferrer.SymbolTable, literal.Literal));
+            return new InferredType(new TypeInfo(SymbolHelper.GetType(inferrer.SymbolTable, literal.Literal)));
         }
     }
 }

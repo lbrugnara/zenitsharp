@@ -25,6 +25,8 @@ namespace Fl.Semantics.Inferrers
         private ReturnTypeInferrer returnTypeInferrer;
         private CallableTypeInferrer callTypeInferrer;
         private FunctionTypeInferrer funcDeclTypeInferrer;
+        private ObjectTypeInferrer objectTypeInferrer;
+        private ObjectPropertyTypeInferrer objectPropertyTypeInferrer;
         private TupleTypeInferrer tupleTypeInferrer;
         private NullCoalescingTypeInferrer nullCoalescingTypeInferrer;
         private ClassTypeInferrer classTypeInferrer;
@@ -52,6 +54,8 @@ namespace Fl.Semantics.Inferrers
             this.continueTypeInferrer = new ContinueTypeInferrer();
             this.callTypeInferrer = new CallableTypeInferrer();
             this.funcDeclTypeInferrer = new FunctionTypeInferrer();
+            this.objectTypeInferrer = new ObjectTypeInferrer();
+            this.objectPropertyTypeInferrer = new ObjectPropertyTypeInferrer();
             this.tupleTypeInferrer = new TupleTypeInferrer();
             this.returnTypeInferrer = new ReturnTypeInferrer();
             this.nullCoalescingTypeInferrer = new NullCoalescingTypeInferrer();
@@ -120,6 +124,12 @@ namespace Fl.Semantics.Inferrers
 
                 case FunctionNode func:
                     return this.funcDeclTypeInferrer.Visit(this, func);
+
+                case ObjectNode obj:
+                    return this.objectTypeInferrer.Visit(this, obj);
+
+                case ObjectPropertyNode objProp:
+                    return this.objectPropertyTypeInferrer.Visit(this, objProp);
 
                 case TupleNode t:
                     return this.tupleTypeInferrer.Visit(this, t);

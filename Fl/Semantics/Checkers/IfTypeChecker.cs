@@ -14,7 +14,7 @@ namespace Fl.Semantics.Checkers
         {
             var conditionType = ifnode.Condition.Visit(checker);
 
-            if (conditionType.Type != Bool.Instance)
+            if (conditionType.TypeInfo.Type != Bool.Instance)
                 throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Add a new common block for the if's boyd

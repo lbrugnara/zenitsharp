@@ -37,7 +37,7 @@ namespace Fl.Semantics.Types
                 return false;
 
             return this.Properties.SequenceEqual(classObj.Properties)
-                    && this.Methods.SequenceEqual(classObj.Methods);
+                    && this.Functions.SequenceEqual(classObj.Functions);
         }
 
         public override bool IsAssignableFrom(Object type)

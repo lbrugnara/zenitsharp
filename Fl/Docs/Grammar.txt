@@ -150,6 +150,7 @@ expression	-> expression_assignment
 
 
 expression_assignment	-> ( member_access | destructuring ) ( ( '=' | '+=' | '-=' | '/=' | '*=' )  expression_assignment )?
+                        | object_expression
 						| lambda_expression
 						| conditional_expression
                         ;
@@ -181,6 +182,12 @@ conditional_expression  -> null_coalescing_expression ( '?' expression ':' expre
 null_coalescing_expression  -> or_expression ( '??' null_coalescing_expression )?
                             ;
 
+(* Objects expression *)
+object_expression   -> '{' object_property ( ',' object_property )* ','? '}'
+                    ;
+
+object_property     -> 'mut'? IDENTIFIER ':' expression
+                    ;
 
 (* Lambdas *)
 lambda_expression   -> lambda_params '=>' ( block | expression )

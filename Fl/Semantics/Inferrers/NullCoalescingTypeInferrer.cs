@@ -13,7 +13,9 @@ namespace Fl.Semantics.Inferrers
             var left = nullc.Left.Visit(visitor);
             var right = nullc.Right.Visit(visitor);
 
-            return new InferredType(visitor.Inferrer.InferFromType(left.Type, right.Type));
+            visitor.Inferrer.Unify(left.TypeInfo, right.TypeInfo);
+
+            return new InferredType(left.TypeInfo);
         }
     }
 }

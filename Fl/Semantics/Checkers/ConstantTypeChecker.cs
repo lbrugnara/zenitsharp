@@ -17,13 +17,13 @@ namespace Fl.Semantics.Checkers
             foreach (var definition in constdec.Definitions)
             {
                 if (lhsType == null)
-                    lhsType = new CheckedType(checker.SymbolTable.GetSymbol(definition.Left.Value).Type);
+                    lhsType = new CheckedType(checker.SymbolTable.GetSymbol(definition.Left.Value).TypeInfo);
 
                 // Get the right-hand side operand (a must for a constant)
                 var rhsType = definition.Right.Visit(checker);
 
-                if (!lhsType.Type.IsAssignableFrom(rhsType.Type))
-                    throw new SymbolException($"Cannot assign type {rhsType.Type} to constant of type {lhsType.Type}");
+                if (!lhsType.TypeInfo.Type.IsAssignableFrom(rhsType.TypeInfo.Type))
+                    throw new SymbolException($"Cannot assign type {rhsType.TypeInfo} to constant of type {lhsType.TypeInfo}");
 
             }
 

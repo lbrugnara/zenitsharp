@@ -14,8 +14,8 @@ namespace Fl.Semantics.Checkers
             var left = binary.Left.Visit(checker);
             var right = binary.Right.Visit(checker);
 
-            if (!left.Type.IsAssignableFrom(right.Type))
-                throw new System.Exception($"Operator {binary.Operator.Value} cannot be applied on operands of type {left.Type} and {right.Type}");
+            if (!left.TypeInfo.Type.IsAssignableFrom(right.TypeInfo.Type))
+                throw new System.Exception($"Operator {binary.Operator.Value} cannot be applied on operands of type {left.TypeInfo} and {right.TypeInfo}");
 
             left.Symbol = null;
 

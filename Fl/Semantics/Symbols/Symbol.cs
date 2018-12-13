@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Symbols
 {
@@ -15,7 +14,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Type information
         /// </summary>
-        public virtual Object Type { get; set; }
+        public TypeInfo TypeInfo { get; set; }
 
         /// <summary>
         /// Symbol's access level
@@ -27,10 +26,10 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         public Storage Storage { get; set; }
 
-        public Symbol(string name, Object type, Access access, Storage storage)
+        public Symbol(string name, TypeInfo type, Access access, Storage storage)
         {
             this.Name = name;
-            this.Type = type;
+            this.TypeInfo = type;
             this.Access = access;
             this.Storage = storage;
         }
@@ -42,7 +41,7 @@ namespace Fl.Semantics.Symbols
 
         public override string ToString()
         {
-            return $"{this.Access.ToKeyword()} {this.Storage.ToKeyword()} {this.Name}: {this.Type}";
+            return $"{this.Access.ToKeyword()} {this.Storage.ToKeyword()} {this.Name}: {this.TypeInfo}";
         }
     }
 }

@@ -8,12 +8,12 @@ namespace Fl.Semantics.Inferrers
 {
     public class InferredType
     {
-        public Object Type { get; set; }
+        public TypeInfo TypeInfo { get; set; }
         public Symbol Symbol { get; set; }
 
-        public InferredType(Object type, Symbol symbol = null)
+        public InferredType(TypeInfo type, Symbol symbol = null)
         {
-            this.Type = type;
+            this.TypeInfo = type;
             this.Symbol = symbol;
         }
     }

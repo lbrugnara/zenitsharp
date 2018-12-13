@@ -1,4 +1,6 @@
-﻿namespace Fl.Semantics.Types
+﻿using System.Collections.Generic;
+
+namespace Fl.Semantics.Types
 {
     public class Anonymous : Object
     {
@@ -30,7 +32,25 @@
 
         public override string ToString()
         {
-            return $"{base.ToString()}{this.name}";
+            var assignedName = $"{base.ToString()}{this.name}";
+
+            if (this.Properties.Count > 0 || this.Functions.Count > 0)
+                assignedName += " {";
+
+            var members = new List<string>();
+
+            foreach (var kvp in this.Properties)
+                members.Add($"{kvp.Key} : {kvp.Value}");
+
+            foreach (var kvp in this.Functions)
+                members.Add($"{kvp.Key} : {kvp.Value}");
+
+            assignedName += string.Join(", ", members);
+
+            if (this.Properties.Count > 0 || this.Functions.Count > 0)
+                assignedName += "} ";
+
+            return assignedName;
         }
 
         public override bool IsAssignableFrom(Object type)

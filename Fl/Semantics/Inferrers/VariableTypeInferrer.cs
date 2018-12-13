@@ -30,23 +30,25 @@ namespace Fl.Semantics.Inferrers
             foreach (var definition in vardecl.Definitions)
             {
                 // Symbol should be already resolved here
-                var lhs = visitor.SymbolTable.GetSymbol(definition.Left.Value);
+                var leftSymbol = visitor.SymbolTable.GetSymbol(definition.Left.Value);
 
+                // Get the inferred type
                 if (inferredType == null)
-                    inferredType = new InferredType(lhs.Type);
+                    inferredType = new InferredType(leftSymbol.TypeInfo);
 
                 // If the rhs is null, continue, is just a declaration
                 if (definition.Right == null)
                     continue;
 
                 // If it is a variable definition, get the right-hand side type info
-                var rhs = definition.Right?.Visit(visitor);
+                var rhsInferredType = definition.Right?.Visit(visitor);
 
-                if (visitor.Inferrer.IsTypeAssumption(lhs.Type) && (rhs == null || rhs.Type == null))
-                    throw new SymbolException($"Implicitly-typed variable '{lhs.Name}' needs to be initialized");
+                // If the symbol is an anonymous type, the rhs type is a must
+                if (leftSymbol.TypeInfo.IsAnonymousType && (rhsInferredType == null || rhsInferredType.TypeInfo == null || rhsInferredType.TypeInfo.Type == null))
+                    throw new SymbolException($"Implicitly-typed variable '{leftSymbol.Name}' needs to be initialized");
 
                 // Check types to see if we can unify them
-                visitor.Inferrer.InferFromType(lhs.Type, rhs.Type);
+                visitor.Inferrer.Unify(leftSymbol.TypeInfo, rhsInferredType.TypeInfo);
             }
 
             return inferredType;
@@ -54,10 +56,7 @@ namespace Fl.Semantics.Inferrers
 
         protected InferredType VarDestructuringNode(TypeInferrerVisitor visitor, VariableDestructuringNode destructuringNode)
         {
-            var initType = destructuringNode.Right.Visit(visitor);
-
-            // Get the variable type from the declaration
-            InferredType inferredType = new InferredType(initType.Type);
+            var inferredType = destructuringNode.Right.Visit(visitor);
 
             for (int i=0; i < destructuringNode.Left.Count; i++)
             {
@@ -70,10 +69,10 @@ namespace Fl.Semantics.Inferrers
                 var lhs = visitor.SymbolTable.GetSymbol(declaration.Value);
 
                 // If it is a variable definition, get the right-hand side type info
-                var rhsType = (initType.Type as Tuple).Types[i];
+                var rhsType = (inferredType.TypeInfo.Type as Tuple).Types[i];
 
                 // Check types to see if we can unify them
-                visitor.Inferrer.InferFromType(lhs.Type, rhsType);
+                visitor.Inferrer.Unify(lhs.TypeInfo, rhsType);
             }
 
             return inferredType;

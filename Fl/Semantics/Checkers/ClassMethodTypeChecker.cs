@@ -21,7 +21,7 @@ namespace Fl.Semantics.Checkers
 
             checker.SymbolTable.LeaveScope();
 
-            return new CheckedType(methodSymbol.Type, methodSymbol);
+            return new CheckedType(methodSymbol.TypeInfo, methodSymbol);
         }
     }
 }

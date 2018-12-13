@@ -4,6 +4,7 @@
 using Fl.Semantics;
 using Fl.Ast;
 using Fl.Semantics.Types;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
@@ -11,21 +12,21 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, ConstantNode constdec)
         {
-            Object lhsType = null;
+            TypeInfo typeInfo = null;
 
             foreach (var definition in constdec.Definitions)
             {
                 // Multiple constant definitions in the same statement are all of the same type so take the first
-                if (lhsType == null)
-                    lhsType = visitor.SymbolTable.GetSymbol(definition.Left.Value).Type;
+                if (typeInfo == null)
+                    typeInfo = visitor.SymbolTable.GetSymbol(definition.Left.Value).TypeInfo;
 
                 // Get the right-hand side expression-s type (a must for a constant)
                 var rhs = definition.Right.Visit(visitor);
 
-                visitor.Inferrer.InferFromType(lhsType, rhs.Type);
+                visitor.Inferrer.Unify(typeInfo, rhs.TypeInfo);
             }
 
-            return new InferredType(lhsType);
+            return new InferredType(typeInfo);
         }
     }
 }

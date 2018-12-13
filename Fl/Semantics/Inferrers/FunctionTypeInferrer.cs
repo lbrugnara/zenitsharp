@@ -17,7 +17,7 @@ namespace Fl.Semantics.Inferrers
             var functionSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Name);
 
             // Get the function's type we may update at this step
-            Function functionType = functionSymbol.Type as Function;
+            Function functionType = functionSymbol.TypeInfo.Type as Function;
 
             // Enter the requested function's block
             var functionScope = visitor.SymbolTable.EnterFunctionScope(funcdecl.Name);
@@ -46,41 +46,41 @@ namespace Fl.Semantics.Inferrers
 
                 // If the expression has a type, and the return symbol is not defined (by now it MUST NOT be defined at this point)
                 // create the @ret symbol and assign the type
-                if (lambdaExpression.Type != null)
+                if (lambdaExpression.TypeInfo != null)
                 {
-                    visitor.Inferrer.InferFromType(lambdaExpression.Type, functionScope.ReturnSymbol.Type);
+                    visitor.Inferrer.Unify(lambdaExpression.TypeInfo, functionScope.ReturnSymbol.TypeInfo);
 
                     // Update the function's return type with the expression type
-                    functionScope.UpdateReturnType(lambdaExpression.Type);
+                    functionScope.UpdateReturnType(lambdaExpression.TypeInfo);
 
                     // If the type is an assumed type, register the @ret symbol under that assumption
-                    if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.Type))
-                        visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.Type, functionScope.ReturnSymbol);
+                    /*if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.TypeInfo))
+                        visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.TypeInfo, functionScope.ReturnSymbol);*/
                 }           
                 else
                 {
-                    visitor.Inferrer.InferFromType(Void.Instance, functionScope.ReturnSymbol.Type);
+                    visitor.Inferrer.Unify(Void.Instance, functionScope.ReturnSymbol.TypeInfo);
                 }
             }
-            else if (!statements.OfType<ReturnNode>().Any() && functionScope.ReturnSymbol.Type != Void.Instance)
+            else if (!statements.OfType<ReturnNode>().Any() && functionScope.ReturnSymbol.TypeInfo.Type != Void.Instance)
             {
-                visitor.Inferrer.InferFromType(Void.Instance, functionScope.ReturnSymbol.Type);
+                visitor.Inferrer.Unify(Void.Instance, functionScope.ReturnSymbol.TypeInfo);
             }
 
             // If the @ret type is an assumption, register the symbol under that assumption too
-            if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.Type))
-                visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.Type, functionScope.ReturnSymbol);
+            /*if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.TypeInfo))
+                visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.TypeInfo, functionScope.ReturnSymbol);*/
 
             // The inferred function type is a complex type, it might contain assumptions for parameters' types or return type
             // if that is the case, make this inferred type an assumption
-            if (visitor.Inferrer.IsTypeAssumption(functionType))
-                visitor.Inferrer.AddTypeDependency(functionType, functionSymbol);
+            /*if (visitor.Inferrer.IsTypeAssumption(functionType))
+                visitor.Inferrer.AddTypeDependency(functionType, functionSymbol);*/
 
             // Leave the function's scope
             visitor.SymbolTable.LeaveScope();
 
             // Return inferred function type
-            return new InferredType(functionType, functionSymbol);
+            return new InferredType(functionSymbol.TypeInfo, functionSymbol);
         }
     }
 }

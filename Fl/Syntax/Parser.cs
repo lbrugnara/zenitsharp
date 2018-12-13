@@ -696,7 +696,7 @@ namespace Fl.Syntax
             if (this.Match(TokenType.If))
                 return this.IfStatement();
 
-            if (this.Match(TokenType.LeftBrace))
+            if (this.Match(TokenType.LeftBrace) && !this.IsObjectExpression())
                 return this.Block();
 
             if (this.Match(TokenType.While))
@@ -1006,6 +1006,52 @@ namespace Fl.Syntax
         }
 
         // Rule:
+        // object_expression -> '{' object_property ( ',' object_property )* ','? '}'
+        private ObjectNode ObjectExpression()
+        {
+            var properties = new List<ObjectPropertyNode>();
+
+            this.Consume(TokenType.LeftBrace);
+
+            while (this.Match(TokenType.Identifier) || this.Match(TokenType.Mutable, TokenType.Identifier))
+            {
+                // Create a dummy token for the var token
+                var curTok = this.Peek();
+                var varToken = new Token
+                {
+                    Col = curTok.Col-1,
+                    Line = curTok.Line,
+                    Type = TokenType.Variable,
+                    Value = "var"
+                };
+
+                var info = new SymbolInformation(varToken, this.Match(TokenType.Mutable) ? this.Consume(TokenType.Mutable) : null, null);
+                var name = this.Consume(TokenType.Identifier);
+
+                this.Consume(TokenType.Colon);
+
+                var value = this.Expression();
+
+                var property = new ObjectPropertyNode
+                {
+                    Name = name,
+                    Information = info,
+                    Value = value
+                };
+
+                properties.Add(property);
+
+                // Consume trailing comma
+                if (this.Match(TokenType.Comma))
+                    this.Consume(TokenType.Comma);
+            }
+
+            this.Consume(TokenType.RightBrace);
+
+            return new ObjectNode(properties);
+        }
+
+        // Rule:
         // lambda_expression -> lambda_params '=>' ( block | expression )
         private FunctionNode LambdaExpression()
         {
@@ -1168,6 +1214,9 @@ namespace Fl.Syntax
                 this.RestoreCheckpoint(checkpoint);
                 return this.ConditionalExpression();
             }
+
+            if (this.IsObjectExpression())
+                return this.ObjectExpression();
 
             // Try to parse a lambda expression
             if (this.IsLambdaExpression())
@@ -1573,6 +1622,13 @@ namespace Fl.Syntax
         {
             return this.Match(TokenType.Identifier)
                 && this.MatchAnyFrom(1, TokenType.Dot, TokenType.LeftParen, TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign);
+        }
+
+        private bool IsObjectExpression()
+        {
+            return this.Match(TokenType.LeftBrace) 
+                && (this.MatchFrom(1, TokenType.Mutable, TokenType.Identifier, TokenType.Colon)
+                    || this.MatchFrom(1, TokenType.Identifier, TokenType.Colon));
         }
 
         private bool IsLambdaExpression()

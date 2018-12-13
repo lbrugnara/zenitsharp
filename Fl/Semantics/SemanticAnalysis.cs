@@ -75,10 +75,10 @@ namespace Fl.Semantics
             this.inferrer.Visit(ast);
 
             // Check all the operations are valid
-            this.checker.Visit(ast);
+            /*this.checker.Visit(ast);
 
             // Ensure the mutability rules of variables and function calls
-            this.mutabilityChecker.Visit(ast);
+            this.mutabilityChecker.Visit(ast);*/
 
             return this.symbolTable;
         }

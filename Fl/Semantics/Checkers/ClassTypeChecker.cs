@@ -17,7 +17,7 @@ namespace Fl.Semantics.Checkers
 
             checker.SymbolTable.LeaveScope();
 
-            return new CheckedType(checker.SymbolTable.GetSymbol(node.Name.Value).Type);
+            return new CheckedType(checker.SymbolTable.GetSymbol(node.Name.Value).TypeInfo);
         }
     }
 }

@@ -22,8 +22,8 @@ namespace Fl.Semantics.Checkers
             // If it is an empty return statement, leave 
             if (rnode.Expression == null)
             {
-                if (returnSymbol.Type != Void.Instance)
-                    throw new System.Exception($"Cannot return without an object of type '{returnSymbol.Type}'");
+                if (returnSymbol.TypeInfo.Type != Void.Instance)
+                    throw new System.Exception($"Cannot return without an object of type '{returnSymbol.TypeInfo}'");
 
                 return null;
             }
@@ -32,20 +32,20 @@ namespace Fl.Semantics.Checkers
             var checkedType = rnode.Expression.Visit(checker);
 
             // Get the return expression's type
-            Object type = checkedType.Type;
+            var typeInfo = checkedType.TypeInfo;
 
             // The return statement expects a tuple and if that tuple contains
             // just one element, we use it as the return's type
-            if ((type is Tuple t) && t.Types.Count == 1)
-                type = t.Types.First();
+            if ((typeInfo.Type is Tuple t) && t.Types.Count == 1)
+                typeInfo.Type = t.Types.First();
 
-            if (returnSymbol.Type == Void.Instance)
-                throw new System.Exception($"Function '{checker.SymbolTable.CurrentFunctionScope.Uid}' returns void. Cannot return object of type '{type}'");
+            if (returnSymbol.TypeInfo.Type == Void.Instance)
+                throw new System.Exception($"Function '{checker.SymbolTable.CurrentFunctionScope.Uid}' returns void. Cannot return object of type '{typeInfo}'");
 
-            if (!returnSymbol.Type.IsAssignableFrom(type))
-                throw new System.Exception($"Function returns '{returnSymbol.Type}', cannot convert return value from '{type}'");
+            if (!returnSymbol.TypeInfo.Type.IsAssignableFrom(typeInfo.Type))
+                throw new System.Exception($"Function returns '{returnSymbol.TypeInfo}', cannot convert return value from '{typeInfo}'");
 
-            return new CheckedType(type, checkedType.Symbol);
+            return new CheckedType(typeInfo, checkedType.Symbol);
         }
     }
 }

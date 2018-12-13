@@ -102,6 +102,9 @@ namespace Fl.Semantics.Symbols
                     case ScopeType.Class:
                         scope = new ClassScope(uid, this);
                         break;
+                    case ScopeType.Object:
+                        scope = new ObjectScope(uid, this);
+                        break;
                     default:
                         scope = new Scope(uid, this);
                         break;
@@ -294,7 +297,7 @@ namespace Fl.Semantics.Symbols
             this.Symbols[symbol.Name] = symbol;
         }
 
-        public Symbol CreateSymbol(string name, Object type, Access access, Storage storage)
+        public Symbol CreateSymbol(string name, TypeInfo type, Access access, Storage storage)
         {
             if (this.Symbols.ContainsKey(name))
                 throw new SymbolException($"Symbol {name} is already defined in current scope");

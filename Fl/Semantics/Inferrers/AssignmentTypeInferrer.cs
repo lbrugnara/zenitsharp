@@ -23,8 +23,10 @@ namespace Fl.Semantics.Inferrers
             var leftHandSide = node.Accessor.Visit(visitor);
             var rightHandSide = node.Right.Visit(visitor);
 
+            visitor.Inferrer.Unify(leftHandSide.TypeInfo, rightHandSide.TypeInfo);
+
             // Make conclusions about the types if possible
-            return new InferredType(visitor.Inferrer.InferFromType(leftHandSide.Type, rightHandSide.Type));
+            return new InferredType(leftHandSide.TypeInfo);
         }
 
         private InferredType MakeDestructuringAssignment(DestructuringAssignmentNode node, TypeInferrerVisitor visitor)
@@ -32,20 +34,7 @@ namespace Fl.Semantics.Inferrers
             var tupleInferredType = node.Left.Visit(visitor);
             var exprInferredType = node.Right.Visit(visitor);
 
-            var tupleTypes = tupleInferredType.Type as Tuple;
-            var exprTypes = exprInferredType.Type as Tuple;
-
-            for (int i=0; i < tupleTypes.Count; i++)
-            {
-                var varType = tupleTypes.Types[i];
-
-                if (varType == null)
-                    continue;
-
-                var exprType = exprTypes.Types[i];
-
-                visitor.Inferrer.InferFromType(varType, exprType);
-            }
+            visitor.Inferrer.Unify(tupleInferredType.TypeInfo, exprInferredType.TypeInfo);
 
             return exprInferredType;
         }

@@ -28,11 +28,11 @@ namespace Fl.Semantics.Resolvers
 
         protected void VarDefinitionNode(SymbolResolverVisitor binder, VariableDefinitionNode vardecl)
         {
-            // Get the variable type from the declaration or assume an anonymous type
-            var lhsType = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, vardecl.Information.Type);
-
-            var isAssumedType = binder.Inferrer.IsTypeAssumption(lhsType);
-
+            // Get the type information:
+            //  An anonymous type
+            //  A named type
+            var typeInfo = SymbolHelper.GetTypeInfo(binder.SymbolTable, binder.Inferrer, vardecl.Information.Type);
+            
             foreach (var definition in vardecl.Definitions)
             {
                 // Get the identifier name
@@ -43,12 +43,7 @@ namespace Fl.Semantics.Resolvers
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // Create the new symbol for the variable
-                var storage = SymbolHelper.GetStorage(vardecl.Information.Mutability);
-                var symbol = binder.SymbolTable.CreateSymbol(variableName, lhsType, Access.Public, storage);
-
-                // If it is a type assumption, register the symbol under that assumption
-                if (isAssumedType)
-                    binder.Inferrer.AddTypeDependency(lhsType, symbol);
+                var symbol = binder.SymbolTable.CreateSymbol(variableName, typeInfo, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability));
 
                 // If it is a variable definition, visit the right-hand side expression
                 definition.Right?.Visit(binder);
@@ -71,14 +66,14 @@ namespace Fl.Semantics.Resolvers
                 if (visitor.SymbolTable.HasSymbol(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
-                var lhsType = visitor.Inferrer.NewAnonymousType();
+                // If the type anotation is not specific (uses 'var'), we need to create an anonymous type
+                // for every variable. If not, we just get the type information from the token
+                var varType = destrnode.Information.Type.Type == Syntax.TokenType.Variable 
+                    ? visitor.Inferrer.NewAnonymousType() 
+                    : SymbolHelper.GetTypeInfo(visitor.SymbolTable, visitor.Inferrer, destrnode.Information.Type);
 
                 // Create the new symbol for the variable
-                var storage = SymbolHelper.GetStorage(destrnode.Information.Mutability);
-                var symbol = visitor.SymbolTable.CreateSymbol(variableName, lhsType, Access.Public, storage);
-
-                // Register the symbol under that assumption
-                visitor.Inferrer.AddTypeDependency(lhsType, symbol);
+                var symbol = visitor.SymbolTable.CreateSymbol(variableName, varType, Access.Public, SymbolHelper.GetStorage(destrnode.Information.Mutability));
             }
         }
     }

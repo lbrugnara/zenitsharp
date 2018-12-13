@@ -22,21 +22,21 @@ namespace Fl.Semantics.Symbols
 
         public override ScopeType Type => ScopeType.Class;
         
-        public Symbol CreateProperty(string name, Object type, Access access, Storage storage)
+        public Symbol CreateProperty(string name, TypeInfo type, Access access, Storage storage)
         {
             var symbol = this.CreateSymbol(name, type, access, storage);
             this.Properties.Add(symbol.Name);
             return symbol;
         }
 
-        public Symbol CreateConstant(string name, Object type, Access access)
+        public Symbol CreateConstant(string name, TypeInfo type, Access access)
         {
             var symbol = this.CreateSymbol(name, type, access, Storage.Constant);
             this.Constants.Add(symbol.Name);
             return symbol;
         }
 
-        public Symbol CreateMethod(string name, Object type, Access access)
+        public Symbol CreateMethod(string name, TypeInfo type, Access access)
         {
             var symbol = this.CreateSymbol(name, type, access, Storage.Constant);
             this.Methods.Add(symbol.Name);

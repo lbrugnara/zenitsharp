@@ -26,6 +26,11 @@ namespace Fl.Semantics.Symbols
         Function,
 
         /// <summary>
+        /// Represents an object's scope
+        /// </summary>
+        Object,
+
+        /// <summary>
         /// Represents a package block
         /// </summary>
         Package,

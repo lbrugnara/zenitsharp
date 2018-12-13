@@ -26,6 +26,8 @@ namespace Fl.Semantics.Resolvers
         private ReturnSymbolResolver returnSymbolResolver;
         private CallableSymbolResolver callSymbolResolver;
         private FunctionSymbolResolver funcDeclSymbolResolver;
+        private ObjectSymbolResolver objectSymbolResolver;
+        private ObjectPropertySymbolResolver objectPropertySymbolResolver;
         private TupleSymbolResolver tupleSymbolResolver;
         private NullCoalescingSymbolResolver nullCoalescingSymbolResolver;
         private ClassSymbolResolver classSymbolResolver;
@@ -53,6 +55,8 @@ namespace Fl.Semantics.Resolvers
             this.continueSymbolResolver = new ContinueSymbolResolver();
             this.callSymbolResolver = new CallableSymbolResolver();
             this.funcDeclSymbolResolver = new FunctionSymbolResolver();
+            this.objectSymbolResolver = new ObjectSymbolResolver();
+            this.objectPropertySymbolResolver = new ObjectPropertySymbolResolver();
             this.tupleSymbolResolver = new TupleSymbolResolver();
             this.returnSymbolResolver = new ReturnSymbolResolver();
             this.nullCoalescingSymbolResolver = new NullCoalescingSymbolResolver();
@@ -137,6 +141,14 @@ namespace Fl.Semantics.Resolvers
 
                 case FunctionNode func:
                     this.funcDeclSymbolResolver.Visit(this, func);
+                    break;
+
+                case ObjectNode obj:
+                    this.objectSymbolResolver.Visit(this, obj);
+                    break;
+
+                case ObjectPropertyNode objProp:
+                    this.objectPropertySymbolResolver.Visit(this, objProp);
                     break;
 
                 case TupleNode t:

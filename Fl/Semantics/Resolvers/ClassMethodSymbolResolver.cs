@@ -12,7 +12,7 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor visitor, ClassMethodNode method)
         {
-            var classScope = visitor.SymbolTable.CurrentScope as ClassScope;
+            /*var classScope = visitor.SymbolTable.CurrentScope as ClassScope;
 
             if (classScope == null)
                 throw new SymbolException($"Current scope is not a class scope ({visitor.SymbolTable.CurrentScope.GetType().Name})");
@@ -58,7 +58,7 @@ namespace Fl.Semantics.Resolvers
             methodType.SetReturnType(rettype);
 
             // Update the @ret symbol
-            methodScope.ReturnSymbol.Type = rettype;
+            methodScope.ReturnSymbol.TypeInfo.Type = rettype;
             visitor.Inferrer.AddTypeDependency(rettype, methodScope.ReturnSymbol);
 
             // At this point, the method's type is an assumed type, register
@@ -66,7 +66,7 @@ namespace Fl.Semantics.Resolvers
             visitor.Inferrer.AddTypeDependency(methodType, methodSymbol);
 
             // Restore previous scope
-            visitor.SymbolTable.LeaveScope();
+            visitor.SymbolTable.LeaveScope();*/
         }
     }
 }

@@ -26,16 +26,16 @@ namespace Fl.Semantics.Symbols
 
         public Symbol ReturnSymbol { get; private set; }
 
-        public void UpdateReturnType(Object type)
+        public void UpdateReturnType(TypeInfo typeInfo)
         {
-            this.ReturnSymbol.Type = type ?? throw new System.ArgumentNullException(nameof(type), "Return type cannot be null");
-            (this.Parent.GetSymbol(this.Uid).Type as Function)
-                .SetReturnType(type);
+            this.ReturnSymbol.TypeInfo = typeInfo ?? throw new System.ArgumentNullException(nameof(typeInfo), "Return type cannot be null");
+            (this.Parent.GetSymbol(this.Uid).TypeInfo.Type as Function)
+                .SetReturnType(typeInfo.Type);
         }
 
-        public Symbol CreateParameter(string name, Object type, Access access, Storage storage)
+        public Symbol CreateParameter(string name, TypeInfo typeInfo, Access access, Storage storage)
         {
-            var symbol = this.CreateSymbol(name, type, access, storage);
+            var symbol = this.CreateSymbol(name, typeInfo, access, storage);
             this.Parameters.Add(symbol.Name);
             return symbol;
         }

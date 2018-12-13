@@ -17,7 +17,7 @@ namespace Fl.Semantics.Checkers
             // Emmit the condition code
             var conditionType = wnode.Condition.Visit(checker);
 
-            if (conditionType.Type != Bool.Instance)
+            if (conditionType.TypeInfo.Type != Bool.Instance)
                 throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Emmit the body code

@@ -11,7 +11,7 @@ namespace Fl.Semantics.Resolvers
         public void Visit(SymbolResolverVisitor binder, ClassNode node)
         {
             // By now we just allow class definition at global scope or package scope (no nested classes)
-            if (!binder.SymbolTable.CurrentScope.IsGlobal && !binder.SymbolTable.CurrentScope.IsPackage)
+            /*if (!binder.SymbolTable.CurrentScope.IsGlobal && !binder.SymbolTable.CurrentScope.IsPackage)
                 throw new SymbolException($"Cannot define a class within a {binder.SymbolTable.CurrentScope.Type.ToString().ToLower()}");
 
             // There are 3 components in the class definition:
@@ -33,23 +33,23 @@ namespace Fl.Semantics.Resolvers
             node.Properties.ForEach(propertyNode => {
                 propertyNode.Visit(binder);
                 var propertyName = propertyNode.Name.Value;
-                classType.Properties[propertyName] = binder.SymbolTable.GetSymbol(propertyName).Type;
+                classType.Properties[propertyName] = binder.SymbolTable.GetSymbol(propertyName).TypeInfo.Type;
             });
 
             node.Constants.ForEach(constantNode => {
                 constantNode.Visit(binder);
                 var constantName = constantNode.Name.Value;
-                classType.Properties[constantName] = binder.SymbolTable.GetSymbol(constantName).Type;
+                classType.Properties[constantName] = binder.SymbolTable.GetSymbol(constantName).TypeInfo.Type;
             });
 
             node.Methods.ForEach(methodNode => {
                 methodNode.Visit(binder);
-                var method = binder.SymbolTable.GetSymbol(methodNode.Name).Type as Function ?? throw new System.Exception($"Method type is not {typeof(Function).FullName}");
+                var method = binder.SymbolTable.GetSymbol(methodNode.Name).TypeInfo.Type as Function ?? throw new System.Exception($"Method type is not {typeof(Function).FullName}");
                 //method.SetDefiningClass(classType);
                 classType.Methods[methodNode.Name] = method;
             });
 
-            binder.SymbolTable.LeaveScope();
+            binder.SymbolTable.LeaveScope();*/
         }
     }
 }

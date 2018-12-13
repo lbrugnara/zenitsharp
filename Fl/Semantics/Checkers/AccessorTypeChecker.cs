@@ -22,7 +22,7 @@ namespace Fl.Semantics.Checkers
                 // Get accessed symbol that must be defined in the symtable's scope
                 symbol = checker.SymbolTable.GetSymbol(symbolName);
 
-                Object type = symbol.Type;
+                var type = symbol.TypeInfo;
 
                 // Return the type check information for this symbol
                 return new CheckedType(type, symbol);
@@ -37,16 +37,16 @@ namespace Fl.Semantics.Checkers
             if (encsym is ISymbolTable)
             {
                 symbol = (encsym as ISymbolTable).GetSymbol(symbolName);
-                return new CheckedType(symbol.Type, symbol);
+                return new CheckedType(symbol.TypeInfo, symbol);
             }
 
             // If the symbol is a class, we need to get the class's scope
             // to retrieve the class member
-            if (encsym.Type is Class clasz)
+            if (encsym.TypeInfo.Type is Class clasz)
             {
                 // Find the Class scope
                 symbol = checker.SymbolTable.GetClassScope(encsym.Name).GetSymbol(symbolName);
-                return new CheckedType(symbol.Type, symbol);
+                return new CheckedType(symbol.TypeInfo, symbol);
             }
 
             // Here we have to get the class's scope and the type must be one of the following types:
@@ -54,11 +54,11 @@ namespace Fl.Semantics.Checkers
             //  - A native type
             ISymbolTable symtable = null;
 
-            if (encsym.Type is ClassInstance classInstance)
+            if (encsym.TypeInfo.Type is ClassInstance classInstance)
                 // Find the Class scope
                 symtable = checker.SymbolTable.GetClassScope(classInstance.Class.ClassName);
-            else if (checker.SymbolTable.TryGetSymbol(encsym.Type.Name)?.Type is Class)
-                symtable = checker.SymbolTable.GetClassScope(encsym.Type.Name);
+            else if (checker.SymbolTable.TryGetSymbol(encsym.TypeInfo.Type.Name)?.TypeInfo.Type is Class)
+                symtable = checker.SymbolTable.GetClassScope(encsym.TypeInfo.Type.Name);
             else
                 throw new SymbolException($"Unhandled accessor type {encsym}");
 
@@ -68,7 +68,7 @@ namespace Fl.Semantics.Checkers
             // Either case, we are talking about an instance of a class or an instance of a primitive type, 
             // because of that we need to return the type of the member, and not just the ClassProperty or ClassMethod
             // type.
-            return new CheckedType(symbol.Type, symbol);
+            return new CheckedType(symbol.TypeInfo, symbol);
         }
     }
 }

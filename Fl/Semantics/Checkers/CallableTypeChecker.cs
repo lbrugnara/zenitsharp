@@ -3,6 +3,7 @@
 
 using Fl.Ast;
 using Fl.Semantics.Exceptions;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
@@ -22,20 +23,20 @@ namespace Fl.Semantics.Checkers
 
                 var argCheckedType = argument.Visit(checker);
 
-                if (!parameter.Type.IsAssignableFrom(argCheckedType.Type))
-                    throw new SymbolException($"Function '{targetFuncScope.Uid}' expects parameter '{parameter.Name}' to be of type '{parameter.Type}'. Received '{argCheckedType.Type}' instead.");
+                if (!parameter.TypeInfo.Type.IsAssignableFrom(argCheckedType.TypeInfo.Type))
+                    throw new SymbolException($"Function '{targetFuncScope.Uid}' expects parameter '{parameter.Name}' to be of type '{parameter.TypeInfo}'. Received '{argCheckedType.TypeInfo}' instead.");
             }
 
-            if (target.Type is Function f1)
-                return new CheckedType(f1.Return);
+            if (target.TypeInfo.Type is Function f1)
+                return new CheckedType(new TypeInfo(f1.Return));
 
             /*if (target.Type is ClassMethod cm && cm.Type is Function f2)
                 return new CheckedType(f2.Return);*/
 
-            if (target.Type is Class c)
-                return new CheckedType(new ClassInstance(c));
+            if (target.TypeInfo.Type is Class c)
+                return new CheckedType(new TypeInfo(new ClassInstance(c)));
 
-            throw new System.Exception($"Symbol {target.Symbol.Name} is not a function ({target.Type})");
+            throw new System.Exception($"Symbol {target.Symbol.Name} is not a function ({target.TypeInfo})");
         }
     }
 }

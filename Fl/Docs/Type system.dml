@@ -33,7 +33,7 @@ Taking as reference the second level in the type system hierarchy there are 3 bi
 
 1- [Primitive types]: This comprehends the most basic level of inference, and it can be inferred by means of simply processing the `Literal` nodes.
 2- [Complex types]: The next level of inference belongs to the complex types. Here we need to take into consideration the fundamental parts that compound the complex type, which eventually are `primitive` types, and in this process, we need to be careful with the recursive types.
-3- [Anonymous types]: Finallay, the category of the anonymous types simply refers to types that are inferred up to a certain point where we can identify the expected members of a type, but we don't have enough information to specifically reduce all the constraints to a certain type. The decision to make this `anonymous` types work this way is to get both [parametric polymorphism] and [structural typing] support by default.
+3- [Anonymous types]: Finally, the category of the anonymous types simply refers to types that are inferred up to a certain point where we can identify the expected members of a type, but we don't have enough information to specifically reduce all the constraints to a certain type. The decision to make this `anonymous` types work this way is to get both [parametric polymorphism] and [structural typing] support by default.
 
 From the points above we get the following constraints in the type system:
 

@@ -11,7 +11,7 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor binder, ClassPropertyNode node)
         {
-            var classScope = binder.SymbolTable.CurrentScope as ClassScope;
+            /*var classScope = binder.SymbolTable.CurrentScope as ClassScope;
 
             if (classScope == null)
                 throw new SymbolException($"Current scope is not a class scope ({binder.SymbolTable.CurrentScope.GetType().Name})");
@@ -36,7 +36,7 @@ namespace Fl.Semantics.Resolvers
                 binder.Inferrer.AddTypeDependency(propertyType, symbol);
 
             // If the property has a definition, visit the right-hand side expression
-            node.Definition?.Visit(binder);
+            node.Definition?.Visit(binder);*/
         }
     }
 }

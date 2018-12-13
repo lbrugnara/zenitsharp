@@ -20,7 +20,7 @@ namespace Fl.Semantics.Symbols
         /// <param name="name">Symbol's name</param>
         /// <param name="type">Symbol's data type</param>
         /// <returns></returns>
-        Symbol CreateSymbol(string name, Object type, Access access, Storage storage);
+        Symbol CreateSymbol(string name, TypeInfo type, Access access, Storage storage);
 
         /// <summary>
         /// Return true if a symbol with that name exists in the

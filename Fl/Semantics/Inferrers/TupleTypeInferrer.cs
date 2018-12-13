@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 using System.Linq;
 
@@ -12,7 +13,7 @@ namespace Fl.Semantics.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, TupleNode node)
         {
             var inferredTypes = node.Items?.Select(i => i?.Visit(visitor));
-            return new InferredType(new Tuple(inferredTypes.Select(it => it?.Type).ToArray()));
+            return new InferredType(new TypeInfo(new Tuple(inferredTypes.Select(it => it?.TypeInfo?.Type).ToArray())));
         }
     }
 }

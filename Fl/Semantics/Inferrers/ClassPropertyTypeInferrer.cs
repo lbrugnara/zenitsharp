@@ -17,12 +17,12 @@ namespace Fl.Semantics.Inferrers
 
             // Use the ClassProperty.Type property in the inference
             if (defInferredType != null)
-                inferrer.Inferrer.InferFromType(property.Type, defInferredType.Type);
+                inferrer.Inferrer.Unify(property.TypeInfo, defInferredType.TypeInfo);
 
             // TODO: By now return the ClassProperty, as the result does not need to be used,
             // but if in the future we support multiple property declaration, we need to review
             // this, as we would want the ClassProperty.Type type
-            return new InferredType(property.Type, property);
+            return new InferredType(property.TypeInfo, property);
         }
     }
 }

@@ -11,15 +11,13 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor binder, ConstantNode constdec)
         {            
-            Object type = null;
+            TypeInfo typeInfo = null;
 
             // Get the constant's type or assume it if not present
             if (constdec.Type != null)
-                type = SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, constdec.Type);
+                typeInfo = new TypeInfo(SymbolHelper.GetType(binder.SymbolTable, binder.Inferrer, constdec.Type));
             else
-                type = binder.Inferrer.NewAnonymousType();
-
-            var typeAssumption = binder.Inferrer.IsTypeAssumption(type);
+                typeInfo = binder.Inferrer.NewAnonymousType();
 
             foreach (var definition in constdec.Definitions)
             {
@@ -27,15 +25,10 @@ namespace Fl.Semantics.Resolvers
                 var constantName = definition.Left.Value;
 
                 // Create the new symbol
-                var symbol = binder.SymbolTable.CreateSymbol(constantName, type, Access.Public, Storage.Constant);
-
-                // Register under the assumption of having an anonymous type, if needed
-                if (typeAssumption)
-                    binder.Inferrer.AddTypeDependency(type, symbol);
+                var symbol = binder.SymbolTable.CreateSymbol(constantName, typeInfo, Access.Public, Storage.Constant);
 
                 // Get the right-hand side operand (a must for a constant)
-                definition.Right.Visit(binder);                
-
+                definition.Right.Visit(binder);
             }
         }
     }
