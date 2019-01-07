@@ -12,7 +12,7 @@ namespace Fl.Semantics.Mutability
         public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
-            checker.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
+            checker.SymbolTable.EnterLoopScope($"{fornode.Uid}");
 
             fornode.Init.Visit(checker);
 

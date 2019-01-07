@@ -12,7 +12,7 @@ namespace Fl.Semantics.Mutability
         public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
-            checker.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
+            checker.SymbolTable.EnterLoopScope($"{wnode.Uid}");
 
             wnode.Condition.Visit(checker);
 

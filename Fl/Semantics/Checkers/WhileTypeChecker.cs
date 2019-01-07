@@ -12,7 +12,7 @@ namespace Fl.Semantics.Checkers
         public CheckedType Visit(TypeCheckerVisitor checker, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
-            checker.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
+            checker.SymbolTable.EnterLoopScope($"{wnode.Uid}");
 
             // Emmit the condition code
             var conditionType = wnode.Condition.Visit(checker);

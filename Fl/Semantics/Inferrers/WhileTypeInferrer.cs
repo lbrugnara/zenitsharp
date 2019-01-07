@@ -12,7 +12,7 @@ namespace Fl.Semantics.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
-            visitor.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
+            visitor.SymbolTable.EnterLoopScope($"{wnode.Uid}");
 
             // Emmit the condition code
             var conditionType = wnode.Condition.Visit(visitor);

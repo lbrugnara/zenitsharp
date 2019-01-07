@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,43 +11,44 @@ using Fl.Syntax;
 
 namespace Fl.Semantics.Symbols
 {
-    public class SymbolTable : ISymbolTable
+    public class SymbolTable : ISymbolContainer
     {
         /// <summary>
         /// Keep track of the scope chain
         /// </summary>
-        private readonly Stack<Scope> scopes;
+        private readonly Stack<SymbolContainer> scopes;
 
         private readonly Dictionary<string, List<Token>> unresolved;
 
         public SymbolTable()
         {
-            this.scopes = new Stack<Scope>();
+            this.scopes = new Stack<SymbolContainer>();
 
             // Create the initial scope (Global)
-            this.scopes.Push(new Scope("global"));
+            this.scopes.Push(new BlockSymbolContainer("@global"));
             this.unresolved = new Dictionary<string, List<Token>>();
         }
 
         /// <summary>
         /// Global scope is the first created (last in the stack) scope
         /// </summary>
-        private Scope Global => this.scopes.Last();
+        private SymbolContainer Global => this.scopes.Last();
 
         /// <summary>
         /// Current scope is the latest added one
         /// </summary>
-        public Scope CurrentScope => this.scopes.Peek();
+        public SymbolContainer CurrentScope => this.scopes.Peek();
 
-        public FunctionScope CurrentFunctionScope
+        /// <summary>
+        /// Check if there's a child scope in the current scope with the provided UID.
+        /// If scope does not exist, create a new scope and chain it to the current scope.
+        /// Either way, push retrieved/created scope to the stack to make it the current scope.
+        /// </summary>
+        /// <param name="type">Type of the scope to get/create</param>
+        /// <param name="name">ID of the scope to get/create</param>
+        public SymbolContainer EnterBlockScope(string name)
         {
-            get
-            {
-                if (!this.InFunction)
-                    throw new ScopeOperationException("Current scope is not a function");
-
-                return this.CurrentScope.CurrentFunction;
-            }
+            return this.EnterScope<BlockSymbolContainer>(name, this.scopes.Peek());
         }
 
         /// <summary>
@@ -55,73 +57,55 @@ namespace Fl.Semantics.Symbols
         /// Either way, push retrieved/created scope to the stack to make it the current scope.
         /// </summary>
         /// <param name="type">Type of the scope to get/create</param>
-        /// <param name="uid">ID of the scope to get/create</param>
-        public Scope EnterScope(ScopeType type, string uid)
+        /// <param name="name">ID of the scope to get/create</param>
+        public LoopSymbolContainer EnterLoopScope(string name)
         {
-            var scope = this.scopes.Peek().GetOrCreateNestedScope(type, uid);
-            this.scopes.Push(scope);
-            return scope;
+            return this.EnterScope<LoopSymbolContainer>(name, this.scopes.Peek());
         }
 
-        public FunctionScope EnterFunctionScope(string uid)
+        public FunctionSymbol EnterFunctionScope(string name)
         {
-            var scope = this.scopes.Peek().GetOrCreateNestedScope(ScopeType.Function, uid) as FunctionScope;
-            this.scopes.Push(scope);
-            return scope;
+            return this.EnterScope<FunctionSymbol>(name, this.scopes.Peek());
         }
 
-        public ObjectScope EnterObjectScope(string uid)
+        public ObjectSymbol EnterObjectScope(string name)
         {
-            var scope = this.scopes.Peek().GetOrCreateNestedScope(ScopeType.Object, uid) as ObjectScope;
-            this.scopes.Push(scope);
-            return scope;
+            return this.EnterScope<ObjectSymbol>(name, this.scopes.Peek());
         }
 
-        public ClassScope EnterClassScope(string className)
+        public ClassSymbol EnterClassScope(string name)
         {
-            ClassScope scope = null;
-            if (this.CurrentScope.IsPackage)
+            return this.EnterScope<ClassSymbol>(name, this.Global);
+        }
+
+        private T EnterScope<T>(string name, SymbolContainer currentScope)
+            where T : SymbolContainer
+        {
+            T targetScope = null;
+
+            if (currentScope.HasChild(name))
             {
-                // TODO: Do something with the Package
-            }
-            if (this.CurrentScope.IsClass)
-            {
-                // TODO: Do something with the Class
+                targetScope = currentScope.GetChild(name) as T;
             }
             else
             {
-                scope = this.Global.GetOrCreateNestedScope(ScopeType.Class, className) as ClassScope;
-                this.scopes.Push(scope);
+                targetScope = Activator.CreateInstance(typeof(T), name, currentScope) as T;
+                currentScope.AddChild(targetScope);
             }
-            return scope;
+
+            this.scopes.Push(targetScope);
+
+            return targetScope;
+        }
+        public SymbolContainer GetClassScope(string className)
+        {
+            // TODO: Handle Package and nested classes
+            return this.Global.GetChild(className);
         }
 
-        public Scope GetClassScope(string className)
+        public FunctionSymbol GetFunctionScope(string funcName)
         {
-            if (this.CurrentScope.IsPackage)
-            {
-                // TODO: Do something with the Package
-            }
-            if (this.CurrentScope.IsClass)
-            {
-                // TODO: Do something with the Class
-            }
-
-            return this.Global.GetNestedScope(ScopeType.Class, className);
-        }
-
-        public FunctionScope GetFunctionScope(string funcName)
-        {
-            if (this.CurrentScope.IsPackage)
-            {
-                // TODO: Do something with the Package
-            }
-            if (this.CurrentScope.IsClass)
-            {
-                // TODO: Do something with the Class
-            }
-
-            return this.Global.GetNestedScope(ScopeType.Function, funcName) as FunctionScope;
+            return this.CurrentScope.GetChild(funcName) as FunctionSymbol;
         }
 
         /// <summary>
@@ -139,7 +123,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Return true if the current scope (or its parent) is a ScopeType.Function
         /// </summary>
-        public bool InFunction => this.scopes.Peek().IsFunction;
+        public bool InFunction => this.scopes.Peek() is FunctionSymbol;
 
         #region ISymbolTable implementation
 
@@ -166,16 +150,16 @@ namespace Fl.Semantics.Symbols
             if (this.unresolved.ContainsKey(className))
                 this.unresolved.Remove(className);
 
-            Scope scope = this.Global;
+            SymbolContainer scope = this.Global;
 
-            if (this.CurrentScope.IsPackage)
+            /*if (this.CurrentScope.IsPackage)
             {
                 // TODO: Do something with the Package
             }
             if (this.CurrentScope.IsClass)
             {
                 // TODO: Do something with the Class
-            }
+            }*/
 
             return scope.CreateSymbol(className, clasz, access, Storage.Constant);
         }

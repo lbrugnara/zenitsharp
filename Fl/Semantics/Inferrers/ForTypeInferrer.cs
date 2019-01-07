@@ -12,7 +12,7 @@ namespace Fl.Semantics.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
-            visitor.SymbolTable.EnterScope(ScopeType.Loop, $"for-{fornode.GetHashCode()}");
+            visitor.SymbolTable.EnterLoopScope($"{fornode.Uid}");
 
             // Initialize the for-block
             fornode.Init.Visit(visitor);

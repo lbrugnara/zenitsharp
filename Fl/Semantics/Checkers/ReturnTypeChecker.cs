@@ -17,7 +17,7 @@ namespace Fl.Semantics.Checkers
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
             // Get the current function's return symbol
-            var returnSymbol = checker.SymbolTable.CurrentFunctionScope.ReturnSymbol;
+            var returnSymbol = (checker.SymbolTable.CurrentScope as FunctionSymbol).ReturnSymbol;
 
             // If it is an empty return statement, leave 
             if (rnode.Expression == null)
@@ -40,7 +40,7 @@ namespace Fl.Semantics.Checkers
                 typeInfo.Type = t.Types.First();
 
             if (returnSymbol.TypeInfo.Type == Void.Instance)
-                throw new System.Exception($"Function '{checker.SymbolTable.CurrentFunctionScope.Uid}' returns void. Cannot return object of type '{typeInfo}'");
+                throw new System.Exception($"Function '{(checker.SymbolTable.CurrentScope as FunctionSymbol).Name}' returns void. Cannot return object of type '{typeInfo}'");
 
             if (!returnSymbol.TypeInfo.Type.IsAssignableFrom(typeInfo.Type))
                 throw new System.Exception($"Function returns '{returnSymbol.TypeInfo}', cannot convert return value from '{typeInfo}'");

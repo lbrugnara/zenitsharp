@@ -32,9 +32,9 @@ namespace Fl.Semantics.Inferrers
 
             // If the enclosing symbol implements ISymbolTable we will search for 
             // the symbol within the enclosing scope
-            if (encsym is ISymbolTable)
+            if (encsym is ISymbolContainer)
             {
-                symbol = (encsym as ISymbolTable).GetSymbol(symbolName);
+                symbol = (encsym as ISymbolContainer).GetSymbol(symbolName);
                 return new InferredType(symbol.TypeInfo, symbol);
             }
 
@@ -50,7 +50,7 @@ namespace Fl.Semantics.Inferrers
             // Here we have to get the class's scope and the type must be one of the following types:
             //  - ClassInstance type
             //  - A native type
-            ISymbolTable symtable = null;
+            ISymbolContainer symtable = null;
 
             if (encsym.TypeInfo.Type is ClassInstance classInstance)
                 // Find the Class scope

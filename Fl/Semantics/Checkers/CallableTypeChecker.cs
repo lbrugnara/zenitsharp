@@ -24,7 +24,7 @@ namespace Fl.Semantics.Checkers
                 var argCheckedType = argument.Visit(checker);
 
                 if (!parameter.TypeInfo.Type.IsAssignableFrom(argCheckedType.TypeInfo.Type))
-                    throw new SymbolException($"Function '{targetFuncScope.Uid}' expects parameter '{parameter.Name}' to be of type '{parameter.TypeInfo}'. Received '{argCheckedType.TypeInfo}' instead.");
+                    throw new SymbolException($"Function '{targetFuncScope.Name}' expects parameter '{parameter.Name}' to be of type '{parameter.TypeInfo}'. Received '{argCheckedType.TypeInfo}' instead.");
             }
 
             if (target.TypeInfo.Type is Function f1)

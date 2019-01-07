@@ -5,19 +5,17 @@ using System.Collections.Generic;
 
 namespace Fl.Semantics.Symbols
 {
-    public class ObjectScope : Scope
+    public class ObjectSymbol : SymbolContainer
     {
         protected List<string> Properties { get; set; }
         protected List<string> Functions { get; set; }
         
-        public ObjectScope(string uid, Scope parent = null)
-            : base(uid, parent)
+        public ObjectSymbol(string name, SymbolContainer parent = null)
+            : base(name, parent)
         {
             this.Properties = new List<string>();
             this.Functions = new List<string>();
         }
-
-        public override ScopeType Type => ScopeType.Object;
 
         public Symbol CreateProperty(string name, TypeInfo type, Access access, Storage storage)
         {

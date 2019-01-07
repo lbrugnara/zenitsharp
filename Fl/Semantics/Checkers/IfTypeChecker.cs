@@ -18,7 +18,7 @@ namespace Fl.Semantics.Checkers
                 throw new System.Exception($"For condition needs a {Bool.Instance} expression");
 
             // Add a new common block for the if's boyd
-            checker.SymbolTable.EnterScope(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
+            checker.SymbolTable.EnterBlockScope($"{ifnode.Uid}");
 
             // Generate the if's body
             ifnode.Then?.Visit(checker);
@@ -29,7 +29,7 @@ namespace Fl.Semantics.Checkers
             if (ifnode.Else != null)
             {
                 // Add a block for the else's body and generate it, then leave the block
-                checker.SymbolTable.EnterScope(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
+                checker.SymbolTable.EnterBlockScope($"{ifnode.Uid}");
 
                 ifnode.Else.Visit(checker);
 

@@ -11,7 +11,7 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, BlockNode node)
         {
-            visitor.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
+            visitor.SymbolTable.EnterBlockScope($"{node.Uid}");
 
             foreach (Node statement in node.Statements)
                 statement.Visit(visitor);

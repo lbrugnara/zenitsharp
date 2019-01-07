@@ -17,7 +17,7 @@ namespace Fl.Semantics.Checkers
             // function's body
             var funcsym = checker.SymbolTable.GetSymbol(funcdecl.Name);
 
-            checker.SymbolTable.EnterScope(ScopeType.Function, funcdecl.Name);
+            checker.SymbolTable.EnterFunctionScope(funcdecl.Name);
 
             funcdecl.Body.ForEach(s => s.Visit(checker));
 

@@ -12,7 +12,7 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, BlockNode node)
         {
-            checker.SymbolTable.EnterScope(ScopeType.Common, $"block-{node.GetHashCode()}");
+            checker.SymbolTable.EnterBlockScope($"{node.Uid}");
 
             foreach (Node statement in node.Statements)
                 statement.Visit(checker);

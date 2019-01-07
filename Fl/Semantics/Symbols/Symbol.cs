@@ -4,7 +4,7 @@
 
 namespace Fl.Semantics.Symbols
 {
-    public class Symbol
+    public class Symbol : ISymbol
     {
         /// <summary>
         /// Symbol name (user-defined name)
@@ -19,7 +19,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Symbol's access level
         /// </summary>
-        public Access Access { get; set; }
+        public virtual Access Access { get; private set; }
 
         /// <summary>
         /// Symbol's storage type
@@ -42,6 +42,11 @@ namespace Fl.Semantics.Symbols
         public override string ToString()
         {
             return $"{this.Access.ToKeyword()} {this.Storage.ToKeyword()} {this.Name}: {this.TypeInfo}";
+        }
+
+        public virtual string ToDebugString(int indent = 0)
+        {
+            return "".PadLeft(indent) + this.ToString();
         }
     }
 }

@@ -6,22 +6,20 @@ using System.Collections.Generic;
 
 namespace Fl.Semantics.Symbols
 {
-    public class ClassScope : Scope
+    public class ClassSymbol : SymbolContainer
     {
         protected List<string> Properties { get; set; }
         protected List<string> Constants { get; set; }
         protected List<string> Methods { get; set; }
 
-        public ClassScope(string uid, Scope parent = null)
-            : base(uid, parent)
+        public ClassSymbol(string name, SymbolContainer parent = null)
+            : base(name, parent)
         {
             this.Properties = new List<string>();
             this.Constants = new List<string>();
             this.Methods = new List<string>();
         }
 
-        public override ScopeType Type => ScopeType.Class;
-        
         public Symbol CreateProperty(string name, TypeInfo type, Access access, Storage storage)
         {
             var symbol = this.CreateSymbol(name, type, access, storage);

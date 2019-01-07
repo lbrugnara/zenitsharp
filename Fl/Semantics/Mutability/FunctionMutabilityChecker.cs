@@ -13,7 +13,7 @@ namespace Fl.Semantics.Mutability
     {
         public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, FunctionNode funcdecl)
         {
-            checker.SymbolTable.EnterScope(ScopeType.Function, funcdecl.Name);
+            checker.SymbolTable.EnterFunctionScope(funcdecl.Name);
 
             funcdecl.Body.ForEach(s => s.Visit(checker));
 

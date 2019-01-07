@@ -15,7 +15,7 @@ namespace Fl.Semantics.Mutability
             var id = accessor.Target.Value;
             var enclosing = accessor.Parent?.Visit(checker);
 
-            var symtable = (enclosing?.Symbol as ISymbolTable) ?? checker.SymbolTable;
+            var symtable = (enclosing?.Symbol as ISymbolContainer) ?? checker.SymbolTable;
 
             return new MutabilityCheckResult(symtable.GetSymbol(id));
         }

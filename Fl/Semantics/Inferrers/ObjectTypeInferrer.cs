@@ -11,7 +11,7 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, ObjectNode node)
         {
-            visitor.SymbolTable.EnterObjectScope($"object-{node.GetHashCode()}");
+            visitor.SymbolTable.EnterObjectScope($"obj-{node.Uid}");
 
             var typeInfo = visitor.Inferrer.NewAnonymousType();
             var type = typeInfo.Type;
@@ -31,7 +31,7 @@ namespace Fl.Semantics.Inferrers
 
             visitor.SymbolTable.LeaveScope();
 
-            return new InferredType(typeInfo);
+            return new InferredType(typeInfo, visitor.SymbolTable.CurrentScope);
         }
     }
 }

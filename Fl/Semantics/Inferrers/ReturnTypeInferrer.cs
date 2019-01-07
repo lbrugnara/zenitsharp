@@ -18,7 +18,7 @@ namespace Fl.Semantics.Inferrers
 
             // The current scope is the function's scope. We get a reference to the
             // return type and we update it if needed
-            var functionScope = visitor.SymbolTable.CurrentFunctionScope;
+            var functionScope = visitor.SymbolTable.CurrentScope as FunctionSymbol;
 
             // If there's an empty return statement, leave here
             if (rnode.Expression == null)

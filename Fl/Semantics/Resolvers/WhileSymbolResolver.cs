@@ -11,7 +11,7 @@ namespace Fl.Semantics.Resolvers
         public void Visit(SymbolResolverVisitor visitor, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
-            visitor.SymbolTable.EnterScope(ScopeType.Loop, $"while-body-{wnode.GetHashCode()}");
+            visitor.SymbolTable.EnterLoopScope($"{wnode.Uid}");
 
             // Emmit the condition code
             wnode.Condition.Visit(visitor);

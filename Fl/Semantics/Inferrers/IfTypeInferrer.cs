@@ -17,7 +17,7 @@ namespace Fl.Semantics.Inferrers
             visitor.Inferrer.Unify(Bool.Instance, conditionType.TypeInfo);
 
             // Add a new common block for the if's boyd
-            visitor.SymbolTable.EnterScope(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
+            visitor.SymbolTable.EnterBlockScope($"{ifnode.Uid}");
 
             // Generate the if's body
             ifnode.Then?.Visit(visitor);
@@ -28,7 +28,7 @@ namespace Fl.Semantics.Inferrers
             if (ifnode.Else != null)
             {
                 // Add a block for the else's body and generate it, then leave the block
-                visitor.SymbolTable.EnterScope(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
+                visitor.SymbolTable.EnterBlockScope($"{ifnode.Uid}");
 
                 ifnode.Else.Visit(visitor);
 

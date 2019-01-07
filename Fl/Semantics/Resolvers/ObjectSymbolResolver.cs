@@ -9,7 +9,7 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor visitor, ObjectNode node)
         {
-            visitor.SymbolTable.EnterObjectScope($"object-{node.GetHashCode()}");
+            visitor.SymbolTable.EnterObjectScope($"obj-{node.Uid}");
 
             node.Properties.ForEach(p => visitor.Visit(p));
 

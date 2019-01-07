@@ -15,7 +15,7 @@ namespace Fl.Semantics.Mutability
             ifnode.Condition.Visit(checker);
 
             // Add a new common block for the if's boyd
-            checker.SymbolTable.EnterScope(ScopeType.Common, $"if-then-{ifnode.GetHashCode()}");
+            checker.SymbolTable.EnterBlockScope($"{ifnode.Uid}");
 
             ifnode.Then?.Visit(checker);
 
@@ -25,7 +25,7 @@ namespace Fl.Semantics.Mutability
             if (ifnode.Else != null)
             {
                 // Add a block for the else's body, check it, then leave the block
-                checker.SymbolTable.EnterScope(ScopeType.Common, $"if-else-{ifnode.GetHashCode()}");
+                checker.SymbolTable.EnterBlockScope($"{ifnode.Uid}");
 
                 ifnode.Else.Visit(checker);
 

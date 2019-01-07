@@ -5,7 +5,7 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Symbols
 {
-    public interface ISymbolTable
+    public interface ISymbolContainer
     {
         /// <summary>
         /// Adds symbol to this SymbolTable

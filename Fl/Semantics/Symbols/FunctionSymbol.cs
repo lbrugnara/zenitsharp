@@ -6,12 +6,12 @@ using System.Collections.Generic;
 
 namespace Fl.Semantics.Symbols
 {
-    public class FunctionScope : Scope
+    public class FunctionSymbol : SymbolContainer
     {
         public List<string> Parameters { get; set; }
 
-        public FunctionScope(string uid, Scope parent = null)
-            : base (uid, parent)
+        public FunctionSymbol(string name, SymbolContainer parent = null)
+            : base (name, parent)
         {
             this.Parameters = new List<string>();
             this.ReturnSymbol = this.CreateSymbol(
@@ -22,14 +22,12 @@ namespace Fl.Semantics.Symbols
             );
         }
 
-        public override ScopeType Type => ScopeType.Function;
-
         public Symbol ReturnSymbol { get; private set; }
 
         public void UpdateReturnType(TypeInfo typeInfo)
         {
             this.ReturnSymbol.TypeInfo = typeInfo ?? throw new System.ArgumentNullException(nameof(typeInfo), "Return type cannot be null");
-            (this.Parent.GetSymbol(this.Uid).TypeInfo.Type as Function)
+            (this.Parent.GetSymbol(this.Name).TypeInfo.Type as Function)
                 .SetReturnType(typeInfo.Type);
         }
 
