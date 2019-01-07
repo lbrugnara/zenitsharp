@@ -71,8 +71,18 @@ namespace Fl.Semantics
             // If there are unresolved types, throw an exception
             this.symbolTable.ThrowIfUnresolved();
 
+            Console.WriteLine("================");
+            Console.WriteLine("SYMBOL RESOLVING");
+            Console.WriteLine("================");
+            Console.WriteLine(this.symbolTable.ToDebugString());
+
             // Make the type inference
             this.inferrer.Visit(ast);
+
+            Console.WriteLine("=============");
+            Console.WriteLine("TYPE INFERRER");
+            Console.WriteLine("=============");
+            Console.WriteLine(this.symbolTable.ToDebugString());
 
             // Check all the operations are valid
             /*this.checker.Visit(ast);

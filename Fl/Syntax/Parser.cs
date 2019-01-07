@@ -696,7 +696,7 @@ namespace Fl.Syntax
             if (this.Match(TokenType.If))
                 return this.IfStatement();
 
-            if (this.Match(TokenType.LeftBrace) && !this.IsObjectExpression())
+            if (this.Match(TokenType.LeftBrace))
                 return this.Block();
 
             if (this.Match(TokenType.While))
@@ -1627,7 +1627,7 @@ namespace Fl.Syntax
         private bool IsObjectExpression()
         {
             return this.Match(TokenType.LeftBrace) 
-                && (this.MatchFrom(1, TokenType.Mutable, TokenType.Identifier, TokenType.Colon)
+                && (this.MatchFrom(1, TokenType.RightBrace) || this.MatchFrom(1, TokenType.Mutable, TokenType.Identifier, TokenType.Colon)
                     || this.MatchFrom(1, TokenType.Identifier, TokenType.Colon));
         }
 

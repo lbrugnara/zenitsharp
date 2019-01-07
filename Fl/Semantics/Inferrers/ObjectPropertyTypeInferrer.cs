@@ -12,6 +12,7 @@ namespace Fl.Semantics.Inferrers
         {
             var inferredType = visitor.Visit(node.Value);
             inferredType.Symbol = visitor.SymbolTable.GetSymbol(node.Name.Value);
+            inferredType.Symbol.TypeInfo = inferredType.TypeInfo;
             return inferredType;
         }
     }

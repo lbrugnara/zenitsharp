@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Fl.Semantics.Exceptions;
 using Fl.Semantics.Types;
 using Fl.Syntax;
@@ -202,6 +203,17 @@ namespace Fl.Semantics.Symbols
             }
 
             throw new SymbolException(string.Join("\n", errors));
+        }
+
+        public string ToDebugString()
+        {
+            var sb = new StringBuilder();
+
+            sb.AppendLine("[Symbol Table]");
+
+            sb.AppendLine(this.Global.ToDebugString(1));
+
+            return sb.ToString();
         }
     }
 }

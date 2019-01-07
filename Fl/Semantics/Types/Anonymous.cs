@@ -40,10 +40,10 @@ namespace Fl.Semantics.Types
             var members = new List<string>();
 
             foreach (var kvp in this.Properties)
-                members.Add($"{kvp.Key} : {kvp.Value}");
+                members.Add($"{kvp.Key}: {kvp.Value}");
 
             foreach (var kvp in this.Functions)
-                members.Add($"{kvp.Key} : {kvp.Value}");
+                members.Add($"{kvp.Key}: {kvp.Value}");
 
             assignedName += string.Join(", ", members);
 

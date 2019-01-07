@@ -1,8 +1,7 @@
 Type system
 ===========
 
-The root type is called `object` and it represents the top-level type. The next level in the hierarchy contains the `primitive` types, the `complex` types, the `anonymous` types, and the special type `void`. The third level contains the children of both `primitive` and `complex` types. `primitive`'s children include `char`, `bool`, `int`, `float`, `double`, `decimal`, and `string`. On the `complex` side we have `func`, `tuple`, `class`, and `error`.
-`void` is a special type used for functions that do not return a value. It can't be used in variable or parameter definition. It is just visible to the compiler.
+The root type is called `object` and it represents the top-level type. The next level in the hierarchy contains the `primitive` types, the `complex` types, the `anonymous` types, and the special type `void`. `void` is a special type used for functions that do not return a value. It can't be used in variable or parameter definition. It is just visible to the compiler. The third level contains the children of both `primitive` and `complex` types. `primitive`'s children include `char`, `bool`, `int`, `float`, `double`, `decimal`, and `string`. On the `complex` side we have `func`, `tuple`, `class`, and `error`.
 
 ```
 object

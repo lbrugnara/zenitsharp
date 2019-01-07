@@ -5,6 +5,7 @@ using Fl.Semantics.Exceptions;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace Fl.Semantics.Symbols
 {
@@ -325,5 +326,32 @@ namespace Fl.Semantics.Symbols
                     :*/ null;
 
         #endregion
+
+        public string ToDebugString(int indent = 0)
+        {
+            int titleIndentN = indent + 1;
+            int memberIndentN = indent + 2;
+
+            var sb = new StringBuilder();
+
+            // Title
+            var nameIndent = "".PadLeft(indent);
+            sb.AppendLine($"{nameIndent}[{this.Type} '{this.Uid}']");
+
+            // Symbols
+            var memberIndent = "".PadLeft(titleIndentN);
+            sb.AppendLine($"{memberIndent}[Symbols]");
+
+            var symbolIndent = "".PadLeft(memberIndentN);
+            foreach (var symbol in this.GetAllSymbols())
+                sb.AppendLine($"{symbolIndent}{symbol}");
+
+            // Children Scopes
+            sb.AppendLine($"{memberIndent}[Children]");
+            foreach (var scope in this.Children)
+                sb.AppendLine(scope.Value.ToDebugString(memberIndentN));
+
+            return sb.ToString();
+        }
     }
 }
