@@ -3,6 +3,7 @@
 
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
@@ -12,6 +13,8 @@ namespace Fl.Semantics.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, ObjectNode node)
         {
             visitor.SymbolTable.EnterObjectScope($"obj-{node.Uid}");
+
+            ISymbolContainer self = visitor.SymbolTable.CurrentScope;
 
             var typeInfo = visitor.Inferrer.NewAnonymousType();
             var type = typeInfo.Type;
@@ -31,7 +34,7 @@ namespace Fl.Semantics.Inferrers
 
             visitor.SymbolTable.LeaveScope();
 
-            return new InferredType(typeInfo, visitor.SymbolTable.CurrentScope);
+            return new InferredType(typeInfo, self as IComplexSymbol);
         }
     }
 }

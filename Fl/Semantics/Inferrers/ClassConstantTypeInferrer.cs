@@ -10,7 +10,7 @@ namespace Fl.Semantics.Inferrers
         public InferredType Visit(TypeInferrerVisitor inferrer, ClassConstantNode node)
         {
             // Get the constant symbol
-            var constant = inferrer.SymbolTable.GetSymbol(node.Name.Value);
+            var constant = inferrer.SymbolTable.Lookup(node.Name.Value);
 
             // Get the inferred type of the right-hand side expression and make the conclusions
             var defInferredType = node.Definition.Visit(inferrer);

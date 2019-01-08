@@ -39,11 +39,11 @@ namespace Fl.Semantics.Resolvers
                 var variableName = definition.Left.Value;
 
                 // Check if the symbol is already defined
-                if (binder.SymbolTable.HasSymbol(variableName))
+                if (binder.SymbolTable.Contains(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // Create the new symbol for the variable
-                var symbol = binder.SymbolTable.CreateSymbol(variableName, typeInfo, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability));
+                var symbol = binder.SymbolTable.Insert(variableName, typeInfo, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability));
 
                 // If it is a variable definition, visit the right-hand side expression
                 definition.Right?.Visit(binder);
@@ -63,7 +63,7 @@ namespace Fl.Semantics.Resolvers
                 var variableName = declaration.Value;
 
                 // Check if the symbol is already defined
-                if (visitor.SymbolTable.HasSymbol(variableName))
+                if (visitor.SymbolTable.Contains(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // If the type anotation is not specific (uses 'var'), we need to create an anonymous type
@@ -73,7 +73,7 @@ namespace Fl.Semantics.Resolvers
                     : SymbolHelper.GetTypeInfo(visitor.SymbolTable, visitor.Inferrer, destrnode.Information.Type);
 
                 // Create the new symbol for the variable
-                var symbol = visitor.SymbolTable.CreateSymbol(variableName, varType, Access.Public, SymbolHelper.GetStorage(destrnode.Information.Mutability));
+                var symbol = visitor.SymbolTable.Insert(variableName, varType, Access.Public, SymbolHelper.GetStorage(destrnode.Information.Mutability));
             }
         }
     }

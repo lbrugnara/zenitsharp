@@ -11,33 +11,33 @@ using Fl.Syntax;
 
 namespace Fl.Semantics.Symbols
 {
-    public class SymbolTable : ISymbolContainer
+    public class SymbolTable : ISymbolTable
     {
         /// <summary>
         /// Keep track of the scope chain
         /// </summary>
-        private readonly Stack<SymbolContainer> scopes;
+        private readonly Stack<ISymbolContainer> scopes;
 
         private readonly Dictionary<string, List<Token>> unresolved;
 
         public SymbolTable()
         {
-            this.scopes = new Stack<SymbolContainer>();
+            this.scopes = new Stack<ISymbolContainer>();
 
             // Create the initial scope (Global)
-            this.scopes.Push(new BlockSymbolContainer("@global"));
+            this.scopes.Push(new Block("@global"));
             this.unresolved = new Dictionary<string, List<Token>>();
         }
 
         /// <summary>
         /// Global scope is the first created (last in the stack) scope
         /// </summary>
-        private SymbolContainer Global => this.scopes.Last();
+        private ISymbolContainer Global => this.scopes.Last();
 
         /// <summary>
         /// Current scope is the latest added one
         /// </summary>
-        public SymbolContainer CurrentScope => this.scopes.Peek();
+        public ISymbolContainer CurrentScope => this.scopes.Peek();
 
         /// <summary>
         /// Check if there's a child scope in the current scope with the provided UID.
@@ -46,9 +46,9 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="type">Type of the scope to get/create</param>
         /// <param name="name">ID of the scope to get/create</param>
-        public SymbolContainer EnterBlockScope(string name)
+        public Block EnterBlockScope(string name)
         {
-            return this.EnterScope<BlockSymbolContainer>(name, this.scopes.Peek());
+            return this.EnterBlockScope<Block>(name, this.scopes.Peek());
         }
 
         /// <summary>
@@ -58,62 +58,88 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="type">Type of the scope to get/create</param>
         /// <param name="name">ID of the scope to get/create</param>
-        public LoopSymbolContainer EnterLoopScope(string name)
+        public Loop EnterLoopScope(string name)
         {
-            return this.EnterScope<LoopSymbolContainer>(name, this.scopes.Peek());
+            return this.EnterBlockScope<Loop>(name, this.scopes.Peek());
+        }
+
+        private T EnterBlockScope<T>(string name, ISymbolContainer parent)
+            where T : Block
+        {
+            T scope = null;
+
+            if (parent.Contains(name))
+            {
+                scope = parent.Get<T>(name);
+                this.scopes.Push(scope);
+                return scope;
+            }
+
+            if (typeof(T) == typeof(Loop))
+                scope = new Loop(name, parent) as T;
+            else if (typeof(T) == typeof(Block))
+                scope = new Block(name, parent) as T;
+            else
+                throw new ScopeException($"Unknown scope type {typeof(T).Name}");
+
+            parent.Add(scope);
+            this.scopes.Push(scope);
+
+            return scope;
         }
 
         public FunctionSymbol EnterFunctionScope(string name)
         {
-            return this.EnterScope<FunctionSymbol>(name, this.scopes.Peek());
+            return this.EnterComplexSymbolScope<FunctionSymbol>(name, this.scopes.Peek());
         }
 
         public ObjectSymbol EnterObjectScope(string name)
         {
-            return this.EnterScope<ObjectSymbol>(name, this.scopes.Peek());
+            return this.EnterComplexSymbolScope<ObjectSymbol>(name, this.scopes.Peek());
         }
 
         public ClassSymbol EnterClassScope(string name)
         {
-            return this.EnterScope<ClassSymbol>(name, this.Global);
+            return this.EnterComplexSymbolScope<ClassSymbol>(name, this.Global);
         }
 
-        private T EnterScope<T>(string name, SymbolContainer currentScope)
-            where T : SymbolContainer
+        private T EnterComplexSymbolScope<T>(string name, ISymbolContainer parent)
+            where T : ComplexSymbol
         {
-            T targetScope = null;
+            T scope = null;
 
-            if (currentScope.HasChild(name))
+            if (parent.Contains(name))
             {
-                targetScope = currentScope.GetChild(name) as T;
-            }
+                scope = parent.Get<T>(name);
+                this.scopes.Push(scope);
+                return scope;
+            }            
+
+            if (typeof(T) == typeof(FunctionSymbol))
+                scope = new FunctionSymbol(name, parent) as T;
+            else if (typeof(T) == typeof(ObjectSymbol))
+                scope = new ObjectSymbol(name, parent) as T;
+            else if (typeof(T) == typeof(ClassSymbol))
+                scope = new ClassSymbol(name, parent) as T;
             else
-            {
-                targetScope = Activator.CreateInstance(typeof(T), name, currentScope) as T;
-                currentScope.AddChild(targetScope);
-            }
+                throw new ScopeException($"Unknown scope type {typeof(T).Name}");
 
-            this.scopes.Push(targetScope);
+            parent.Add(scope);
+            this.scopes.Push(scope);
 
-            return targetScope;
+            return scope;
         }
-        public SymbolContainer GetClassScope(string className)
+
+        public ClassSymbol GetClassScope(string className)
         {
             // TODO: Handle Package and nested classes
-            return this.Global.GetChild(className);
+            return this.Global.Get<ClassSymbol>(className);
         }
 
         public FunctionSymbol GetFunctionScope(string funcName)
         {
-            return this.CurrentScope.GetChild(funcName) as FunctionSymbol;
+            return this.CurrentScope.Get<FunctionSymbol>(funcName);
         }
-
-        /// <summary>
-        /// Enter to the function's scope, chain it to the stack of scopes, and make it the current 
-        /// executing scope
-        /// </summary>
-        /// <param name="function">Function symbol owner of the scope</param>
-        //public void EnterFunctionScope(FunctionSymbol funcsym) => this.scopes.Push(funcsym.Scope);
 
         /// <summary>
         /// Remove the current scope from the stack (go back to the current scope's parent)
@@ -127,42 +153,25 @@ namespace Fl.Semantics.Symbols
 
         #region ISymbolTable implementation
 
-        /// <inheritdoc/>
-        public void AddSymbol(Symbol symbol) 
-            => this.scopes.Peek().AddSymbol(symbol);
+        public ISymbol Insert(string name, TypeInfo type, Access access, Storage storage)
+        {
+            var symbol = new Symbol(name, type, access, storage, this.CurrentScope);
+            this.Insert(symbol);
+            return symbol;
+        }
 
         /// <inheritdoc/>
-        public Symbol CreateSymbol(string name, TypeInfo type, Access access, Storage storage) 
-            => this.scopes.Peek().CreateSymbol(name, type, access, storage);
+        public void Insert(ISymbol symbol) => this.scopes.Peek().Add(symbol);
 
         /// <inheritdoc/>
-        public bool HasSymbol(string name) => this.scopes.Peek().HasSymbol(name);
+        public bool Contains(string name) => this.scopes.Peek().Contains(name);
 
         /// <inheritdoc/>
-        public Symbol GetSymbol(string name) => this.scopes.Peek().GetSymbol(name);
+        public ISymbol Lookup(string name) => this.scopes.Peek().Get<ISymbol>(name);
 
-        public Symbol TryGetSymbol(string name) => this.scopes.Peek().TryGetSymbol(name);
+        public ISymbol TryLookup(string name) => this.scopes.Peek().Get<ISymbol>(name);
 
         #endregion
-
-        public Symbol NewClassSymbol(string className, TypeInfo clasz, Access access)
-        {
-            if (this.unresolved.ContainsKey(className))
-                this.unresolved.Remove(className);
-
-            SymbolContainer scope = this.Global;
-
-            /*if (this.CurrentScope.IsPackage)
-            {
-                // TODO: Do something with the Package
-            }
-            if (this.CurrentScope.IsClass)
-            {
-                // TODO: Do something with the Class
-            }*/
-
-            return scope.CreateSymbol(className, clasz, access, Storage.Constant);
-        }
 
         public void AddUnresolvedType(string name, Token info)
         {

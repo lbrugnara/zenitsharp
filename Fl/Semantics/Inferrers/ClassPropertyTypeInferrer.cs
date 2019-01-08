@@ -10,7 +10,7 @@ namespace Fl.Semantics.Inferrers
         public InferredType Visit(TypeInferrerVisitor inferrer, ClassPropertyNode node)
         {
             // Get the property symbol
-            var property = inferrer.SymbolTable.GetSymbol(node.Name.Value);
+            var property = inferrer.SymbolTable.Lookup(node.Name.Value);
 
             // If the right-hand side is present, get the inferred type and make the conclusions
             var defInferredType = node.Definition?.Visit(inferrer);

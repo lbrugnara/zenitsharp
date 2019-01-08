@@ -4,13 +4,7 @@
 
 namespace Fl.Semantics.Symbols
 {
-    public interface ISymbol
-    {
-        string Name { get; }
-    }
-
-
-    public interface IValueSymbol : ISymbol
+    public interface ISymbol : ISymbolTableEntry
     {
         TypeInfo TypeInfo { get; }
         Access Access { get; }

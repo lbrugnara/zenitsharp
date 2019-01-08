@@ -23,10 +23,10 @@ namespace Fl.Semantics.Resolvers
             var typeInfo = new TypeInfo(functionType);
 
             // Create the function symbol
-            var functionSymbol = new Symbol(funcdecl.Name, typeInfo, Access.Public, Storage.Constant);
+            var functionSymbol = new Symbol(funcdecl.Name, typeInfo, Access.Public, Storage.Constant, visitor.SymbolTable.CurrentScope);
 
             // Register the function's symbol in the current scope
-            visitor.SymbolTable.AddSymbol(functionSymbol);
+            visitor.SymbolTable.Insert(functionSymbol);
 
             // Change the current scope to be the function's scope
             var functionScope = visitor.SymbolTable.EnterFunctionScope(funcdecl.Name);

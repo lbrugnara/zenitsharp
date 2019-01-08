@@ -4,9 +4,9 @@
 
 namespace Fl.Semantics.Symbols
 {
-    public class LoopSymbolContainer : SymbolContainer
+    public class Loop : Block
     {
-        public LoopSymbolContainer(string name, SymbolContainer parent)
+        public Loop(string name, ISymbolContainer parent)
             : base(name, parent)
         {
         }

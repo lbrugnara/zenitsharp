@@ -14,7 +14,7 @@ namespace Fl.Semantics.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, FunctionNode funcdecl)
         {
             // Get the function symbol
-            var functionSymbol = visitor.SymbolTable.GetSymbol(funcdecl.Name);
+            var functionSymbol = visitor.SymbolTable.Lookup(funcdecl.Name);
 
             // Get the function's type we may update at this step
             Function functionType = functionSymbol.TypeInfo.Type as Function;

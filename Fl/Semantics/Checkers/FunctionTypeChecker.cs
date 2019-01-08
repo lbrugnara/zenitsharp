@@ -15,7 +15,7 @@ namespace Fl.Semantics.Checkers
         {
             // We just need to enter to the function's scope and run the type-checker through the
             // function's body
-            var funcsym = checker.SymbolTable.GetSymbol(funcdecl.Name);
+            var funcsym = checker.SymbolTable.Lookup(funcdecl.Name);
 
             checker.SymbolTable.EnterFunctionScope(funcdecl.Name);
 

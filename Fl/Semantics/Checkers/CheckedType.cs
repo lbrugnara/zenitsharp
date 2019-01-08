@@ -9,9 +9,9 @@ namespace Fl.Semantics.Checkers
     public class CheckedType
     {
         public TypeInfo TypeInfo { get; set; }
-        public Symbol Symbol { get; set; }
+        public ISymbol Symbol { get; set; }
 
-        public CheckedType(TypeInfo type, Symbol symbol = null)
+        public CheckedType(TypeInfo type, ISymbol symbol = null)
         {
             this.TypeInfo = type;
             this.Symbol = symbol;

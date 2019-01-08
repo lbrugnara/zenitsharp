@@ -19,7 +19,7 @@ namespace Fl.Semantics.Inferrers
 
             inferrer.SymbolTable.LeaveScope();
 
-            return new InferredType(inferrer.SymbolTable.GetSymbol(node.Name.Value).TypeInfo);
+            return new InferredType(inferrer.SymbolTable.Lookup(node.Name.Value).TypeInfo);
         }
     }
 }

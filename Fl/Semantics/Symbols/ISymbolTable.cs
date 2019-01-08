@@ -1,16 +1,27 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Symbols
 {
-    public interface ISymbolContainer : ISymbolTableEntry
+    public interface ISymbolTable
     {
         /// <summary>
         /// Adds symbol to this SymbolTable
         /// </summary>
         /// <param name="symbol"></param>
-        void Add<T>(T symbol) where T : ISymbolTableEntry;
+        void Insert(ISymbol symbol);
+
+        /// <summary>
+        /// Creates and inserts into the symbol table a new Symbol
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
+        /// <param name="access"></param>
+        /// <param name="storage"></param>
+        /// <returns></returns>
+        ISymbol Insert(string name, TypeInfo type, Access access, Storage storage);
 
         /// <summary>
         /// Return true if a symbol with that name exists in the
@@ -26,7 +37,7 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
-        T Get<T>(string name) where T : ISymbolTableEntry;
+        ISymbol Lookup(string name);
 
         /// <summary>
         /// Return a symbol with the provided name. It returns null
@@ -34,6 +45,6 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
-        T TryGet<T>(string name) where T : ISymbolTableEntry;
+        ISymbol TryLookup(string name);
     }
 }

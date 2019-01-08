@@ -8,9 +8,9 @@ namespace Fl.Semantics.Mutability
 {
     public class MutabilityCheckResult
     {
-        public Symbol Symbol { get; set; }
+        public ISymbol Symbol { get; set; }
 
-        public MutabilityCheckResult(Symbol symbol)
+        public MutabilityCheckResult(ISymbol symbol)
         {
             this.Symbol = symbol;
         }

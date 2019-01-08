@@ -10,10 +10,13 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, ObjectPropertyNode node)
         {
-            var inferredType = visitor.Visit(node.Value);
-            inferredType.Symbol = visitor.SymbolTable.GetSymbol(node.Name.Value);
-            inferredType.Symbol.TypeInfo = inferredType.TypeInfo;
-            return inferredType;
+            var rightType = visitor.Visit(node.Value);
+
+            var property = visitor.SymbolTable.Lookup(node.Name.Value);
+
+            visitor.Inferrer.Unify(property.TypeInfo, rightType.TypeInfo);
+
+            return new InferredType(property.TypeInfo, property);
         }
     }
 }

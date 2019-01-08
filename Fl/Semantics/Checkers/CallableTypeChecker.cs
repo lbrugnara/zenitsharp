@@ -18,7 +18,7 @@ namespace Fl.Semantics.Checkers
 
             for (var i=0; i < node.Arguments.Expressions.Count; i++)
             {
-                var parameter = targetFuncScope.GetSymbol(targetFuncScope.Parameters[i]);
+                var parameter = targetFuncScope.Get<ISymbol>(targetFuncScope.Parameters[i]);
                 var argument = node.Arguments.Expressions[i];
 
                 var argCheckedType = argument.Visit(checker);

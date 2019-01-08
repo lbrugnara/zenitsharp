@@ -25,7 +25,7 @@ namespace Fl.Semantics.Resolvers
                 var constantName = definition.Left.Value;
 
                 // Create the new symbol
-                var symbol = binder.SymbolTable.CreateSymbol(constantName, typeInfo, Access.Public, Storage.Constant);
+                var symbol = binder.SymbolTable.Insert(constantName, typeInfo, Access.Public, Storage.Constant);
 
                 // Get the right-hand side operand (a must for a constant)
                 definition.Right.Visit(binder);

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-
 namespace Fl.Semantics.Symbols
 {
     public class Symbol : ISymbol
@@ -24,19 +23,20 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Symbol's storage type
         /// </summary>
-        public Storage Storage { get; set; }
+        public Storage Storage { get; private set; }
 
-        public Symbol(string name, TypeInfo type, Access access, Storage storage)
+        /// <summary>
+        /// If present, reference to the parent scope
+        /// </summary>
+        public ISymbolContainer Parent { get; private set; }
+
+        public Symbol(string name, TypeInfo type, Access access, Storage storage, ISymbolContainer parent)
         {
             this.Name = name;
             this.TypeInfo = type;
             this.Access = access;
             this.Storage = storage;
-        }
-
-        protected Symbol(string name)
-        {
-            this.Name = name;
+            this.Parent = parent;
         }
 
         public override string ToString()

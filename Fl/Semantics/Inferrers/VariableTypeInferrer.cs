@@ -30,7 +30,7 @@ namespace Fl.Semantics.Inferrers
             foreach (var definition in vardecl.Definitions)
             {
                 // Symbol should be already resolved here
-                var leftSymbol = visitor.SymbolTable.GetSymbol(definition.Left.Value);
+                var leftSymbol = visitor.SymbolTable.Lookup(definition.Left.Value);
 
                 // Get the inferred type
                 if (inferredType == null)
@@ -66,7 +66,7 @@ namespace Fl.Semantics.Inferrers
                     continue;
 
                 // Symbol should be already resolved here
-                var lhs = visitor.SymbolTable.GetSymbol(declaration.Value);
+                var lhs = visitor.SymbolTable.Lookup(declaration.Value);
 
                 // If it is a variable definition, get the right-hand side type info
                 var rhsType = (inferredType.TypeInfo.Type as Tuple).Types[i];

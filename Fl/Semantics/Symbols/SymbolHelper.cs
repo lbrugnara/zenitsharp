@@ -79,9 +79,9 @@ namespace Fl.Semantics.Types
                 if (token.Value == "func" || token.Value == "tuple")
                     return inferrer?.NewAnonymousType();
 
-                if (symtable.HasSymbol(token.Value))
+                if (symtable.Contains(token.Value))
                 {
-                    var typeInfo = symtable.GetSymbol(token.Value).TypeInfo;
+                    var typeInfo = symtable.Lookup(token.Value).TypeInfo;
                     if (typeInfo.Type is Class ctype)
                         return new TypeInfo(new ClassInstance(ctype));
                     return typeInfo;

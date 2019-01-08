@@ -13,7 +13,7 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, ClassMethodNode method)
         {
-            var methodSymbol = checker.SymbolTable.GetSymbol(method.Name);
+            var methodSymbol = checker.SymbolTable.Lookup(method.Name);
 
             checker.SymbolTable.EnterFunctionScope(method.Name);
 

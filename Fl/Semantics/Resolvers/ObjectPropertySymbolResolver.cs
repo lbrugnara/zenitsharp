@@ -10,7 +10,7 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor visitor, ObjectPropertyNode node)
         {
-            visitor.SymbolTable.CreateSymbol(
+            visitor.SymbolTable.Insert(
                 node.Name.Value,
                 SymbolHelper.GetTypeInfo(visitor.SymbolTable, visitor.Inferrer, node.Information.Type),
                 Symbols.Access.Public,
