@@ -9,10 +9,13 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor visitor, ObjectNode node)
         {
-            visitor.SymbolTable.EnterObjectScope($"obj-{node.Uid}");
+            // Create a new ObjectSymbol and enter to the scope
+            visitor.SymbolTable.EnterObjectScope(node.Uid);
 
+            // Visit each object's property
             node.Properties.ForEach(p => visitor.Visit(p));
 
+            // Leave the object's scope
             visitor.SymbolTable.LeaveScope();
         }
     }

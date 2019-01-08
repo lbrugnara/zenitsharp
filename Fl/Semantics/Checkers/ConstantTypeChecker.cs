@@ -17,7 +17,7 @@ namespace Fl.Semantics.Checkers
             foreach (var definition in constdec.Definitions)
             {
                 if (lhsType == null)
-                    lhsType = new CheckedType(checker.SymbolTable.Lookup(definition.Left.Value).TypeInfo);
+                    lhsType = new CheckedType(checker.SymbolTable.Get(definition.Left.Value).TypeInfo);
 
                 // Get the right-hand side operand (a must for a constant)
                 var rhsType = definition.Right.Visit(checker);

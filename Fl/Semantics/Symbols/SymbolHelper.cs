@@ -81,7 +81,7 @@ namespace Fl.Semantics.Types
 
                 if (symtable.Contains(token.Value))
                 {
-                    var typeInfo = symtable.Lookup(token.Value).TypeInfo;
+                    var typeInfo = symtable.Get(token.Value).TypeInfo;
                     if (typeInfo.Type is Class ctype)
                         return new TypeInfo(new ClassInstance(ctype));
                     return typeInfo;

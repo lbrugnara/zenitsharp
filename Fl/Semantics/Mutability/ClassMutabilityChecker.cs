@@ -17,7 +17,7 @@ namespace Fl.Semantics.Mutability
 
             checker.SymbolTable.LeaveScope();
 
-            return new MutabilityCheckResult(checker.SymbolTable.Lookup(node.Name.Value));
+            return new MutabilityCheckResult(checker.SymbolTable.Get(node.Name.Value));
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Fl.Semantics.Checkers
             if (accessor.Parent == null)
             {
                 // Get accessed symbol that must be defined in the symtable's scope
-                symbol = checker.SymbolTable.Lookup(symbolName);
+                symbol = checker.SymbolTable.Get(symbolName);
 
                 var type = symbol.TypeInfo;
 
@@ -36,7 +36,7 @@ namespace Fl.Semantics.Checkers
             // the symbol within the enclosing scope
             if (encsym is ISymbolTable)
             {
-                symbol = (encsym as ISymbolTable).Lookup(symbolName);
+                symbol = (encsym as ISymbolTable).Get(symbolName);
                 return new CheckedType(symbol.TypeInfo, symbol);
             }
 
@@ -57,7 +57,7 @@ namespace Fl.Semantics.Checkers
             if (encsym.TypeInfo.Type is ClassInstance classInstance)
                 // Find the Class scope
                 symtable = checker.SymbolTable.GetClassScope(classInstance.Class.ClassName);
-            else if (checker.SymbolTable.TryLookup(encsym.TypeInfo.Type.Name)?.TypeInfo.Type is Class)
+            else if (checker.SymbolTable.TryGet(encsym.TypeInfo.Type.Name)?.TypeInfo.Type is Class)
                 symtable = checker.SymbolTable.GetClassScope(encsym.TypeInfo.Type.Name);
             else
                 throw new SymbolException($"Unhandled accessor type {encsym}");

@@ -19,7 +19,7 @@ namespace Fl.Semantics.Mutability
 
             checker.SymbolTable.LeaveScope();
 
-            return new MutabilityCheckResult(checker.SymbolTable.Lookup(funcdecl.Name));
+            return new MutabilityCheckResult(checker.SymbolTable.Get(funcdecl.Name));
         }
     }
 }

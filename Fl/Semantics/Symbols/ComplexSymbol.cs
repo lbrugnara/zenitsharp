@@ -31,7 +31,7 @@ namespace Fl.Semantics.Symbols
 
         #region ISymbolContainer implementation
 
-        public void Add<T>(T symbol)
+        public void Insert<T>(T symbol)
             where T : ISymbolTableEntry
         {
             if (this.Symbols.ContainsKey(symbol.Name))
@@ -79,7 +79,7 @@ namespace Fl.Semantics.Symbols
 
             // Title
             var nameIndent = "".PadLeft(indent);
-            sb.AppendLine($"{nameIndent}[{this.GetType().Name.Replace("SymbolContainer", "")} '{this.Name}']");
+            sb.AppendLine($"{nameIndent}[{this.Name}: {this.TypeInfo}]");
 
             // Symbols
             /*var memberIndent = "".PadLeft(titleIndentN);

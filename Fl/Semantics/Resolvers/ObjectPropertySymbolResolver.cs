@@ -10,6 +10,7 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor visitor, ObjectPropertyNode node)
         {
+            // Create the symbol for the object's property
             visitor.SymbolTable.Insert(
                 node.Name.Value,
                 SymbolHelper.GetTypeInfo(visitor.SymbolTable, visitor.Inferrer, node.Information.Type),
@@ -17,6 +18,7 @@ namespace Fl.Semantics.Resolvers
                 SymbolHelper.GetStorage(node.Information.Mutability)
             );
 
+            // Visit the property's value node
             visitor.Visit(node.Value);
         }
     }

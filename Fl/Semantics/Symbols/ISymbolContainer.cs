@@ -10,7 +10,7 @@ namespace Fl.Semantics.Symbols
         /// Adds symbol to this SymbolTable
         /// </summary>
         /// <param name="symbol"></param>
-        void Add<T>(T symbol) where T : ISymbolTableEntry;
+        void Insert<T>(T symbol) where T : ISymbolTableEntry;
 
         /// <summary>
         /// Return true if a symbol with that name exists in the

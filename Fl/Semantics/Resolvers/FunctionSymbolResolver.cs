@@ -11,19 +11,8 @@ namespace Fl.Semantics.Resolvers
     {
         public void Visit(SymbolResolverVisitor visitor, FunctionNode funcdecl)
         {
-            // There are 3 components in the function definition:
-            //  Function's type: It is the concrete type that we need to "build" while resolving the symbol. It contains structural information of the function
-            //  Function's symbol: Represents the binding of the function to the current scope
-            //  Function's scope: Track the function's symbols on its own scope
-            // The symbol and the type are related and saved in the current scope while the FunctionScope is a nested scope in the symbol table
-
-            // Create the new function type
-            var functionType = new Function();
-
-            var typeInfo = new TypeInfo(functionType);
-
             // Create the function symbol
-            var functionSymbol = new Symbol(funcdecl.Name, typeInfo, Access.Public, Storage.Constant, visitor.SymbolTable.CurrentScope);
+            var functionSymbol = new FunctionSymbol(funcdecl.Name, visitor.SymbolTable.CurrentScope);
 
             // Register the function's symbol in the current scope
             visitor.SymbolTable.Insert(functionSymbol);
@@ -33,17 +22,16 @@ namespace Fl.Semantics.Resolvers
 
             // Process the parameters
             funcdecl.Parameters.ForEach(parameter => {
-                // Define the symbol in the function's scope
+                // If the parameter's type is present use it, if not use an anonymous type
                 var paramTypeInfo = parameter.SymbolInfo.Type == null
                             ? visitor.Inferrer.NewAnonymousType()
                             : new TypeInfo(SymbolHelper.GetType(visitor.SymbolTable, parameter.SymbolInfo.Type));
 
-                // Update the function's type (with parameter type)
-                functionType.DefineParameterType(paramTypeInfo.Type);
-
-                // Update function's scope with the parameter definition
+                // Check if the parameter has storage modifiers
                 var storage = SymbolHelper.GetStorage(parameter.SymbolInfo.Mutability);
-                var symbol = functionScope.CreateParameter(parameter.Name.Value, paramTypeInfo, Access.Public, storage);
+
+                // Create the parameter symbol in the function's scope
+                functionScope.CreateParameter(parameter.Name.Value, paramTypeInfo, storage);
             });
 
             // Visit the function's body

@@ -23,7 +23,7 @@ namespace Fl.Semantics.Symbols
         public Symbol CreateProperty(string name, TypeInfo type, Access access, Storage storage)
         {
             var symbol = new Symbol(name, type, access, storage, this);
-            this.Add(symbol);
+            this.Insert(symbol);
             this.Properties.Add(symbol.Name);
             return symbol;
         }
@@ -31,7 +31,7 @@ namespace Fl.Semantics.Symbols
         public Symbol CreateConstant(string name, TypeInfo type, Access access)
         {
             var symbol = new Symbol(name, type, access, Storage.Constant, this);
-            this.Add(symbol);
+            this.Insert(symbol);
             this.Constants.Add(symbol.Name);
             return symbol;
         }
@@ -39,7 +39,7 @@ namespace Fl.Semantics.Symbols
         public Symbol CreateMethod(string name, TypeInfo type, Access access)
         {
             var symbol = new FunctionSymbol(name, this);
-            this.Add(symbol);
+            this.Insert(symbol);
             this.Methods.Add(symbol.Name);
             return symbol;
         }

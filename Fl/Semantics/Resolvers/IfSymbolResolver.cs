@@ -15,7 +15,7 @@ namespace Fl.Semantics.Resolvers
             ifnode.Condition.Visit(visitor);            
             
             // Add a new common block for the if's boyd
-            visitor.SymbolTable.EnterBlockScope($"{ifnode.Uid}");
+            visitor.SymbolTable.EnterBlockScope(ifnode.Uid);
 
             // Generate the if's body
             ifnode.Then?.Visit(visitor);
@@ -26,7 +26,7 @@ namespace Fl.Semantics.Resolvers
             if (ifnode.Else != null)
             {
                 // Enter to the Else's scope
-                visitor.SymbolTable.EnterBlockScope($"{ifnode.Uid}");
+                visitor.SymbolTable.EnterBlockScope(ifnode.Uid);
 
                 // Visit the else
                 ifnode.Else.Visit(visitor);

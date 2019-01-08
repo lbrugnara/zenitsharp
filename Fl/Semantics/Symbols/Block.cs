@@ -47,7 +47,7 @@ namespace Fl.Semantics.Symbols
 
         #region ISymbolContainer implementation
 
-        public void Add<T>(T symbol)
+        public void Insert<T>(T symbol)
             where T : ISymbolTableEntry
         {
             if (this.Symbols.ContainsKey(symbol.Name))

@@ -9,37 +9,44 @@ namespace Fl.Semantics.Symbols
     public class FunctionSymbol : ComplexSymbol
     {
         public List<string> Parameters { get; set; }
+        public Symbol ReturnSymbol { get; private set; }
 
-        public FunctionSymbol(string name, ISymbolContainer parent = null)
-            : base (name, parent)
+        public FunctionSymbol(string name, ISymbolContainer parent)
+            : base (name, new TypeInfo(new Function()), Access.Public, Storage.Constant, parent)
         {
             this.Parameters = new List<string>();
-            this.ReturnSymbol = new Symbol(
-                "@ret",
-                null,
-                Access.Public,
-                Storage.Mutable, 
-                this
-            );
-            this.Add(this.ReturnSymbol);
+
+            // Create the @ret symbol and save it into the function's symbol table
+            this.ReturnSymbol = new Symbol("@ret", null, Access.Public, Storage.Mutable, this);
+            this.Insert(this.ReturnSymbol);
         }
 
-        public Symbol ReturnSymbol { get; private set; }
+        public Function Type => this.TypeInfo.Type as Function;
 
         public void UpdateReturnType(TypeInfo typeInfo)
         {
+            // Update the @ret symbol's type
             this.ReturnSymbol.TypeInfo = typeInfo ?? throw new System.ArgumentNullException(nameof(typeInfo), "Return type cannot be null");
 
-            var self = this.Parent.Get<FunctionSymbol>(this.Name);
-
-            (self?.TypeInfo.Type as Function)?.SetReturnType(typeInfo.Type);
+            // Update the function's return type
+            this.Type.SetReturnType(typeInfo.Type);
         }
 
-        public Symbol CreateParameter(string name, TypeInfo typeInfo, Access access, Storage storage)
+        public Symbol CreateParameter(string name, TypeInfo typeInfo, Storage storage)
         {
-            var symbol = new Symbol(name, typeInfo, access, storage, this);
-            this.Add(symbol);
+            // Update the function's type (with parameter type)
+            this.Type.DefineParameterType(typeInfo.Type);
+
+            // Create the parameter symbol
+            var symbol = new Symbol(name, typeInfo, Access.Private, storage, this);
+            
+            // Insert it into the Function's symbol table
+            this.Insert(symbol);
+
+            // Keep track of the parameter name (and position)
             this.Parameters.Add(symbol.Name);
+
+            // Return a reference to the created symbol
             return symbol;
         }
     }

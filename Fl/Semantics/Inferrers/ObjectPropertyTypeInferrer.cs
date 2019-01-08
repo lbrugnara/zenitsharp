@@ -12,7 +12,7 @@ namespace Fl.Semantics.Inferrers
         {
             var rightType = visitor.Visit(node.Value);
 
-            var property = visitor.SymbolTable.Lookup(node.Name.Value);
+            var property = visitor.SymbolTable.Get(node.Name.Value);
 
             visitor.Inferrer.Unify(property.TypeInfo, rightType.TypeInfo);
 

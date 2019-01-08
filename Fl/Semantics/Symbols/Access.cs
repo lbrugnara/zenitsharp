@@ -8,8 +8,7 @@ namespace Fl.Semantics.Symbols
     {
         Public,
         Protected,
-        Private,
-        System
+        Private
     }
 
     public static class AccessExtensions
@@ -26,9 +25,6 @@ namespace Fl.Semantics.Symbols
 
                 case Access.Private:
                     return "private";
-
-                case Access.System:
-                    return "system";
 
                 default:
                     throw new System.Exception($"Unhandled access type {s}");

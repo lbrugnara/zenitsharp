@@ -20,7 +20,7 @@ namespace Fl.Semantics.Inferrers
             if (accessor.Parent == null)
             {
                 // Get accessed symbol that must be defined in the symtable's scope
-                symbol = inferrer.SymbolTable.Lookup(symbolName);
+                symbol = inferrer.SymbolTable.Get(symbolName);
 
                 // Return the inferred type information for this symbol
                 return new InferredType(symbol.TypeInfo, symbol);
@@ -34,7 +34,7 @@ namespace Fl.Semantics.Inferrers
             // the symbol within the enclosing scope
             if (encsym is ISymbolTable)
             {
-                symbol = (encsym as ISymbolTable).Lookup(symbolName);
+                symbol = (encsym as ISymbolTable).Get(symbolName);
                 return new InferredType(symbol.TypeInfo, symbol);
             }
 
@@ -55,7 +55,7 @@ namespace Fl.Semantics.Inferrers
             if (encsym.TypeInfo.Type is ClassInstance classInstance)
                 // Find the Class scope
                 symtable = inferrer.SymbolTable.GetClassScope(classInstance.Class.ClassName) as ISymbolContainer;
-            else if (inferrer.SymbolTable.TryLookup(encsym.TypeInfo.Type.Name)?.TypeInfo.Type is Class)
+            else if (inferrer.SymbolTable.TryGet(encsym.TypeInfo.Type.Name)?.TypeInfo.Type is Class)
                 symtable = inferrer.SymbolTable.GetClassScope(encsym.TypeInfo.Type.Name) as ISymbolContainer;
             else
                 throw new SymbolException($"Unhandled accessor type {encsym}");

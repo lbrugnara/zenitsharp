@@ -12,12 +12,8 @@ namespace Fl.Semantics.Inferrers
     {
         public InferredType Visit(TypeInferrerVisitor visitor, ObjectNode node)
         {
-            visitor.SymbolTable.EnterObjectScope($"obj-{node.Uid}");
-
-            ISymbolContainer self = visitor.SymbolTable.CurrentScope;
-
-            var typeInfo = visitor.Inferrer.NewAnonymousType();
-            var type = typeInfo.Type;
+            var self = visitor.SymbolTable.EnterObjectScope(node.Uid);
+            var type = self.TypeInfo.Type;
 
             node.Properties.ForEach(p => {
                 var propertyInfo = visitor.Visit(p);
@@ -34,7 +30,7 @@ namespace Fl.Semantics.Inferrers
 
             visitor.SymbolTable.LeaveScope();
 
-            return new InferredType(typeInfo, self as IComplexSymbol);
+            return new InferredType(self.TypeInfo, self);
         }
     }
 }

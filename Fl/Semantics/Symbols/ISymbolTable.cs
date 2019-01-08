@@ -37,7 +37,7 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
-        ISymbol Lookup(string name);
+        ISymbol Get(string name);
 
         /// <summary>
         /// Return a symbol with the provided name. It returns null
@@ -45,6 +45,6 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
-        ISymbol TryLookup(string name);
+        ISymbol TryGet(string name);
     }
 }

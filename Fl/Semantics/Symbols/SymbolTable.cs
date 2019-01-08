@@ -75,7 +75,7 @@ namespace Fl.Semantics.Symbols
             else
                 throw new ScopeException($"Unknown scope type {typeof(T).Name}");
 
-            parent.Add(scope);
+            parent.Insert(scope);
             this.CurrentScope = scope;
             return scope;
         }
@@ -116,7 +116,7 @@ namespace Fl.Semantics.Symbols
             else
                 throw new ScopeException($"Unknown scope type {typeof(T).Name}");
 
-            parent.Add(scope);
+            parent.Insert(scope);
             this.CurrentScope = scope;
 
             return scope;
@@ -159,15 +159,15 @@ namespace Fl.Semantics.Symbols
         }
 
         /// <inheritdoc/>
-        public void Insert(ISymbol symbol) => this.CurrentScope.Add(symbol);
+        public void Insert(ISymbol symbol) => this.CurrentScope.Insert(symbol);
 
         /// <inheritdoc/>
         public bool Contains(string name) => this.CurrentScope.Contains(name);
 
         /// <inheritdoc/>
-        public ISymbol Lookup(string name) => this.CurrentScope.Get<ISymbol>(name);
+        public ISymbol Get(string name) => this.CurrentScope.Get<ISymbol>(name);
 
-        public ISymbol TryLookup(string name) => this.CurrentScope.Get<ISymbol>(name);
+        public ISymbol TryGet(string name) => this.CurrentScope.Get<ISymbol>(name);
 
         #endregion
 

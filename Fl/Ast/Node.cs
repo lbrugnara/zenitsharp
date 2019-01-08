@@ -15,6 +15,6 @@ namespace Fl.Ast
             walker.Visit(this);
         }
 
-        public virtual string Uid => $"@{this.GetType().Name}-{this.GetHashCode()}";
+        public virtual string Uid => $"@{this.GetType().Name.Replace("Node", "").ToLower()}{this.GetHashCode()}";
     }
 }

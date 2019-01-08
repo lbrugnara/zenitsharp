@@ -27,7 +27,7 @@ namespace Fl.Semantics.Checkers
             foreach (var definition in vardecl.Definitions)
             {
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.Lookup(definition.Left.Value).TypeInfo;
+                var lhsType = checker.SymbolTable.Get(definition.Left.Value).TypeInfo;
 
                 // If it is a variable definition, get the right-hand side type info
                 var rhs = definition.Right?.Visit(checker);
@@ -51,7 +51,7 @@ namespace Fl.Semantics.Checkers
                     continue;
 
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.Lookup(declaration.Value).TypeInfo;
+                var lhsType = checker.SymbolTable.Get(declaration.Value).TypeInfo;
                 var rhsType = (initType.TypeInfo.Type as Tuple).Types[i];
 
                 // When lhs is "var", take the type from the right hand side expression, or throw if it is not available
