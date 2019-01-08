@@ -41,7 +41,14 @@ namespace Fl.Semantics.Symbols
 
         public override string ToString()
         {
-            return $"{this.Access.ToKeyword()} {this.Storage.ToKeyword()} {this.Name}: {this.TypeInfo}";
+            var str = this.Access.ToKeyword();
+
+            if (this.Storage != Storage.Immutable)
+                str += $" {this.Storage.ToKeyword()}";
+
+            str += $" {this.Name}: {this.TypeInfo}";
+
+            return str;
         }
 
         public virtual string ToDebugString(int indent = 0)

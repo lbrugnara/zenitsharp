@@ -14,30 +14,23 @@ namespace Fl.Semantics.Symbols
     public class SymbolTable : ISymbolTable
     {
         /// <summary>
-        /// Keep track of the scope chain
+        /// Global scope is the first created (last in the stack) scope
         /// </summary>
-        private readonly Stack<ISymbolContainer> scopes;
+        private ISymbolContainer Global { get; set; }
+
+        /// <summary>
+        /// Current scope is the latest added one
+        /// </summary>
+        public ISymbolContainer CurrentScope { get; private set; }
 
         private readonly Dictionary<string, List<Token>> unresolved;
 
         public SymbolTable()
         {
-            this.scopes = new Stack<ISymbolContainer>();
-
-            // Create the initial scope (Global)
-            this.scopes.Push(new Block("@global"));
+            // Create the @global scope and set it as the current scope
+            this.Global = this.CurrentScope = new Block("@global");
             this.unresolved = new Dictionary<string, List<Token>>();
         }
-
-        /// <summary>
-        /// Global scope is the first created (last in the stack) scope
-        /// </summary>
-        private ISymbolContainer Global => this.scopes.Last();
-
-        /// <summary>
-        /// Current scope is the latest added one
-        /// </summary>
-        public ISymbolContainer CurrentScope => this.scopes.Peek();
 
         /// <summary>
         /// Check if there's a child scope in the current scope with the provided UID.
@@ -48,7 +41,7 @@ namespace Fl.Semantics.Symbols
         /// <param name="name">ID of the scope to get/create</param>
         public Block EnterBlockScope(string name)
         {
-            return this.EnterBlockScope<Block>(name, this.scopes.Peek());
+            return this.EnterBlockScope<Block>(name, this.CurrentScope);
         }
 
         /// <summary>
@@ -60,7 +53,7 @@ namespace Fl.Semantics.Symbols
         /// <param name="name">ID of the scope to get/create</param>
         public Loop EnterLoopScope(string name)
         {
-            return this.EnterBlockScope<Loop>(name, this.scopes.Peek());
+            return this.EnterBlockScope<Loop>(name, this.CurrentScope);
         }
 
         private T EnterBlockScope<T>(string name, ISymbolContainer parent)
@@ -71,7 +64,7 @@ namespace Fl.Semantics.Symbols
             if (parent.Contains(name))
             {
                 scope = parent.Get<T>(name);
-                this.scopes.Push(scope);
+                this.CurrentScope = scope;
                 return scope;
             }
 
@@ -83,19 +76,18 @@ namespace Fl.Semantics.Symbols
                 throw new ScopeException($"Unknown scope type {typeof(T).Name}");
 
             parent.Add(scope);
-            this.scopes.Push(scope);
-
+            this.CurrentScope = scope;
             return scope;
         }
 
         public FunctionSymbol EnterFunctionScope(string name)
         {
-            return this.EnterComplexSymbolScope<FunctionSymbol>(name, this.scopes.Peek());
+            return this.EnterComplexSymbolScope<FunctionSymbol>(name, this.CurrentScope);
         }
 
         public ObjectSymbol EnterObjectScope(string name)
         {
-            return this.EnterComplexSymbolScope<ObjectSymbol>(name, this.scopes.Peek());
+            return this.EnterComplexSymbolScope<ObjectSymbol>(name, this.CurrentScope);
         }
 
         public ClassSymbol EnterClassScope(string name)
@@ -111,7 +103,7 @@ namespace Fl.Semantics.Symbols
             if (parent.Contains(name))
             {
                 scope = parent.Get<T>(name);
-                this.scopes.Push(scope);
+                this.CurrentScope = scope;
                 return scope;
             }            
 
@@ -125,7 +117,7 @@ namespace Fl.Semantics.Symbols
                 throw new ScopeException($"Unknown scope type {typeof(T).Name}");
 
             parent.Add(scope);
-            this.scopes.Push(scope);
+            this.CurrentScope = scope;
 
             return scope;
         }
@@ -144,12 +136,18 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Remove the current scope from the stack (go back to the current scope's parent)
         /// </summary>
-        public void LeaveScope() => this.scopes.Pop();
+        public void LeaveScope()
+        {
+            if (this.CurrentScope.Parent == null)
+                throw new ScopeOperationException($"Scope {this.CurrentScope.Name} does not have a parent scope");
+
+            this.CurrentScope = this.CurrentScope.Parent;
+        }
 
         /// <summary>
         /// Return true if the current scope (or its parent) is a ScopeType.Function
         /// </summary>
-        public bool InFunction => this.scopes.Peek() is FunctionSymbol;
+        public bool InFunction => this.CurrentScope is FunctionSymbol;
 
         #region ISymbolTable implementation
 
@@ -161,15 +159,15 @@ namespace Fl.Semantics.Symbols
         }
 
         /// <inheritdoc/>
-        public void Insert(ISymbol symbol) => this.scopes.Peek().Add(symbol);
+        public void Insert(ISymbol symbol) => this.CurrentScope.Add(symbol);
 
         /// <inheritdoc/>
-        public bool Contains(string name) => this.scopes.Peek().Contains(name);
+        public bool Contains(string name) => this.CurrentScope.Contains(name);
 
         /// <inheritdoc/>
-        public ISymbol Lookup(string name) => this.scopes.Peek().Get<ISymbol>(name);
+        public ISymbol Lookup(string name) => this.CurrentScope.Get<ISymbol>(name);
 
-        public ISymbol TryLookup(string name) => this.scopes.Peek().Get<ISymbol>(name);
+        public ISymbol TryLookup(string name) => this.CurrentScope.Get<ISymbol>(name);
 
         #endregion
 
