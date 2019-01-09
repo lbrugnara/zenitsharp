@@ -13,8 +13,8 @@ namespace Fl.Semantics.Checkers
         {
             var nbreak = wnode.Number.Visit(checker);
 
-            if (nbreak.TypeInfo.Type != Int.Instance)
-                throw new System.Exception($"Number of breaks must be an {Int.Instance}");
+            if (nbreak.TypeInfo.Type.BuiltinType != BuiltinType.Int)
+                throw new System.Exception($"Number of breaks must be an {BuiltinType.Int.GetName()}");
 
             return nbreak;
         }

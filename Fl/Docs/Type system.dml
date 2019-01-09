@@ -6,22 +6,18 @@ The root type is called `object` and it represents the top-level type. The next 
 ```
 object
     |
-    |-- anonymous
-    |-- primitive
-    |   |-- string
-    |   |-- decimal
-    |   `-- double
-    |         `-- float
-    |             `-- int
-    |                 `-- bool
-    |                     `-- char
-    |-- complex
-    |   |-- func
-    |   |-- tuple
-    |   |-- class
-    |   `-- error
-    |
-    `-- void
+    |-- number
+    |    |-- decimal
+    |    `-- double
+    |          `-- float
+    |              `-- int
+    |                  `-- bool
+    |                      `-- char
+    |-- string
+    |-- func
+    |-- tuple
+    |-- class
+    |-- error
 
 ```
 

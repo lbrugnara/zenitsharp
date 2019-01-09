@@ -28,44 +28,45 @@ namespace Fl.Semantics.Inferrers
 
             // If the accessed member has an eclosing accessor node, visit
             // it to get the enclosing symbol's type
-            var encsym = accessor.Parent.Visit(inferrer).Symbol;
+            var parentSymbol = accessor.Parent.Visit(inferrer).Symbol;
 
-            // If the enclosing symbol implements ISymbolTable we will search for 
-            // the symbol within the enclosing scope
-            if (encsym is ISymbolTable)
+            if (parentSymbol.TypeInfo.IsStructuralType)
             {
-                symbol = (encsym as ISymbolTable).Get(symbolName);
-                return new InferredType(symbol.TypeInfo, symbol);
+                Object memberType = null;
+                if (accessor.IsCall)
+                    memberType = parentSymbol.TypeInfo.Type.Functions[symbolName];
+                else
+                    memberType = parentSymbol.TypeInfo.Type.Properties[symbolName];
+
+                return new InferredType(new TypeInfo(memberType));
             }
 
-            // If the symbol is a class, we need to get the class's scope
-            // to retrieve the class member
-            if (encsym.TypeInfo.Type is Class clasz)
+            if (parentSymbol.TypeInfo.IsPrimitiveType)
             {
-                // Find the Class scope
-                symbol = inferrer.SymbolTable.GetClassScope(encsym.Name).Get<ISymbol>(symbolName);
-                return new InferredType(symbol.TypeInfo, symbol);
+
             }
 
-            // Here we have to get the class's scope and the type must be one of the following types:
-            //  - ClassInstance type
-            //  - A native type
-            ISymbolContainer symtable = null;
+            if (parentSymbol.TypeInfo.IsAnonymousType)
+            {
+                Object memberType = null;
 
-            if (encsym.TypeInfo.Type is ClassInstance classInstance)
-                // Find the Class scope
-                symtable = inferrer.SymbolTable.GetClassScope(classInstance.Class.ClassName) as ISymbolContainer;
-            else if (inferrer.SymbolTable.TryGet(encsym.TypeInfo.Type.Name)?.TypeInfo.Type is Class)
-                symtable = inferrer.SymbolTable.GetClassScope(encsym.TypeInfo.Type.Name) as ISymbolContainer;
-            else
-                throw new SymbolException($"Unhandled accessor type {encsym}");
+                // We have constraints that need to be added to the type
+                if (accessor.IsCall)
+                {
+                    var memberFunc = new Function();
+                    memberFunc.SetReturnType(inferrer.Inferrer.NewAnonymousType().Type);
 
-            symbol = symtable.Get<ISymbol>(symbolName);
+                    memberType = parentSymbol.TypeInfo.Type.Functions[symbolName] = memberFunc;
+                }
+                else
+                {
+                    memberType = parentSymbol.TypeInfo.Type.Properties[symbolName] = inferrer.Inferrer.NewAnonymousType().Type;
+                }
 
-            // Either case, we are talking about an instance of a class or an instance of a primitive type, 
-            // because of that we need to return the type of the member, and not just the ClassProperty or ClassMethod
-            // type.
-            return new InferredType(symbol.TypeInfo, symbol);
+                return new InferredType(new TypeInfo(memberType));
+            }
+
+            throw new ScopeOperationException($"Member {symbolName} couldn't be retrieved from enclosing symbol {parentSymbol}");
         }
     }
 }

@@ -14,10 +14,7 @@ namespace Fl.Semantics.Inferrers
             var left = binary.Left.Visit(visitor);
             var right = binary.Right.Visit(visitor);
 
-            visitor.Inferrer.Unify(left.TypeInfo, right.TypeInfo);
-
-            // Make conclusions about the types if possible
-            return new InferredType(left.TypeInfo);
+            return new InferredType(visitor.Inferrer.FindMostGeneralType(left.TypeInfo, right.TypeInfo));
         }
     }
 }

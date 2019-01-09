@@ -24,17 +24,10 @@ namespace Fl.Semantics.Inferrers
 
         protected InferredType VarDefinitionNode(TypeInferrerVisitor visitor, VariableDefinitionNode vardecl)
         {
-            // Get the variable type from the declaration
-            InferredType inferredType = null;
-
             foreach (var definition in vardecl.Definitions)
             {
                 // Symbol should be already resolved here
                 var leftSymbol = visitor.SymbolTable.Get(definition.Left.Value);
-
-                // Get the inferred type
-                if (inferredType == null)
-                    inferredType = new InferredType(leftSymbol.TypeInfo);
 
                 // If the rhs is null, continue, is just a declaration
                 if (definition.Right == null)
@@ -47,11 +40,14 @@ namespace Fl.Semantics.Inferrers
                 if (leftSymbol.TypeInfo.IsAnonymousType && (rhsInferredType == null || rhsInferredType.TypeInfo == null || rhsInferredType.TypeInfo.Type == null))
                     throw new SymbolException($"Implicitly-typed variable '{leftSymbol.Name}' needs to be initialized");
 
-                // Check types to see if we can unify them
-                visitor.Inferrer.Unify(leftSymbol.TypeInfo, rhsInferredType.TypeInfo);
+                // Get the most general type that encloses both types
+                var generalType = visitor.Inferrer.FindMostGeneralType(leftSymbol.TypeInfo, rhsInferredType.TypeInfo);
+
+                // Update lhs and rhs (if present)
+                visitor.Inferrer.Unify(generalType, leftSymbol.TypeInfo, rhsInferredType.Symbol?.TypeInfo);
             }
 
-            return inferredType;
+            return null;
         }
 
         protected InferredType VarDestructuringNode(TypeInferrerVisitor visitor, VariableDestructuringNode destructuringNode)
@@ -72,7 +68,7 @@ namespace Fl.Semantics.Inferrers
                 var rhsType = (inferredType.TypeInfo.Type as Tuple).Types[i];
 
                 // Check types to see if we can unify them
-                visitor.Inferrer.Unify(lhs.TypeInfo, rhsType);
+                visitor.Inferrer.FindMostGeneralType(lhs.TypeInfo, rhsType);
             }
 
             return inferredType;

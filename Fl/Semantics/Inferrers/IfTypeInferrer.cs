@@ -14,7 +14,7 @@ namespace Fl.Semantics.Inferrers
             var conditionType = ifnode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.Unify(Bool.Instance, conditionType.TypeInfo);
+            visitor.Inferrer.ExpectsToUnifyWith(conditionType.TypeInfo, BuiltinType.Bool);
 
             // Add a new common block for the if's boyd
             visitor.SymbolTable.EnterBlockScope($"{ifnode.Uid}");

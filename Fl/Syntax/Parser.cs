@@ -1215,9 +1215,6 @@ namespace Fl.Syntax
                 return this.ConditionalExpression();
             }
 
-            if (this.IsObjectExpression())
-                return this.ObjectExpression();
-
             // Try to parse a lambda expression
             if (this.IsLambdaExpression())
                 return this.LambdaExpression();
@@ -1392,6 +1389,9 @@ namespace Fl.Syntax
         // primary_expression -> primary ( "." IDENTIFIER | "(" arguments? ")" )*
         private Node PrimaryExpression()
         {
+            if (this.IsObjectExpression())
+                return this.ObjectExpression();
+
             Token newt = null;
             if (this.Match(TokenType.New))
             {

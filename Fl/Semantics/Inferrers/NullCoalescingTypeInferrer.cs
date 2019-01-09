@@ -13,7 +13,7 @@ namespace Fl.Semantics.Inferrers
             var left = nullc.Left.Visit(visitor);
             var right = nullc.Right.Visit(visitor);
 
-            visitor.Inferrer.Unify(left.TypeInfo, right.TypeInfo);
+            visitor.Inferrer.FindMostGeneralType(left.TypeInfo, right.TypeInfo);
 
             return new InferredType(left.TypeInfo);
         }

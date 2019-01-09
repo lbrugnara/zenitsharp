@@ -12,7 +12,7 @@ namespace Fl.Semantics.Symbols
         protected List<string> Functions { get; set; }
         
         public ObjectSymbol(string name, ISymbolContainer parent = null)
-            : base(name, new TypeInfo(new Anonymous("a")), Access.Public, Storage.Constant, parent)
+            : base(name, new TypeInfo(new Object(BuiltinType.Object)), Access.Public, Storage.Constant, parent)
         {
             this.Properties = new List<string>();
             this.Functions = new List<string>();

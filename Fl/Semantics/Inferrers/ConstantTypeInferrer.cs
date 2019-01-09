@@ -23,7 +23,7 @@ namespace Fl.Semantics.Inferrers
                 // Get the right-hand side expression-s type (a must for a constant)
                 var rhs = definition.Right.Visit(visitor);
 
-                visitor.Inferrer.Unify(typeInfo, rhs.TypeInfo);
+                typeInfo = visitor.Inferrer.FindMostGeneralType(typeInfo, rhs.TypeInfo);
             }
 
             return new InferredType(typeInfo);

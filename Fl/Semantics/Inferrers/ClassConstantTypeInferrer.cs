@@ -16,7 +16,7 @@ namespace Fl.Semantics.Inferrers
             var defInferredType = node.Definition.Visit(inferrer);
 
             // Use the ClassProperty.Type type in the inference process
-            inferrer.Inferrer.Unify(constant.TypeInfo, defInferredType.TypeInfo);
+            inferrer.Inferrer.FindMostGeneralType(constant.TypeInfo, defInferredType.TypeInfo);
 
             // TODO: By now return the ClassProperty, as the result does not need to be used,
             // but if in the future we support multiple constant declaration, we need to review

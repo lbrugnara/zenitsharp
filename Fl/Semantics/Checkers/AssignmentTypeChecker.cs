@@ -24,8 +24,8 @@ namespace Fl.Semantics.Checkers
             {
                 var enc = node.Accessor.Parent.Visit(checker);
 
-                if (enc.TypeInfo.Type is Class c)
-                    throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{node.Accessor.Target.Value}'");
+                /*if (enc.TypeInfo.Type is Class c)
+                    throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{node.Accessor.Target.Value}'");*/
             }
 
             var leftHandSide = node.Accessor.Visit(checker);
@@ -63,8 +63,8 @@ namespace Fl.Semantics.Checkers
                 {
                     var enc = accessor.Parent.Visit(checker);
 
-                    if (enc.TypeInfo.Type is Class c)
-                        throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{accessor.Target.Value}'");
+                    /*if (enc.TypeInfo.Type is Class c)
+                        throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{accessor.Target.Value}'");*/
                 }
 
                 var leftHandSide = varnode.Visit(checker);

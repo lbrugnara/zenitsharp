@@ -20,8 +20,8 @@ namespace Fl.Semantics.Checkers
             // Emmit the condition code
             var conditionType = fornode.Condition.Visit(checker);
 
-            if (conditionType.TypeInfo.Type != Bool.Instance)
-                throw new System.Exception($"For condition needs a {Bool.Instance} expression");
+            if (conditionType.TypeInfo.Type.BuiltinType != BuiltinType.Bool)
+                throw new System.Exception($"For condition needs a {BuiltinType.Bool.GetName()} expression");
 
             // Emmit the body code
             fornode.Body.Visit(checker);

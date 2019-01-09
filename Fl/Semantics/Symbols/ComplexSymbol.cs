@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-
 using Fl.Semantics.Exceptions;
+using Fl.Semantics.Types;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

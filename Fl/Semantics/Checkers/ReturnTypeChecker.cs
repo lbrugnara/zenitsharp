@@ -22,7 +22,7 @@ namespace Fl.Semantics.Checkers
             // If it is an empty return statement, leave 
             if (rnode.Expression == null)
             {
-                if (returnSymbol.TypeInfo.Type != Void.Instance)
+                if (returnSymbol.TypeInfo.Type.BuiltinType != BuiltinType.Void)
                     throw new System.Exception($"Cannot return without an object of type '{returnSymbol.TypeInfo}'");
 
                 return null;
@@ -37,9 +37,9 @@ namespace Fl.Semantics.Checkers
             // The return statement expects a tuple and if that tuple contains
             // just one element, we use it as the return's type
             if ((typeInfo.Type is Tuple t) && t.Types.Count == 1)
-                typeInfo.Type = t.Types.First();
+                typeInfo.ChangeType(t.Types.First());
 
-            if (returnSymbol.TypeInfo.Type == Void.Instance)
+            if (returnSymbol.TypeInfo.Type.BuiltinType == BuiltinType.Void)
                 throw new System.Exception($"Function '{(checker.SymbolTable.CurrentScope as FunctionSymbol).Name}' returns void. Cannot return object of type '{typeInfo}'");
 
             if (!returnSymbol.TypeInfo.Type.IsAssignableFrom(typeInfo.Type))

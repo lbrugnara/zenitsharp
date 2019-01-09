@@ -20,7 +20,7 @@ namespace Fl.Helpers
                 if (this.names[i] < 25)
                 {
                     this.names[i] += 1;
-                    return string.Join("", this.names.Where(n => n > -1).Select(n => (char)('A' + n)));
+                    return string.Join("", this.names.Where(n => n > -1).Select(n => (char)('a' + n)));
                 }
                 this.names[i] = 0;
             }

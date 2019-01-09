@@ -48,7 +48,8 @@ namespace Fl.Semantics.Inferrers
                 // create the @ret symbol and assign the type
                 if (lambdaExpression.TypeInfo != null)
                 {
-                    visitor.Inferrer.Unify(lambdaExpression.TypeInfo, functionScope.ReturnSymbol.TypeInfo);
+                    var generalType = visitor.Inferrer.FindMostGeneralType(lambdaExpression.TypeInfo, functionScope.ReturnSymbol.TypeInfo);
+                    visitor.Inferrer.Unify(generalType, lambdaExpression.TypeInfo, functionScope.ReturnSymbol.TypeInfo);
 
                     // Update the function's return type with the expression type
                     functionScope.UpdateReturnType(lambdaExpression.TypeInfo);
@@ -59,12 +60,12 @@ namespace Fl.Semantics.Inferrers
                 }           
                 else
                 {
-                    visitor.Inferrer.Unify(Void.Instance, functionScope.ReturnSymbol.TypeInfo);
+                    visitor.Inferrer.ExpectsToUnifyWith(functionScope.ReturnSymbol.TypeInfo, BuiltinType.Void);
                 }
             }
-            else if (!statements.OfType<ReturnNode>().Any() && functionScope.ReturnSymbol.TypeInfo.Type != Void.Instance)
+            else if (!statements.OfType<ReturnNode>().Any() && functionScope.ReturnSymbol.TypeInfo.Type.BuiltinType != BuiltinType.Void)
             {
-                visitor.Inferrer.Unify(Void.Instance, functionScope.ReturnSymbol.TypeInfo);
+                visitor.Inferrer.ExpectsToUnifyWith(functionScope.ReturnSymbol.TypeInfo, BuiltinType.Void);
             }
 
             // If the @ret type is an assumption, register the symbol under that assumption too

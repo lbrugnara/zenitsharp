@@ -51,12 +51,12 @@ namespace Fl.Semantics.Inferrers
                 }
                 else
                 {
-                    visitor.Inferrer.Unify(Void.Instance, functionScope.ReturnSymbol.TypeInfo);
+                    visitor.Inferrer.Unify(BuiltinType.Void, functionScope.ReturnSymbol.TypeInfo);
                 }
             }
-            else if (!statements.OfType<ReturnNode>().Any() && functionScope.ReturnSymbol.TypeInfo != Void.Instance)
+            else if (!statements.OfType<ReturnNode>().Any() && functionScope.ReturnSymbol.TypeInfo != BuiltinType.Void)
             {
-                visitor.Inferrer.Unify(Void.Instance, functionScope.ReturnSymbol.TypeInfo);
+                visitor.Inferrer.Unify(BuiltinType.Void, functionScope.ReturnSymbol.TypeInfo);
             }
 
             // If the @ret type is an assumption, register the symbol under that assumption too

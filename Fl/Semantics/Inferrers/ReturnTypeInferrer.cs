@@ -23,7 +23,7 @@ namespace Fl.Semantics.Inferrers
             // If there's an empty return statement, leave here
             if (rnode.Expression == null)
             {
-                visitor.Inferrer.Unify(Void.Instance, functionScope.ReturnSymbol.TypeInfo);
+                visitor.Inferrer.ExpectsToUnifyWith(functionScope.ReturnSymbol.TypeInfo, BuiltinType.Void);
                 // again, we assume the first return's expression type is the function's return type
                 functionScope.UpdateReturnType(functionScope.ReturnSymbol.TypeInfo);
 
@@ -38,9 +38,9 @@ namespace Fl.Semantics.Inferrers
             // The return statement expects a tuple and if that tuple contains
             // just one element, we use it as the return's type
             if ((typeInfo.Type is Tuple t) && t.Types.Count == 1)
-                typeInfo.Type = t.Types.First();
+                typeInfo.ChangeType(t.Types.First());
 
-            visitor.Inferrer.Unify(typeInfo, functionScope.ReturnSymbol.TypeInfo);
+            visitor.Inferrer.FindMostGeneralType(typeInfo, functionScope.ReturnSymbol.TypeInfo);
 
             // again, we assume the first return's expression type is the function's return type
             functionScope.UpdateReturnType(typeInfo);

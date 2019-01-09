@@ -12,7 +12,7 @@ namespace Fl.Semantics.Inferrers
         public InferredType Visit(TypeInferrerVisitor visitor, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
-            visitor.SymbolTable.EnterLoopScope($"{fornode.Uid}");
+            visitor.SymbolTable.EnterLoopScope(fornode.Uid);
 
             // Initialize the for-block
             fornode.Init.Visit(visitor);
@@ -21,7 +21,7 @@ namespace Fl.Semantics.Inferrers
             var conditionType = fornode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.Unify(Bool.Instance, conditionType.TypeInfo);
+            visitor.Inferrer.ExpectsToUnifyWith(conditionType.TypeInfo, BuiltinType.Bool);
 
             // Emmit the body code
             fornode.Body.Visit(visitor);

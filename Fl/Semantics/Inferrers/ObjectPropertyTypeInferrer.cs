@@ -14,7 +14,11 @@ namespace Fl.Semantics.Inferrers
 
             var property = visitor.SymbolTable.Get(node.Name.Value);
 
-            visitor.Inferrer.Unify(property.TypeInfo, rightType.TypeInfo);
+            // Get the most general type
+            var generalType = visitor.Inferrer.FindMostGeneralType(property.TypeInfo, rightType.TypeInfo);
+            
+            // Unify the types
+            visitor.Inferrer.Unify(generalType, property.TypeInfo, rightType.TypeInfo);
 
             return new InferredType(property.TypeInfo, property);
         }

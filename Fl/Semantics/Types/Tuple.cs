@@ -6,18 +6,18 @@ using System.Linq;
 
 namespace Fl.Semantics.Types
 {
-    public class Tuple : Complex
+    public class Tuple : Object
     {
         public List<Object> Types { get; set; }
 
         private Tuple()
-            : base("tuple")
+            : base(BuiltinType.Tuple, "tuple")
         {
             this.Types = new List<Object>();
         }
 
         public Tuple(params Object[] types)
-            : base("tuple")
+            : base(BuiltinType.Tuple, "tuple")
         {
             this.Types = types?.ToList() ?? new List<Object>();
         }
@@ -49,8 +49,10 @@ namespace Fl.Semantics.Types
                 if (safeTypes.Any(st => st.type == t))
                     return safeTypes.First(st => st.type == t).safestr;
 
-                if (t is Complex stype)
-                    return stype.ToSafeString(safeTypes);
+                if (t is Tuple ttype)
+                    return ttype.ToSafeString(safeTypes);
+                else if (t is Function ftype)
+                    return ftype.ToSafeString(safeTypes);
 
                 return t.ToString() ?? "?";
             });

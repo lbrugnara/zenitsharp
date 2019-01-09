@@ -17,7 +17,7 @@ namespace Fl.Semantics.Inferrers
 
             // Use the ClassProperty.Type property in the inference
             if (defInferredType != null)
-                inferrer.Inferrer.Unify(property.TypeInfo, defInferredType.TypeInfo);
+                inferrer.Inferrer.FindMostGeneralType(property.TypeInfo, defInferredType.TypeInfo);
 
             // TODO: By now return the ClassProperty, as the result does not need to be used,
             // but if in the future we support multiple property declaration, we need to review

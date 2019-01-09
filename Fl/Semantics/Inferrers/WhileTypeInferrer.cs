@@ -18,7 +18,7 @@ namespace Fl.Semantics.Inferrers
             var conditionType = wnode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.Unify(Bool.Instance, conditionType.TypeInfo);
+            visitor.Inferrer.ExpectsToUnifyWith(conditionType.TypeInfo, BuiltinType.Bool);
 
             // Emmit the body code
             wnode.Body.Visit(visitor);

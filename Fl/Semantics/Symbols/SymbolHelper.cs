@@ -54,26 +54,26 @@ namespace Fl.Semantics.Types
             // If the token has a reference to an identifier, the types come from the explicit annotation
             if (token.Type == TokenType.Identifier)
             {
-                if (token.Value == Bool.Instance.ToString())
-                    return new TypeInfo(Bool.Instance);
+                if (token.Value == BuiltinType.Bool.GetName())
+                    return new TypeInfo(new Object(BuiltinType.Bool));
 
-                if (token.Value == Char.Instance.ToString())
-                    return new TypeInfo(Char.Instance);
+                if (token.Value == BuiltinType.Char.GetName())
+                    return new TypeInfo(new Object(BuiltinType.Char));
 
-                if (token.Value == Int.Instance.ToString())
-                    return new TypeInfo(Int.Instance);
+                if (token.Value == BuiltinType.Int.GetName())
+                    return new TypeInfo(new Object(BuiltinType.Int));
 
-                if (token.Value == Float.Instance.ToString())
-                    return new TypeInfo(Float.Instance);
+                if (token.Value == BuiltinType.Float.GetName())
+                    return new TypeInfo(new Object(BuiltinType.Float));
 
-                if (token.Value == Double.Instance.ToString())
-                    return new TypeInfo(Double.Instance);
+                if (token.Value == BuiltinType.Double.GetName())
+                    return new TypeInfo(new Object(BuiltinType.Double));
 
-                if (token.Value == Decimal.Instance.ToString())
-                    return new TypeInfo(Decimal.Instance);
+                if (token.Value == BuiltinType.Decimal.GetName())
+                    return new TypeInfo(new Object(BuiltinType.Decimal));
 
-                if (token.Value == String.Instance.ToString())
-                    return new TypeInfo(String.Instance);
+                if (token.Value == BuiltinType.String.GetName())
+                    return new TypeInfo(new Object(BuiltinType.String));
 
                 // Support complex types:
                 if (token.Value == "func" || token.Value == "tuple")
@@ -81,15 +81,16 @@ namespace Fl.Semantics.Types
 
                 if (symtable.Contains(token.Value))
                 {
-                    var typeInfo = symtable.Get(token.Value).TypeInfo;
+                    /*var typeInfo = symtable.Get(token.Value).TypeInfo;
                     if (typeInfo.Type is Class ctype)
                         return new TypeInfo(new ClassInstance(ctype));
-                    return typeInfo;
+                    return typeInfo;*/
                 }
 
-                var type = new ClassInstance(new Class(token.Value));
+                /*var type = new ClassInstance(new Class(token.Value));
                 symtable.AddUnresolvedType(type.Class.ClassName, token);
-                return new TypeInfo(type);
+                return new TypeInfo(type);*/
+                throw new Exception($"Unknown type '{token.Value}'");
             }
 
 
@@ -97,25 +98,25 @@ namespace Fl.Semantics.Types
             switch (token.Type)
             {
                 case TokenType.Boolean:
-                    return new TypeInfo(Bool.Instance);
+                    return new TypeInfo(new Object(BuiltinType.Bool));
 
                 case TokenType.Char:
-                    return new TypeInfo(Char.Instance);
+                    return new TypeInfo(new Object(BuiltinType.Char));
 
                 case TokenType.Integer:
-                    return new TypeInfo(Int.Instance);
+                    return new TypeInfo(new Object(BuiltinType.Int));
 
                 case TokenType.Float:
-                    return new TypeInfo(Float.Instance);
+                    return new TypeInfo(new Object(BuiltinType.Float));
 
                 case TokenType.Double:
-                    return new TypeInfo(Double.Instance);
+                    return new TypeInfo(new Object(BuiltinType.Double));
 
                 case TokenType.Decimal:
-                    return new TypeInfo(Decimal.Instance);
+                    return new TypeInfo(new Object(BuiltinType.Decimal));
 
                 case TokenType.String:
-                    return new TypeInfo(String.Instance);
+                    return new TypeInfo(new Object(BuiltinType.String));
 
                 case TokenType.Variable:
                     return inferrer?.NewAnonymousType(); // Auto

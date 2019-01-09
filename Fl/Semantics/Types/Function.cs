@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Fl.Semantics.Types
 {
-    public class Function : Complex
+    public class Function : Object
     {
         /// <summary>
         /// Function's parameters types
@@ -19,13 +19,13 @@ namespace Fl.Semantics.Types
         public Object Return { get; private set; }
 
         public Function()
-            : base("func")
+            : base(BuiltinType.Function, "func")
         {
             this.Parameters = new List<Object>();
         }
 
         public Function(params Object[] parametersTypes)
-            : base("func")
+            : base(BuiltinType.Function, "func")
         {
             this.Parameters = parametersTypes?.ToList() ?? new List<Object>();
         }
@@ -99,10 +99,15 @@ namespace Fl.Semantics.Types
             {
                 str += safeTypes.First(st => st.type == this.Return).safestr;
             }
-            else if (this.Return is Complex stype)
+            else if (this.Return is Tuple ttype)
             {
                 safeTypes.Add((this, "...<cyclic func ref>"));
-                str += stype.ToSafeString(safeTypes);
+                str += ttype.ToSafeString(safeTypes);
+            }
+            else if (this.Return is Function ftype)
+            {
+                safeTypes.Add((this, "...<cyclic func ref>"));
+                str += ftype.ToSafeString(safeTypes);
             }
             else
             {
