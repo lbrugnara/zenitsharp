@@ -5,9 +5,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ClassTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassNode, InferredType>
+    class ClassTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor inferrer, ClassNode node)
+        public ITypeSymbol Visit(TypeInferrerVisitor inferrer, ClassNode node)
         {
             inferrer.SymbolTable.EnterClassScope(node.Name.Value);
 
@@ -19,7 +19,7 @@ namespace Fl.Semantics.Inferrers
 
             inferrer.SymbolTable.LeaveScope();
 
-            return new InferredType(inferrer.SymbolTable.Get(node.Name.Value).TypeInfo);
+            return inferrer.SymbolTable.GetBoundSymbol(node.Name.Value).TypeSymbol;
         }
     }
 }

@@ -8,11 +8,11 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, LiteralNode, InferredType>
+    class LiteralTypeInferrer : INodeVisitor<TypeInferrerVisitor, LiteralNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor inferrer, LiteralNode literal)
+        public ITypeSymbol Visit(TypeInferrerVisitor inferrer, LiteralNode literal)
         {
-            return new InferredType(new TypeInfo(SymbolHelper.GetType(inferrer.SymbolTable, literal.Literal)));
+            return new PrimitiveSymbol(SymbolHelper.GetType(inferrer.SymbolTable, literal.Literal), inferrer.SymbolTable.CurrentScope);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Types;
 using Fl.Syntax;
 using Fl.Semantics.Exceptions;
 using System;
@@ -39,41 +38,41 @@ namespace Fl.Semantics.Types
             throw new Exception($"Unhandled storage type {str}");
         }
 
-        internal static Object GetType(SymbolTable symtable, Token token)
+        internal static BuiltinType GetType(SymbolTable symtable, Token token)
         {
             return GetType(symtable, null, token);
         }
 
-        internal static Object GetType(SymbolTable symtable, TypeInferrer inferrer, Token token)
+        internal static BuiltinType GetType(SymbolTable symtable, TypeInferrer inferrer, Token token)
         {
-            return GetTypeInfo(symtable, inferrer, token).Type;
+            return GetTypeSymbol(symtable, inferrer, token).BuiltinType;
         }
 
-        internal static TypeInfo GetTypeInfo(SymbolTable symtable, TypeInferrer inferrer, Token token)
+        internal static ITypeSymbol GetTypeSymbol(SymbolTable symtable, TypeInferrer inferrer, Token token)
         {
             // If the token has a reference to an identifier, the types come from the explicit annotation
             if (token.Type == TokenType.Identifier)
             {
                 if (token.Value == BuiltinType.Bool.GetName())
-                    return new TypeInfo(new Object(BuiltinType.Bool));
+                    return new PrimitiveSymbol(BuiltinType.Bool, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Char.GetName())
-                    return new TypeInfo(new Object(BuiltinType.Char));
+                    return new PrimitiveSymbol(BuiltinType.Char, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Int.GetName())
-                    return new TypeInfo(new Object(BuiltinType.Int));
+                    return new PrimitiveSymbol(BuiltinType.Int, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Float.GetName())
-                    return new TypeInfo(new Object(BuiltinType.Float));
+                    return new PrimitiveSymbol(BuiltinType.Float, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Double.GetName())
-                    return new TypeInfo(new Object(BuiltinType.Double));
+                    return new PrimitiveSymbol(BuiltinType.Double, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Decimal.GetName())
-                    return new TypeInfo(new Object(BuiltinType.Decimal));
+                    return new PrimitiveSymbol(BuiltinType.Decimal, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.String.GetName())
-                    return new TypeInfo(new Object(BuiltinType.String));
+                    return new PrimitiveSymbol(BuiltinType.String, symtable.CurrentScope);
 
                 // Support complex types:
                 if (token.Value == "func" || token.Value == "tuple")
@@ -81,15 +80,15 @@ namespace Fl.Semantics.Types
 
                 if (symtable.Contains(token.Value))
                 {
-                    /*var typeInfo = symtable.Get(token.Value).TypeInfo;
+                    /*var typeInfo = symtable.Get(token.Value).ITypeSymbol;
                     if (typeInfo.Type is Class ctype)
-                        return new TypeInfo(new ClassInstance(ctype));
+                        return new ITypeSymbol(new ClassInstance(ctype));
                     return typeInfo;*/
                 }
 
                 /*var type = new ClassInstance(new Class(token.Value));
                 symtable.AddUnresolvedType(type.Class.ClassName, token);
-                return new TypeInfo(type);*/
+                return new ITypeSymbol(type);*/
                 throw new Exception($"Unknown type '{token.Value}'");
             }
 
@@ -98,25 +97,25 @@ namespace Fl.Semantics.Types
             switch (token.Type)
             {
                 case TokenType.Boolean:
-                    return new TypeInfo(new Object(BuiltinType.Bool));
+                    return new PrimitiveSymbol(BuiltinType.Bool, symtable.CurrentScope);
 
                 case TokenType.Char:
-                    return new TypeInfo(new Object(BuiltinType.Char));
+                    return new PrimitiveSymbol(BuiltinType.Char, symtable.CurrentScope);
 
                 case TokenType.Integer:
-                    return new TypeInfo(new Object(BuiltinType.Int));
+                    return new PrimitiveSymbol(BuiltinType.Int, symtable.CurrentScope);
 
                 case TokenType.Float:
-                    return new TypeInfo(new Object(BuiltinType.Float));
+                    return new PrimitiveSymbol(BuiltinType.Float, symtable.CurrentScope);
 
                 case TokenType.Double:
-                    return new TypeInfo(new Object(BuiltinType.Double));
+                    return new PrimitiveSymbol(BuiltinType.Double, symtable.CurrentScope);
 
                 case TokenType.Decimal:
-                    return new TypeInfo(new Object(BuiltinType.Decimal));
+                    return new PrimitiveSymbol(BuiltinType.Decimal, symtable.CurrentScope);
 
                 case TokenType.String:
-                    return new TypeInfo(new Object(BuiltinType.String));
+                    return new PrimitiveSymbol(BuiltinType.String, symtable.CurrentScope);
 
                 case TokenType.Variable:
                     return inferrer?.NewAnonymousType(); // Auto

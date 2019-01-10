@@ -8,9 +8,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassMethodSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassMethodNode>
+    class ClassMethodSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassMethodNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, ClassMethodNode method)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, ClassMethodNode method)
         {
             /*var classScope = visitor.SymbolTable.CurrentScope as ClassScope;
 
@@ -58,7 +58,7 @@ namespace Fl.Semantics.Resolvers
             methodType.SetReturnType(rettype);
 
             // Update the @ret symbol
-            methodScope.ReturnSymbol.TypeInfo.Type = rettype;
+            methodScope.ReturnSymbol.ITypeSymbol.Type = rettype;
             visitor.Inferrer.AddTypeDependency(rettype, methodScope.ReturnSymbol);
 
             // At this point, the method's type is an assumed type, register
@@ -67,6 +67,7 @@ namespace Fl.Semantics.Resolvers
 
             // Restore previous scope
             visitor.SymbolTable.LeaveScope();*/
+            return null;
         }
     }
 }

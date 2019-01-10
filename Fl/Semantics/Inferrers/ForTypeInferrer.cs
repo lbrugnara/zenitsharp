@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, ForNode, InferredType>
+    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, ForNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, ForNode fornode)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
             visitor.SymbolTable.EnterLoopScope(fornode.Uid);
@@ -21,7 +21,7 @@ namespace Fl.Semantics.Inferrers
             var conditionType = fornode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.ExpectsToUnifyWith(conditionType.TypeInfo, BuiltinType.Bool);
+            //visitor.Inferrer.ExpectsToUnifyWith(conditionType.TypeSymbol, BuiltinType.Bool);
 
             // Emmit the body code
             fornode.Body.Visit(visitor);

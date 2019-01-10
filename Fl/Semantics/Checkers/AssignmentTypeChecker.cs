@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
@@ -24,7 +25,7 @@ namespace Fl.Semantics.Checkers
             {
                 var enc = node.Accessor.Parent.Visit(checker);
 
-                /*if (enc.TypeInfo.Type is Class c)
+                /*if (enc.ITypeSymbol is Class c)
                     throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{node.Accessor.Target.Value}'");*/
             }
 
@@ -32,10 +33,10 @@ namespace Fl.Semantics.Checkers
             var rightHandSide = node.Right.Visit(checker);
 
             if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
-                throw new System.Exception($"Cannot change value of constant {leftHandSide.TypeInfo.Type.Name} '{leftHandSide.Symbol.Name}'");
+                throw new System.Exception($"Cannot change value of constant {leftHandSide.TypeSymbol.Name} '{leftHandSide.Symbol.Name}'");
 
-            if (!leftHandSide.TypeInfo.Type.IsAssignableFrom(rightHandSide.TypeInfo.Type))
-                throw new System.Exception($"Cannot convert from {rightHandSide.TypeInfo} to {leftHandSide.TypeInfo}");
+            /*if (!leftHandSide.TypeSymbol.IsAssignableFrom(rightHandSide.TypeSymbol))
+                throw new System.Exception($"Cannot convert from {rightHandSide.TypeSymbol} to {leftHandSide.TypeSymbol}");*/
 
             leftHandSide.Symbol = null;
 
@@ -47,8 +48,8 @@ namespace Fl.Semantics.Checkers
             var tupleCheckedType = node.Left.Visit(checker);
             var exprCheckedType = node.Right.Visit(checker);
 
-            var tupleTypes = tupleCheckedType.TypeInfo.Type as Tuple;
-            var exprTypes = exprCheckedType.TypeInfo.Type as Tuple;
+            var tupleTypes = tupleCheckedType.TypeSymbol as TupleSymbol;
+            var exprTypes = exprCheckedType.TypeSymbol as TupleSymbol;
 
             for (int i = 0; i < tupleTypes.Count; i++)
             {
@@ -63,19 +64,19 @@ namespace Fl.Semantics.Checkers
                 {
                     var enc = accessor.Parent.Visit(checker);
 
-                    /*if (enc.TypeInfo.Type is Class c)
+                    /*if (enc.ITypeSymbol is Class c)
                         throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{accessor.Target.Value}'");*/
                 }
 
                 var leftHandSide = varnode.Visit(checker);
 
                 if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
-                    throw new System.Exception($"Cannot change value of constant {leftHandSide.TypeInfo.Type.Name} '{leftHandSide.Symbol.Name}'");
+                    throw new System.Exception($"Cannot change value of constant {leftHandSide.TypeSymbol.Name} '{leftHandSide.Symbol.Name}'");
 
                 var exprType = exprTypes.Types[i];
 
-                if (!varType.IsAssignableFrom(exprType))
-                    throw new System.Exception($"Cannot convert from {varType} to {exprType}");
+                /*if (!varType.IsAssignableFrom(exprType))
+                    throw new System.Exception($"Cannot convert from {varType} to {exprType}");*/
             }
 
             return exprCheckedType;

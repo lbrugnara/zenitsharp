@@ -18,25 +18,25 @@ namespace Fl.Semantics.Checkers
 
             for (var i=0; i < node.Arguments.Expressions.Count; i++)
             {
-                var parameter = targetFuncScope.Get<ISymbol>(targetFuncScope.Parameters[i]);
+                var parameter = targetFuncScope.Get<IBoundSymbol>(targetFuncScope.Parameters[i].Name);
                 var argument = node.Arguments.Expressions[i];
 
                 var argCheckedType = argument.Visit(checker);
 
-                if (!parameter.TypeInfo.Type.IsAssignableFrom(argCheckedType.TypeInfo.Type))
-                    throw new SymbolException($"Function '{targetFuncScope.Name}' expects parameter '{parameter.Name}' to be of type '{parameter.TypeInfo}'. Received '{argCheckedType.TypeInfo}' instead.");
+                /*if (!parameter.TypeSymbol.IsAssignableFrom(argCheckedType.TypeSymbol.Type))
+                    throw new SymbolException($"Function '{targetFuncScope.Name}' expects parameter '{parameter.Name}' to be of type '{parameter.TypeSymbol}'. Received '{argCheckedType.TypeSymbol}' instead.");*/
             }
 
-            if (target.TypeInfo.Type is Function f1)
-                return new CheckedType(new TypeInfo(f1.Return));
+            if (target.TypeSymbol is FunctionSymbol f1)
+                return new CheckedType(f1.Return.TypeSymbol);
 
             /*if (target.Type is ClassMethod cm && cm.Type is Function f2)
                 return new CheckedType(f2.Return);*/
 
-            /*if (target.TypeInfo.Type is Class c)
-                return new CheckedType(new TypeInfo(new ClassInstance(c)));*/
+            /*if (target.ITypeSymbol.Type is Class c)
+                return new CheckedType(new ITypeSymbol(new ClassInstance(c)));*/
 
-            throw new System.Exception($"Symbol {target.Symbol.Name} is not a function ({target.TypeInfo})");
+            throw new System.Exception($"Symbol {target.Symbol.Name} is not a function ({target.TypeSymbol})");
         }
     }
 }

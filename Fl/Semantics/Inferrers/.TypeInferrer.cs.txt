@@ -5,9 +5,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class #Name#TypeInferrer : INodeVisitor<TypeInferrerVisitor, Ast#Name#Node, InferredType>
+    class #Name#TypeInferrer : INodeVisitor<TypeInferrerVisitor, Ast#Name#Node, IValueSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor inferrer, Ast#Name#Node node)
+        public IValueSymbol Visit(TypeInferrerVisitor inferrer, Ast#Name#Node node)
         {
             // TODO: Implement #Name# inferrer
             return null;

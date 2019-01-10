@@ -8,14 +8,14 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ReturnSymbolResolver : INodeVisitor<SymbolResolverVisitor, ReturnNode>
+    class ReturnSymbolResolver : INodeVisitor<SymbolResolverVisitor, ReturnNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, ReturnNode rnode)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, ReturnNode rnode)
         {
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            rnode.Expression?.Visit(visitor);
+            return rnode.Expression?.Visit(visitor);
         }
     }
 }

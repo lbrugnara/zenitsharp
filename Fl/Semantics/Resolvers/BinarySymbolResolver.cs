@@ -3,15 +3,21 @@
 
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class BinarySymbolResolver : INodeVisitor<SymbolResolverVisitor, BinaryNode>
+    class BinarySymbolResolver : INodeVisitor<SymbolResolverVisitor, BinaryNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, BinaryNode binary)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, BinaryNode binary)
         {
-            binary.Left.Visit(visitor);
-            binary.Right.Visit(visitor);
+            var left = binary.Left.Visit(visitor);
+            var right = binary.Right.Visit(visitor);
+
+            if (visitor.Inferrer.CanUnify(left, right))
+                return visitor.Inferrer.FindMostGeneralType(left, right);
+
+            return null;
         }
     }
 }

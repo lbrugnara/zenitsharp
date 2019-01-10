@@ -9,21 +9,21 @@ using System.Linq;
 
 namespace Fl.Semantics.Inferrers
 {
-    class FunctionTypeInferrer : INodeVisitor<TypeInferrerVisitor, FunctionNode, InferredType>
+    class FunctionTypeInferrer : INodeVisitor<TypeInferrerVisitor, FunctionNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, FunctionNode funcdecl)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, FunctionNode funcdecl)
         {
             // Get the function symbol
-            var functionSymbol = visitor.SymbolTable.Get(funcdecl.Name);
+            var functionSymbol = visitor.SymbolTable.GetBoundSymbol(funcdecl.Name);
 
             // Get the function's type we may update at this step
-            Function functionType = functionSymbol.TypeInfo.Type as Function;
+            var functionType = functionSymbol.TypeSymbol;
 
             // Enter the requested function's block
             var functionScope = visitor.SymbolTable.EnterFunctionScope(funcdecl.Name);
 
             // Grab all the parameters' symbols
-            var parametersSymbols = new List<Symbol>();
+            var parametersSymbols = new List<BoundSymbol>();
 
             // TODO: Infer parameter types
             // parametersSymbols.AddRange(funcdecl.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value)));
@@ -42,35 +42,35 @@ namespace Fl.Semantics.Inferrers
                 // A lambda function is actually an expression, so, the "last statement" for this
                 // type of functions is the "return statement" that defines the lambda's return type 
                 // (if the expression is not void)
-                var lambdaExpression = statements.Select(s => s.inferred).Last();
+                var lambdaExpressionType = statements.Select(s => s.inferred).Last();
 
                 // If the expression has a type, and the return symbol is not defined (by now it MUST NOT be defined at this point)
                 // create the @ret symbol and assign the type
-                if (lambdaExpression.TypeInfo != null)
+                if (lambdaExpressionType != null)
                 {
-                    var generalType = visitor.Inferrer.FindMostGeneralType(lambdaExpression.TypeInfo, functionScope.ReturnSymbol.TypeInfo);
-                    visitor.Inferrer.Unify(generalType, lambdaExpression.TypeInfo, functionScope.ReturnSymbol.TypeInfo);
+                    var generalType = visitor.Inferrer.FindMostGeneralType(lambdaExpressionType, functionScope.Return.TypeSymbol);
+                    visitor.Inferrer.Unify(generalType, lambdaExpressionType, functionScope.Return.TypeSymbol);
 
                     // Update the function's return type with the expression type
-                    functionScope.UpdateReturnType(lambdaExpression.TypeInfo);
+                    functionScope.UpdateReturnType(lambdaExpressionType);
 
                     // If the type is an assumed type, register the @ret symbol under that assumption
-                    /*if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.TypeInfo))
-                        visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.TypeInfo, functionScope.ReturnSymbol);*/
+                    /*if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.ITypeSymbol))
+                        visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.ITypeSymbol, functionScope.ReturnSymbol);*/
                 }           
                 else
                 {
-                    visitor.Inferrer.ExpectsToUnifyWith(functionScope.ReturnSymbol.TypeInfo, BuiltinType.Void);
+                    //visitor.Inferrer.ExpectsToUnifyWith(functionScope.Return.TypeSymbol, BuiltinType.Void);
                 }
             }
-            else if (!statements.OfType<ReturnNode>().Any() && functionScope.ReturnSymbol.TypeInfo.Type.BuiltinType != BuiltinType.Void)
+            else if (!statements.OfType<ReturnNode>().Any() && functionScope.Return.TypeSymbol.BuiltinType != BuiltinType.Void)
             {
-                visitor.Inferrer.ExpectsToUnifyWith(functionScope.ReturnSymbol.TypeInfo, BuiltinType.Void);
+                //visitor.Inferrer.ExpectsToUnifyWith(functionScope.Return.TypeSymbol, BuiltinType.Void);
             }
 
             // If the @ret type is an assumption, register the symbol under that assumption too
-            /*if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.TypeInfo))
-                visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.TypeInfo, functionScope.ReturnSymbol);*/
+            /*if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.ITypeSymbol))
+                visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.ITypeSymbol, functionScope.ReturnSymbol);*/
 
             // The inferred function type is a complex type, it might contain assumptions for parameters' types or return type
             // if that is the case, make this inferred type an assumption
@@ -81,7 +81,7 @@ namespace Fl.Semantics.Inferrers
             visitor.SymbolTable.LeaveScope();
 
             // Return inferred function type
-            return new InferredType(functionSymbol.TypeInfo, functionSymbol);
+            return functionSymbol.TypeSymbol;
         }
     }
 }

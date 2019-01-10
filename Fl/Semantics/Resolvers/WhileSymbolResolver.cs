@@ -6,9 +6,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class WhileSymbolResolver : INodeVisitor<SymbolResolverVisitor, WhileNode>
+    class WhileSymbolResolver : INodeVisitor<SymbolResolverVisitor, WhileNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, WhileNode wnode)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             visitor.SymbolTable.EnterLoopScope(wnode.Uid);
@@ -21,6 +21,8 @@ namespace Fl.Semantics.Resolvers
 
             // Leave the while-block
             visitor.SymbolTable.LeaveScope();
+
+            return null;
         }
     }
 }

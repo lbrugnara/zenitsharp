@@ -6,9 +6,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class BlockSymbolResolver : INodeVisitor<SymbolResolverVisitor, BlockNode>
+    class BlockSymbolResolver : INodeVisitor<SymbolResolverVisitor, BlockNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, BlockNode node)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, BlockNode node)
         {
             visitor.SymbolTable.EnterBlockScope(node.Uid);
 
@@ -16,6 +16,8 @@ namespace Fl.Semantics.Resolvers
                 statement.Visit(visitor);
 
             visitor.SymbolTable.LeaveScope();
+
+            return null;
         }
     }
 }

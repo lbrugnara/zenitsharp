@@ -14,7 +14,7 @@ namespace Fl.Semantics.Checkers
         {
             var conditionType = ifnode.Condition.Visit(checker);
 
-            if (conditionType.TypeInfo.Type.BuiltinType != BuiltinType.Bool)
+            if (conditionType.TypeSymbol.BuiltinType != BuiltinType.Bool)
                 throw new System.Exception($"For condition needs a {BuiltinType.Bool.GetName()} expression");
 
             // Add a new common block for the if's boyd

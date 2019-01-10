@@ -6,9 +6,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ForSymbolResolver : INodeVisitor<SymbolResolverVisitor, ForNode>
+    class ForSymbolResolver : INodeVisitor<SymbolResolverVisitor, ForNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, ForNode fornode)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
             visitor.SymbolTable.EnterLoopScope(fornode.Uid);
@@ -27,6 +27,8 @@ namespace Fl.Semantics.Resolvers
 
             // Leave the for
             visitor.SymbolTable.LeaveScope();
+
+            return null;
         }
     }
 }

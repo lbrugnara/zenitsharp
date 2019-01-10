@@ -1,26 +1,26 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ObjectPropertyTypeInferrer : INodeVisitor<TypeInferrerVisitor, ObjectPropertyNode, InferredType>
+    class ObjectPropertyTypeInferrer : INodeVisitor<TypeInferrerVisitor, ObjectPropertyNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, ObjectPropertyNode node)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ObjectPropertyNode node)
         {
             var rightType = visitor.Visit(node.Value);
 
-            var property = visitor.SymbolTable.Get(node.Name.Value);
+            var property = visitor.SymbolTable.GetBoundSymbol(node.Name.Value);
 
             // Get the most general type
-            var generalType = visitor.Inferrer.FindMostGeneralType(property.TypeInfo, rightType.TypeInfo);
+            var generalType = visitor.Inferrer.FindMostGeneralType(property.TypeSymbol, rightType);
             
             // Unify the types
-            visitor.Inferrer.Unify(generalType, property.TypeInfo, rightType.TypeInfo);
+            visitor.Inferrer.Unify(generalType, property.TypeSymbol, rightType);
 
-            return new InferredType(property.TypeInfo, property);
+            return property.TypeSymbol;
         }
     }
 }

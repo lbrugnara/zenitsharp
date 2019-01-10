@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class FunctionSymbolResolver : INodeVisitor<SymbolResolverVisitor, FunctionNode>
+    class FunctionSymbolResolver : INodeVisitor<SymbolResolverVisitor, FunctionNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, FunctionNode funcdecl)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, FunctionNode funcdecl)
         {
             // Change the current scope to be the function's scope
             var functionSymbol = visitor.SymbolTable.EnterFunctionScope(funcdecl.Name);
@@ -25,20 +25,22 @@ namespace Fl.Semantics.Resolvers
 
             // Restore previous scope
             visitor.SymbolTable.LeaveScope();
+
+            return functionSymbol;
         }
 
         private void CreateParameterSymbol(SymbolResolverVisitor visitor, FunctionSymbol functionSymbol, ParameterNode parameter)
         {
             // If the parameter's type is present use it, if not use an anonymous type
-            var paramTypeInfo = parameter.SymbolInfo.Type == null
+            var paramITypeSymbol = parameter.SymbolInfo.Type == null
                         ? visitor.Inferrer.NewAnonymousType()
-                        : new TypeInfo(SymbolHelper.GetType(visitor.SymbolTable, parameter.SymbolInfo.Type));
+                        : SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, parameter.SymbolInfo.Type);
 
             // Check if the parameter has storage modifiers
             var storage = SymbolHelper.GetStorage(parameter.SymbolInfo.Mutability);
 
             // Create the parameter symbol in the function's scope
-            functionSymbol.CreateParameter(parameter.Name.Value, paramTypeInfo, storage);
+            functionSymbol.CreateParameter(parameter.Name.Value, paramITypeSymbol, storage);
         }
     }
 }

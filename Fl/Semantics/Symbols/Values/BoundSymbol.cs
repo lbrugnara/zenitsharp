@@ -5,7 +5,7 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Symbols
 {
-    public class Symbol : ISymbol
+    public class BoundSymbol : IBoundSymbol
     {
         /// <summary>
         /// Symbol name (user-defined name)
@@ -15,7 +15,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Type information
         /// </summary>
-        public TypeInfo TypeInfo { get; set; }
+        public ITypeSymbol TypeSymbol { get; set; }
 
         /// <summary>
         /// Symbol's access level
@@ -32,10 +32,10 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         public ISymbolContainer Parent { get; private set; }
 
-        public Symbol(string name, TypeInfo type, Access access, Storage storage, ISymbolContainer parent)
+        public BoundSymbol(string id, ITypeSymbol typeSymbol, Access access, Storage storage, ISymbolContainer parent)
         {
-            this.Name = name;
-            this.TypeInfo = type;
+            this.Name = id;
+            this.TypeSymbol = typeSymbol;
             this.Access = access;
             this.Storage = storage;
             this.Parent = parent;
@@ -48,7 +48,7 @@ namespace Fl.Semantics.Symbols
             if (this.Storage != Storage.Immutable)
                 str += $" {this.Storage.ToKeyword()}";
 
-            str += $" {this.Name}: {this.TypeInfo}";
+            str += $" {this.Name}: {this.TypeSymbol}";
 
             return str;
         }

@@ -7,9 +7,9 @@ using System.Collections.Generic;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassPropertySymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassPropertyNode>
+    class ClassPropertySymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassPropertyNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor binder, ClassPropertyNode node)
+        public ITypeSymbol Visit(SymbolResolverVisitor binder, ClassPropertyNode node)
         {
             /*var classScope = binder.SymbolTable.CurrentScope as ClassScope;
 
@@ -37,6 +37,7 @@ namespace Fl.Semantics.Resolvers
 
             // If the property has a definition, visit the right-hand side expression
             node.Definition?.Visit(binder);*/
+            return null;
         }
     }
 }

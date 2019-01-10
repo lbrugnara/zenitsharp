@@ -1,36 +1,34 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-
 using Fl.Ast;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ObjectTypeInferrer : INodeVisitor<TypeInferrerVisitor, ObjectNode, InferredType>
+    class ObjectTypeInferrer : INodeVisitor<TypeInferrerVisitor, ObjectNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, ObjectNode node)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ObjectNode node)
         {
             var self = visitor.SymbolTable.EnterObjectScope(node.Uid);
-            var type = self.TypeInfo.Type;
-
+            
             node.Properties.ForEach(p => {
                 var propertyInfo = visitor.Visit(p);
 
-                if (propertyInfo.TypeInfo.Type is Function funcType)
+                if (propertyInfo is FunctionSymbol funcType)
                 {
-                    type.Functions[propertyInfo.Symbol.Name] = funcType;
+                    self.Functions[propertyInfo.Name] = funcType;
                 }
                 else
                 {
-                    type.Properties[propertyInfo.Symbol.Name] = propertyInfo.TypeInfo.Type;
+                    self.Properties[propertyInfo.Name] = propertyInfo;
                 }
             });
 
             visitor.SymbolTable.LeaveScope();
 
-            return new InferredType(self.TypeInfo, self);
+            return self;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Fl.Semantics.Mutability
 
             var symtable = (enclosing?.Symbol as ISymbolTable) ?? checker.SymbolTable;
 
-            return new MutabilityCheckResult(symtable.Get(id));
+            return new MutabilityCheckResult(symtable.GetBoundSymbol(id));
         }
     }
 }

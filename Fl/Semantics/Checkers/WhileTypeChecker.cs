@@ -17,7 +17,7 @@ namespace Fl.Semantics.Checkers
             // Emmit the condition code
             var conditionType = wnode.Condition.Visit(checker);
 
-            if (conditionType.TypeInfo.Type.BuiltinType != BuiltinType.Bool)
+            if (conditionType.TypeSymbol.BuiltinType != BuiltinType.Bool)
                 throw new System.Exception($"For condition needs a {BuiltinType.Bool.GetName()} expression");
 
             // Emmit the body code

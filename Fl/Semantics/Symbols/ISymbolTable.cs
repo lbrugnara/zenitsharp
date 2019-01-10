@@ -8,10 +8,10 @@ namespace Fl.Semantics.Symbols
     public interface ISymbolTable
     {
         /// <summary>
-        /// Adds symbol to this SymbolTable
+        /// Adds symbol to this SymbolTable bound to the specific name
         /// </summary>
         /// <param name="symbol"></param>
-        void Insert(ISymbol symbol);
+        void Insert(string name, IBoundSymbol symbol);
 
         /// <summary>
         /// Creates and inserts into the symbol table a new Symbol
@@ -21,7 +21,13 @@ namespace Fl.Semantics.Symbols
         /// <param name="access"></param>
         /// <param name="storage"></param>
         /// <returns></returns>
-        ISymbol Insert(string name, TypeInfo type, Access access, Storage storage);
+        IBoundSymbol Insert(string name, ITypeSymbol type, Access access, Storage storage);
+
+        /// <summary>
+        /// Removes the symbol name from the table
+        /// </summary>
+        /// <param name="name"></param>
+        void Remove(string name);
 
         /// <summary>
         /// Return true if a symbol with that name exists in the
@@ -37,7 +43,7 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
-        ISymbol Get(string name);
+        IBoundSymbol GetBoundSymbol(string name);
 
         /// <summary>
         /// Return a symbol with the provided name. It returns null
@@ -45,6 +51,6 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
-        ISymbol TryGet(string name);
+        IBoundSymbol TryGetBoundSymbol(string name);
     }
 }

@@ -3,15 +3,18 @@
 
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    public class CallableSymbolResolver : INodeVisitor<SymbolResolverVisitor, CallableNode>
+    public class CallableSymbolResolver : INodeVisitor<SymbolResolverVisitor, CallableNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, CallableNode node)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, CallableNode node)
         {
             node.Target.Visit(visitor);
             node.Arguments.Expressions.ForEach(e => e.Visit(visitor));
+
+            return null;
         }
     }
 }

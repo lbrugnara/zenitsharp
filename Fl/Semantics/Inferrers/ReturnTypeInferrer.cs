@@ -9,9 +9,9 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
-    class ReturnTypeInferrer : INodeVisitor<TypeInferrerVisitor, ReturnNode, InferredType>
+    class ReturnTypeInferrer : INodeVisitor<TypeInferrerVisitor, ReturnNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, ReturnNode rnode)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ReturnNode rnode)
         {
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
@@ -23,35 +23,35 @@ namespace Fl.Semantics.Inferrers
             // If there's an empty return statement, leave here
             if (rnode.Expression == null)
             {
-                visitor.Inferrer.ExpectsToUnifyWith(functionScope.ReturnSymbol.TypeInfo, BuiltinType.Void);
+                //visitor.Inferrer.ExpectsToUnifyWith(functionScope.ReturnSymbol.TypeSymbol, BuiltinType.Void);
                 // again, we assume the first return's expression type is the function's return type
-                functionScope.UpdateReturnType(functionScope.ReturnSymbol.TypeInfo);
+                functionScope.UpdateReturnType(functionScope.Return.TypeSymbol);
 
-                return new InferredType(functionScope.ReturnSymbol.TypeInfo);
+                return functionScope.Return.TypeSymbol;
             }
 
             // Infer the return's expression type
-            var returnInferredType = rnode.Expression.Visit(visitor);
+            var returnIValueSymbol = rnode.Expression.Visit(visitor);
             
-            TypeInfo typeInfo = returnInferredType.TypeInfo;
+            ITypeSymbol typeInfo = returnIValueSymbol;
 
             // The return statement expects a tuple and if that tuple contains
             // just one element, we use it as the return's type
-            if ((typeInfo.Type is Tuple t) && t.Types.Count == 1)
-                typeInfo.ChangeType(t.Types.First());
+            //if ((typeInfo is TupleSymbol t) && t.Types.Count == 1)
+            //    typeInfo.ChangeType(t.Types.First());
 
-            visitor.Inferrer.FindMostGeneralType(typeInfo, functionScope.ReturnSymbol.TypeInfo);
+            visitor.Inferrer.FindMostGeneralType(typeInfo, functionScope.Return.TypeSymbol);
 
             // again, we assume the first return's expression type is the function's return type
             functionScope.UpdateReturnType(typeInfo);
 
             // If the @ret type is an assumption, register the symbol under that assumption too
-            /*if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.TypeInfo))
-                visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.TypeInfo, functionScope.ReturnSymbol);*/
+            /*if (visitor.Inferrer.IsTypeAssumption(functionScope.Return.ITypeSymbol))
+                visitor.Inferrer.AddTypeDependency(functionScope.Return.ITypeSymbol, functionScope.Return);*/
 
             // The type we infer from the return expression must honor the @ret symbol's type
             // as we are "leaving" the function, and the return type must be the first we processed
-            return new InferredType(functionScope.ReturnSymbol.TypeInfo, returnInferredType.Symbol);
+            return functionScope.Return.TypeSymbol;
         }
     }
 }

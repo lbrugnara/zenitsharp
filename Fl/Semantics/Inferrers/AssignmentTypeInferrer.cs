@@ -2,13 +2,14 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Types;
+using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Inferrers
 {
-    class AssignmentTypeInferrer : INodeVisitor<TypeInferrerVisitor, AssignmentNode, InferredType>
+    class AssignmentTypeInferrer : INodeVisitor<TypeInferrerVisitor, AssignmentNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, AssignmentNode node)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, AssignmentNode node)
         {
             if (node is VariableAssignmentNode)
                 return this.MakeVariableAssignment(node as VariableAssignmentNode, visitor);
@@ -18,20 +19,20 @@ namespace Fl.Semantics.Inferrers
             throw new AstWalkerException($"Invalid variable assignment of type {node.GetType().FullName}");
         }
 
-        private InferredType MakeVariableAssignment(VariableAssignmentNode node, TypeInferrerVisitor visitor)
+        private ITypeSymbol MakeVariableAssignment(VariableAssignmentNode node, TypeInferrerVisitor visitor)
         {
             var leftHandSide = node.Accessor.Visit(visitor);
             var rightHandSide = node.Right.Visit(visitor);
 
-            return new InferredType(visitor.Inferrer.FindMostGeneralType(leftHandSide.TypeInfo, rightHandSide.TypeInfo));
+            return visitor.Inferrer.FindMostGeneralType(leftHandSide, rightHandSide);
         }
 
-        private InferredType MakeDestructuringAssignment(DestructuringAssignmentNode node, TypeInferrerVisitor visitor)
+        private ITypeSymbol MakeDestructuringAssignment(DestructuringAssignmentNode node, TypeInferrerVisitor visitor)
         {
-            var tupleInferredType = node.Left.Visit(visitor);
-            var exprInferredType = node.Right.Visit(visitor);
+            var tupleIValueSymbol = node.Left.Visit(visitor);
+            var exprIValueSymbol = node.Right.Visit(visitor);
 
-            return new InferredType(visitor.Inferrer.FindMostGeneralType(tupleInferredType.TypeInfo, exprInferredType.TypeInfo));
+            return visitor.Inferrer.FindMostGeneralType(tupleIValueSymbol, exprIValueSymbol);
         }
     }
 }

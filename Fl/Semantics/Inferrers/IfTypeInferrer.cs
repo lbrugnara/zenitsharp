@@ -7,14 +7,14 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, IfNode, InferredType>
+    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, IfNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, IfNode ifnode)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, IfNode ifnode)
         {
             var conditionType = ifnode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.ExpectsToUnifyWith(conditionType.TypeInfo, BuiltinType.Bool);
+            //visitor.Inferrer.ExpectsToUnifyWith(conditionType.TypeSymbol, BuiltinType.Bool);
 
             // Add a new common block for the if's boyd
             visitor.SymbolTable.EnterBlockScope($"{ifnode.Uid}");

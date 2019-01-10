@@ -4,6 +4,7 @@
 using Fl.Ast;
 using Fl.Semantics.Types;
 using Fl.Semantics.Exceptions;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Checkers
 {
@@ -27,13 +28,13 @@ namespace Fl.Semantics.Checkers
             foreach (var definition in vardecl.Definitions)
             {
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.Get(definition.Left.Value).TypeInfo;
+                var lhsType = checker.SymbolTable.GetBoundSymbol(definition.Left.Value).TypeSymbol;
 
                 // If it is a variable definition, get the right-hand side type info
                 var rhs = definition.Right?.Visit(checker);
 
-                if (rhs != null && !lhsType.Type.IsAssignableFrom(rhs.TypeInfo.Type))
-                    throw new SymbolException($"Cannot assign type {rhs.TypeInfo} to variable of type {lhsType}");
+                /*if (rhs != null && !lhsType.Type.IsAssignableFrom(rhs.TypeSymbol.Type))
+                    throw new SymbolException($"Cannot assign type {rhs.TypeSymbol} to variable of type {lhsType}");*/
             }
 
             return null;
@@ -51,12 +52,12 @@ namespace Fl.Semantics.Checkers
                     continue;
 
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.Get(declaration.Value).TypeInfo;
-                var rhsType = (initType.TypeInfo.Type as Tuple).Types[i];
+                var lhsType = checker.SymbolTable.GetBoundSymbol(declaration.Value).TypeSymbol;
+                var rhsType = (initType.TypeSymbol as TupleSymbol).Types[i];
 
                 // When lhs is "var", take the type from the right hand side expression, or throw if it is not available
-                if (!lhsType.Type.IsAssignableFrom(rhsType))
-                    throw new SymbolException($"Cannot assign type {rhsType} to variable of type {lhsType}");
+                /*if (!lhsType.Type.IsAssignableFrom(rhsType))
+                    throw new SymbolException($"Cannot assign type {rhsType} to variable of type {lhsType}");*/
             }
 
             return null;

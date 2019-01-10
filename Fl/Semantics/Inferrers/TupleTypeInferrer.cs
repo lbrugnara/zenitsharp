@@ -3,17 +3,21 @@
 
 using Fl.Ast;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 using System.Linq;
 
 namespace Fl.Semantics.Inferrers
 {
-    class TupleTypeInferrer : INodeVisitor<TypeInferrerVisitor, TupleNode, InferredType>
+    class TupleTypeInferrer : INodeVisitor<TypeInferrerVisitor, TupleNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, TupleNode node)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, TupleNode node)
         {
             var inferredTypes = node.Items?.Select(i => i?.Visit(visitor));
-            return new InferredType(new TypeInfo(new Tuple(inferredTypes.Select(it => it?.TypeInfo?.Type).ToArray())));
+            return new TupleSymbol("tuple", visitor.SymbolTable.CurrentScope)
+            {
+                Types = inferredTypes.OfType<IValueSymbol>().Where(it => it != null).ToList()
+            };
         }
     }
 }

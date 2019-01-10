@@ -3,10 +3,11 @@
 
 using Fl.Ast;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Inferrers
 {
-    public class TypeInferrerVisitor : IAstWalker<InferredType>
+    public class TypeInferrerVisitor : IAstWalker<ITypeSymbol>
     {
         private UnaryTypeInferrer unaryTypeInferrer;
         private BinaryTypeInferrer binaryTypeInferrer;
@@ -72,7 +73,7 @@ namespace Fl.Semantics.Inferrers
 
         public TypeInferrer Inferrer { get; private set; }
 
-        public InferredType Visit(Node node)
+        public ITypeSymbol Visit(Node node)
         {
             object n = node;
             switch (n)

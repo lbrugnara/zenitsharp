@@ -1,14 +1,29 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Symbols
 {
-    public interface ISymbol : ISymbolTableEntry
+    /// <summary>
+    /// Represents any type of symbol that can be added to an ISymbolTable
+    /// </summary>
+    public interface ISymbol
     {
-        TypeInfo TypeInfo { get; }
-        Access Access { get; }
-        Storage Storage { get; }
+        /// <summary>
+        /// Name of the entry that indentifies it in the symbol table
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
+        /// Reference to the parent scope, if present
+        /// </summary>
+        ISymbolContainer Parent { get; }
+
+        /// <summary>
+        /// String with a dump of the entry
+        /// </summary>
+        /// <param name="indent">Indentation of the members of the entry</param>
+        /// <returns></returns>
+        string ToDebugString(int indent = 0);
     }
 }

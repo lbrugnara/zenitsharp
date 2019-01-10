@@ -3,17 +3,20 @@
 
 using System;
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AssignmentNode>
+    class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AssignmentNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, AssignmentNode node)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, AssignmentNode node)
         {
             if (node is VariableAssignmentNode)
                 this.MakeVariableAssignment(node as VariableAssignmentNode, visitor);
             else if (node is DestructuringAssignmentNode)
                 this.MakeDestructuringAssignment(node as DestructuringAssignmentNode, visitor);
+
+            return null;
         }
 
         private void MakeVariableAssignment(VariableAssignmentNode node, SymbolResolverVisitor visitor)

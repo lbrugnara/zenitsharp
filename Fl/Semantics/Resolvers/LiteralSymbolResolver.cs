@@ -3,13 +3,16 @@
 
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
+using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class LiteralSymbolResolver : INodeVisitor<SymbolResolverVisitor, LiteralNode>
+    class LiteralSymbolResolver : INodeVisitor<SymbolResolverVisitor, LiteralNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, LiteralNode literal)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, LiteralNode literal)
         {
+            return new PrimitiveSymbol(SymbolHelper.GetType(visitor.SymbolTable, literal.Literal), visitor.SymbolTable.CurrentScope);
         }
     }
 }

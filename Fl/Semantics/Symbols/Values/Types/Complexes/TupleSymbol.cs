@@ -1,35 +1,31 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Types;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Fl.Semantics.Types
+namespace Fl.Semantics.Symbols
 {
-    public class Tuple : Object
+    public class TupleSymbol : ComplexSymbol
     {
-        public List<Object> Types { get; set; }
+        public List<IValueSymbol> Types { get; set; }
 
-        private Tuple()
-            : base(BuiltinType.Tuple, "tuple")
+        public TupleSymbol(string name, ISymbolContainer parent)
+            : base(name, BuiltinType.Tuple, parent)
         {
-            this.Types = new List<Object>();
-        }
-
-        public Tuple(params Object[] types)
-            : base(BuiltinType.Tuple, "tuple")
-        {
-            this.Types = types?.ToList() ?? new List<Object>();
+            this.Types = new List<IValueSymbol>();
         }
 
         public override bool Equals(object obj)
         {
-            return base.Equals(obj) && this.Types.SequenceEqual((obj as Tuple).Types);
+            return base.Equals(obj) && this.Types.SequenceEqual((obj as TupleSymbol).Types);
         }
 
         public int Count => this.Types.Count;
 
-        public static bool operator ==(Tuple type1, Object type2)
+        public static bool operator ==(TupleSymbol type1, TupleSymbol type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -37,21 +33,21 @@ namespace Fl.Semantics.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Tuple type1, Object type2)
+        public static bool operator !=(TupleSymbol type1, TupleSymbol type2)
         {
             return !(type1 == type2);
         }
 
-        public override string ToSafeString(List<(Object type, string safestr)> safeTypes)
+        public override string ToSafeString(List<(ITypeSymbol type, string safestr)> safeTypes)
         {
             var types = this.Types.Select(t =>
             {
                 if (safeTypes.Any(st => st.type == t))
                     return safeTypes.First(st => st.type == t).safestr;
 
-                if (t is Tuple ttype)
+                if (t is TupleSymbol ttype)
                     return ttype.ToSafeString(safeTypes);
-                else if (t is Function ftype)
+                else if (t is FunctionSymbol ftype)
                     return ftype.ToSafeString(safeTypes);
 
                 return t.ToString() ?? "?";
@@ -62,12 +58,7 @@ namespace Fl.Semantics.Types
 
         public override string ToString()
         {
-            return this.ToSafeString(new List<(Object type, string safestr)>());
-        }
-
-        public override bool IsAssignableFrom(Object type)
-        {
-            return this.Equals(type);
+            return this.ToSafeString(new List<(ITypeSymbol type, string safestr)>());
         }
     }
 }

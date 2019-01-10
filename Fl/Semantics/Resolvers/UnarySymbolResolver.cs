@@ -2,14 +2,15 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class UnarySymbolResolver : INodeVisitor<SymbolResolverVisitor, UnaryNode>
+    class UnarySymbolResolver : INodeVisitor<SymbolResolverVisitor, UnaryNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, UnaryNode unary)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, UnaryNode unary)
         {
-            unary.Left.Visit(visitor);
+            return unary.Left.Visit(visitor);
         }
     }
 }

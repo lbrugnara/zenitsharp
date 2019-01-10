@@ -19,7 +19,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Contains symbols defined in this scope
         /// </summary>
-        private Dictionary<string, ISymbolTableEntry> Symbols { get; }
+        private Dictionary<string, ISymbol> Symbols { get; }
 
         /// <summary>
         /// If present, reference to the parent scope
@@ -34,7 +34,7 @@ namespace Fl.Semantics.Symbols
         public Block(string name, ISymbolContainer parent)
         {
             this.Name = name;
-            this.Symbols = new Dictionary<string, ISymbolTableEntry>();
+            this.Symbols = new Dictionary<string, ISymbol>();
             this.Parent = parent;
         }
 
@@ -43,17 +43,30 @@ namespace Fl.Semantics.Symbols
             return $"block-{this.Name}";
         }        
 
-        public List<ISymbolTableEntry> GetAllSymbols() => this.Symbols.Values.ToList();
-
         #region ISymbolContainer implementation
 
         public void Insert<T>(T symbol)
-            where T : ISymbolTableEntry
+            where T : ISymbol
         {
             if (this.Symbols.ContainsKey(symbol.Name))
                 throw new SymbolException($"Symbol {symbol.Name} is already defined in current scope");
 
             this.Symbols[symbol.Name] = symbol;
+        }
+
+        public void Remove(string name)
+        {
+            if (this.Symbols.ContainsKey(name))
+                this.Symbols.Remove(name);
+        }
+
+        public void Insert<T>(string name, T symbol)
+            where T : ISymbol
+        {
+            if (this.Symbols.ContainsKey(name))
+                throw new SymbolException($"Symbol {name} is already defined in current scope");
+
+            this.Symbols[name] = symbol;
         }
 
         public bool Contains(string name)
@@ -62,7 +75,7 @@ namespace Fl.Semantics.Symbols
         }
 
         public T Get<T>(string name)
-            where T : ISymbolTableEntry
+            where T : ISymbol
         {
             var symbol = this.TryGet<T>(name);
 
@@ -73,10 +86,15 @@ namespace Fl.Semantics.Symbols
         }
 
         public T TryGet<T>(string name)
-            where T : ISymbolTableEntry
+            where T : ISymbol
         {
             if (this.Symbols.ContainsKey(name))
                 return (T)this.Symbols[name];
+
+            var symbol = this.Symbols.Values.OfType<T>().FirstOrDefault(v => v.Name == name);
+
+            if (symbol != null)
+                return (T)symbol;
 
             if (this.Parent == null || !this.Parent.Contains(name))
                 return default(T);
@@ -95,14 +113,13 @@ namespace Fl.Semantics.Symbols
 
             // Title
             var nameIndent = "".PadLeft(indent);
-            sb.AppendLine($"{nameIndent}[{this.GetType().Name.Replace("SymbolContainer", "")} '{this.Name}']");
+            sb.AppendLine($"{nameIndent}[{this.GetType().Name} '{this.Name}']");
 
-            // Symbols
-            /*var memberIndent = "".PadLeft(titleIndentN);
-            sb.AppendLine($"{memberIndent}[Symbols]");*/
+            foreach (var (name, symbolEntry) in this.Symbols.Where(kvp => kvp.Value is IBoundSymbol))
+                sb.AppendLine($"{"".PadLeft(memberIndentN)}{name}: {(symbolEntry as IBoundSymbol).TypeSymbol.ToDebugString(memberIndentN)}");
 
-            foreach (var symbol in this.GetAllSymbols())
-                sb.AppendLine($"{symbol.ToDebugString(memberIndentN)}");
+            foreach (var (name, symbolEntry) in this.Symbols.Where(kvp => kvp.Value is ISymbolContainer))
+                sb.AppendLine((symbolEntry as ISymbolContainer).ToDebugString(memberIndentN));
 
             return sb.ToString();
         }

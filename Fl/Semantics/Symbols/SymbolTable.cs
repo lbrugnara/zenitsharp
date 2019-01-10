@@ -59,11 +59,10 @@ namespace Fl.Semantics.Symbols
         private T EnterBlockScope<T>(string name, ISymbolContainer parent)
             where T : Block
         {
-            T scope = null;
+            T scope = parent.TryGet<T>(name);
 
-            if (parent.Contains(name))
+            if (scope != null)
             {
-                scope = parent.Get<T>(name);
                 this.CurrentScope = scope;
                 return scope;
             }
@@ -75,7 +74,7 @@ namespace Fl.Semantics.Symbols
             else
                 throw new ScopeException($"Unknown scope type {typeof(T).Name}");
 
-            parent.Insert(scope);
+            parent.Insert(name, scope);
             this.CurrentScope = scope;
             return scope;
         }
@@ -98,11 +97,10 @@ namespace Fl.Semantics.Symbols
         private T EnterComplexSymbolScope<T>(string name, ISymbolContainer parent)
             where T : ComplexSymbol
         {
-            T scope = null;
+            T scope = parent.TryGet<T>(name);
 
-            if (parent.Contains(name))
+            if (scope != null)
             {
-                scope = parent.Get<T>(name);
                 this.CurrentScope = scope;
                 return scope;
             }            
@@ -116,7 +114,7 @@ namespace Fl.Semantics.Symbols
             else
                 throw new ScopeException($"Unknown scope type {typeof(T).Name}");
 
-            parent.Insert(scope);
+            parent.Insert(name, scope);
             this.CurrentScope = scope;
 
             return scope;
@@ -151,23 +149,25 @@ namespace Fl.Semantics.Symbols
 
         #region ISymbolTable implementation
 
-        public ISymbol Insert(string name, TypeInfo type, Access access, Storage storage)
-        {
-            var symbol = new Symbol(name, type, access, storage, this.CurrentScope);
-            this.Insert(symbol);
-            return symbol;
-        }
-
         /// <inheritdoc/>
-        public void Insert(ISymbol symbol) => this.CurrentScope.Insert(symbol);
+        public void Insert(string name, IBoundSymbol symbol) => this.CurrentScope.Insert(name, symbol);
+
+        public IBoundSymbol Insert(string name, ITypeSymbol type, Access access, Storage storage)
+        {
+            var symbol = new BoundSymbol(name, type, access, storage, this.CurrentScope);
+            this.Insert(name, symbol);
+            return symbol;
+        }        
+
+        public void Remove(string name) => this.CurrentScope.Remove(name);
 
         /// <inheritdoc/>
         public bool Contains(string name) => this.CurrentScope.Contains(name);
 
         /// <inheritdoc/>
-        public ISymbol Get(string name) => this.CurrentScope.Get<ISymbol>(name);
+        public IBoundSymbol GetBoundSymbol(string name) => this.CurrentScope.Get<IBoundSymbol>(name);
 
-        public ISymbol TryGet(string name) => this.CurrentScope.Get<ISymbol>(name);
+        public IBoundSymbol TryGetBoundSymbol(string name) => this.CurrentScope.Get<IBoundSymbol>(name);
 
         #endregion
 

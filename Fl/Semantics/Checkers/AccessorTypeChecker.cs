@@ -12,7 +12,7 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, AccessorNode accessor)
         {
-            ISymbol symbol = null;
+            IBoundSymbol symbol = null;
             string symbolName = accessor.Target.Value;
 
             // If this is the end of the accessor path, get the symbol in the current
@@ -20,9 +20,9 @@ namespace Fl.Semantics.Checkers
             if (accessor.Parent == null)
             {
                 // Get accessed symbol that must be defined in the symtable's scope
-                symbol = checker.SymbolTable.Get(symbolName);
+                symbol = checker.SymbolTable.GetBoundSymbol(symbolName);
 
-                var type = symbol.TypeInfo;
+                var type = symbol.TypeSymbol;
 
                 // Return the type check information for this symbol
                 return new CheckedType(type, symbol);
@@ -36,17 +36,17 @@ namespace Fl.Semantics.Checkers
             // the symbol within the enclosing scope
             if (encsym is ISymbolTable)
             {
-                symbol = (encsym as ISymbolTable).Get(symbolName);
-                return new CheckedType(symbol.TypeInfo, symbol);
+                symbol = (encsym as ISymbolTable).GetBoundSymbol(symbolName);
+                return new CheckedType(symbol.TypeSymbol, symbol);
             }
 
             // If the symbol is a class, we need to get the class's scope
             // to retrieve the class member
-            /*if (encsym.TypeInfo.Type is Class clasz)
+            /*if (encsym.ITypeSymbol.Type is Class clasz)
             {
                 // Find the Class scope
                 symbol = checker.SymbolTable.GetClassScope(encsym.Name).Get<ISymbol>(symbolName);
-                return new CheckedType(symbol.TypeInfo, symbol);
+                return new CheckedType(symbol.ITypeSymbol, symbol);
             }*/
 
             // Here we have to get the class's scope and the type must be one of the following types:
@@ -54,11 +54,11 @@ namespace Fl.Semantics.Checkers
             //  - A native type
             /*ISymbolContainer symtable = null;
 
-            if (encsym.TypeInfo.Type is ClassInstance classInstance)
+            if (encsym.ITypeSymbol.Type is ClassInstance classInstance)
                 // Find the Class scope
                 symtable = checker.SymbolTable.GetClassScope(classInstance.Class.ClassName);
-            else if (checker.SymbolTable.TryGet(encsym.TypeInfo.Type.Name)?.TypeInfo.Type is Class)
-                symtable = checker.SymbolTable.GetClassScope(encsym.TypeInfo.Type.Name);
+            else if (checker.SymbolTable.TryGet(encsym.ITypeSymbol.Type.Name)?.ITypeSymbol.Type is Class)
+                symtable = checker.SymbolTable.GetClassScope(encsym.ITypeSymbol.Type.Name);
             else
                 throw new SymbolException($"Unhandled accessor type {encsym}");
 
@@ -68,7 +68,7 @@ namespace Fl.Semantics.Checkers
             // Either case, we are talking about an instance of a class or an instance of a primitive type, 
             // because of that we need to return the type of the member, and not just the ClassProperty or ClassMethod
             // type.
-            return new CheckedType(symbol.TypeInfo, symbol);
+            return new CheckedType(symbol.TypeSymbol, symbol);
         }
     }
 }

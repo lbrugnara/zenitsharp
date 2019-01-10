@@ -7,7 +7,7 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    public class SymbolResolverVisitor : IAstWalker
+    public class SymbolResolverVisitor : IAstWalker<ITypeSymbol>
     {
         private UnarySymbolResolver unarySymbolResolver;
         private BinarySymbolResolver binarySymbolResolver;
@@ -73,114 +73,89 @@ namespace Fl.Semantics.Resolvers
 
         public TypeInferrer Inferrer { get; private set; }
 
-        public void Visit(Node node)
+        public ITypeSymbol Visit(Node node)
         {
             object n = node;
 
             switch (n)
             {
                 case UnaryNode u:
-                    this.unarySymbolResolver.Visit(this, u);
-                    break;
+                    return this.unarySymbolResolver.Visit(this, u);
 
                 case BinaryNode b:
-                    this.binarySymbolResolver.Visit(this, b);
-                    break;
+                    return this.binarySymbolResolver.Visit(this, b);
 
                 case AssignmentNode a:
-                    this.assignmentSymbolResolver.Visit(this, a);
-                    break;
+                    return this.assignmentSymbolResolver.Visit(this, a);
 
                 case ConstantNode c:
-                    this.constantSymbolResolver.Visit(this, c);
-                    break;
+                    return this.constantSymbolResolver.Visit(this, c);
 
                 case VariableNode v:
-                    this.variableSymbolResolver.Visit(this, v);
-                    break;
+                    return this.variableSymbolResolver.Visit(this, v);
 
                 case BlockNode bl:
-                    this.blockSymbolResolver.Visit(this, bl);
-                    break;
+                    return this.blockSymbolResolver.Visit(this, bl);
 
                 case DeclarationNode d:
-                    this.declarationSymbolResolver.Visit(this, d);
-                    break;
+                    return this.declarationSymbolResolver.Visit(this, d);
 
                 case LiteralNode l:
-                    this.literalSymbolResolver.Visit(this, l);
-                    break;
+                    return this.literalSymbolResolver.Visit(this, l);
 
                 case AccessorNode ivk:
-                    this.accessorSymbolResolver.Visit(this, ivk);
-                    break;
+                    return this.accessorSymbolResolver.Visit(this, ivk);
 
                 case IfNode i:
-                    this.ifSymbolResolver.Visit(this, i);
-                    break;
+                    return this.ifSymbolResolver.Visit(this, i);
 
                 case WhileNode w:
-                    this.whileSymbolResolver.Visit(this, w);
-                    break;
+                    return this.whileSymbolResolver.Visit(this, w);
 
                 case ForNode f:
-                    this.forSymbolResolver.Visit(this, f);
-                    break;
+                    return this.forSymbolResolver.Visit(this, f);
 
                 case BreakNode brk:
-                    this.breakSymbolResolver.Visit(this, brk);
-                    break;
+                    return this.breakSymbolResolver.Visit(this, brk);
 
                 case ContinueNode cont:
-                    this.continueSymbolResolver.Visit(this, cont);
-                    break;
+                    return this.continueSymbolResolver.Visit(this, cont);
 
                 case CallableNode call:
-                    this.callSymbolResolver.Visit(this, call);
-                    break;
+                    return this.callSymbolResolver.Visit(this, call);
 
                 case FunctionNode func:
-                    this.funcDeclSymbolResolver.Visit(this, func);
-                    break;
+                    return this.funcDeclSymbolResolver.Visit(this, func);
 
                 case ObjectNode obj:
-                    this.objectSymbolResolver.Visit(this, obj);
-                    break;
+                    return this.objectSymbolResolver.Visit(this, obj);
 
                 case ObjectPropertyNode objProp:
-                    this.objectPropertySymbolResolver.Visit(this, objProp);
-                    break;
+                    return this.objectPropertySymbolResolver.Visit(this, objProp);
 
                 case TupleNode t:
-                    this.tupleSymbolResolver.Visit(this, t);
-                    break;
+                    return this.tupleSymbolResolver.Visit(this, t);
 
                 case ReturnNode ret:
-                    this.returnSymbolResolver.Visit(this, ret);
-                    break;
+                    return this.returnSymbolResolver.Visit(this, ret);
 
                 case NullCoalescingNode nc:
-                    this.nullCoalescingSymbolResolver.Visit(this, nc);
-                    break;
+                    return this.nullCoalescingSymbolResolver.Visit(this, nc);
 
                 case ClassNode cn:
-                    this.classSymbolResolver.Visit(this, cn);
-                    break;
+                    return this.classSymbolResolver.Visit(this, cn);
 
                 case ClassPropertyNode cpn:
-                    this.classPropertySymbolResolver.Visit(this, cpn);
-                    break;
+                    return this.classPropertySymbolResolver.Visit(this, cpn);
 
                 case ClassConstantNode ccn:
-                    this.classConstantSymbolResolver.Visit(this, ccn);
-                    break;
+                    return this.classConstantSymbolResolver.Visit(this, ccn);
 
                 case ClassMethodNode cmn:
-                    this.classMethodSymbolResolver.Visit(this, cmn);
-                    break;
+                    return this.classMethodSymbolResolver.Visit(this, cmn);
 
                 case NoOpNode np:
-                    break;
+                    return null;
 
                 default:
                     throw new AstWalkerException($"Unhandled SymbolResolver type {node.GetType()}");

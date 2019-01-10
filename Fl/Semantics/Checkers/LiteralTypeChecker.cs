@@ -12,7 +12,7 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, LiteralNode literal)
         {
-            return new CheckedType(new TypeInfo(SymbolHelper.GetType(checker.SymbolTable, literal.Literal)));
+            return new CheckedType(new PrimitiveSymbol(SymbolHelper.GetType(checker.SymbolTable, literal.Literal), checker.SymbolTable.CurrentScope));
         }
     }
 }

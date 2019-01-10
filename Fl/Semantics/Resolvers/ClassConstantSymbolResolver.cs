@@ -6,9 +6,9 @@ using System;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassConstantNode>
+    class ClassConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassConstantNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor binder, ClassConstantNode node)
+        public ITypeSymbol Visit(SymbolResolverVisitor binder, ClassConstantNode node)
         {
             /*var classScope = binder.SymbolTable.CurrentScope as ClassScope;
 
@@ -34,6 +34,8 @@ namespace Fl.Semantics.Resolvers
 
             // Visit the right-hand side expression
             node.Definition.Visit(binder);*/
+
+            return null;
         }
     }
 }

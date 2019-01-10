@@ -1,35 +1,57 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics;
+using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Types;
 using System.Collections.Generic;
 
-namespace Fl.Semantics.Types
+namespace Fl.Semantics.Symbols
 {
-    public class Object
+    public abstract class TypeSymbol : ITypeSymbol
     {
-        public string Name { get; private set; }
-        public virtual BuiltinType BuiltinType { get; }
-        public Dictionary<string, Object> Properties { get; }
-        public Dictionary<string, Function> Functions { get; }
+        /// <summary>
+        /// Type symbol
+        /// </summary>
+        public string Name { get; }
 
-        public Object(BuiltinType type)
-            : this(type, type.GetName())
+        /// <summary>
+        /// Built-in type information
+        /// </summary>
+        public BuiltinType BuiltinType { get; }
+
+        /// <summary>
+        /// Symbol's parent
+        /// </summary>
+        public ISymbolContainer Parent { get; }
+
+        /// <summary>
+        /// Type's properties
+        /// </summary>
+        public Dictionary<string, IValueSymbol> Properties { get; }
+
+        /// <summary>
+        /// Type's functions
+        /// </summary>
+        public Dictionary<string, IValueSymbol> Functions { get; }
+
+        public TypeSymbol(BuiltinType type, ISymbolContainer parent)
         {
+            this.Name = type.ToString();
             this.BuiltinType = type;
+            this.Parent = parent;
+            this.Properties = new Dictionary<string, IValueSymbol>();
+            this.Functions = new Dictionary<string, IValueSymbol>();
         }
 
-        public Object(BuiltinType type, string name)
+        protected TypeSymbol(string name, BuiltinType type, ISymbolContainer parent)
+            : this (type, parent)
         {
             this.Name = name;
-            this.BuiltinType = type;
-            this.Properties = new Dictionary<string, Object>();
-            this.Functions = new Dictionary<string, Function>();
         }
 
         public override bool Equals(object obj)
         {
-            var objectType = obj as Object;
+            var objectType = obj as TypeSymbol;
 
             if (obj == null || objectType == null)
                 return false;
@@ -61,7 +83,7 @@ namespace Fl.Semantics.Types
             return true;
         }
 
-        public static bool operator ==(Object type1, Object type2)
+        public static bool operator ==(TypeSymbol type1, ITypeSymbol type2)
         {
             if (type1 is null)
                 return type2 is null;
@@ -69,17 +91,17 @@ namespace Fl.Semantics.Types
             return type1.Equals(type2);
         }
 
-        public static bool operator !=(Object type1, Object type2)
+        public static bool operator !=(TypeSymbol type1, ITypeSymbol type2)
         {
             return !(type1 == type2);
         }
 
         public override int GetHashCode()
         {
-            return this.Name.GetHashCode();
+            return base.GetHashCode();
         }
 
-        public virtual string ToSafeString(List<(Object type, string safestr)> safeTypes) => this.ToString();
+        public virtual string ToSafeString(List<(ITypeSymbol type, string safestr)> safeTypes) => this.ToString();
 
         public override string ToString()
         {
@@ -104,9 +126,9 @@ namespace Fl.Semantics.Types
             return assignedName;
         }
 
-        public virtual bool IsAssignableFrom(Object type)
+        public virtual string ToDebugString(int indent = 0)
         {
-            return this == type;
+            return this.BuiltinType.GetName();
         }
     }
 }

@@ -3,13 +3,14 @@
 
 using Fl.Ast;
 using Fl.Semantics.Exceptions;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class VariableTypeInferrer : INodeVisitor<TypeInferrerVisitor, VariableNode, InferredType>
+    class VariableTypeInferrer : INodeVisitor<TypeInferrerVisitor, VariableNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, VariableNode vardecl)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, VariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -22,35 +23,35 @@ namespace Fl.Semantics.Inferrers
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected InferredType VarDefinitionNode(TypeInferrerVisitor visitor, VariableDefinitionNode vardecl)
+        protected ITypeSymbol VarDefinitionNode(TypeInferrerVisitor visitor, VariableDefinitionNode vardecl)
         {
             foreach (var definition in vardecl.Definitions)
             {
                 // Symbol should be already resolved here
-                var leftSymbol = visitor.SymbolTable.Get(definition.Left.Value);
+                var leftSymbol = visitor.SymbolTable.GetBoundSymbol(definition.Left.Value);
 
                 // If the rhs is null, continue, is just a declaration
                 if (definition.Right == null)
                     continue;
 
                 // If it is a variable definition, get the right-hand side type info
-                var rhsInferredType = definition.Right?.Visit(visitor);
+                var rhsTypeSymbol = definition.Right?.Visit(visitor);
 
                 // If the symbol is an anonymous type, the rhs type is a must
-                if (leftSymbol.TypeInfo.IsAnonymousType && (rhsInferredType == null || rhsInferredType.TypeInfo == null || rhsInferredType.TypeInfo.Type == null))
+                if (leftSymbol.TypeSymbol is AnonymousSymbol && rhsTypeSymbol == null)
                     throw new SymbolException($"Implicitly-typed variable '{leftSymbol.Name}' needs to be initialized");
 
                 // Get the most general type that encloses both types
-                var generalType = visitor.Inferrer.FindMostGeneralType(leftSymbol.TypeInfo, rhsInferredType.TypeInfo);
+                var generalType = visitor.Inferrer.FindMostGeneralType(leftSymbol.TypeSymbol, rhsTypeSymbol);
 
                 // Update lhs and rhs (if present)
-                visitor.Inferrer.Unify(generalType, leftSymbol.TypeInfo, rhsInferredType.Symbol?.TypeInfo);
+                visitor.Inferrer.Unify(visitor.SymbolTable, generalType, leftSymbol);
             }
 
             return null;
         }
 
-        protected InferredType VarDestructuringNode(TypeInferrerVisitor visitor, VariableDestructuringNode destructuringNode)
+        protected ITypeSymbol VarDestructuringNode(TypeInferrerVisitor visitor, VariableDestructuringNode destructuringNode)
         {
             var inferredType = destructuringNode.Right.Visit(visitor);
 
@@ -62,13 +63,13 @@ namespace Fl.Semantics.Inferrers
                     continue;
 
                 // Symbol should be already resolved here
-                var lhs = visitor.SymbolTable.Get(declaration.Value);
+                var lhs = visitor.SymbolTable.GetBoundSymbol(declaration.Value);
 
                 // If it is a variable definition, get the right-hand side type info
-                var rhsType = (inferredType.TypeInfo.Type as Tuple).Types[i];
+                var rhsType = (inferredType as TupleSymbol).Types[i];
 
                 // Check types to see if we can unify them
-                visitor.Inferrer.FindMostGeneralType(lhs.TypeInfo, rhsType);
+                visitor.Inferrer.FindMostGeneralType(lhs.TypeSymbol, rhsType is ITypeSymbol rts ? rts : (rhsType as IBoundSymbol).TypeSymbol);
             }
 
             return inferredType;

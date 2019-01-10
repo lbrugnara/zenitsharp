@@ -7,47 +7,47 @@ using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
-    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, CallableNode, InferredType>
+    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, CallableNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, CallableNode node)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, CallableNode node)
         {
             // Get the callable inferred type (and symbol)
-            var inferredInfo = node.Target.Visit(visitor);
+            var typeSymbol = node.Target.Visit(visitor);
 
             // If the inferred type is an anonymous type, it means the target symbol's type has not
             // been defined yet, we need to infer the function type
-            if (inferredInfo.TypeInfo.IsAnonymousType)
-                return this.InferFromAnonymousCall(visitor, node, inferredInfo);
+            if (typeSymbol is AnonymousSymbol)
+                return this.InferFromAnonymousCall(visitor, node, typeSymbol);
 
             // If the inferred type is a Function, we have more information about the target, we can infer
             // both parameter and arguments types
-            if (inferredInfo.TypeInfo.Type is Function)
-                return this.InferFromFunctionCall(visitor, node, inferredInfo);
+            if (typeSymbol is FunctionSymbol)
+                return this.InferFromFunctionCall(visitor, node, typeSymbol);
 
             /*if (inferredInfo.Type is ClassMethod cm)
                 return this.InferFromFunctionCall(visitor, node, cm.Type as Function);
             */
-            /*if (inferredInfo.TypeInfo.Type is Class c)
+            /*if (inferredInfo.ITypeSymbol.Type is Class c)
                 return this.InferFromConstructorCall(visitor, node, inferredInfo);*/
 
             throw new System.Exception($"Cannot invoke a non-function object");
         }
         /*
-        private InferredType InferFromConstructorCall(TypeInferrerVisitor visitor, CallableNode node, InferredType inferredInfo)
+        private IValueSymbol InferFromConstructorCall(TypeInferrerVisitor visitor, CallableNode node, IValueSymbol inferredInfo)
         {
-            Class classType = inferredInfo.TypeInfo.Type as Class;
+            Class classType = inferredInfo.ITypeSymbol.Type as Class;
 
             var classScope = visitor.SymbolTable.Global.GetNestedScope(ScopeType.Class, inferredInfo.Symbol.Name);
 
             var ctorSymbol = classScope.TryGetSymbol(inferredInfo.Symbol.Name);
 
-            return new InferredType(new TypeInfo(new ClassInstance(classType)));
+            return new IValueSymbol(new ITypeSymbol(new ClassInstance(classType)));
         }*/
 
-        private InferredType InferFromAnonymousCall(TypeInferrerVisitor visitor, CallableNode node, InferredType inferred)
+        private ITypeSymbol InferFromAnonymousCall(TypeInferrerVisitor visitor, CallableNode node, ITypeSymbol inferred)
         {
             // The function we need to infer here is a Function type
-            Function funcType = new Function();
+            FunctionSymbol funcType = new FunctionSymbol(inferred.Name, inferred.Parent);
 
             // Iterate over the function arguments and infer funcType's types
             for (var i = 0; i < node.Arguments.Count; i++)
@@ -55,26 +55,27 @@ namespace Fl.Semantics.Inferrers
                 // Get the inferred argument type for this call
                 var inferredParamType = node.Arguments.Expressions[i].Visit(visitor);
 
+                funcType.CreateParameter(inferredParamType.Name, inferredParamType, Storage.Constant);
                 // Define a funcType parameter using the argument's inferred type
-                funcType.DefineParameterType(inferredParamType.TypeInfo.Type);
+                //funcType.DefineParameterType(inferredParamType.TypeSymbol.Type);
             }
 
             // We also need to infer the target's return type
             var rettype = visitor.Inferrer.NewAnonymousType();
 
             // Set the return type in the Function object
-            funcType.SetReturnType(rettype.Type);
+            funcType.UpdateReturnType(rettype);
 
             // Replace the symbol's anonymous type with the new inferred type
-            visitor.Inferrer.FindMostGeneralType(new TypeInfo(funcType), inferred.Symbol.TypeInfo);
+            visitor.Inferrer.FindMostGeneralType(funcType, inferred);
 
             // This invocation will have the function's return type
-            return new InferredType(rettype);
+            return rettype;
         }
 
-        private InferredType InferFromFunctionCall(TypeInferrerVisitor visitor, CallableNode node, InferredType inferredType)
+        private ITypeSymbol InferFromFunctionCall(TypeInferrerVisitor visitor, CallableNode node, ITypeSymbol inferredType)
         {
-            var funcType = inferredType.TypeInfo.Type as Function;
+            var funcType = inferredType as FunctionSymbol;
             // Check parameters count
             // TODO: This is not needed to be here
             if (funcType.Parameters.Count != node.Arguments.Expressions.Count)
@@ -87,11 +88,11 @@ namespace Fl.Semantics.Inferrers
                 var inferredParamType = node.Arguments.Expressions[i].Visit(visitor);
 
                 // If possible, make conclusions about the inferred argument type and the parameter type
-                //visitor.Inferrer.Unify(inferredParamType.TypeInfo, funcType.Parameters[i]);
+                //visitor.Inferrer.Unify(inferredParamType.ITypeSymbol, funcType.Parameters[i]);
             }
 
             // This invocation will have the function's return type
-            return new InferredType(new TypeInfo(funcType.Return), (inferredType.Symbol as FunctionSymbol).ReturnSymbol);
+            return funcType.Return.TypeSymbol;
         }
     }
 }

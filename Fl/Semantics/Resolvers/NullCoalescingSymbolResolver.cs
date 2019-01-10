@@ -3,15 +3,18 @@
 
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class NullCoalescingSymbolResolver : INodeVisitor<SymbolResolverVisitor, NullCoalescingNode>
+    class NullCoalescingSymbolResolver : INodeVisitor<SymbolResolverVisitor, NullCoalescingNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, NullCoalescingNode nullc)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, NullCoalescingNode nullc)
         {
-            nullc.Left.Visit(visitor);
-            nullc.Right.Visit(visitor);
+            var left = nullc.Left.Visit(visitor);
+            var right = nullc.Right.Visit(visitor);
+
+            return left ?? right;
         }
     }
 }

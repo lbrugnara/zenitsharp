@@ -7,9 +7,9 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Inferrers
 {
-    class WhileTypeInferrer : INodeVisitor<TypeInferrerVisitor, WhileNode, InferredType>
+    class WhileTypeInferrer : INodeVisitor<TypeInferrerVisitor, WhileNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, WhileNode wnode)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             visitor.SymbolTable.EnterLoopScope($"{wnode.Uid}");
@@ -18,7 +18,7 @@ namespace Fl.Semantics.Inferrers
             var conditionType = wnode.Condition.Visit(visitor);
 
             // We know we need a boolean type here
-            visitor.Inferrer.ExpectsToUnifyWith(conditionType.TypeInfo, BuiltinType.Bool);
+            //visitor.Inferrer.ExpectsToUnifyWith(conditionType.TypeSymbol, BuiltinType.Bool);
 
             // Emmit the body code
             wnode.Body.Visit(visitor);

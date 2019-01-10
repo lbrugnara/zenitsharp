@@ -13,8 +13,8 @@ namespace Fl.Semantics.Checkers
             var left = nullc.Left.Visit(checker);
             var right = nullc.Right.Visit(checker);
 
-            if (!left.TypeInfo.Type.IsAssignableFrom(right.TypeInfo.Type))
-                throw new System.Exception($"Operator ?? cannot be applied to operands of type {left.TypeInfo} and {right.TypeInfo}");
+            /*if (!left.TypeSymbol.Type.IsAssignableFrom(right.TypeSymbol.Type))
+                throw new System.Exception($"Operator ?? cannot be applied to operands of type {left.TypeSymbol} and {right.TypeSymbol}");*/
 
             left.Symbol = null;
 

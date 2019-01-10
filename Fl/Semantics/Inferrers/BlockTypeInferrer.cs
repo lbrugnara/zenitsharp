@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-
 using Fl.Ast;
 using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
-    class BlockTypeInferrer : INodeVisitor<TypeInferrerVisitor, BlockNode, InferredType>
+    class BlockTypeInferrer : INodeVisitor<TypeInferrerVisitor, BlockNode, ITypeSymbol>
     {
-        public InferredType Visit(TypeInferrerVisitor visitor, BlockNode node)
+        public ITypeSymbol Visit(TypeInferrerVisitor visitor, BlockNode node)
         {
             visitor.SymbolTable.EnterBlockScope(node.Uid);
 

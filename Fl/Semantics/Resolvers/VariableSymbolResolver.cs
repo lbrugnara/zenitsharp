@@ -8,22 +8,25 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class VariableSymbolResolver : INodeVisitor<SymbolResolverVisitor, VariableNode>
+    class VariableSymbolResolver : INodeVisitor<SymbolResolverVisitor, VariableNode, ITypeSymbol>
     {
-        public void Visit(SymbolResolverVisitor visitor, VariableNode vardecl)
+        public ITypeSymbol Visit(SymbolResolverVisitor visitor, VariableNode vardecl)
         {
             switch (vardecl)
             {
                 case VariableDefinitionNode vardefnode:
                     VarDefinitionNode(visitor, vardefnode);
-                    return;
+                    break;
 
                 case VariableDestructuringNode vardestnode:
                     VarDestructuringNode(visitor, vardestnode);
-                    return;
+                    break;
+
+                default:
+                    throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
             }
 
-            throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
+            return null;
         }
 
         protected void VarDefinitionNode(SymbolResolverVisitor binder, VariableDefinitionNode vardecl)
@@ -31,7 +34,7 @@ namespace Fl.Semantics.Resolvers
             // Get the type information:
             //  An anonymous type
             //  A named type
-            var typeInfo = SymbolHelper.GetTypeInfo(binder.SymbolTable, binder.Inferrer, vardecl.Information.Type);
+            var typeInfo = SymbolHelper.GetTypeSymbol(binder.SymbolTable, binder.Inferrer, vardecl.Information.Type);
             
             foreach (var definition in vardecl.Definitions)
             {
@@ -42,11 +45,23 @@ namespace Fl.Semantics.Resolvers
                 if (binder.SymbolTable.Contains(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
-                // Create the new symbol for the variable
-                var symbol = binder.SymbolTable.Insert(variableName, typeInfo, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability));
-
                 // If it is a variable definition, visit the right-hand side expression
-                definition.Right?.Visit(binder);
+                var rhsSymbol = definition.Right?.Visit(binder);
+
+                IBoundSymbol lhsSymbol = null;
+
+                if (rhsSymbol == null)
+                {
+                    // Create the new symbol for the variable
+                    lhsSymbol = binder.SymbolTable.Insert(variableName, typeInfo, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability));
+                }
+                else
+                {
+                    // Remove the bound -complex- symbol
+                    // binder.SymbolTable.Remove(rhsSymbol.Id);
+                    // Bind it to the variable name
+                    binder.SymbolTable.Insert(variableName, new BoundSymbol(variableName, rhsSymbol, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability), binder.SymbolTable.CurrentScope));
+                }
             }
         }
 
@@ -70,7 +85,7 @@ namespace Fl.Semantics.Resolvers
                 // for every variable. If not, we just get the type information from the token
                 var varType = destrnode.Information.Type.Type == Syntax.TokenType.Variable 
                     ? visitor.Inferrer.NewAnonymousType() 
-                    : SymbolHelper.GetTypeInfo(visitor.SymbolTable, visitor.Inferrer, destrnode.Information.Type);
+                    : SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, destrnode.Information.Type);
 
                 // Create the new symbol for the variable
                 var symbol = visitor.SymbolTable.Insert(variableName, varType, Access.Public, SymbolHelper.GetStorage(destrnode.Information.Mutability));

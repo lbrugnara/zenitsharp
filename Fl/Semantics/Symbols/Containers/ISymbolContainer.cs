@@ -4,13 +4,19 @@
 
 namespace Fl.Semantics.Symbols
 {
-    public interface ISymbolContainer : ISymbolTableEntry
+    public interface ISymbolContainer : ISymbol
     {
         /// <summary>
-        /// Adds symbol to this SymbolTable
+        /// Adds symbol to this SymbolTable bound to the specific name
         /// </summary>
         /// <param name="symbol"></param>
-        void Insert<T>(T symbol) where T : ISymbolTableEntry;
+        void Insert<T>(string name, T symbol) where T : ISymbol;
+
+        /// <summary>
+        /// Removes the symbol name from the table
+        /// </summary>
+        /// <param name="name"></param>
+        void Remove(string name);
 
         /// <summary>
         /// Return true if a symbol with that name exists in the
@@ -26,7 +32,7 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
-        T Get<T>(string name) where T : ISymbolTableEntry;
+        T Get<T>(string name) where T : ISymbol;
 
         /// <summary>
         /// Return a symbol with the provided name. It returns null
@@ -34,6 +40,6 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
-        T TryGet<T>(string name) where T : ISymbolTableEntry;
+        T TryGet<T>(string name) where T : ISymbol;
     }
 }
