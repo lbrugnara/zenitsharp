@@ -12,6 +12,8 @@ namespace Fl.Semantics.Resolvers
     {
         public ITypeSymbol Visit(SymbolResolverVisitor visitor, VariableNode vardecl)
         {
+            // Variable definition are statements and not expressions, therefore they do not return
+            // the ITypeSymbol received from the right-hand side
             switch (vardecl)
             {
                 case VariableDefinitionNode vardefnode:
@@ -67,7 +69,7 @@ namespace Fl.Semantics.Resolvers
 
         protected void VarDestructuringNode(SymbolResolverVisitor visitor, VariableDestructuringNode destrnode)
         {
-            destrnode.Right.Visit(visitor);
+            var types = destrnode.Right.Visit(visitor);
 
             foreach (var declaration in destrnode.Left)
             {

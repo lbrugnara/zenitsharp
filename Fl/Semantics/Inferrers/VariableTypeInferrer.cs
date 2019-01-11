@@ -53,7 +53,7 @@ namespace Fl.Semantics.Inferrers
 
         protected ITypeSymbol VarDestructuringNode(TypeInferrerVisitor visitor, VariableDestructuringNode destructuringNode)
         {
-            var inferredType = destructuringNode.Right.Visit(visitor);
+            var rhsTupleType = destructuringNode.Right.Visit(visitor) as TupleSymbol;
 
             for (int i=0; i < destructuringNode.Left.Count; i++)
             {
@@ -66,13 +66,15 @@ namespace Fl.Semantics.Inferrers
                 var lhs = visitor.SymbolTable.GetBoundSymbol(declaration.Value);
 
                 // If it is a variable definition, get the right-hand side type info
-                var rhsType = (inferredType as TupleSymbol).Types[i];
+                var rhsType = rhsTupleType.Types[i];
 
                 // Check types to see if we can unify them
-                visitor.Inferrer.FindMostGeneralType(lhs.TypeSymbol, rhsType is ITypeSymbol rts ? rts : (rhsType as IBoundSymbol).TypeSymbol);
+                var generalType = visitor.Inferrer.FindMostGeneralType(lhs.TypeSymbol, rhsType is ITypeSymbol rts ? rts : (rhsType as IBoundSymbol).TypeSymbol);
+
+                visitor.Inferrer.Unify(visitor.SymbolTable, generalType, lhs as IBoundSymbol);
             }
 
-            return inferredType;
+            return rhsTupleType;
         }
     }
 }

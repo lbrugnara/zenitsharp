@@ -32,7 +32,7 @@ namespace Fl.Semantics.Resolvers
         private void CreateParameterSymbol(SymbolResolverVisitor visitor, FunctionSymbol functionSymbol, ParameterNode parameter)
         {
             // If the parameter's type is present use it, if not use an anonymous type
-            var paramITypeSymbol = parameter.SymbolInfo.Type == null
+            var paramTypeSymbol = parameter.SymbolInfo.Type == null
                         ? visitor.Inferrer.NewAnonymousType()
                         : SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, parameter.SymbolInfo.Type);
 
@@ -40,7 +40,7 @@ namespace Fl.Semantics.Resolvers
             var storage = SymbolHelper.GetStorage(parameter.SymbolInfo.Mutability);
 
             // Create the parameter symbol in the function's scope
-            functionSymbol.CreateParameter(parameter.Name.Value, paramITypeSymbol, storage);
+            functionSymbol.CreateParameter(parameter.Name.Value, paramTypeSymbol, storage);
         }
     }
 }

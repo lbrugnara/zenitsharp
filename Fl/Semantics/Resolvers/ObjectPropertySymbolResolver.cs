@@ -29,6 +29,7 @@ namespace Fl.Semantics.Resolvers
             }
             else
             {
+                // If they right-hand side symbol is present, bound the property name with the symbol
                 typeSymbol = rhsSymbol;
                 visitor.SymbolTable.Insert(node.Name.Value, new BoundSymbol(node.Name.Value, rhsSymbol, Access.Public, SymbolHelper.GetStorage(node.Information.Mutability), visitor.SymbolTable.CurrentScope));
             }

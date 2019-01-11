@@ -382,9 +382,18 @@ namespace Fl.Syntax
                 variableType = new SymbolInformation(type, mutability, null, dimensions);
             }
 
-            // If there is a left parent present, it is a destructuring declaration
-            if (this.IsDestructuring())
-                return this.VarDestructuring(variableType);
+            var state = this.SaveCheckpoint();
+
+            try
+            {
+                // If there is a left parent present, it is a destructuring declaration
+                if (this.IsDestructuring())
+                    return this.VarDestructuring(variableType);
+            }
+            catch (Exception e)
+            {
+                this.RestoreCheckpoint(state);
+            }
 
             // If not, it is a simple typed var definition
             return new VariableDefinitionNode(variableType, this.TypedVarDefinition());
@@ -1583,7 +1592,8 @@ namespace Fl.Syntax
             if (this.MatchFrom(offset, TokenType.Identifier))
             {
                 // identifier identifier ( '=' expression )?
-                if (this.MatchFrom(offset + 1, TokenType.Identifier) && this.MatchAnyFrom(offset + 2, TokenType.Assignment, TokenType.Semicolon))
+                if (this.MatchFrom(offset + 1, TokenType.Identifier) 
+                    && (this.MatchAnyFrom(offset + 2, TokenType.Assignment, TokenType.Semicolon) || this.MatchAnyFrom(offset + 2, TokenType.Comma, TokenType.Identifier)))
                     return true;
 
                 // identifier ( '[' ']' )+ identifier ( '=' expression )?

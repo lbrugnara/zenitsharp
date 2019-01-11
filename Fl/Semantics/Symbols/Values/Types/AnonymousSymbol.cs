@@ -18,9 +18,14 @@ namespace Fl.Semantics.Symbols
             this.Name = name;
         }
 
-        public string ToDebugString(int indent = 0)
+        public override string ToString()
         {
             return this.Name;
         }
+
+        public string ToDebugString(int indent = 0)
+        {
+            return this.Name;
+        }        
     }
 }
