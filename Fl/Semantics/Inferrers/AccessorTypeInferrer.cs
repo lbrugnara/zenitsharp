@@ -12,8 +12,7 @@ namespace Fl.Semantics.Inferrers
     class AccessorTypeInferrer : INodeVisitor<TypeInferrerVisitor, AccessorNode, ITypeSymbol>
     {
         public ITypeSymbol Visit(TypeInferrerVisitor inferrer, AccessorNode accessor)
-        {
-            IBoundSymbol symbol = null;
+        {           
             string symbolName = accessor.Target.Value;
 
             // If this is the end of the accessor path, get the symbol in the current
@@ -21,10 +20,12 @@ namespace Fl.Semantics.Inferrers
             if (accessor.Parent == null)
             {
                 // Get accessed symbol that must be defined in the symtable's scope
-                symbol = inferrer.SymbolTable.GetBoundSymbol(symbolName);
+                var symbol = inferrer.SymbolTable.CurrentScope.Get<IValueSymbol>(symbolName);
 
-                // Return the inferred type information for this symbol
-                return symbol.TypeSymbol;
+                if (symbol is IBoundSymbol bs)                
+                    return bs.TypeSymbol;
+
+                return symbol as ITypeSymbol;
             }
 
             // If the accessed member has an eclosing accessor node, visit

@@ -11,8 +11,12 @@ namespace Fl.Semantics.Resolvers
     {
         public ITypeSymbol Visit(SymbolResolverVisitor visitor, CallableNode node)
         {
-            node.Target.Visit(visitor);
+            var target = node.Target.Visit(visitor);
+
             node.Arguments.Expressions.ForEach(e => e.Visit(visitor));
+
+            if (target is FunctionSymbol fs)
+                return fs?.Return.TypeSymbol;
 
             return null;
         }

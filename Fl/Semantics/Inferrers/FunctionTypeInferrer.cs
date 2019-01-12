@@ -14,12 +14,6 @@ namespace Fl.Semantics.Inferrers
         public ITypeSymbol Visit(TypeInferrerVisitor visitor, FunctionNode funcdecl)
         {
             // Get the function symbol
-            var functionSymbol = visitor.SymbolTable.GetBoundSymbol(funcdecl.Name);
-
-            // Get the function's type we may update at this step
-            var functionType = functionSymbol.TypeSymbol;
-
-            // Enter the requested function's block
             var functionScope = visitor.SymbolTable.EnterFunctionScope(funcdecl.Name);
 
             // Grab all the parameters' symbols
@@ -81,7 +75,7 @@ namespace Fl.Semantics.Inferrers
             visitor.SymbolTable.LeaveScope();
 
             // Return inferred function type
-            return functionSymbol.TypeSymbol;
+            return functionScope;
         }
     }
 }

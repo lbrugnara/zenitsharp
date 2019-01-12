@@ -11,28 +11,21 @@ namespace Fl.Semantics.Resolvers
     {
         public ITypeSymbol Visit(SymbolResolverVisitor visitor, ObjectPropertyNode node)
         {
-            ITypeSymbol typeSymbol = null;
+            var storage = SymbolHelper.GetStorage(node.Information.Mutability);
 
             // Visit the property's value node
             var rhsSymbol = visitor.Visit(node.Value);
 
-            if (rhsSymbol == null)
+            if (rhsSymbol != null)
             {
-                // Create the symbol for the object's property
-                var boundSymbol = visitor.SymbolTable.Insert(
-                    node.Name.Value,
-                    SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, node.Information.Type),
-                    Symbols.Access.Public,
-                    SymbolHelper.GetStorage(node.Information.Mutability)
-                );
-                typeSymbol = boundSymbol.TypeSymbol;
+                visitor.SymbolTable.Insert(node.Name.Value, new BoundSymbol(node.Name.Value, rhsSymbol, Access.Public, storage, visitor.SymbolTable.CurrentScope));
+                return rhsSymbol;
             }
-            else
-            {
-                // If they right-hand side symbol is present, bound the property name with the symbol
-                typeSymbol = rhsSymbol;
-                visitor.SymbolTable.Insert(node.Name.Value, new BoundSymbol(node.Name.Value, rhsSymbol, Access.Public, SymbolHelper.GetStorage(node.Information.Mutability), visitor.SymbolTable.CurrentScope));
-            }
+
+            var typeSymbol = SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, node.Information.Type);
+
+            // Create the symbol for the object's property
+            visitor.SymbolTable.Insert(node.Name.Value, typeSymbol, Access.Public, storage);
 
             return typeSymbol;
         }

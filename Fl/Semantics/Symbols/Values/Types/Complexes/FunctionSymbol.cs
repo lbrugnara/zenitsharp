@@ -27,7 +27,7 @@ namespace Fl.Semantics.Symbols
             this.Parameters = new List<IBoundSymbol>();
 
             // Create the @ret symbol and save it into the function's symbol table
-            this.Return = new BoundSymbol("@ret", new PrimitiveSymbol(BuiltinType.None, this), Access.Public, Storage.Mutable, this);
+            this.Return = new BoundSymbol("@ret", new AnonymousSymbol(), Access.Public, Storage.Mutable, this);
             this.Insert("@ret", this.Return);
         }        
 

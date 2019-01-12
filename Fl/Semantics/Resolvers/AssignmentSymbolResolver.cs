@@ -12,23 +12,28 @@ namespace Fl.Semantics.Resolvers
         public ITypeSymbol Visit(SymbolResolverVisitor visitor, AssignmentNode node)
         {
             if (node is VariableAssignmentNode)
-                this.MakeVariableAssignment(node as VariableAssignmentNode, visitor);
-            else if (node is DestructuringAssignmentNode)
-                this.MakeDestructuringAssignment(node as DestructuringAssignmentNode, visitor);
+                return this.MakeVariableAssignment(node as VariableAssignmentNode, visitor);
 
-            return null;
+            if (node is DestructuringAssignmentNode)
+                return this.MakeDestructuringAssignment(node as DestructuringAssignmentNode, visitor);
+
+            throw new System.Exception($"Unhandled AssignmentNode type {node.GetType().FullName}");
         }
 
-        private void MakeVariableAssignment(VariableAssignmentNode node, SymbolResolverVisitor visitor)
+        private ITypeSymbol MakeVariableAssignment(VariableAssignmentNode node, SymbolResolverVisitor visitor)
         {
-            node.Accessor.Visit(visitor);
+            var left = node.Accessor.Visit(visitor);
             node.Right.Visit(visitor);
+
+            return left;
         }
 
-        private void MakeDestructuringAssignment(DestructuringAssignmentNode node, SymbolResolverVisitor visitor)
+        private ITypeSymbol MakeDestructuringAssignment(DestructuringAssignmentNode node, SymbolResolverVisitor visitor)
         {
-            node.Left.Visit(visitor);
+            var left = node.Left.Visit(visitor);
             node.Right.Visit(visitor);
+
+            return left;
         }
     }
 }

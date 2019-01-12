@@ -1240,7 +1240,7 @@ namespace Fl.Syntax
                     if (this.MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
                     {
                         Token assignmentop = this.Consume();
-                        Node expression = this.Expression();
+                        Node expression = this.TupleInitializer();
                         return new DestructuringAssignmentNode(lvalue, assignmentop, expression as TupleNode);
                     }
                 }

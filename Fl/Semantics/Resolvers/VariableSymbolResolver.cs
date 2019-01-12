@@ -33,11 +33,6 @@ namespace Fl.Semantics.Resolvers
 
         protected void VarDefinitionNode(SymbolResolverVisitor binder, VariableDefinitionNode vardecl)
         {
-            // Get the type information:
-            //  An anonymous type
-            //  A named type
-            var typeInfo = SymbolHelper.GetTypeSymbol(binder.SymbolTable, binder.Inferrer, vardecl.Information.Type);
-            
             foreach (var definition in vardecl.Definitions)
             {
                 // Get the identifier name
@@ -55,7 +50,9 @@ namespace Fl.Semantics.Resolvers
                 if (rhsSymbol == null)
                 {
                     // Create the new symbol for the variable
-                    lhsSymbol = binder.SymbolTable.Insert(variableName, typeInfo, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability));
+                    var typeInfo = SymbolHelper.GetTypeSymbol(binder.SymbolTable, binder.Inferrer, vardecl.Information.Type);
+                    var storage = SymbolHelper.GetStorage(vardecl.Information.Mutability);
+                    lhsSymbol = binder.SymbolTable.Insert(variableName, typeInfo, Access.Public, storage);
                 }
                 else
                 {
