@@ -9,5 +9,10 @@ namespace Fl.Semantics.Symbols.Values
     /// </summary>
     public interface IValueSymbol : ISymbol
     {
+        /// <summary>
+        /// Returns a representation of the value symbol
+        /// </summary>
+        /// <returns></returns>
+        string ToValueString();
     }
 }

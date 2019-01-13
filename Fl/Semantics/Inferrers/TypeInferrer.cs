@@ -55,7 +55,7 @@ namespace Fl.Semantics.Inferrers
                 switch (left.BuiltinType)
                 {
                     case BuiltinType.Function:
-                        type = new FunctionSymbol(this.namegen.Generate(), left.Parent ?? right.Parent);
+                        type = new FunctionSymbol(this.namegen.Generate(), this.NewAnonymousType(), left.Parent ?? right.Parent);
                         break;
                     case BuiltinType.Tuple:
                         type = new TupleSymbol(this.namegen.Generate(), left.Parent ?? right.Parent);

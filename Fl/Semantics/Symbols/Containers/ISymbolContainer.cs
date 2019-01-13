@@ -41,5 +41,12 @@ namespace Fl.Semantics.Symbols
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
         T TryGet<T>(string name) where T : ISymbol;
+
+        /// <summary>
+        /// String with a dump of the entry
+        /// </summary>
+        /// <param name="indent">Indentation of the members of the entry</param>
+        /// <returns></returns>
+        string ToDumpString(int indent = 0);
     }
 }

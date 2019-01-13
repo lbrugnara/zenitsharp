@@ -16,7 +16,7 @@ namespace Fl.Semantics.Inferrers
             var inferredTypes = node.Items?.Select(i => i?.Visit(visitor));
             return new TupleSymbol("tuple", visitor.SymbolTable.CurrentScope)
             {
-                Types = inferredTypes.OfType<IValueSymbol>().Where(it => it != null).ToList()
+                Types = inferredTypes.OfType<ITypeSymbol>().Where(it => it != null).ToList()
             };
         }
     }

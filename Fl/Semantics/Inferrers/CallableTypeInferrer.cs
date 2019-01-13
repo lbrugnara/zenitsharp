@@ -47,7 +47,7 @@ namespace Fl.Semantics.Inferrers
         private ITypeSymbol InferFromAnonymousCall(TypeInferrerVisitor visitor, CallableNode node, ITypeSymbol inferred)
         {
             // The function we need to infer here is a Function type
-            FunctionSymbol funcType = new FunctionSymbol(inferred.Name, inferred.Parent);
+            FunctionSymbol funcType = new FunctionSymbol(inferred.Name, visitor.Inferrer.NewAnonymousType(), inferred.Parent);
 
             // Iterate over the function arguments and infer funcType's types
             for (var i = 0; i < node.Arguments.Count; i++)

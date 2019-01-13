@@ -15,7 +15,7 @@ namespace Fl.Semantics.Checkers
         {
             var types = node.Items?.Select(i => i?.Visit(checker)?.TypeSymbol);
             return new CheckedType(new TupleSymbol("tuple", checker.SymbolTable.CurrentScope) {
-                Types = types.OfType<IValueSymbol>().ToList()
+                Types = types.OfType<ITypeSymbol>().ToList()
             });
         }
     }

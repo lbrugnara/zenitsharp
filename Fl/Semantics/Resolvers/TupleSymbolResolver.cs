@@ -15,7 +15,7 @@ namespace Fl.Semantics.Resolvers
             // Tuples always return the TupleSymbol type
             var types = new TupleSymbol("tuple", visitor.SymbolTable.CurrentScope)
             {
-                Types = node.Items?.Select(item => item.Visit(visitor)).Cast<IValueSymbol>().ToList()
+                Types = node.Items?.Select(item => item.Visit(visitor)).Cast<ITypeSymbol>().ToList()
             };
 
             return types != null && !types.Types.All(t => t == null) ? types : null;

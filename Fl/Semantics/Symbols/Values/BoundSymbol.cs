@@ -53,9 +53,9 @@ namespace Fl.Semantics.Symbols
             return str;
         }
 
-        public virtual string ToDebugString(int indent = 0)
+        public string ToValueString()
         {
-            return "".PadLeft(indent) + this.ToString();
+            return $"{this.Name}: {this.TypeSymbol.ToValueString()}";
         }
     }
 }

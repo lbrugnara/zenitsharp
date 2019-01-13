@@ -3,6 +3,7 @@
 
 using Fl.Semantics.Types;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Fl.Semantics.Symbols
 {
@@ -31,6 +32,26 @@ namespace Fl.Semantics.Symbols
             this.Functions[name] = symbol;
 
             return symbol;
+        }
+
+        public override string ToValueString()
+        {
+            var members = new List<string>();
+
+            var symbols = this.Symbols.Where(kvp => kvp.Value is IBoundSymbol).Select(kvp => kvp.Value as IBoundSymbol).ToList();
+
+            foreach (var value in symbols)
+                members.Add(value.ToValueString());
+
+            if (members.Any())
+                return $"{{ {string.Join(", ", members)} }}";
+
+            return "{}";
+        }
+
+        public override string ToSafeString(params (ITypeSymbol type, string safestr)[] safeTypes)
+        {
+            return this.ToValueString();
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Fl.Semantics.Exceptions;
+using Fl.Semantics.Inferrers;
 using Fl.Semantics.Types;
 using Fl.Syntax;
 
@@ -25,10 +26,13 @@ namespace Fl.Semantics.Symbols
 
         private readonly Dictionary<string, List<Token>> unresolved;
 
-        public SymbolTable()
+        private TypeInferrer TypeInferrer { get; }
+
+        public SymbolTable(TypeInferrer typeInferrer)
         {
             // Create the @global scope and set it as the current scope
             this.Global = this.CurrentScope = new Block("@global");
+            this.TypeInferrer = typeInferrer;
             this.unresolved = new Dictionary<string, List<Token>>();
         }
 
@@ -106,7 +110,7 @@ namespace Fl.Semantics.Symbols
             }            
 
             if (typeof(T) == typeof(FunctionSymbol))
-                scope = new FunctionSymbol(name, parent) as T;
+                scope = new FunctionSymbol(name, this.TypeInferrer.NewAnonymousType(), parent) as T;
             else if (typeof(T) == typeof(ObjectSymbol))
                 scope = new ObjectSymbol(name, parent) as T;
             else if (typeof(T) == typeof(ClassSymbol))
@@ -202,7 +206,7 @@ namespace Fl.Semantics.Symbols
 
             sb.AppendLine("[Symbol Table]");
 
-            sb.AppendLine(this.Global.ToDebugString(1));
+            sb.AppendLine(this.Global.ToDumpString());
 
             return sb.ToString();
         }

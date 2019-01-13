@@ -21,13 +21,13 @@ namespace Fl.Semantics.Symbols
         public IBoundSymbol Return { get; }
 
 
-        public FunctionSymbol(string name, ISymbolContainer parent)
+        public FunctionSymbol(string name, ITypeSymbol returnType, ISymbolContainer parent)
             : base (name, BuiltinType.Function, parent)
         {
             this.Parameters = new List<IBoundSymbol>();
 
             // Create the @ret symbol and save it into the function's symbol table
-            this.Return = new BoundSymbol("@ret", new AnonymousSymbol(), Access.Public, Storage.Mutable, this);
+            this.Return = new BoundSymbol("@ret", returnType, Access.Public, Storage.Mutable, this);
             this.Insert("@ret", this.Return);
         }        
 
@@ -85,32 +85,43 @@ namespace Fl.Semantics.Symbols
                     || this.Return == func.Return;
         }
 
-        public override string ToSafeString(List<(ITypeSymbol type, string safestr)> safeTypes)
+        public override string ToString()
+        {
+            return this.ToSafeString((this, "self"));
+        }
+
+        public override string ToValueString()
+        {
+            return this.ToSafeString((this, "self"));
+        }
+
+        public override string ToSafeString(params (ITypeSymbol type, string safestr)[] safeTypes)
         {
             var parameters = this.Parameters
-                            .Select(s => s?.ToString() ?? "?")
+                            .Select(s => s?.ToValueString() ?? "?")
                             .ToList();
 
-            var str = base.ToString() + "(" + string.Join(", ", parameters) + $"):";
+            var str = $"fn {this.Name}({string.Join(", ", parameters)})->";
 
-            str += " ";
-            if (safeTypes.Any(st => st.type == this.Return))
+            if (safeTypes.Any(st => st.type == this.Return.TypeSymbol))
             {
-                str += safeTypes.First(st => st.type == this.Return).safestr;
+                str += safeTypes.First(st => st.type == this.Return.TypeSymbol).safestr;
             }
-            else if (this.Return is TupleSymbol ttype)
+            else if (this.Return.TypeSymbol is TupleSymbol ttype)
             {
-                safeTypes.Add((this, "...<cyclic func ref>"));
-                str += ttype.ToSafeString(safeTypes);
+                var l = safeTypes.ToList();
+                l.Add((this, "...<cyclic func ref>"));
+                str += ttype.ToSafeString(l.ToArray());
             }
-            else if (this.Return is FunctionSymbol ftype)
+            else if (this.Return.TypeSymbol is FunctionSymbol ftype)
             {
-                safeTypes.Add((this, "...<cyclic func ref>"));
-                str += ftype.ToSafeString(safeTypes);
+                var l = safeTypes.ToList();
+                l.Add((this, "...<cyclic func ref>"));
+                str += ftype.ToSafeString(l.ToArray());
             }
             else
             {
-                str += this.Return?.ToString() ?? "void";
+                str += this.Return.TypeSymbol?.ToString() ?? "void";
             }
 
             return str;

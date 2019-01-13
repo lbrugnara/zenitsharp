@@ -18,12 +18,5 @@ namespace Fl.Semantics.Symbols
         /// Reference to the parent scope, if present
         /// </summary>
         ISymbolContainer Parent { get; }
-
-        /// <summary>
-        /// String with a dump of the entry
-        /// </summary>
-        /// <param name="indent">Indentation of the members of the entry</param>
-        /// <returns></returns>
-        string ToDebugString(int indent = 0);
     }
 }

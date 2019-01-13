@@ -50,5 +50,15 @@ namespace Fl.Semantics.Symbols
 
             return symbol;
         }
+
+        public override string ToValueString()
+        {
+            return "class (FIXME)";
+        }
+
+        public override string ToSafeString(params (ITypeSymbol type, string safestr)[] safeTypes)
+        {
+            return ToValueString();
+        }
     }
 }

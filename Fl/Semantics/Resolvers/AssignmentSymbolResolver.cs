@@ -23,7 +23,7 @@ namespace Fl.Semantics.Resolvers
         private ITypeSymbol MakeVariableAssignment(VariableAssignmentNode node, SymbolResolverVisitor visitor)
         {
             var left = node.Accessor.Visit(visitor);
-            node.Right.Visit(visitor);
+            var right = node.Right.Visit(visitor);
 
             return left;
         }
@@ -31,7 +31,7 @@ namespace Fl.Semantics.Resolvers
         private ITypeSymbol MakeDestructuringAssignment(DestructuringAssignmentNode node, SymbolResolverVisitor visitor)
         {
             var left = node.Left.Visit(visitor);
-            node.Right.Visit(visitor);
+            var right = node.Right.Visit(visitor);
 
             return left;
         }

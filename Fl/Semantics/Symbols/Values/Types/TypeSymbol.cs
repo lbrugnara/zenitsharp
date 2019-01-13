@@ -101,11 +101,9 @@ namespace Fl.Semantics.Symbols
             return base.GetHashCode();
         }
 
-        public virtual string ToSafeString(List<(ITypeSymbol type, string safestr)> safeTypes) => this.ToString();
-
-        public override string ToString()
+        /*public override string ToString()
         {
-            var assignedName = $"{this.Name}";
+            var assignedName = $"{this.BuiltinType.GetName()}";
 
             if (this.Properties.Count > 0 || this.Functions.Count > 0)
                 assignedName += " {";
@@ -113,10 +111,10 @@ namespace Fl.Semantics.Symbols
             var members = new List<string>();
 
             foreach (var kvp in this.Properties)
-                members.Add($"{kvp.Key}: {kvp.Value}");
+                members.Add($"{kvp.Key}: {kvp.Value.ToDebugString()}");
 
             foreach (var kvp in this.Functions)
-                members.Add($"{kvp.Key}: {kvp.Value}");
+                members.Add($"{kvp.Key}: {kvp.Value.ToDebugString()}");
 
             assignedName += string.Join(", ", members);
 
@@ -124,11 +122,8 @@ namespace Fl.Semantics.Symbols
                 assignedName += "} ";
 
             return assignedName;
-        }
+        }*/
 
-        public virtual string ToDebugString(int indent = 0)
-        {
-            return this.BuiltinType.GetName();
-        }
+        public abstract string ToValueString();
     }
 }

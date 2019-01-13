@@ -104,22 +104,37 @@ namespace Fl.Semantics.Symbols
 
         #endregion
 
-        public virtual string ToDebugString(int indent = 0)
+        public virtual string ToDumpString(int indent = 0)
         {
-            int titleIndentN = indent + 1;
-            int memberIndentN = indent + 2;
-
-            var sb = new StringBuilder();
+            int titleIndentN = indent + 2;
+            int memberIndentN = indent + 4;
 
             // Title
             var nameIndent = "".PadLeft(indent);
-            sb.AppendLine($"{nameIndent}[{this.GetType().Name} '{this.Name}']");
 
-            foreach (var (name, symbolEntry) in this.Symbols.Where(kvp => kvp.Value is IBoundSymbol))
-                sb.AppendLine($"{"".PadLeft(memberIndentN)}{name}: {(symbolEntry as IBoundSymbol).TypeSymbol.ToDebugString(memberIndentN)}");
+            if (!this.Symbols.Any())
+                return $"{nameIndent}{this.Name} {{}}";
 
-            foreach (var (name, symbolEntry) in this.Symbols.Where(kvp => kvp.Value is ISymbolContainer))
-                sb.AppendLine((symbolEntry as ISymbolContainer).ToDebugString(memberIndentN));
+            var sb = new StringBuilder();
+            sb.AppendLine($"{nameIndent}{this.Name} {{");
+
+            foreach (var (name, symbol) in this.Symbols)
+            {
+                if (symbol is IBoundSymbol bs)
+                {
+                    sb.AppendLine($"{"".PadLeft(memberIndentN)}{bs.ToValueString()}");
+                }
+                else if (symbol is ISymbolContainer sc)
+                {
+                    sb.AppendLine(sc.ToDumpString(memberIndentN));
+                }
+                else
+                {
+                    sb.AppendLine($"NOT HANDLED SYMBOL {symbol.GetType()}");
+                }
+            }
+
+            sb.Append($"{nameIndent}}}");
 
             return sb.ToString();
         }

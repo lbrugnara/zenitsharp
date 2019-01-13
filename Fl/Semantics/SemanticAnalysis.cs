@@ -48,7 +48,7 @@ namespace Fl.Semantics
         public SemanticAnalysis()
         {
             this.typeInferrer = new TypeInferrer();
-            this.symbolTable = new SymbolTable();
+            this.symbolTable = new SymbolTable(typeInferrer);
 
             this.resolver = new SymbolResolverVisitor(this.symbolTable, this.typeInferrer);
             this.inferrer = new TypeInferrerVisitor(this.symbolTable, this.typeInferrer);

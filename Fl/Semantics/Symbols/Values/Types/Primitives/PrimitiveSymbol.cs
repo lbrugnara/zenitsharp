@@ -17,9 +17,6 @@ namespace Fl.Semantics.Symbols
             return this.BuiltinType.GetName();
         }
 
-        public override string ToDebugString(int indent = 0)
-        {
-            return this.BuiltinType.GetName();
-        }
+        public override string ToValueString() => this.ToString();
     }
 }

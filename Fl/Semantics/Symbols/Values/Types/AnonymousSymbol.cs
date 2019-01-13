@@ -13,7 +13,7 @@ namespace Fl.Semantics.Symbols
 
         public BuiltinType BuiltinType => BuiltinType.Anonymous;
 
-        public AnonymousSymbol(string name = "'a")
+        public AnonymousSymbol(string name)
         {
             this.Name = name;
         }
@@ -23,7 +23,7 @@ namespace Fl.Semantics.Symbols
             return this.Name;
         }
 
-        public string ToDebugString(int indent = 0)
+        public string ToValueString()
         {
             return this.Name;
         }        

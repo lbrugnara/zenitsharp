@@ -14,7 +14,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Contains symbols defined in this scope
         /// </summary>
-        private Dictionary<string, ISymbol> Symbols { get; }
+        protected Dictionary<string, ISymbol> Symbols { get; }
 
         protected ComplexSymbol(string name, BuiltinType type, ISymbolContainer parent)
             : base(name, type, parent)
@@ -74,22 +74,39 @@ namespace Fl.Semantics.Symbols
 
         #endregion
 
-        public override string ToDebugString(int indent = 0)
-        {
-            int titleIndentN = indent + 1;
-            int memberIndentN = indent + 2;
+        public abstract string ToSafeString(params (ITypeSymbol type, string safestr)[] safeTypes);
 
-            var sb = new StringBuilder();
+        public virtual string ToDumpString(int indent = 0)
+        {
+            int titleIndentN = indent + 2;
+            int memberIndentN = indent + 4;
 
             // Title
             var nameIndent = "".PadLeft(indent);
-            sb.AppendLine($"{nameIndent}[{this.BuiltinType} '{this.Name}']");
 
-            foreach (var (name, symbolEntry) in this.Symbols.Where(kvp => kvp.Value is IBoundSymbol))
-                sb.AppendLine($"{"".PadLeft(memberIndentN)}{name}: {(symbolEntry as IBoundSymbol).TypeSymbol.ToDebugString(memberIndentN)}");
+            if (!this.Symbols.Any())
+                return $"{nameIndent}{this.Name} {{}}";
 
-            foreach (var (name, symbolEntry) in this.Symbols.Where(kvp => kvp.Value is ISymbolContainer))
-                sb.AppendLine((symbolEntry as ISymbolContainer).ToDebugString(memberIndentN));
+            var sb = new StringBuilder();
+            sb.AppendLine($"{nameIndent}{this.Name} {{");
+
+            foreach (var (name, symbol) in this.Symbols)
+            {
+                if (symbol is IBoundSymbol bs)
+                {
+                    sb.AppendLine($"{"".PadLeft(memberIndentN)}{bs.ToValueString()}");
+                }
+                else if (symbol is ISymbolContainer sc)
+                {
+                    sb.AppendLine(sc.ToDumpString(memberIndentN));
+                }
+                else
+                {
+                    sb.AppendLine($"NOT HANDLED SYMBOL {symbol.GetType()}");
+                }
+            }
+
+            sb.Append($"{nameIndent}}}");
 
             return sb.ToString();
         }

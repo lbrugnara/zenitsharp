@@ -10,12 +10,12 @@ namespace Fl.Semantics.Symbols
 {
     public class TupleSymbol : ComplexSymbol
     {
-        public List<IValueSymbol> Types { get; set; }
+        public List<ITypeSymbol> Types { get; set; }
 
         public TupleSymbol(string name, ISymbolContainer parent)
             : base(name, BuiltinType.Tuple, parent)
         {
-            this.Types = new List<IValueSymbol>();
+            this.Types = new List<ITypeSymbol>();
         }
 
         public override bool Equals(object obj)
@@ -38,7 +38,12 @@ namespace Fl.Semantics.Symbols
             return !(type1 == type2);
         }
 
-        public override string ToSafeString(List<(ITypeSymbol type, string safestr)> safeTypes)
+        public override string ToValueString()
+        {
+            return this.ToSafeString((this, "self"));
+        }
+
+        public override string ToSafeString(params (ITypeSymbol type, string safestr)[] safeTypes)
         {
             var types = this.Types.Select(t =>
             {
@@ -50,15 +55,15 @@ namespace Fl.Semantics.Symbols
                 else if (t is FunctionSymbol ftype)
                     return ftype.ToSafeString(safeTypes);
 
-                return t.ToString() ?? "?";
-            });
+                return t.ToValueString() ?? "?";
+            }).ToList();
 
-            return base.ToString() + "(" + string.Join(", ", types) + ")";
+            return $"({string.Join(", ", types)})";
         }
 
         public override string ToString()
         {
-            return this.ToSafeString(new List<(ITypeSymbol type, string safestr)>());
+            return this.ToSafeString((this, "self"));
         }
     }
 }
