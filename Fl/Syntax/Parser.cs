@@ -390,7 +390,7 @@ namespace Fl.Syntax
                 if (this.IsDestructuring())
                     return this.VarDestructuring(variableType);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 this.RestoreCheckpoint(state);
             }

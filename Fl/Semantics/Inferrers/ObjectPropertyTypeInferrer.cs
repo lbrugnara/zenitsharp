@@ -18,7 +18,7 @@ namespace Fl.Semantics.Inferrers
             var generalType = visitor.Inferrer.FindMostGeneralType(property.TypeSymbol, rightType);
             
             // Unify the types
-            visitor.Inferrer.Unify(generalType, property.TypeSymbol, rightType);
+            visitor.Inferrer.Unify(visitor.SymbolTable, generalType, property);
 
             return property.TypeSymbol;
         }

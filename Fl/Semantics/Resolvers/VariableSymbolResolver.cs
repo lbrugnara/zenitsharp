@@ -53,6 +53,9 @@ namespace Fl.Semantics.Resolvers
                     var typeInfo = SymbolHelper.GetTypeSymbol(binder.SymbolTable, binder.Inferrer, vardecl.Information.Type);
                     var storage = SymbolHelper.GetStorage(vardecl.Information.Mutability);
                     lhsSymbol = binder.SymbolTable.Insert(variableName, typeInfo, Access.Public, storage);
+
+                    if (typeInfo is AnonymousSymbol asym)
+                        binder.Inferrer.TrackSymbol(lhsSymbol, asym);
                 }
                 else
                 {
@@ -83,7 +86,7 @@ namespace Fl.Semantics.Resolvers
                 // If the type anotation is not specific (uses 'var'), we need to create an anonymous type
                 // for every variable. If not, we just get the type information from the token
                 var varType = destrnode.Information.Type.Type == Syntax.TokenType.Variable 
-                    ? visitor.Inferrer.NewAnonymousType() 
+                    ? visitor.Inferrer.NewAnonymousType()
                     : SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, destrnode.Information.Type);
 
                 // Create the new symbol for the variable

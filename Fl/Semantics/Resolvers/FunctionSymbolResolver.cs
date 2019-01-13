@@ -20,9 +20,6 @@ namespace Fl.Semantics.Resolvers
             // Visit the function's body
             funcdecl.Body.ForEach(s => s.Visit(visitor));
 
-            // Create the return type, anonymous by now
-            functionSymbol.UpdateReturnType(visitor.Inferrer.NewAnonymousType());
-
             // Restore previous scope
             visitor.SymbolTable.LeaveScope();
 

@@ -23,9 +23,7 @@ namespace Fl.Semantics.Inferrers
             // If there's an empty return statement, leave here
             if (rnode.Expression == null)
             {
-                //visitor.Inferrer.ExpectsToUnifyWith(functionScope.ReturnSymbol.TypeSymbol, BuiltinType.Void);
-                // again, we assume the first return's expression type is the function's return type
-                functionScope.UpdateReturnType(functionScope.Return.TypeSymbol);
+                visitor.Inferrer.Unify(visitor.SymbolTable, new VoidSymbol(), functionScope.Return);
 
                 return functionScope.Return.TypeSymbol;
             }
@@ -40,10 +38,9 @@ namespace Fl.Semantics.Inferrers
             //if ((typeInfo is TupleSymbol t) && t.Types.Count == 1)
             //    typeInfo.ChangeType(t.Types.First());
 
-            visitor.Inferrer.FindMostGeneralType(typeInfo, functionScope.Return.TypeSymbol);
+            var generalType = visitor.Inferrer.FindMostGeneralType(typeInfo, functionScope.Return.TypeSymbol);
 
-            // again, we assume the first return's expression type is the function's return type
-            functionScope.UpdateReturnType(typeInfo);
+            visitor.Inferrer.Unify(visitor.SymbolTable, generalType, functionScope.Return);
 
             // If the @ret type is an assumption, register the symbol under that assumption too
             /*if (visitor.Inferrer.IsTypeAssumption(functionScope.Return.ITypeSymbol))

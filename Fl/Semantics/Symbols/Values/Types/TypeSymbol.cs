@@ -24,23 +24,11 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         public ISymbolContainer Parent { get; }
 
-        /// <summary>
-        /// Type's properties
-        /// </summary>
-        public Dictionary<string, IValueSymbol> Properties { get; }
-
-        /// <summary>
-        /// Type's functions
-        /// </summary>
-        public Dictionary<string, IValueSymbol> Functions { get; }
-
         public TypeSymbol(BuiltinType type, ISymbolContainer parent)
         {
             this.Name = type.ToString();
             this.BuiltinType = type;
             this.Parent = parent;
-            this.Properties = new Dictionary<string, IValueSymbol>();
-            this.Functions = new Dictionary<string, IValueSymbol>();
         }
 
         protected TypeSymbol(string name, BuiltinType type, ISymbolContainer parent)
@@ -67,18 +55,6 @@ namespace Fl.Semantics.Symbols
             // If just one of them is anonymous, they are not equals
             if (!this.BuiltinType.IsStructuralType() || !objectType.BuiltinType.IsStructuralType())
                 return false;
-
-            // Structural type
-            if (this.Properties.Count != objectType.Properties.Count || this.Functions.Count != objectType.Functions.Count)
-                return false;
-
-            foreach (var p in this.Properties.Values)
-                if (!objectType.Properties.ContainsValue(p))
-                    return false;
-
-            foreach (var m in this.Functions.Values)
-                if (!objectType.Functions.ContainsValue(m))
-                    return false;
 
             return true;
         }

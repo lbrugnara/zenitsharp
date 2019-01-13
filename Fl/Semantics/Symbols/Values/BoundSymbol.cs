@@ -41,6 +41,11 @@ namespace Fl.Semantics.Symbols
             this.Parent = parent;
         }
 
+        public void ChangeType(ITypeSymbol type)
+        {
+            this.TypeSymbol = type;
+        }
+
         public override string ToString()
         {
             var str = this.Access.ToKeyword();

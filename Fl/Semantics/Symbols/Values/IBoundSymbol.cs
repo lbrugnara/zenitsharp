@@ -25,5 +25,11 @@ namespace Fl.Semantics.Symbols
         /// Storage type of the bound variable
         /// </summary>
         Storage Storage { get; }
+
+        /// <summary>
+        /// Change the symbol's underlying type
+        /// </summary>
+        /// <param name="type"></param>
+        void ChangeType(ITypeSymbol type);
     }
 }

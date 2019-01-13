@@ -34,11 +34,11 @@ namespace Fl.Semantics.Inferrers
 
             if (parentSymbol is IComplexSymbol cs)
             {
-                IValueSymbol memberType = null;
-                if (accessor.IsCall)
+                IValueSymbol memberType = cs.Get<IValueSymbol>(symbolName);
+                /*if (accessor.IsCall)
                     memberType = cs.Functions[symbolName];
                 else
-                    memberType = cs.Properties[symbolName];
+                    memberType = cs.Properties[symbolName];*/
 
                 return memberType is ITypeSymbol mt ? mt : (memberType as IBoundSymbol).TypeSymbol;
             }

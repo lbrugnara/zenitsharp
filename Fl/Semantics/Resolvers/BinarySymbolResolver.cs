@@ -14,10 +14,7 @@ namespace Fl.Semantics.Resolvers
             var left = binary.Left.Visit(visitor);
             var right = binary.Right.Visit(visitor);
 
-            if (left != null && right != null && visitor.Inferrer.CanUnify(left, right))
-                return visitor.Inferrer.FindMostGeneralType(left, right);
-
-            return null;
+            return visitor.Inferrer.FindMostGeneralType(left, right);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Fl.Semantics.Symbols
             var symbol = new BoundSymbol(name, type, access, storage, this);
 
             this.Insert(name, symbol);
-            this.Properties[name] = symbol;
+            //this.Properties[name] = symbol;
 
             return symbol;
         }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Fl.Semantics.Mutability;
+using Fl.Helpers;
 
 namespace Fl.Semantics
 {
@@ -55,6 +56,8 @@ namespace Fl.Semantics
             this.checker = new TypeCheckerVisitor(this.symbolTable);
             this.mutabilityChecker = new MutabilityCheckerVisitor(this.symbolTable);
 
+            NameGenerator.Instance.Reset();
+
             /*var intClass = new Class();
 
             this.SymbolTable.NewSymbol("int", intClass);
@@ -75,6 +78,7 @@ namespace Fl.Semantics
             Console.WriteLine("SYMBOL RESOLVING");
             Console.WriteLine("================");
             Console.WriteLine(this.symbolTable.ToDebugString());
+            Console.WriteLine(this.typeInferrer.ToDebugString());
 
             // Make the type inference
             this.inferrer.Visit(ast);
@@ -82,7 +86,8 @@ namespace Fl.Semantics
             Console.WriteLine("=============");
             Console.WriteLine("TYPE INFERRER");
             Console.WriteLine("=============");
-            Console.WriteLine(this.symbolTable.ToDebugString());
+            Console.WriteLine(this.symbolTable.ToDebugString());            
+            Console.WriteLine(this.typeInferrer.ToDebugString());
 
             // Check all the operations are valid
             /*this.checker.Visit(ast);

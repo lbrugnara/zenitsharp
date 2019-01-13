@@ -13,18 +13,7 @@ namespace Fl.Semantics.Inferrers
         {
             var self = visitor.SymbolTable.EnterObjectScope(node.Uid);
             
-            node.Properties.ForEach(p => {
-                var propertyInfo = visitor.Visit(p);
-
-                if (propertyInfo is FunctionSymbol funcType)
-                {
-                    self.Functions[propertyInfo.Name] = funcType;
-                }
-                else
-                {
-                    self.Properties[propertyInfo.Name] = propertyInfo;
-                }
-            });
+            node.Properties.ForEach(p => visitor.Visit(p));
 
             visitor.SymbolTable.LeaveScope();
 

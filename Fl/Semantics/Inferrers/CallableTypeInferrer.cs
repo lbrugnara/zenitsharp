@@ -63,9 +63,6 @@ namespace Fl.Semantics.Inferrers
             // We also need to infer the target's return type
             var rettype = visitor.Inferrer.NewAnonymousType();
 
-            // Set the return type in the Function object
-            funcType.UpdateReturnType(rettype);
-
             // Replace the symbol's anonymous type with the new inferred type
             visitor.Inferrer.FindMostGeneralType(funcType, inferred);
 

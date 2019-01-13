@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Helpers;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Symbols
@@ -9,13 +10,28 @@ namespace Fl.Semantics.Symbols
     {
         public string Name { get; }
 
-        public ISymbolContainer Parent { get; }
+        public ISymbolContainer Parent => null;
 
         public BuiltinType BuiltinType => BuiltinType.Anonymous;
 
-        public AnonymousSymbol(string name)
+        public AnonymousSymbol()
         {
-            this.Name = name;
+            this.Name = $"'{NameGenerator.Instance.Next()}";
+        }
+
+        public override bool Equals(object obj)
+        {
+            var objType = obj as AnonymousSymbol;
+
+            if (objType == null)
+                return false;
+
+            return this.Name == objType.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Name.GetHashCode();
         }
 
         public override string ToString()

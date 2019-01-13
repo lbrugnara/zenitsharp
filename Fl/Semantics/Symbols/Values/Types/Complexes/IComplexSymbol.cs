@@ -8,14 +8,5 @@ namespace Fl.Semantics.Symbols
 {
     public interface IComplexSymbol : ITypeSymbol, ISymbolContainer
     {
-        /// <summary>
-        /// Type's properties
-        /// </summary>
-        Dictionary<string, IValueSymbol> Properties { get; }
-
-        /// <summary>
-        /// Type's functions
-        /// </summary>
-        Dictionary<string, IValueSymbol> Functions { get; }
     }
 }

@@ -22,6 +22,27 @@ namespace Fl.Semantics.Symbols
             this.Symbols = new Dictionary<string, ISymbol>();
         }
 
+        public override bool Equals(object obj)
+        {
+            if (!base.Equals(obj))
+                return false;
+
+            var objectType = obj as ComplexSymbol;
+
+            if (objectType == null)
+                return false;
+
+            var objectSymbols = objectType.Symbols.Values.Where(s => s is IBoundSymbol).ToList();
+
+            foreach (var member in objectSymbols)
+            {
+                if (!this.Symbols.ContainsKey(member.Name) || this.Symbols[member.Name] != member)
+                    return false;
+            }
+
+            return true;
+        }
+
         #region IComplexSymbol implementation
 
         public void Insert<T>(string name, T symbol)

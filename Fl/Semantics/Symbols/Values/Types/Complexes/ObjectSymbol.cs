@@ -19,7 +19,7 @@ namespace Fl.Semantics.Symbols
             var symbol = new BoundSymbol(name, type, access, storage, this);
 
             this.Insert(name, symbol);
-            this.Properties[name] = symbol;
+            //this.Properties[name] = symbol;
 
             return symbol;
         }
@@ -29,7 +29,7 @@ namespace Fl.Semantics.Symbols
             var symbol = new BoundSymbol(name, type, access, Storage.Constant, this);
 
             this.Insert(name, symbol);
-            this.Functions[name] = symbol;
+            //this.Functions[name] = symbol;
 
             return symbol;
         }

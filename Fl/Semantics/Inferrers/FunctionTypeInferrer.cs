@@ -43,33 +43,18 @@ namespace Fl.Semantics.Inferrers
                 if (lambdaExpressionType != null)
                 {
                     var generalType = visitor.Inferrer.FindMostGeneralType(lambdaExpressionType, functionScope.Return.TypeSymbol);
-                    visitor.Inferrer.Unify(generalType, lambdaExpressionType, functionScope.Return.TypeSymbol);
 
-                    // Update the function's return type with the expression type
-                    functionScope.UpdateReturnType(lambdaExpressionType);
-
-                    // If the type is an assumed type, register the @ret symbol under that assumption
-                    /*if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.ITypeSymbol))
-                        visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.ITypeSymbol, functionScope.ReturnSymbol);*/
+                    visitor.Inferrer.Unify(visitor.SymbolTable, generalType, functionScope.Return);
                 }           
                 else
                 {
-                    //visitor.Inferrer.ExpectsToUnifyWith(functionScope.Return.TypeSymbol, BuiltinType.Void);
+                    visitor.Inferrer.Unify(visitor.SymbolTable, new VoidSymbol(), functionScope.Return);
                 }
             }
             else if (!statements.OfType<ReturnNode>().Any() && functionScope.Return.TypeSymbol.BuiltinType != BuiltinType.Void)
             {
-                //visitor.Inferrer.ExpectsToUnifyWith(functionScope.Return.TypeSymbol, BuiltinType.Void);
+                visitor.Inferrer.Unify(visitor.SymbolTable, new VoidSymbol(), functionScope.Return);
             }
-
-            // If the @ret type is an assumption, register the symbol under that assumption too
-            /*if (visitor.Inferrer.IsTypeAssumption(functionScope.ReturnSymbol.ITypeSymbol))
-                visitor.Inferrer.AddTypeDependency(functionScope.ReturnSymbol.ITypeSymbol, functionScope.ReturnSymbol);*/
-
-            // The inferred function type is a complex type, it might contain assumptions for parameters' types or return type
-            // if that is the case, make this inferred type an assumption
-            /*if (visitor.Inferrer.IsTypeAssumption(functionType))
-                visitor.Inferrer.AddTypeDependency(functionType, functionSymbol);*/
 
             // Leave the function's scope
             visitor.SymbolTable.LeaveScope();

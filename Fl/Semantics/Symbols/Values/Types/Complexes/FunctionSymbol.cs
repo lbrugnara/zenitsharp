@@ -18,7 +18,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Function's return type
         /// </summary>
-        public IBoundSymbol Return { get; }
+        public IBoundSymbol Return => this.TryGet<IBoundSymbol>("@ret");
 
 
         public FunctionSymbol(string name, ITypeSymbol returnType, ISymbolContainer parent)
@@ -27,15 +27,8 @@ namespace Fl.Semantics.Symbols
             this.Parameters = new List<IBoundSymbol>();
 
             // Create the @ret symbol and save it into the function's symbol table
-            this.Return = new BoundSymbol("@ret", returnType, Access.Public, Storage.Mutable, this);
-            this.Insert("@ret", this.Return);
+            this.Insert(BuiltinSymbol.Return.GetName(), new BoundSymbol(BuiltinSymbol.Return.GetName(), returnType, Access.Public, Storage.Mutable, this));
         }        
-
-        public void UpdateReturnType(ITypeSymbol typeInfo)
-        {
-            // Update the @ret symbol's type
-            // this.Return.TypeSymbol = typeInfo ?? throw new System.ArgumentNullException(nameof(typeInfo), "Return type cannot be null");
-        }
 
         public IBoundSymbol CreateParameter(string name, ITypeSymbol typeInfo, Storage storage)
         {
