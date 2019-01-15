@@ -3,6 +3,7 @@
 
 using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,7 +19,7 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Function's return type
         /// </summary>
-        public IBoundSymbol Return => this.TryGet<IBoundSymbol>("@ret");
+        public IBoundSymbol Return => this.TryGet<IBoundSymbol>($"@ret-{this.Name}");
 
 
         public FunctionSymbol(string name, ITypeSymbol returnType, ISymbolContainer parent)
@@ -27,8 +28,13 @@ namespace Fl.Semantics.Symbols
             this.Parameters = new List<IBoundSymbol>();
 
             // Create the @ret symbol and save it into the function's symbol table
-            this.Insert(BuiltinSymbol.Return.GetName(), new BoundSymbol(BuiltinSymbol.Return.GetName(), returnType, Access.Public, Storage.Mutable, this));
-        }        
+            this.Insert($"{BuiltinSymbol.Return.GetName()}-{this.Name}", new BoundSymbol($"{BuiltinSymbol.Return.GetName()}-{this.Name}", returnType, Access.Public, Storage.Mutable, this));
+        }
+
+        internal void UpdateReturnType(ITypeSymbol lastExpr)
+        {
+            throw new NotImplementedException();
+        }
 
         public IBoundSymbol CreateParameter(string name, ITypeSymbol typeInfo, Storage storage)
         {
@@ -80,12 +86,12 @@ namespace Fl.Semantics.Symbols
 
         public override string ToString()
         {
-            return this.ToSafeString((this, "self"));
+            return this.ToSafeString((this, $"self-{this.Name}"));
         }
 
         public override string ToValueString()
         {
-            return this.ToSafeString((this, "self"));
+            return this.ToSafeString((this, $"self-{this.Name}"));
         }
 
         public override string ToSafeString(params (ITypeSymbol type, string safestr)[] safeTypes)

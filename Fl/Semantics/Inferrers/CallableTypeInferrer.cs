@@ -47,7 +47,7 @@ namespace Fl.Semantics.Inferrers
         private ITypeSymbol InferFromAnonymousCall(TypeInferrerVisitor visitor, CallableNode node, ITypeSymbol inferred)
         {
             // The function we need to infer here is a Function type
-            FunctionSymbol funcType = new FunctionSymbol(inferred.Name, visitor.Inferrer.NewAnonymousType(), inferred.Parent);
+            var funcType = new FunctionSymbol(inferred.Name, new NoneSymbol(), inferred.Parent);
 
             // Iterate over the function arguments and infer funcType's types
             for (var i = 0; i < node.Arguments.Count; i++)
@@ -61,7 +61,7 @@ namespace Fl.Semantics.Inferrers
             }
 
             // We also need to infer the target's return type
-            var rettype = visitor.Inferrer.NewAnonymousType();
+            var rettype = visitor.Inferrer.NewAnonymousTypeFor();
 
             // Replace the symbol's anonymous type with the new inferred type
             visitor.Inferrer.FindMostGeneralType(funcType, inferred);
@@ -73,6 +73,7 @@ namespace Fl.Semantics.Inferrers
         private ITypeSymbol InferFromFunctionCall(TypeInferrerVisitor visitor, CallableNode node, ITypeSymbol inferredType)
         {
             var funcType = inferredType as FunctionSymbol;
+            
             // Check parameters count
             // TODO: This is not needed to be here
             if (funcType.Parameters.Count != node.Arguments.Expressions.Count)
@@ -85,7 +86,10 @@ namespace Fl.Semantics.Inferrers
                 var inferredParamType = node.Arguments.Expressions[i].Visit(visitor);
 
                 // If possible, make conclusions about the inferred argument type and the parameter type
-                //visitor.Inferrer.Unify(inferredParamType.ITypeSymbol, funcType.Parameters[i]);
+                var generalType = visitor.Inferrer.FindMostGeneralType(inferredParamType, funcType.Parameters[i].TypeSymbol);
+
+                if (generalType != null)
+                    visitor.Inferrer.Unify(visitor.SymbolTable, generalType, funcType.Parameters[i]);
             }
 
             // This invocation will have the function's return type

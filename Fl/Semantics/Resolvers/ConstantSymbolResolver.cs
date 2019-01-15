@@ -4,13 +4,14 @@
 using Fl.Ast;
 using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ConstantNode, ITypeSymbol>
+    class ConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ConstantNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor binder, ConstantNode constdec)
+        public IValueSymbol Visit(SymbolResolverVisitor binder, ConstantNode constdec)
         {            
             ITypeSymbol typeSymbol = null;
 
@@ -18,7 +19,7 @@ namespace Fl.Semantics.Resolvers
             if (constdec.Type != null)
                 typeSymbol = SymbolHelper.GetTypeSymbol(binder.SymbolTable, binder.Inferrer, constdec.Type);
             else
-                typeSymbol = binder.Inferrer.NewAnonymousType();
+                typeSymbol = binder.Inferrer.NewAnonymousTypeFor();
 
             foreach (var definition in constdec.Definitions)
             {

@@ -11,7 +11,7 @@ namespace Fl
 {
     public class Compiler
     {
-        public ILProgram Compile(string source)
+        public void Compile(string source)
         {
             var syntacticAnalysis = new SyntacticAnalysis();
             var ast = syntacticAnalysis.Run(source);
@@ -20,8 +20,8 @@ namespace Fl
             semanticAnalysis.Run(ast);
 
             // Generate IL program
-            var ilGenerator = new ILGenerator();
-            return ilGenerator.Build(ast);
+            /*var ilGenerator = new ILGenerator();
+            return ilGenerator.Build(ast);*/
         }
     }
 }

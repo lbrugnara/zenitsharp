@@ -3,12 +3,13 @@
 
 using Fl.Ast;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ForSymbolResolver : INodeVisitor<SymbolResolverVisitor, ForNode, ITypeSymbol>
+    class ForSymbolResolver : INodeVisitor<SymbolResolverVisitor, ForNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor visitor, ForNode fornode)
+        public IValueSymbol Visit(SymbolResolverVisitor visitor, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
             visitor.SymbolTable.EnterLoopScope(fornode.Uid);

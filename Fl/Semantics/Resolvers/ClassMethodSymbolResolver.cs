@@ -2,15 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Exceptions;
-using Fl.Semantics.Symbols;
-using Fl.Semantics.Types;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassMethodSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassMethodNode, ITypeSymbol>
+    class ClassMethodSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassMethodNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor visitor, ClassMethodNode method)
+        public IValueSymbol Visit(SymbolResolverVisitor visitor, ClassMethodNode method)
         {
             /*var classScope = visitor.SymbolTable.CurrentScope as ClassScope;
 

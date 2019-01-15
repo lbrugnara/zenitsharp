@@ -4,10 +4,11 @@
 using Fl.Ast;
 using Fl.Semantics.Inferrers;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
 {
-    public class SymbolResolverVisitor : IAstWalker<ITypeSymbol>
+    public class SymbolResolverVisitor : IAstWalker<IValueSymbol>
     {
         private UnarySymbolResolver unarySymbolResolver;
         private BinarySymbolResolver binarySymbolResolver;
@@ -73,7 +74,7 @@ namespace Fl.Semantics.Resolvers
 
         public TypeInferrer Inferrer { get; private set; }
 
-        public ITypeSymbol Visit(Node node)
+        public IValueSymbol Visit(Node node)
         {
             object n = node;
 

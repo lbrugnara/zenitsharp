@@ -1,14 +1,11 @@
 ﻿using Fl.Ast;
-using Fl.Semantics.Exceptions;
-using Fl.Semantics.Symbols;
-using Fl.Semantics.Types;
-using System;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassNode, ITypeSymbol>
+    class ClassSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor binder, ClassNode node)
+        public IValueSymbol Visit(SymbolResolverVisitor binder, ClassNode node)
         {
             // By now we just allow class definition at global scope or package scope (no nested classes)
             /*if (!binder.SymbolTable.CurrentScope.IsGlobal && !binder.SymbolTable.CurrentScope.IsPackage)
@@ -33,18 +30,18 @@ namespace Fl.Semantics.Resolvers
             node.Properties.ForEach(propertyNode => {
                 propertyNode.Visit(binder);
                 var propertyName = propertyNode.Name.Value;
-                classType.Properties[propertyName] = binder.SymbolTable.GetSymbol(propertyName).ITypeSymbol.Type;
+                classType.Properties[propertyName] = binder.SymbolTable.GetSymbol(propertyName).IValueSymbol.Type;
             });
 
             node.Constants.ForEach(constantNode => {
                 constantNode.Visit(binder);
                 var constantName = constantNode.Name.Value;
-                classType.Properties[constantName] = binder.SymbolTable.GetSymbol(constantName).ITypeSymbol.Type;
+                classType.Properties[constantName] = binder.SymbolTable.GetSymbol(constantName).IValueSymbol.Type;
             });
 
             node.Methods.ForEach(methodNode => {
                 methodNode.Visit(binder);
-                var method = binder.SymbolTable.GetSymbol(methodNode.Name).ITypeSymbol.Type as Function ?? throw new System.Exception($"Method type is not {typeof(Function).FullName}");
+                var method = binder.SymbolTable.GetSymbol(methodNode.Name).IValueSymbol.Type as Function ?? throw new System.Exception($"Method type is not {typeof(Function).FullName}");
                 //method.SetDefiningClass(classType);
                 classType.Methods[methodNode.Name] = method;
             });

@@ -102,6 +102,8 @@ namespace Fl.Semantics.Symbols
             return this.Parent.TryGet<T>(name);
         }
 
+        public List<T> GetSymbols<T>() where T : ISymbol => this.Symbols.Values.OfType<T>().Cast<T>().ToList();
+
         #endregion
 
         public virtual string ToDumpString(int indent = 0)

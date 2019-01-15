@@ -31,14 +31,9 @@ namespace FlInterpreter
                     }
 
                     var compiler = new Compiler();
-                    var ilProgram = compiler.Compile(line);
+                    compiler.Compile(line);
 
                     System.Diagnostics.Trace.WriteLine($"Source: {line}");
-
-                    if (ilProgram == null)
-                        continue;
-
-                    Console.WriteLine(ilProgram.ToString());
 
                     /*ip.Run();
 

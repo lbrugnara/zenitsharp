@@ -3,13 +3,14 @@
 
 using Fl.Ast;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ObjectPropertySymbolResolver : INodeVisitor<SymbolResolverVisitor, ObjectPropertyNode, ITypeSymbol>
+    class ObjectPropertySymbolResolver : INodeVisitor<SymbolResolverVisitor, ObjectPropertyNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor visitor, ObjectPropertyNode node)
+        public IValueSymbol Visit(SymbolResolverVisitor visitor, ObjectPropertyNode node)
         {
             var storage = SymbolHelper.GetStorage(node.Information.Mutability);
 
@@ -18,7 +19,10 @@ namespace Fl.Semantics.Resolvers
 
             if (rhsSymbol != null)
             {
-                visitor.SymbolTable.Insert(node.Name.Value, new BoundSymbol(node.Name.Value, rhsSymbol, Access.Public, storage, visitor.SymbolTable.CurrentScope));
+                var rhsTypeSymbol = rhsSymbol as ITypeSymbol;
+                var rhsBoundSymbol = rhsSymbol as IBoundSymbol;
+
+                visitor.SymbolTable.Insert(node.Name.Value, new BoundSymbol(node.Name.Value, rhsTypeSymbol ?? rhsBoundSymbol?.TypeSymbol, Access.Public, storage, visitor.SymbolTable.CurrentScope));
                 return rhsSymbol;
             }
 

@@ -24,8 +24,6 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         public ISymbolContainer CurrentScope { get; private set; }
 
-        private readonly Dictionary<string, List<Token>> unresolved;
-
         private TypeInferrer TypeInferrer { get; }
 
         public SymbolTable(TypeInferrer typeInferrer)
@@ -33,7 +31,6 @@ namespace Fl.Semantics.Symbols
             // Create the @global scope and set it as the current scope
             this.Global = this.CurrentScope = new Block("@global");
             this.TypeInferrer = typeInferrer;
-            this.unresolved = new Dictionary<string, List<Token>>();
         }
 
         /// <summary>
@@ -107,16 +104,24 @@ namespace Fl.Semantics.Symbols
             {
                 this.CurrentScope = scope;
                 return scope;
-            }            
+            }
 
             if (typeof(T) == typeof(FunctionSymbol))
-                scope = new FunctionSymbol(name, this.TypeInferrer.NewAnonymousType(), parent) as T;
+            {
+                scope = new FunctionSymbol(name, new NoneSymbol(), parent) as T;
+            }
             else if (typeof(T) == typeof(ObjectSymbol))
+            {
                 scope = new ObjectSymbol(name, parent) as T;
+            }
             else if (typeof(T) == typeof(ClassSymbol))
+            {
                 scope = new ClassSymbol(name, parent) as T;
+            }
             else
+            {
                 throw new ScopeException($"Unknown scope type {typeof(T).Name}");
+            }
 
             parent.Insert(name, scope);
             this.CurrentScope = scope;
@@ -175,29 +180,99 @@ namespace Fl.Semantics.Symbols
 
         #endregion
 
-        public void AddUnresolvedType(string name, Token info)
+        /// <summary>
+        /// Call <see cref="UpdateSymbolReferences(ISymbolContainer)"/> using the global scope as the starting point
+        /// </summary>
+        public void UpdateSymbolReferences()
         {
-            if (!this.unresolved.ContainsKey(name))
-                this.unresolved[name] = new List<Token>();
-            this.unresolved[name].Add(info);
+            this.UpdateSymbolReferences(this.Global);
         }
 
+        /// <summary>
+        /// Starting from the global scope, checks if there are unresolved symbols, and in case there are, this method throws an exception.
+        /// </summary>
         public void ThrowIfUnresolved()
         {
-            if (this.unresolved.Count == 0)
-                return;
+            this.ThrowIfUnresolved(this.Global);
+        }
 
-            var errors = new List<string>();
+        /// <summary>
+        /// Iterate through all the IBoundSymbols with IUnresolvedTypeSymbols type in order to update the reference, in 
+        /// case the referenced symbol has been defined.
+        /// </summary>
+        /// <param name="scope"></param>
+        private void UpdateSymbolReferences(ISymbolContainer scope)
+        {
+            var containers = scope.GetSymbols<ISymbolContainer>();
 
-            foreach (var type in this.unresolved)
+            foreach (var container in containers)
+                this.UpdateSymbolReferences(container);
+
+            var boundSymbols = scope.GetSymbols<IBoundSymbol>().Where(bs => bs.TypeSymbol is IUnresolvedTypeSymbol);
+
+            foreach (var boundSymbol in boundSymbols)
             {
-                var name = type.Key;
-                var tokens = type.Value;
+                var uts = boundSymbol.TypeSymbol as IUnresolvedTypeSymbol;
 
-                tokens.ForEach(token => errors.Add($"Type '{name}' is not defined in line {token.Line}:{token.Col}"));
+                if (uts is UnresolvedTypeSymbol us)
+                {
+                    if (us.IsFunction)
+                    {
+                        if (!us.Parent.Contains(us.Name))
+                            continue;
+
+                        var func = us.Parent.Get<FunctionSymbol>(us.Name);
+
+                        boundSymbol.ChangeType(func.Return.TypeSymbol);
+                    }
+                }
             }
+        }        
 
-            throw new SymbolException(string.Join("\n", errors));
+        /// <summary>
+        /// Iterate all the unresolved symbols in order to determine if they are not defined or if they are 
+        /// cyclic references, and in that case assing an anonymous type
+        /// </summary>
+        /// <param name="scope"></param>
+        private void ThrowIfUnresolved(ISymbolContainer scope)
+        {
+            var containers = scope.GetSymbols<ISymbolContainer>();
+
+            foreach (var container in containers)
+                this.ThrowIfUnresolved(container);
+
+            var boundSymbols = scope.GetSymbols<IBoundSymbol>().Where(bs => bs.TypeSymbol is IUnresolvedTypeSymbol);
+
+            foreach (var boundSymbol in boundSymbols)
+            {
+                var uts = boundSymbol.TypeSymbol as IUnresolvedTypeSymbol;
+
+                if (uts is UnresolvedTypeSymbol us)
+                {
+                    if (us.IsFunction)
+                    {
+                        if (!us.Parent.Contains(us.Name))
+                            throw new SymbolException($"Function {us.Name} is not defined.");
+
+                        var func = us.Parent.Get<FunctionSymbol>(us.Name);
+
+                        if (func.Return.TypeSymbol is IUnresolvedTypeSymbol)
+                        {
+                            // Circular reference?
+                            if (boundSymbol.TypeSymbol == func.Return.TypeSymbol)
+                            {                                
+                                this.TypeInferrer.NewAnonymousTypeFor(func.Return);
+                            }
+                            else
+                            {
+                                throw new SymbolException($"Function {us.Name} is not defined.");
+                            }
+                        }
+
+                        boundSymbol.ChangeType(func.Return.TypeSymbol);
+                    }
+                }
+            }
         }
 
         public string ToDebugString()

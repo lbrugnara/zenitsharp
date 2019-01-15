@@ -55,11 +55,11 @@ namespace Fl.Semantics.Inferrers
                 // We have constraints that need to be added to the type
                 if (accessor.IsCall)
                 {
-                    memberType = /*parentSymbol.Type.Functions[symbolName] =*/ inferrer.Inferrer.NewAnonymousType();
+                    memberType = /*parentSymbol.Type.Functions[symbolName] =*/ inferrer.Inferrer.NewAnonymousTypeFor();
                 }
                 else
                 {
-                    memberType = /*parentSymbol.TypeSymbol.Type.Properties[symbolName] =*/ inferrer.Inferrer.NewAnonymousType();
+                    memberType = /*parentSymbol.TypeSymbol.Type.Properties[symbolName] =*/ inferrer.Inferrer.NewAnonymousTypeFor();
                 }
 
                 return memberType is ITypeSymbol mt ? mt : (memberType as IBoundSymbol).TypeSymbol;

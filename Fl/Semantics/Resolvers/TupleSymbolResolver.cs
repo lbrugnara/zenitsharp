@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace Fl.Semantics.Resolvers
 {
-    class TupleSymbolResolver : INodeVisitor<SymbolResolverVisitor, TupleNode, ITypeSymbol>
+    class TupleSymbolResolver : INodeVisitor<SymbolResolverVisitor, TupleNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor visitor, TupleNode node)
+        public IValueSymbol Visit(SymbolResolverVisitor visitor, TupleNode node)
         {
             // Tuples always return the TupleSymbol type
             var types = new TupleSymbol("tuple", visitor.SymbolTable.CurrentScope)

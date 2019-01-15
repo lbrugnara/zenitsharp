@@ -78,6 +78,9 @@ namespace Fl.Semantics
             Console.WriteLine("SYMBOL RESOLVING");
             Console.WriteLine("================");
             Console.WriteLine(this.symbolTable.ToDebugString());
+
+            return this.symbolTable;
+
             Console.WriteLine(this.typeInferrer.ToDebugString());
 
             // Make the type inference

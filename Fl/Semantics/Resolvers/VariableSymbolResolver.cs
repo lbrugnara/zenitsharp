@@ -4,13 +4,14 @@
 using Fl.Ast;
 using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class VariableSymbolResolver : INodeVisitor<SymbolResolverVisitor, VariableNode, ITypeSymbol>
+    class VariableSymbolResolver : INodeVisitor<SymbolResolverVisitor, VariableNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor visitor, VariableNode vardecl)
+        public IValueSymbol Visit(SymbolResolverVisitor visitor, VariableNode vardecl)
         {
             // Variable definition are statements and not expressions, therefore they do not return
             // the ITypeSymbol received from the right-hand side
@@ -31,7 +32,7 @@ namespace Fl.Semantics.Resolvers
             return null;
         }
 
-        protected void VarDefinitionNode(SymbolResolverVisitor binder, VariableDefinitionNode vardecl)
+        protected void VarDefinitionNode(SymbolResolverVisitor visitor, VariableDefinitionNode vardecl)
         {
             foreach (var definition in vardecl.Definitions)
             {
@@ -39,30 +40,29 @@ namespace Fl.Semantics.Resolvers
                 var variableName = definition.Left.Value;
 
                 // Check if the symbol is already defined
-                if (binder.SymbolTable.Contains(variableName))
+                if (visitor.SymbolTable.Contains(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // If it is a variable definition, visit the right-hand side expression
-                var rhsSymbol = definition.Right?.Visit(binder);
+                var rhsSymbol = definition.Right?.Visit(visitor);
 
                 IBoundSymbol lhsSymbol = null;
 
                 if (rhsSymbol == null)
                 {
                     // Create the new symbol for the variable
-                    var typeInfo = SymbolHelper.GetTypeSymbol(binder.SymbolTable, binder.Inferrer, vardecl.Information.Type);
+                    var typeInfo = SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, vardecl.Information.Type);
                     var storage = SymbolHelper.GetStorage(vardecl.Information.Mutability);
-                    lhsSymbol = binder.SymbolTable.Insert(variableName, typeInfo, Access.Public, storage);
-
-                    if (typeInfo is AnonymousSymbol asym)
-                        binder.Inferrer.TrackSymbol(lhsSymbol, asym);
+                    lhsSymbol = visitor.SymbolTable.Insert(variableName, typeInfo, Access.Public, storage);
                 }
                 else
                 {
                     // Remove the bound -complex- symbol
                     // binder.SymbolTable.Remove(rhsSymbol.Id);
                     // Bind it to the variable name
-                    binder.SymbolTable.Insert(variableName, new BoundSymbol(variableName, rhsSymbol, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability), binder.SymbolTable.CurrentScope));
+                    var rhsTypeSymbol = rhsSymbol as ITypeSymbol;
+                    var rhsBoundSymbol = rhsSymbol as IBoundSymbol;
+                    visitor.SymbolTable.Insert(variableName, new BoundSymbol(variableName, rhsTypeSymbol ?? rhsBoundSymbol?.TypeSymbol, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability), visitor.SymbolTable.CurrentScope));
                 }
             }
         }
@@ -86,7 +86,7 @@ namespace Fl.Semantics.Resolvers
                 // If the type anotation is not specific (uses 'var'), we need to create an anonymous type
                 // for every variable. If not, we just get the type information from the token
                 var varType = destrnode.Information.Type.Type == Syntax.TokenType.Variable 
-                    ? visitor.Inferrer.NewAnonymousType()
+                    ? visitor.Inferrer.NewAnonymousTypeFor()
                     : SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, destrnode.Information.Type);
 
                 // Create the new symbol for the variable

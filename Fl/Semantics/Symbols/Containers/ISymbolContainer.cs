@@ -2,6 +2,8 @@
 // Full copyright and license information in LICENSE file
 
 
+using System.Collections.Generic;
+
 namespace Fl.Semantics.Symbols
 {
     public interface ISymbolContainer : ISymbol
@@ -41,6 +43,14 @@ namespace Fl.Semantics.Symbols
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
         T TryGet<T>(string name) where T : ISymbol;
+
+        /// <summary>
+        /// Return a list of symbols of type T that 
+        /// belong to the symbol container
+        /// </summary>
+        /// <typeparam name="T">ISymbol descendants</typeparam>
+        /// <returns>List of symbols of type T</returns>
+        List<T> GetSymbols<T>() where T : ISymbol;
 
         /// <summary>
         /// String with a dump of the entry

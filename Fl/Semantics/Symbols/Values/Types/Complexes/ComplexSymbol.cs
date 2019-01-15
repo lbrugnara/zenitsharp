@@ -93,6 +93,8 @@ namespace Fl.Semantics.Symbols
             return this.Parent.TryGet<T>(name);
         }
 
+        public List<T> GetSymbols<T>() where T : ISymbol => this.Symbols.Values.OfType<T>().Cast<T>().ToList();
+
         #endregion
 
         public abstract string ToSafeString(params (ITypeSymbol type, string safestr)[] safeTypes);

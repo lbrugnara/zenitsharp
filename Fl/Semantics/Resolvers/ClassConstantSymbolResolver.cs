@@ -1,14 +1,11 @@
 ﻿using Fl.Ast;
-using Fl.Semantics.Exceptions;
-using Fl.Semantics.Symbols;
-using Fl.Semantics.Types;
-using System;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassConstantNode, ITypeSymbol>
+    class ClassConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassConstantNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor binder, ClassConstantNode node)
+        public IValueSymbol Visit(SymbolResolverVisitor binder, ClassConstantNode node)
         {
             /*var classScope = binder.SymbolTable.CurrentScope as ClassScope;
 

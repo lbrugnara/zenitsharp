@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using System;
 using Fl.Ast;
-using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
 {
-    class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AssignmentNode, ITypeSymbol>
+    class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AssignmentNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor visitor, AssignmentNode node)
+        public IValueSymbol Visit(SymbolResolverVisitor visitor, AssignmentNode node)
         {
             if (node is VariableAssignmentNode)
                 return this.MakeVariableAssignment(node as VariableAssignmentNode, visitor);
@@ -20,7 +19,7 @@ namespace Fl.Semantics.Resolvers
             throw new System.Exception($"Unhandled AssignmentNode type {node.GetType().FullName}");
         }
 
-        private ITypeSymbol MakeVariableAssignment(VariableAssignmentNode node, SymbolResolverVisitor visitor)
+        private IValueSymbol MakeVariableAssignment(VariableAssignmentNode node, SymbolResolverVisitor visitor)
         {
             var left = node.Accessor.Visit(visitor);
             var right = node.Right.Visit(visitor);
@@ -28,7 +27,7 @@ namespace Fl.Semantics.Resolvers
             return left;
         }
 
-        private ITypeSymbol MakeDestructuringAssignment(DestructuringAssignmentNode node, SymbolResolverVisitor visitor)
+        private IValueSymbol MakeDestructuringAssignment(DestructuringAssignmentNode node, SymbolResolverVisitor visitor)
         {
             var left = node.Left.Visit(visitor);
             var right = node.Right.Visit(visitor);

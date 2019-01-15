@@ -76,7 +76,7 @@ namespace Fl.Semantics.Types
 
                 // Support complex types:
                 if (token.Value == "func" || token.Value == "tuple")
-                    return inferrer?.NewAnonymousType();
+                    return inferrer?.NewAnonymousTypeFor();
 
                 if (symtable.Contains(token.Value))
                 {
@@ -118,7 +118,8 @@ namespace Fl.Semantics.Types
                     return new PrimitiveSymbol(BuiltinType.String, symtable.CurrentScope);
 
                 case TokenType.Variable:
-                    return inferrer?.NewAnonymousType(); // Auto
+                    return new NoneSymbol();
+                    //return inferrer?.NewAnonymousType(); // Auto
             }
 
             throw new SymbolException($"Unrecognized literal {token.Type}");

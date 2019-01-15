@@ -2,13 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
 {
-    class IfSymbolResolver : INodeVisitor<SymbolResolverVisitor, IfNode, ITypeSymbol>
+    class IfSymbolResolver : INodeVisitor<SymbolResolverVisitor, IfNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor visitor, IfNode ifnode)
+        public IValueSymbol Visit(SymbolResolverVisitor visitor, IfNode ifnode)
         {
             // Generate the condition and check the result, using exitPoint
             // as the destination if the condition is true

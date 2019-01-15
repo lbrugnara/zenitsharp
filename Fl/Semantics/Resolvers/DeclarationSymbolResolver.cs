@@ -3,13 +3,13 @@
 
 
 using Fl.Ast;
-using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
 {
-    class DeclarationSymbolResolver : INodeVisitor<SymbolResolverVisitor, DeclarationNode, ITypeSymbol>
+    class DeclarationSymbolResolver : INodeVisitor<SymbolResolverVisitor, DeclarationNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor visitor, DeclarationNode decls)
+        public IValueSymbol Visit(SymbolResolverVisitor visitor, DeclarationNode decls)
         {
             foreach (Node statement in decls.Statements)
                 statement.Visit(visitor);

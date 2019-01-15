@@ -4,13 +4,14 @@
 
 using Fl.Ast;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class LiteralSymbolResolver : INodeVisitor<SymbolResolverVisitor, LiteralNode, ITypeSymbol>
+    class LiteralSymbolResolver : INodeVisitor<SymbolResolverVisitor, LiteralNode, IValueSymbol>
     {
-        public ITypeSymbol Visit(SymbolResolverVisitor visitor, LiteralNode literal)
+        public IValueSymbol Visit(SymbolResolverVisitor visitor, LiteralNode literal)
         {
             return new PrimitiveSymbol(SymbolHelper.GetType(visitor.SymbolTable, literal.Literal), visitor.SymbolTable.CurrentScope);
         }
