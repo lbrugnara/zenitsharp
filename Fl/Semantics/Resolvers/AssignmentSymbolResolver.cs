@@ -2,6 +2,8 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Semantics.Exceptions;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
@@ -24,6 +26,13 @@ namespace Fl.Semantics.Resolvers
             var left = node.Accessor.Visit(visitor);
             var right = node.Right.Visit(visitor);
 
+            if (!left.IsAssignable())
+                throw new SymbolException($"'{left.Name}' is a {left.GetType().Name} and cannot be used as a left-hand side in an assignment expression");
+
+            if (!right.IsAssignable())
+                throw new SymbolException($"'{right.Name}' is a {right.GetType().Name} and cannot be used as a right-hand side in an assignment expression");
+
+            // On an assignment statement, we always return the left-hand side type
             return left;
         }
 
@@ -32,6 +41,13 @@ namespace Fl.Semantics.Resolvers
             var left = node.Left.Visit(visitor);
             var right = node.Right.Visit(visitor);
 
+            if (!left.IsAssignable())
+                throw new SymbolException($"'{left.Name}' is a {left.GetType().Name} and cannot be used as a left-hand side in an assignment expression");
+
+            if (!right.IsAssignable()) 
+                throw new SymbolException($"'{right.Name}' is a {right.GetType().Name} and cannot be used as a right-hand side in an assignment expression");
+
+            // On an assignment statement, we always return the left-hand side type
             return left;
         }
     }

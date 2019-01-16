@@ -34,7 +34,7 @@ namespace Fl.Semantics.Resolvers
                 var rhsSymbol = definition.Right?.Visit(binder);
 
                 if (rhsSymbol != null && !(rhsSymbol is IPrimitiveSymbol))
-                    throw new SymbolException($"The expression to initialize '{constantName}' must be a constant expression");                
+                    throw new SymbolException($"The expression to initialize '{constantName}' must be constant");                
 
                 // Create the new symbol for the variable
                 binder.SymbolTable.Insert(constantName, typeSymbol, Access.Public, Storage.Constant);

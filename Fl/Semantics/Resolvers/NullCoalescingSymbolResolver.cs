@@ -3,6 +3,7 @@
 
 
 using Fl.Ast;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
@@ -14,7 +15,7 @@ namespace Fl.Semantics.Resolvers
             var left = nullc.Left.Visit(visitor);
             var right = nullc.Right.Visit(visitor);
 
-            return left ?? right;
+            return visitor.Inferrer.FindMostGeneralType(left.GetTypeSymbol(), right.GetTypeSymbol());
         }
     }
 }

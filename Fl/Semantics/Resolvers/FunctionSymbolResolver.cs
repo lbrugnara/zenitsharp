@@ -24,19 +24,17 @@ namespace Fl.Semantics.Resolvers
 
             if (funcdecl.IsLambda)
             {
-                var lastExpr = exprs.LastOrDefault();
+                // If it is a lambda expression, we will check the expression's type
+                // to determine the function's type
+                var lastExpr = exprs.Last();
 
-                if (lastExpr == null)
-                {
-                    //   lastExpr = visitor.Inferrer.NewAnonymousTypeFor(functionSymbol.Return);
-                    visitor.Inferrer.NewAnonymousTypeFor(functionSymbol.Return);
-                }
-                else
-                {
-                    functionSymbol.Return.ChangeType(lastExpr is ITypeSymbol lets ? lets : (lastExpr as IBoundSymbol).TypeSymbol);
-                    // var generalType = visitor.Inferrer.FindMostGeneralType(functionSymbol.Return.TypeSymbol, lastExpr);
-                    // visitor.Inferrer.Unify(visitor.SymbolTable, generalType, functionSymbol.Return);
-                }                
+                // We do allow lambdas that do not return a value
+                functionSymbol.Return.ChangeType(lastExpr.IsOfType<VoidSymbol>() ? new VoidSymbol() : lastExpr.GetTypeSymbol());
+            }
+            else
+            {
+                if (functionSymbol.Return.TypeSymbol.BuiltinType == BuiltinType.None)
+                    functionSymbol.Return.ChangeType(new VoidSymbol());
             }
 
             // Restore previous scope

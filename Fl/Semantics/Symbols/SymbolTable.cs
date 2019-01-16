@@ -154,7 +154,36 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Return true if the current scope (or its parent) is a ScopeType.Function
         /// </summary>
-        public bool InFunction => this.CurrentScope is FunctionSymbol;
+        public bool InFunction
+        {
+            get
+            {
+                var scope = this.CurrentScope;
+                while (scope != null)
+                {
+                    if (scope is FunctionSymbol)
+                        return true;
+
+                    scope = scope.Parent;
+                }
+
+                return false;
+            }            
+        }
+
+        public FunctionSymbol GetCurrentFunctionScope()
+        {
+            var scope = this.CurrentScope;
+            while (scope != null)
+            {
+                if (scope is FunctionSymbol fs)
+                    return fs;
+
+                scope = scope.Parent;
+            }
+
+            throw new ScopeException("Current scope does not belong to a function");
+        }
 
         #region ISymbolTable implementation
 
@@ -223,7 +252,25 @@ namespace Fl.Semantics.Symbols
 
                         var func = us.Parent.Get<FunctionSymbol>(us.Name);
 
-                        boundSymbol.ChangeType(func.Return.TypeSymbol);
+                        if (func.Return.TypeSymbol.BuiltinType == BuiltinType.None)
+                            continue;
+
+                        boundSymbol.ChangeType(func.Return.TypeSymbol.GetTypeSymbol());
+                    }
+                    else
+                    {
+                        if (!us.Parent.Contains(us.Name))
+                            continue;
+
+                        var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
+
+                        if (symbol.BuiltinType == BuiltinType.None)
+                            continue;
+
+                        if (!symbol.IsOfType<FunctionSymbol>())
+                            continue;
+
+                        boundSymbol.ChangeType(symbol.GetTypeSymbol());
                     }
                 }
             }
@@ -252,7 +299,7 @@ namespace Fl.Semantics.Symbols
                     if (us.IsFunction)
                     {
                         if (!us.Parent.Contains(us.Name))
-                            throw new SymbolException($"Function {us.Name} is not defined.");
+                            throw new SymbolException($"Function '{us.Name}' is not defined in scope '{us.Parent.Name}'.");
 
                         var func = us.Parent.Get<FunctionSymbol>(us.Name);
 
@@ -265,11 +312,26 @@ namespace Fl.Semantics.Symbols
                             }
                             else
                             {
-                                throw new SymbolException($"Function {us.Name} is not defined.");
+                                throw new SymbolException($"Function '{us.Name}' is not defined in scope '{us.Parent.Name}'.");
                             }
                         }
 
-                        boundSymbol.ChangeType(func.Return.TypeSymbol);
+                        boundSymbol.ChangeType(func.Return.TypeSymbol.GetTypeSymbol());
+                    }
+                    else
+                    {
+                        if (!us.Parent.Contains(us.Name))
+                            throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
+
+                        var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
+
+                        if (symbol.BuiltinType == BuiltinType.None)
+                            throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
+
+                        if (!symbol.IsOfType<FunctionSymbol>())
+                            throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
+
+                        boundSymbol.ChangeType(symbol.GetTypeSymbol());                        
                     }
                 }
             }

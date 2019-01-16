@@ -16,7 +16,7 @@ namespace Fl.Semantics.Resolvers
             if (!visitor.SymbolTable.InFunction)
                 throw new ScopeOperationException("Invalid return statement in a non-function block");
 
-            var func = (visitor.SymbolTable.CurrentScope as FunctionSymbol);
+            var func = visitor.SymbolTable.GetCurrentFunctionScope();
 
             if (rnode.Expression == null)
             {
@@ -26,10 +26,7 @@ namespace Fl.Semantics.Resolvers
 
             var ret = rnode.Expression.Visit(visitor);
 
-            if (ret is IBoundSymbol bs)
-                func.Return.ChangeType(bs.TypeSymbol);
-            else if (ret is ITypeSymbol ts)
-                func.Return.ChangeType(ts);                
+            func.Return.ChangeType(ret.GetTypeSymbol());
 
             return func.Return;
         }

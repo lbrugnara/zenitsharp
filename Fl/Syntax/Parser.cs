@@ -727,14 +727,14 @@ namespace Fl.Syntax
         }
 
         // Rule:
-        // return_statement -> 'return' ( expression ( ',' expression )* )? ';'
+        // return_statement -> 'return' ( expression )? ';'
         private ReturnNode ReturnStatement()
         {
             Token kw = this.Consume(TokenType.Return);
 
-            TupleNode expr = null;
+            Node expr = null;
             if (!this.Match(TokenType.Semicolon))
-                expr = new TupleNode(this.ExpressionList());
+                expr = this.Expression();
 
             this.Consume(TokenType.Semicolon);
 
@@ -1412,7 +1412,7 @@ namespace Fl.Syntax
             {
                 if (this.Match(TokenType.LeftParen))
                 {
-                    if (this.TryGetAccessor(primary) == null && this.TryGetLiteral(primary)?.Literal?.Type != TokenType.Identifier)
+                    if (!(primary is FunctionNode) && this.TryGetAccessor(primary) == null && this.TryGetLiteral(primary)?.Literal?.Type != TokenType.Identifier)
                         throw new ParserException($"{this.GetCurrentLineAndCol()} '{primary}' is not an invokable object");
                     ExpressionListNode arguments = this.Arguments();
                     primary = new CallableNode(primary, arguments, newt);

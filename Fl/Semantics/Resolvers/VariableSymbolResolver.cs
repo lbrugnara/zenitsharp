@@ -38,6 +38,7 @@ namespace Fl.Semantics.Resolvers
             {
                 // Get the identifier name
                 var variableName = definition.Left.Value;
+                var storage = SymbolHelper.GetStorage(vardecl.Information.Mutability);
 
                 // Check if the symbol is already defined
                 if (visitor.SymbolTable.Contains(variableName))
@@ -51,18 +52,12 @@ namespace Fl.Semantics.Resolvers
                 if (rhsSymbol == null)
                 {
                     // Create the new symbol for the variable
-                    var typeInfo = SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, vardecl.Information.Type);
-                    var storage = SymbolHelper.GetStorage(vardecl.Information.Mutability);
+                    var typeInfo = SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, vardecl.Information.Type);                    
                     lhsSymbol = visitor.SymbolTable.Insert(variableName, typeInfo, Access.Public, storage);
                 }
                 else
                 {
-                    // Remove the bound -complex- symbol
-                    // binder.SymbolTable.Remove(rhsSymbol.Id);
-                    // Bind it to the variable name
-                    var rhsTypeSymbol = rhsSymbol as ITypeSymbol;
-                    var rhsBoundSymbol = rhsSymbol as IBoundSymbol;
-                    visitor.SymbolTable.Insert(variableName, new BoundSymbol(variableName, rhsTypeSymbol ?? rhsBoundSymbol?.TypeSymbol, Access.Public, SymbolHelper.GetStorage(vardecl.Information.Mutability), visitor.SymbolTable.CurrentScope));
+                    visitor.SymbolTable.Insert(variableName, new BoundSymbol(variableName, rhsSymbol.GetTypeSymbol(), Access.Public, storage, visitor.SymbolTable.CurrentScope));
                 }
             }
         }

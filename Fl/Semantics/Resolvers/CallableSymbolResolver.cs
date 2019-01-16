@@ -15,11 +15,10 @@ namespace Fl.Semantics.Resolvers
 
             node.Arguments.Expressions.ForEach(e => e.Visit(visitor));
 
-            if (target != null && target is IBoundSymbol bs && bs.TypeSymbol is FunctionSymbol fs)
-                return fs?.Return.TypeSymbol;
+            var typeSymbol = target?.GetTypeSymbol();
 
-            if (target != null && target is IValueSymbol && target is FunctionSymbol fs2)
-                return fs2?.Return.TypeSymbol;
+            if (typeSymbol is FunctionSymbol fs)
+                return fs?.Return.TypeSymbol;
 
             if (target is UnresolvedTypeSymbol us)
                 us.IsFunction = true;

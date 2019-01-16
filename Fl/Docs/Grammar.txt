@@ -139,7 +139,7 @@ continue_statement  -> 'continue' ';'
                     ;
 
 
-return_statement -> 'return' ( expression ( ',' expression )* )? ';'
+return_statement -> 'return' ( expression )? ';'
                  ;
 
 

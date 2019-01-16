@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
+using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
@@ -19,10 +20,7 @@ namespace Fl.Semantics.Resolvers
 
             if (rhsSymbol != null)
             {
-                var rhsTypeSymbol = rhsSymbol as ITypeSymbol;
-                var rhsBoundSymbol = rhsSymbol as IBoundSymbol;
-
-                visitor.SymbolTable.Insert(node.Name.Value, new BoundSymbol(node.Name.Value, rhsTypeSymbol ?? rhsBoundSymbol?.TypeSymbol, Access.Public, storage, visitor.SymbolTable.CurrentScope));
+                visitor.SymbolTable.Insert(node.Name.Value, new BoundSymbol(node.Name.Value, rhsSymbol.GetTypeSymbol(), Access.Public, storage, visitor.SymbolTable.CurrentScope));
                 return rhsSymbol;
             }
 
