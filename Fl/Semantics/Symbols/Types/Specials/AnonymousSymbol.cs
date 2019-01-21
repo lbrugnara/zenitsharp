@@ -2,15 +2,16 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Helpers;
+using Fl.Semantics.Symbols.Containers;
 using Fl.Semantics.Types;
 
-namespace Fl.Semantics.Symbols
+namespace Fl.Semantics.Symbols.Types.Specials
 {
-    public class AnonymousSymbol : ITypeSymbol
+    public class AnonymousSymbol : ISpecialTypeSymbol
     {
         public string Name { get; }
 
-        public ISymbolContainer Parent => null;
+        public IContainer Parent => null;
 
         public BuiltinType BuiltinType => BuiltinType.Anonymous;
 

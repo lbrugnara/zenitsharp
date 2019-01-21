@@ -1,7 +1,8 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols.Containers;
+using Fl.Semantics.Symbols.Types;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Fl.Semantics.Symbols
     {
         public List<ITypeSymbol> Types { get; set; }
 
-        public TupleSymbol(string name, ISymbolContainer parent)
+        public TupleSymbol(string name, IContainer parent)
             : base(name, BuiltinType.Tuple, parent)
         {
             this.Types = new List<ITypeSymbol>();

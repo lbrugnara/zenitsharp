@@ -1,7 +1,4 @@
 ﻿using Fl.Ast;
-using Fl.Semantics.Checkers;
-using Fl.Semantics.Exceptions;
-using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Checkers
 {

@@ -3,7 +3,6 @@
 
 
 using Fl.Ast;
-using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Mutability
 {

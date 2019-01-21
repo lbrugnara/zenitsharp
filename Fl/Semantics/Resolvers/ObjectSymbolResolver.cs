@@ -2,13 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ObjectSymbolResolver : INodeVisitor<SymbolResolverVisitor, ObjectNode, IValueSymbol>
+    class ObjectSymbolResolver : INodeVisitor<SymbolResolverVisitor, ObjectNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, ObjectNode node)
+        public ISymbol Visit(SymbolResolverVisitor visitor, ObjectNode node)
         {
             // Create a new ObjectSymbol and enter to the scope
             var objectSymbol = visitor.SymbolTable.EnterObjectScope(node.Uid);

@@ -1,4 +1,7 @@
 ﻿using Fl.Semantics.Exceptions;
+using Fl.Semantics.Symbols.Types;
+using Fl.Semantics.Symbols.Types.Specials;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Symbols
 {

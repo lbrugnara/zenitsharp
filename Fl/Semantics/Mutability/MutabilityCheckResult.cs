@@ -1,8 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Symbols;
-using Fl.Semantics.Types;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Mutability
 {

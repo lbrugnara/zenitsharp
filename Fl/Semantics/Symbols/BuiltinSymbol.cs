@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Fl.Semantics.Symbols
+﻿namespace Fl.Semantics.Symbols
 {
     public enum BuiltinSymbol
     {

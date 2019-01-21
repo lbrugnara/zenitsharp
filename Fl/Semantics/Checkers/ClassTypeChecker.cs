@@ -1,5 +1,4 @@
 ﻿using Fl.Ast;
-using Fl.Semantics.Checkers;
 
 namespace Fl.Semantics.Checkers
 {

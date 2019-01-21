@@ -2,15 +2,14 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class BinarySymbolResolver : INodeVisitor<SymbolResolverVisitor, BinaryNode, IValueSymbol>
+    class BinarySymbolResolver : INodeVisitor<SymbolResolverVisitor, BinaryNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, BinaryNode binary)
+        public ISymbol Visit(SymbolResolverVisitor visitor, BinaryNode binary)
         {
             var left = binary.Left.Visit(visitor);
             var right = binary.Right.Visit(visitor);

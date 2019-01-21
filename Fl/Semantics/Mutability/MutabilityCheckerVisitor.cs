@@ -2,9 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Inferrers;
 using Fl.Semantics.Symbols;
-using System.Collections.Generic;
 
 namespace Fl.Semantics.Mutability
 {

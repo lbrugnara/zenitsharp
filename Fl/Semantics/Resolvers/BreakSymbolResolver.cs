@@ -3,13 +3,13 @@
 
 
 using Fl.Ast;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class BreakSymbolResolver : INodeVisitor<SymbolResolverVisitor, BreakNode, IValueSymbol>
+    class BreakSymbolResolver : INodeVisitor<SymbolResolverVisitor, BreakNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, BreakNode wnode)
+        public ISymbol Visit(SymbolResolverVisitor visitor, BreakNode wnode)
         {
             wnode.Number?.Visit(visitor);
 

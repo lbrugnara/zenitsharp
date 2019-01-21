@@ -2,9 +2,8 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Types;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Checkers
 {
@@ -14,7 +13,7 @@ namespace Fl.Semantics.Checkers
         {
             var target = node.Target.Visit(checker);
 
-            var targetFuncScope = checker.SymbolTable.GetFunctionScope(target.Symbol.Name);
+            var targetFuncScope = checker.SymbolTable.CurrentScope.Get<FunctionSymbol>(target.Symbol.Name);
 
             for (var i=0; i < node.Arguments.Expressions.Count; i++)
             {

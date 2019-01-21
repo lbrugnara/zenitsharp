@@ -2,8 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Types;
-using Fl.Semantics.Exceptions;
 
 namespace Fl.Semantics.Mutability
 {

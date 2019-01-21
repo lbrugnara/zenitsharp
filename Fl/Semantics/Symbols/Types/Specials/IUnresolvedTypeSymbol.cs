@@ -1,9 +1,8 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Symbols.Values;
 
-namespace Fl.Semantics.Symbols
+namespace Fl.Semantics.Symbols.Types.Specials
 {
     /// <summary>
     /// Represents a referenced symbol that has not been
@@ -11,7 +10,7 @@ namespace Fl.Semantics.Symbols
     /// Before moving to the next phase, all the unresolved references
     /// should be satisfied
     /// </summary>
-    public interface IUnresolvedTypeSymbol : ITypeSymbol
+    public interface IUnresolvedTypeSymbol : ISpecialTypeSymbol
     {
     }
 }

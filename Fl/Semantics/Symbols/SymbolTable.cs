@@ -1,14 +1,15 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Fl.Semantics.Exceptions;
 using Fl.Semantics.Inferrers;
+using Fl.Semantics.Symbols.Containers;
+using Fl.Semantics.Symbols.Types;
+using Fl.Semantics.Symbols.Types.Specials;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
-using Fl.Syntax;
 
 namespace Fl.Semantics.Symbols
 {
@@ -17,12 +18,12 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Global scope is the first created (last in the stack) scope
         /// </summary>
-        private ISymbolContainer Global { get; set; }
+        private IContainer Global { get; set; }
 
         /// <summary>
         /// Current scope is the latest added one
         /// </summary>
-        public ISymbolContainer CurrentScope { get; private set; }
+        public IContainer CurrentScope { get; private set; }
 
         private TypeInferrer TypeInferrer { get; }
 
@@ -30,6 +31,7 @@ namespace Fl.Semantics.Symbols
         {
             // Create the @global scope and set it as the current scope
             this.Global = this.CurrentScope = new Block("@global");
+            //this.CurrentScope.Insert<Expressions.Package>("myPackage", new Expressions.Package("myPackage", this.CurrentScope));
             this.TypeInferrer = typeInferrer;
         }
 
@@ -57,7 +59,7 @@ namespace Fl.Semantics.Symbols
             return this.EnterBlockScope<Loop>(name, this.CurrentScope);
         }
 
-        private T EnterBlockScope<T>(string name, ISymbolContainer parent)
+        private T EnterBlockScope<T>(string name, IContainer parent)
             where T : Block
         {
             T scope = parent.TryGet<T>(name);
@@ -95,7 +97,7 @@ namespace Fl.Semantics.Symbols
             return this.EnterComplexSymbolScope<ClassSymbol>(name, this.Global);
         }
 
-        private T EnterComplexSymbolScope<T>(string name, ISymbolContainer parent)
+        private T EnterComplexSymbolScope<T>(string name, IContainer parent)
             where T : ComplexSymbol
         {
             T scope = parent.TryGet<T>(name);
@@ -129,17 +131,6 @@ namespace Fl.Semantics.Symbols
             return scope;
         }
 
-        public ClassSymbol GetClassScope(string className)
-        {
-            // TODO: Handle Package and nested classes
-            return this.Global.Get<ClassSymbol>(className);
-        }
-
-        public FunctionSymbol GetFunctionScope(string funcName)
-        {
-            return this.CurrentScope.Get<FunctionSymbol>(funcName);
-        }
-
         /// <summary>
         /// Remove the current scope from the stack (go back to the current scope's parent)
         /// </summary>
@@ -151,27 +142,7 @@ namespace Fl.Semantics.Symbols
             this.CurrentScope = this.CurrentScope.Parent;
         }
 
-        /// <summary>
-        /// Return true if the current scope (or its parent) is a ScopeType.Function
-        /// </summary>
-        public bool InFunction
-        {
-            get
-            {
-                var scope = this.CurrentScope;
-                while (scope != null)
-                {
-                    if (scope is FunctionSymbol)
-                        return true;
-
-                    scope = scope.Parent;
-                }
-
-                return false;
-            }            
-        }
-
-        public FunctionSymbol GetCurrentFunctionScope()
+        public FunctionSymbol GetCurrentFunction()
         {
             var scope = this.CurrentScope;
             while (scope != null)
@@ -182,35 +153,26 @@ namespace Fl.Semantics.Symbols
                 scope = scope.Parent;
             }
 
-            throw new ScopeException("Current scope does not belong to a function");
+            throw new ScopeException("Current scope is not a function");
         }
 
         #region ISymbolTable implementation
 
-        /// <inheritdoc/>
-        public void Insert(string name, IBoundSymbol symbol) => this.CurrentScope.Insert(name, symbol);
-
-        public IBoundSymbol Insert(string name, ITypeSymbol type, Access access, Storage storage)
+        public IBoundSymbol BindSymbol(string name, ITypeSymbol type, Access access, Storage storage)
         {
             var symbol = new BoundSymbol(name, type, access, storage, this.CurrentScope);
-            this.Insert(name, symbol);
+            this.CurrentScope.Insert(name, symbol);
             return symbol;
         }        
 
-        public void Remove(string name) => this.CurrentScope.Remove(name);
+        public bool HasBoundSymbol(string name) => this.CurrentScope.Contains<IBoundSymbol>(name);
 
-        /// <inheritdoc/>
-        public bool Contains(string name) => this.CurrentScope.Contains(name);
-
-        /// <inheritdoc/>
         public IBoundSymbol GetBoundSymbol(string name) => this.CurrentScope.Get<IBoundSymbol>(name);
-
-        public IBoundSymbol TryGetBoundSymbol(string name) => this.CurrentScope.Get<IBoundSymbol>(name);
 
         #endregion
 
         /// <summary>
-        /// Call <see cref="UpdateSymbolReferences(ISymbolContainer)"/> using the global scope as the starting point
+        /// Call <see cref="UpdateSymbolReferences(IContainer)"/> using the global scope as the starting point
         /// </summary>
         public void UpdateSymbolReferences()
         {
@@ -230,48 +192,46 @@ namespace Fl.Semantics.Symbols
         /// case the referenced symbol has been defined.
         /// </summary>
         /// <param name="scope"></param>
-        private void UpdateSymbolReferences(ISymbolContainer scope)
+        private void UpdateSymbolReferences(IContainer scope)
         {
-            var containers = scope.GetSymbols<ISymbolContainer>();
+            var containers = scope.GetAllOfType<IContainer>();
 
             foreach (var container in containers)
                 this.UpdateSymbolReferences(container);
 
-            var boundSymbols = scope.GetSymbols<IBoundSymbol>().Where(bs => bs.TypeSymbol is IUnresolvedTypeSymbol);
+            var boundSymbols = scope.GetAllOfType<IBoundSymbol>().Where(bs => bs.TypeSymbol is IUnresolvedTypeSymbol);
 
             foreach (var boundSymbol in boundSymbols)
             {
                 var uts = boundSymbol.TypeSymbol as IUnresolvedTypeSymbol;
 
-                if (uts is UnresolvedTypeSymbol us)
+
+                if (uts is UnresolvedFunctionSymbol ufunc)
                 {
-                    if (us.IsFunction)
-                    {
-                        if (!us.Parent.Contains(us.Name))
-                            continue;
+                    if (!ufunc.Parent.Contains<FunctionSymbol>(ufunc.Name))
+                        continue;
 
-                        var func = us.Parent.Get<FunctionSymbol>(us.Name);
+                    var func = ufunc.Parent.Get<FunctionSymbol>(ufunc.Name);
 
-                        if (func.Return.TypeSymbol.BuiltinType == BuiltinType.None)
-                            continue;
+                    if (func.Return.TypeSymbol.BuiltinType == BuiltinType.None)
+                        continue;
 
-                        boundSymbol.ChangeType(func.Return.TypeSymbol.GetTypeSymbol());
-                    }
-                    else
-                    {
-                        if (!us.Parent.Contains(us.Name))
-                            continue;
+                    boundSymbol.ChangeType(func.Return.TypeSymbol.GetTypeSymbol());
+                }
+                else if (uts is UnresolvedTypeSymbol us)
+                {
+                    if (!us.Parent.Contains<FunctionSymbol>(us.Name))
+                        continue;
 
-                        var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
+                    var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
 
-                        if (symbol.BuiltinType == BuiltinType.None)
-                            continue;
+                    if (symbol.BuiltinType == BuiltinType.None)
+                        continue;
 
-                        if (!symbol.IsOfType<FunctionSymbol>())
-                            continue;
+                    if (!symbol.IsOfType<FunctionSymbol>())
+                        continue;
 
-                        boundSymbol.ChangeType(symbol.GetTypeSymbol());
-                    }
+                    boundSymbol.ChangeType(symbol.GetTypeSymbol());
                 }
             }
         }        
@@ -281,58 +241,55 @@ namespace Fl.Semantics.Symbols
         /// cyclic references, and in that case assing an anonymous type
         /// </summary>
         /// <param name="scope"></param>
-        private void ThrowIfUnresolved(ISymbolContainer scope)
+        private void ThrowIfUnresolved(IContainer scope)
         {
-            var containers = scope.GetSymbols<ISymbolContainer>();
+            var containers = scope.GetAllOfType<IContainer>();
 
             foreach (var container in containers)
                 this.ThrowIfUnresolved(container);
 
-            var boundSymbols = scope.GetSymbols<IBoundSymbol>().Where(bs => bs.TypeSymbol is IUnresolvedTypeSymbol);
+            var boundSymbols = scope.GetAllOfType<IBoundSymbol>().Where(bs => bs.TypeSymbol is IUnresolvedTypeSymbol);
 
             foreach (var boundSymbol in boundSymbols)
             {
                 var uts = boundSymbol.TypeSymbol as IUnresolvedTypeSymbol;
 
-                if (uts is UnresolvedTypeSymbol us)
+                if (uts is UnresolvedFunctionSymbol ufunc)
                 {
-                    if (us.IsFunction)
+                    if (!ufunc.Parent.Contains<FunctionSymbol>(ufunc.Name))
+                        throw new SymbolException($"Function '{ufunc.Name}' is not defined in scope '{ufunc.Parent.Name}'.");
+
+                    var func = ufunc.Parent.Get<FunctionSymbol>(ufunc.Name);
+
+                    if (func.Return.TypeSymbol is IUnresolvedTypeSymbol)
                     {
-                        if (!us.Parent.Contains(us.Name))
-                            throw new SymbolException($"Function '{us.Name}' is not defined in scope '{us.Parent.Name}'.");
-
-                        var func = us.Parent.Get<FunctionSymbol>(us.Name);
-
-                        if (func.Return.TypeSymbol is IUnresolvedTypeSymbol)
+                        // Circular reference?
+                        if (boundSymbol.TypeSymbol == func.Return.TypeSymbol)
                         {
-                            // Circular reference?
-                            if (boundSymbol.TypeSymbol == func.Return.TypeSymbol)
-                            {                                
-                                this.TypeInferrer.NewAnonymousTypeFor(func.Return);
-                            }
-                            else
-                            {
-                                throw new SymbolException($"Function '{us.Name}' is not defined in scope '{us.Parent.Name}'.");
-                            }
+                            this.TypeInferrer.NewAnonymousTypeFor(func.Return);
                         }
-
-                        boundSymbol.ChangeType(func.Return.TypeSymbol.GetTypeSymbol());
+                        else
+                        {
+                            throw new SymbolException($"Function '{ufunc.Name}' is not defined in scope '{ufunc.Parent.Name}'.");
+                        }
                     }
-                    else
-                    {
-                        if (!us.Parent.Contains(us.Name))
-                            throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
 
-                        var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
+                    boundSymbol.ChangeType(func.Return.TypeSymbol.GetTypeSymbol());
+                }
+                else if (uts is UnresolvedTypeSymbol us)
+                {
+                    if (!us.Parent.Contains<FunctionSymbol>(us.Name))
+                        throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
 
-                        if (symbol.BuiltinType == BuiltinType.None)
-                            throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
+                    var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
 
-                        if (!symbol.IsOfType<FunctionSymbol>())
-                            throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
+                    if (symbol.BuiltinType == BuiltinType.None)
+                        throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
 
-                        boundSymbol.ChangeType(symbol.GetTypeSymbol());                        
-                    }
+                    if (!symbol.IsOfType<FunctionSymbol>())
+                        throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
+
+                    boundSymbol.ChangeType(symbol.GetTypeSymbol());
                 }
             }
         }

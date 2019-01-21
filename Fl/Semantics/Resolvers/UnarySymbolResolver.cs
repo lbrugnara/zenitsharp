@@ -3,13 +3,12 @@
 
 using Fl.Ast;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Resolvers
 {
-    class UnarySymbolResolver : INodeVisitor<SymbolResolverVisitor, UnaryNode, IValueSymbol>
+    class UnarySymbolResolver : INodeVisitor<SymbolResolverVisitor, UnaryNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, UnaryNode unary)
+        public ISymbol Visit(SymbolResolverVisitor visitor, UnaryNode unary)
         {
             return unary.Left.Visit(visitor);
         }

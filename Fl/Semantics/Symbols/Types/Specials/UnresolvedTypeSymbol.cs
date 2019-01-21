@@ -2,29 +2,24 @@
 // Full copyright and license information in LICENSE file
 
 
+using Fl.Semantics.Symbols.Containers;
 using Fl.Semantics.Types;
 
-namespace Fl.Semantics.Symbols
+namespace Fl.Semantics.Symbols.Types.Specials
 {
     public class UnresolvedTypeSymbol : IUnresolvedTypeSymbol
     {
         public string Name { get; }
 
-        public ISymbolContainer Parent { get; }
+        public IContainer Parent { get; }
 
         public BuiltinType BuiltinType { get; set; }
 
-        public UnresolvedTypeSymbol(string name, ISymbolContainer parent)
+        public UnresolvedTypeSymbol(string name, IContainer parent)
         {
             this.Name = name;
             this.Parent = parent;
             this.BuiltinType = BuiltinType.None;
-        }
-
-        public bool IsFunction
-        {
-            get => this.BuiltinType == BuiltinType.Function;
-            set => this.BuiltinType = BuiltinType.Function;
         }
 
         public override string ToString()
@@ -34,9 +29,6 @@ namespace Fl.Semantics.Symbols
 
         public string ToValueString()
         {
-            if (this.IsFunction)
-                return $"unresolved func call {this.Name}";
-
             return $"unresolved {this.Name}";
         }
     }

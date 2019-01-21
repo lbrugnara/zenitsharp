@@ -2,21 +2,18 @@
 // Full copyright and license information in LICENSE file
 
 
-using Fl.Semantics.Exceptions;
 using Fl.Ast;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types.Specials;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ReturnSymbolResolver : INodeVisitor<SymbolResolverVisitor, ReturnNode, IValueSymbol>
+    class ReturnSymbolResolver : INodeVisitor<SymbolResolverVisitor, ReturnNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, ReturnNode rnode)
+        public ISymbol Visit(SymbolResolverVisitor visitor, ReturnNode rnode)
         {
-            if (!visitor.SymbolTable.InFunction)
-                throw new ScopeOperationException("Invalid return statement in a non-function block");
-
-            var func = visitor.SymbolTable.GetCurrentFunctionScope();
+            var func = visitor.SymbolTable.GetCurrentFunction();
 
             if (rnode.Expression == null)
             {

@@ -3,7 +3,7 @@
 
 using Fl.Ast;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols.Types;
 
 namespace Fl.Semantics.Inferrers
 {

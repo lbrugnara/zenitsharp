@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Helpers;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types;
+using Fl.Semantics.Symbols.Types.Specials;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
 using System.Linq;

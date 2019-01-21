@@ -4,13 +4,13 @@
 using Fl.Ast;
 using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AssignmentNode, IValueSymbol>
+    class AssignmentSymbolResolver : INodeVisitor<SymbolResolverVisitor, AssignmentNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, AssignmentNode node)
+        public ISymbol Visit(SymbolResolverVisitor visitor, AssignmentNode node)
         {
             if (node is VariableAssignmentNode)
                 return this.MakeVariableAssignment(node as VariableAssignmentNode, visitor);
@@ -21,7 +21,7 @@ namespace Fl.Semantics.Resolvers
             throw new System.Exception($"Unhandled AssignmentNode type {node.GetType().FullName}");
         }
 
-        private IValueSymbol MakeVariableAssignment(VariableAssignmentNode node, SymbolResolverVisitor visitor)
+        private ISymbol MakeVariableAssignment(VariableAssignmentNode node, SymbolResolverVisitor visitor)
         {
             var left = node.Accessor.Visit(visitor);
             var right = node.Right.Visit(visitor);
@@ -36,7 +36,7 @@ namespace Fl.Semantics.Resolvers
             return left;
         }
 
-        private IValueSymbol MakeDestructuringAssignment(DestructuringAssignmentNode node, SymbolResolverVisitor visitor)
+        private ISymbol MakeDestructuringAssignment(DestructuringAssignmentNode node, SymbolResolverVisitor visitor)
         {
             var left = node.Left.Visit(visitor);
             var right = node.Right.Visit(visitor);

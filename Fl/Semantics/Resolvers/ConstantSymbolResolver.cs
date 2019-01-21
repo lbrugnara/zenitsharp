@@ -4,14 +4,15 @@
 using Fl.Ast;
 using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ConstantNode, IValueSymbol>
+    class ConstantSymbolResolver : INodeVisitor<SymbolResolverVisitor, ConstantNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor binder, ConstantNode constdec)
+        public ISymbol Visit(SymbolResolverVisitor binder, ConstantNode constdec)
         {            
             ITypeSymbol typeSymbol = null;
 
@@ -27,7 +28,7 @@ namespace Fl.Semantics.Resolvers
                 var constantName = definition.Left.Value;
 
                 // Check if the symbol is already defined
-                if (binder.SymbolTable.Contains(constantName))
+                if (binder.SymbolTable.HasBoundSymbol(constantName))
                     throw new SymbolException($"Symbol {constantName} is already defined.");
 
                 // If it is a variable definition, visit the right-hand side expression
@@ -37,7 +38,7 @@ namespace Fl.Semantics.Resolvers
                     throw new SymbolException($"The expression to initialize '{constantName}' must be constant");                
 
                 // Create the new symbol for the variable
-                binder.SymbolTable.Insert(constantName, typeSymbol, Access.Public, Storage.Constant);
+                binder.SymbolTable.BindSymbol(constantName, typeSymbol, Access.Public, Storage.Constant);
             }
 
             return null;

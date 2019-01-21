@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Symbols.Values;
-using Fl.Semantics.Types;
+using Fl.Semantics.Symbols.Types;
 
-namespace Fl.Semantics.Symbols
+namespace Fl.Semantics.Symbols.Values
 {
     /// <summary>
     /// Represents a value symbol that is bound to a variable
     /// </summary>
-    public interface IBoundSymbol : IValueSymbol
+    public interface IBoundSymbol : ISymbol
     {
         /// <summary>
         /// Bound symbol's type

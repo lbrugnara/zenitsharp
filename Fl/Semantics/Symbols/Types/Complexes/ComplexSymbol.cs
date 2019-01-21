@@ -2,6 +2,9 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Semantics.Exceptions;
+using Fl.Semantics.Symbols.Containers;
+using Fl.Semantics.Symbols.Types;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +19,7 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         protected Dictionary<string, ISymbol> Symbols { get; }
 
-        protected ComplexSymbol(string name, BuiltinType type, ISymbolContainer parent)
+        protected ComplexSymbol(string name, BuiltinType type, IContainer parent)
             : base(name, type, parent)
         {
             this.Symbols = new Dictionary<string, ISymbol>();
@@ -60,9 +63,10 @@ namespace Fl.Semantics.Symbols
                 this.Symbols.Remove(name);
         }
 
-        public bool Contains(string name)
+        public bool Contains<T>(string name) 
+            where T : ISymbol
         { 
-            return this.Symbols.ContainsKey(name) || (this.Parent != null && this.Parent.Contains(name));
+            return this.Symbols.ContainsKey(name) && this.Symbols[name] is T || (this.Parent != null && this.Parent.Contains<T>(name));
         }
 
         public T Get<T>(string name) 
@@ -87,13 +91,13 @@ namespace Fl.Semantics.Symbols
             if (symbol != null)
                 return (T)symbol;
 
-            if (this.Parent == null || !this.Parent.Contains(name))
+            if (this.Parent == null || !this.Parent.Contains<T>(name))
                 return default(T);
 
             return this.Parent.TryGet<T>(name);
         }
 
-        public List<T> GetSymbols<T>() where T : ISymbol => this.Symbols.Values.OfType<T>().Cast<T>().ToList();
+        public List<T> GetAllOfType<T>() where T : ISymbol => this.Symbols.Values.OfType<T>().Cast<T>().ToList();
 
         #endregion
 
@@ -119,7 +123,7 @@ namespace Fl.Semantics.Symbols
                 {
                     sb.AppendLine($"{"".PadLeft(memberIndentN)}{bs.ToValueString()}");
                 }
-                else if (symbol is ISymbolContainer sc)
+                else if (symbol is IContainer sc)
                 {
                     sb.AppendLine(sc.ToDumpString(memberIndentN));
                 }

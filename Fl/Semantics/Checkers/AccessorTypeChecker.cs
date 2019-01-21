@@ -2,9 +2,8 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Types;
+using Fl.Semantics.Symbols.Values;
 
 namespace Fl.Semantics.Checkers
 {
@@ -52,7 +51,7 @@ namespace Fl.Semantics.Checkers
             // Here we have to get the class's scope and the type must be one of the following types:
             //  - ClassInstance type
             //  - A native type
-            /*ISymbolContainer symtable = null;
+            /*IBlock symtable = null;
 
             if (encsym.ITypeSymbol.Type is ClassInstance classInstance)
                 // Find the Class scope

@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Exceptions;
 using Fl.Ast;
-using Fl.Semantics.Types;
-using System.Linq;
-using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types;
+using Fl.Semantics.Symbols.Types.Specials;
 
 namespace Fl.Semantics.Inferrers
 {
@@ -13,12 +11,9 @@ namespace Fl.Semantics.Inferrers
     {
         public ITypeSymbol Visit(TypeInferrerVisitor visitor, ReturnNode rnode)
         {
-            if (!visitor.SymbolTable.InFunction)
-                throw new ScopeOperationException("Invalid return statement in a non-function block");
-
             // The current scope is the function's scope. We get a reference to the
             // return type and we update it if needed
-            var functionScope = visitor.SymbolTable.CurrentScope as FunctionSymbol;
+            var functionScope = visitor.SymbolTable.GetCurrentFunction();
 
             // If there's an empty return statement, leave here
             if (rnode.Expression == null)

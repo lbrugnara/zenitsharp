@@ -2,13 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class WhileSymbolResolver : INodeVisitor<SymbolResolverVisitor, WhileNode, IValueSymbol>
+    class WhileSymbolResolver : INodeVisitor<SymbolResolverVisitor, WhileNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, WhileNode wnode)
+        public ISymbol Visit(SymbolResolverVisitor visitor, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             visitor.SymbolTable.EnterLoopScope(wnode.Uid);

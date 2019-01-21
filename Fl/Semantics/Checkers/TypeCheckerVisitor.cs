@@ -2,7 +2,6 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Inferrers;
 using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Checkers

@@ -2,13 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class BlockSymbolResolver : INodeVisitor<SymbolResolverVisitor, BlockNode, IValueSymbol>
+    class BlockSymbolResolver : INodeVisitor<SymbolResolverVisitor, BlockNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, BlockNode node)
+        public ISymbol Visit(SymbolResolverVisitor visitor, BlockNode node)
         {
             visitor.SymbolTable.EnterBlockScope(node.Uid);
 

@@ -4,8 +4,6 @@ using Fl.Semantics.Checkers;
 using Fl.Semantics.Inferrers;
 using Fl.Semantics.Symbols;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Fl.Semantics.Mutability;
 using Fl.Helpers;
 

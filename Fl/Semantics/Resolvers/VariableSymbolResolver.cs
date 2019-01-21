@@ -4,14 +4,15 @@
 using Fl.Ast;
 using Fl.Semantics.Exceptions;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols;
 using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class VariableSymbolResolver : INodeVisitor<SymbolResolverVisitor, VariableNode, IValueSymbol>
+    class VariableSymbolResolver : INodeVisitor<SymbolResolverVisitor, VariableNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, VariableNode vardecl)
+        public ISymbol Visit(SymbolResolverVisitor visitor, VariableNode vardecl)
         {
             // Variable definition are statements and not expressions, therefore they do not return
             // the ITypeSymbol received from the right-hand side
@@ -41,7 +42,7 @@ namespace Fl.Semantics.Resolvers
                 var storage = SymbolHelper.GetStorage(vardecl.Information.Mutability);
 
                 // Check if the symbol is already defined
-                if (visitor.SymbolTable.Contains(variableName))
+                if (visitor.SymbolTable.HasBoundSymbol(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // If it is a variable definition, visit the right-hand side expression
@@ -53,11 +54,11 @@ namespace Fl.Semantics.Resolvers
                 {
                     // Create the new symbol for the variable
                     var typeInfo = SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, vardecl.Information.Type);                    
-                    lhsSymbol = visitor.SymbolTable.Insert(variableName, typeInfo, Access.Public, storage);
+                    lhsSymbol = visitor.SymbolTable.BindSymbol(variableName, typeInfo, Access.Public, storage);
                 }
                 else
                 {
-                    visitor.SymbolTable.Insert(variableName, new BoundSymbol(variableName, rhsSymbol.GetTypeSymbol(), Access.Public, storage, visitor.SymbolTable.CurrentScope));
+                    visitor.SymbolTable.BindSymbol(variableName, rhsSymbol.GetTypeSymbol(), Access.Public, storage);
                 }
             }
         }
@@ -75,7 +76,7 @@ namespace Fl.Semantics.Resolvers
                 var variableName = declaration.Value;
 
                 // Check if the symbol is already defined
-                if (visitor.SymbolTable.Contains(variableName))
+                if (visitor.SymbolTable.HasBoundSymbol(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // If the type anotation is not specific (uses 'var'), we need to create an anonymous type
@@ -85,7 +86,7 @@ namespace Fl.Semantics.Resolvers
                     : SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, destrnode.Information.Type);
 
                 // Create the new symbol for the variable
-                var symbol = visitor.SymbolTable.Insert(variableName, varType, Access.Public, SymbolHelper.GetStorage(destrnode.Information.Mutability));
+                var symbol = visitor.SymbolTable.BindSymbol(variableName, varType, Access.Public, SymbolHelper.GetStorage(destrnode.Information.Mutability));
             }
         }
     }

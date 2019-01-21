@@ -4,14 +4,15 @@
 using System.Linq;
 using Fl.Ast;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types.Specials;
 using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Resolvers
 {
-    class FunctionSymbolResolver : INodeVisitor<SymbolResolverVisitor, FunctionNode, IValueSymbol>
+    class FunctionSymbolResolver : INodeVisitor<SymbolResolverVisitor, FunctionNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, FunctionNode funcdecl)
+        public ISymbol Visit(SymbolResolverVisitor visitor, FunctionNode funcdecl)
         {
             // Change the current scope to be the function's scope
             var functionSymbol = visitor.SymbolTable.EnterFunctionScope(funcdecl.Name);
@@ -29,7 +30,8 @@ namespace Fl.Semantics.Resolvers
                 var lastExpr = exprs.Last();
 
                 // We do allow lambdas that do not return a value
-                functionSymbol.Return.ChangeType(lastExpr.IsOfType<VoidSymbol>() ? new VoidSymbol() : lastExpr.GetTypeSymbol());
+                if (lastExpr != null)
+                    functionSymbol.Return.ChangeType(lastExpr.IsOfType<VoidSymbol>() ? new VoidSymbol() : lastExpr.GetTypeSymbol());
             }
             else
             {

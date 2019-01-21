@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Semantics.Symbols.Containers;
 
 namespace Fl.Semantics.Symbols
 {
@@ -17,6 +18,8 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Reference to the parent scope, if present
         /// </summary>
-        ISymbolContainer Parent { get; }
+        IContainer Parent { get; }
+
+        string ToValueString();
     }
 }

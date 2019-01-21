@@ -6,6 +6,8 @@ using Fl.Semantics.Exceptions;
 using System;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Inferrers;
+using Fl.Semantics.Symbols.Types;
+using Fl.Semantics.Symbols.Types.Specials;
 
 namespace Fl.Semantics.Types
 {
@@ -78,7 +80,7 @@ namespace Fl.Semantics.Types
                 if (token.Value == "func" || token.Value == "tuple")
                     return inferrer?.NewAnonymousTypeFor();
 
-                if (symtable.Contains(token.Value))
+                if (symtable.HasBoundSymbol(token.Value))
                 {
                     /*var typeInfo = symtable.Get(token.Value).ITypeSymbol;
                     if (typeInfo.Type is Class ctype)

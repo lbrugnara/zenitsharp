@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols.Containers;
 using Fl.Semantics.Types;
-using System.Collections.Generic;
 
-namespace Fl.Semantics.Symbols
+namespace Fl.Semantics.Symbols.Types
 {
     public abstract class TypeSymbol : ITypeSymbol
     {
@@ -22,16 +21,16 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// Symbol's parent
         /// </summary>
-        public ISymbolContainer Parent { get; }
+        public IContainer Parent { get; }
 
-        public TypeSymbol(BuiltinType type, ISymbolContainer parent)
+        public TypeSymbol(BuiltinType type, IContainer parent)
         {
             this.Name = type.ToString();
             this.BuiltinType = type;
             this.Parent = parent;
         }
 
-        protected TypeSymbol(string name, BuiltinType type, ISymbolContainer parent)
+        protected TypeSymbol(string name, BuiltinType type, IContainer parent)
             : this (type, parent)
         {
             this.Name = name;

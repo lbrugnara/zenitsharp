@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Semantics.Symbols.Containers;
+using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types;
 using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 using System;
@@ -22,7 +25,7 @@ namespace Fl.Semantics.Symbols
         public IBoundSymbol Return => this.TryGet<IBoundSymbol>($"@ret-{this.Name}");
 
 
-        public FunctionSymbol(string name, ITypeSymbol returnType, ISymbolContainer parent)
+        public FunctionSymbol(string name, ITypeSymbol returnType, IContainer parent)
             : base (name, BuiltinType.Function, parent)
         {
             this.Parameters = new List<IBoundSymbol>();
@@ -53,7 +56,7 @@ namespace Fl.Semantics.Symbols
 
         public bool IsCircularReference => this.HasCircularReferenceWith(this.Return);
 
-        protected bool HasCircularReferenceWith(IValueSymbol type)
+        protected bool HasCircularReferenceWith(ISymbol type)
         {
             if (type is FunctionSymbol functype)
             {

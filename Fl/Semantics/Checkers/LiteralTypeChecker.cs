@@ -3,7 +3,6 @@
 
 using Fl.Ast;
 using Fl.Semantics.Types;
-using Fl.Semantics;
 using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Checkers

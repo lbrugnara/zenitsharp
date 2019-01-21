@@ -1,11 +1,9 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Exceptions;
 using Fl.Ast;
 using Fl.Semantics.Types;
 using Fl.Semantics.Symbols;
-using System.Linq;
 
 namespace Fl.Semantics.Checkers
 {
@@ -13,11 +11,10 @@ namespace Fl.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, ReturnNode rnode)
         {
-            if (!checker.SymbolTable.InFunction)
-                throw new ScopeOperationException("Invalid return statement in a non-function block");
+            var func = checker.SymbolTable.GetCurrentFunction();
 
             // Get the current function's return symbol
-            var returnSymbol = (checker.SymbolTable.CurrentScope as FunctionSymbol).Return;
+            var returnSymbol = func.Return;
 
             // If it is an empty return statement, leave 
             if (rnode.Expression == null)

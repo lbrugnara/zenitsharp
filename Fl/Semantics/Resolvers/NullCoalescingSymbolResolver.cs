@@ -4,13 +4,13 @@
 
 using Fl.Ast;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class NullCoalescingSymbolResolver : INodeVisitor<SymbolResolverVisitor, NullCoalescingNode, IValueSymbol>
+    class NullCoalescingSymbolResolver : INodeVisitor<SymbolResolverVisitor, NullCoalescingNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, NullCoalescingNode nullc)
+        public ISymbol Visit(SymbolResolverVisitor visitor, NullCoalescingNode nullc)
         {
             var left = nullc.Left.Visit(visitor);
             var right = nullc.Right.Visit(visitor);

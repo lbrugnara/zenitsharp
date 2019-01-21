@@ -1,7 +1,5 @@
 ﻿using Fl.Ast;
-using Fl.Semantics.Inferrers;
-using Fl.Semantics.Symbols;
-using Fl.Semantics.Types;
+using Fl.Semantics.Symbols.Types;
 
 namespace Fl.Semantics.Inferrers
 {

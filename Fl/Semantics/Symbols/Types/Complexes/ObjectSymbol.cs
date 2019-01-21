@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Semantics.Symbols.Containers;
+using Fl.Semantics.Symbols.Types;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +12,7 @@ namespace Fl.Semantics.Symbols
 {
     public class ObjectSymbol : ComplexSymbol
     {
-        public ObjectSymbol(string name, ISymbolContainer parent)
+        public ObjectSymbol(string name, IContainer parent)
             : base(name, BuiltinType.Object, parent)
         {
         }

@@ -1,9 +1,10 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.Semantics.Types;
+using Fl.Semantics.Symbols.Containers;
+using Fl.Semantics.Symbols.Types;
 
-namespace Fl.Semantics.Symbols
+namespace Fl.Semantics.Symbols.Values
 {
     public class BoundSymbol : IBoundSymbol
     {
@@ -30,9 +31,9 @@ namespace Fl.Semantics.Symbols
         /// <summary>
         /// If present, reference to the parent scope
         /// </summary>
-        public ISymbolContainer Parent { get; private set; }
+        public IContainer Parent { get; private set; }
 
-        public BoundSymbol(string id, ITypeSymbol typeSymbol, Access access, Storage storage, ISymbolContainer parent)
+        public BoundSymbol(string id, ITypeSymbol typeSymbol, Access access, Storage storage, IContainer parent)
         {
             this.Name = id;
             this.TypeSymbol = typeSymbol;

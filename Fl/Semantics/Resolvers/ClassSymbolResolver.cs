@@ -1,11 +1,11 @@
 ﻿using Fl.Ast;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ClassSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassNode, IValueSymbol>
+    class ClassSymbolResolver : INodeVisitor<SymbolResolverVisitor, ClassNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor binder, ClassNode node)
+        public ISymbol Visit(SymbolResolverVisitor binder, ClassNode node)
         {
             // By now we just allow class definition at global scope or package scope (no nested classes)
             /*if (!binder.SymbolTable.CurrentScope.IsGlobal && !binder.SymbolTable.CurrentScope.IsPackage)

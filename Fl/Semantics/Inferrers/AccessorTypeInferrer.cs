@@ -3,9 +3,11 @@
 
 using Fl.Ast;
 using Fl.Semantics.Exceptions;
+using Fl.Semantics.Symbols.Types;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types.Specials;
 using Fl.Semantics.Symbols.Values;
-using Fl.Semantics.Types;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Inferrers
 {
@@ -20,7 +22,7 @@ namespace Fl.Semantics.Inferrers
             if (accessor.Parent == null)
             {
                 // Get accessed symbol that must be defined in the symtable's scope
-                var symbol = inferrer.SymbolTable.CurrentScope.Get<IValueSymbol>(symbolName);
+                var symbol = inferrer.SymbolTable.CurrentScope.Get<ISymbol>(symbolName);
 
                 if (symbol is IBoundSymbol bs)                
                     return bs.TypeSymbol;
@@ -34,7 +36,7 @@ namespace Fl.Semantics.Inferrers
 
             if (parentSymbol is IComplexSymbol cs)
             {
-                IValueSymbol memberType = cs.Get<IValueSymbol>(symbolName);
+                ISymbol memberType = cs.Get<ISymbol>(symbolName);
                 /*if (accessor.IsCall)
                     memberType = cs.Functions[symbolName];
                 else
@@ -50,7 +52,7 @@ namespace Fl.Semantics.Inferrers
 
             if (parentSymbol is AnonymousSymbol anons)
             {
-                IValueSymbol memberType = null;
+                ISymbol memberType = null;
 
                 // We have constraints that need to be added to the type
                 if (accessor.IsCall)

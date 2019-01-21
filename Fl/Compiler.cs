@@ -1,11 +1,8 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Fl.IL;
-using Fl.IL.VM;
 using Fl.Syntax;
 using Fl.Semantics;
-using System;
 
 namespace Fl
 {

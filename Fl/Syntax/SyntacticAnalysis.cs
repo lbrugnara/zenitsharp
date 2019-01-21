@@ -1,7 +1,5 @@
 ﻿using Fl.Ast;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Fl.Syntax
 {

@@ -2,13 +2,13 @@
 // Full copyright and license information in LICENSE file
 
 using Fl.Ast;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
 
 namespace Fl.Semantics.Resolvers
 {
-    class ContinueSymbolResolver : INodeVisitor<SymbolResolverVisitor, ContinueNode, IValueSymbol>
+    class ContinueSymbolResolver : INodeVisitor<SymbolResolverVisitor, ContinueNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, ContinueNode cnode)
+        public ISymbol Visit(SymbolResolverVisitor visitor, ContinueNode cnode)
         {
             return null;
         }

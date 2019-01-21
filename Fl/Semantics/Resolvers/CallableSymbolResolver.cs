@@ -3,13 +3,14 @@
 
 using Fl.Ast;
 using Fl.Semantics.Symbols;
-using Fl.Semantics.Symbols.Values;
+using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types.Specials;
 
 namespace Fl.Semantics.Resolvers
 {
-    public class CallableSymbolResolver : INodeVisitor<SymbolResolverVisitor, CallableNode, IValueSymbol>
+    public class CallableSymbolResolver : INodeVisitor<SymbolResolverVisitor, CallableNode, ISymbol>
     {
-        public IValueSymbol Visit(SymbolResolverVisitor visitor, CallableNode node)
+        public ISymbol Visit(SymbolResolverVisitor visitor, CallableNode node)
         {
             var target = node.Target.Visit(visitor);
 
@@ -21,7 +22,9 @@ namespace Fl.Semantics.Resolvers
                 return fs?.Return.TypeSymbol;
 
             if (target is UnresolvedTypeSymbol us)
-                us.IsFunction = true;
+            {
+                target = new UnresolvedFunctionSymbol(us.Name, us.Parent);
+            }
 
             return target;
         }

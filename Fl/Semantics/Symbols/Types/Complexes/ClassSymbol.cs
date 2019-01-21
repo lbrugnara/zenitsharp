@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
+using Fl.Semantics.Symbols.Containers;
+using Fl.Semantics.Symbols.Types;
+using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Types;
 using System.Collections.Generic;
 
@@ -14,7 +17,7 @@ namespace Fl.Semantics.Symbols
         // TODO: Update methods to be a dictionary <string, IValueSymbol>
         protected List<string> Methods { get; set; }
 
-        public ClassSymbol(string name, ISymbolContainer parent = null)
+        public ClassSymbol(string name, IContainer parent = null)
             : base(name, BuiltinType.Class, parent)
         {
             this.Constants = new List<string>();
