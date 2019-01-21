@@ -4,6 +4,7 @@
 using Fl.Ast;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types.Specials;
 
 namespace Fl.Semantics.Resolvers
 {
@@ -14,7 +15,12 @@ namespace Fl.Semantics.Resolvers
             var left = binary.Left.Visit(visitor);
             var right = binary.Right.Visit(visitor);
 
-            return visitor.Inferrer.FindMostGeneralType(left.GetTypeSymbol(), right.GetTypeSymbol());
+            var type = visitor.Inferrer.FindMostGeneralType(left.GetTypeSymbol(), right.GetTypeSymbol());
+
+            if (type == null)
+                type = new UnresolvedExpressionType("expr", visitor.SymbolTable.CurrentScope, left.GetTypeSymbol(), right.GetTypeSymbol());
+
+            return type;
         }
     }
 }

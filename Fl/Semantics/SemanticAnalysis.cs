@@ -70,6 +70,7 @@ namespace Fl.Semantics
             this.resolver.Visit(ast);
 
             // If there are unresolved types, throw an exception
+            this.symbolTable.UpdateSymbolReferences();
             this.symbolTable.ThrowIfUnresolved();
 
             Console.WriteLine("================");

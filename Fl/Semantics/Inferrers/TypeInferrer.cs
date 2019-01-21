@@ -143,6 +143,9 @@ namespace Fl.Semantics.Inferrers
             if (!this.CanUnify(t1.BuiltinType, t2.BuiltinType))
                 return null;
 
+            if (t1 is IUnresolvedTypeSymbol || t2 is IUnresolvedTypeSymbol)
+                return null;
+
             // t1 and t2 are NoneSymbol
             if (t1.BuiltinType == BuiltinType.None && t2.BuiltinType == BuiltinType.None)
                 return new NoneSymbol();

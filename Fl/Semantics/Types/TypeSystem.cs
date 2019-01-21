@@ -31,9 +31,17 @@ namespace Fl.Semantics.Types
             if (t1 == t2)
                 return t1;
 
-            // Object if one of them does not have a parent in the dict or already is an Object
-            if (!TypeHierarchy.ContainsKey(t1) || !TypeHierarchy.ContainsKey(t2) || t1 == BuiltinType.Object || t2 == BuiltinType.Object)
+            if (t1 == BuiltinType.Object || t2 == BuiltinType.Object)
                 return BuiltinType.Object;
+
+            if (!TypeHierarchy.ContainsKey(t1) && !TypeHierarchy.ContainsKey(t2))
+                return BuiltinType.Object;
+
+            if (!TypeHierarchy.ContainsKey(t1))
+                return TypeHierarchy[t2] == t1 ? t1 : BuiltinType.Object;
+
+            if (!TypeHierarchy.ContainsKey(t2))
+                return TypeHierarchy[t1] == t2 ? t2 : BuiltinType.Object;
 
             BuiltinType child = t1 < t2 ? t1 : t2;
             BuiltinType parent = t1 < t2 ? t2 : t1;

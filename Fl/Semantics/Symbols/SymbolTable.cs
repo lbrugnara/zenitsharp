@@ -187,6 +187,56 @@ namespace Fl.Semantics.Symbols
             this.ThrowIfUnresolved(this.Global);
         }
 
+        private ITypeSymbol ResolveSymbolRference(IUnresolvedTypeSymbol uts)
+        {
+            if (uts is UnresolvedFunctionSymbol ufunc)
+            {
+                if (!ufunc.Parent.Contains<FunctionSymbol>(ufunc.Name))
+                    return null;
+
+                var func = ufunc.Parent.Get<FunctionSymbol>(ufunc.Name);
+
+                if (func.Return.TypeSymbol.BuiltinType == BuiltinType.None)
+                    return null;
+
+                return func.Return.TypeSymbol.GetTypeSymbol();
+            }
+            else if (uts is UnresolvedExpressionType uet)
+            {
+                ITypeSymbol left = uet.Left;
+                ITypeSymbol right = uet.Right;
+
+                if (uet.Left is IUnresolvedTypeSymbol uetl)
+                    left = this.ResolveSymbolRference(uetl) ?? uet.Left;
+
+                if (uet.Right is IUnresolvedTypeSymbol uetr)
+                    right = this.ResolveSymbolRference(uetr) ?? uet.Right;
+
+                var type = this.TypeInferrer.FindMostGeneralType(left, right);
+
+                if (type == null)
+                    return new UnresolvedExpressionType(uet.Name, uet.Parent, left, right);
+
+                return type;
+            }
+            else if (uts is UnresolvedTypeSymbol us)
+            {
+                if (!us.Parent.Contains<FunctionSymbol>(us.Name))
+                    return null;
+
+                var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
+
+                if (symbol.BuiltinType == BuiltinType.None)
+                    return null;
+
+                if (!symbol.IsOfType<FunctionSymbol>())
+                    return null;
+
+                return symbol.GetTypeSymbol();
+            }
+            return null;
+        }
+
         /// <summary>
         /// Iterate through all the IBoundSymbols with IUnresolvedTypeSymbols type in order to update the reference, in 
         /// case the referenced symbol has been defined.
@@ -203,36 +253,10 @@ namespace Fl.Semantics.Symbols
 
             foreach (var boundSymbol in boundSymbols)
             {
-                var uts = boundSymbol.TypeSymbol as IUnresolvedTypeSymbol;
+                var resolvedType = this.ResolveSymbolRference(boundSymbol.TypeSymbol as IUnresolvedTypeSymbol);
 
-
-                if (uts is UnresolvedFunctionSymbol ufunc)
-                {
-                    if (!ufunc.Parent.Contains<FunctionSymbol>(ufunc.Name))
-                        continue;
-
-                    var func = ufunc.Parent.Get<FunctionSymbol>(ufunc.Name);
-
-                    if (func.Return.TypeSymbol.BuiltinType == BuiltinType.None)
-                        continue;
-
-                    boundSymbol.ChangeType(func.Return.TypeSymbol.GetTypeSymbol());
-                }
-                else if (uts is UnresolvedTypeSymbol us)
-                {
-                    if (!us.Parent.Contains<FunctionSymbol>(us.Name))
-                        continue;
-
-                    var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
-
-                    if (symbol.BuiltinType == BuiltinType.None)
-                        continue;
-
-                    if (!symbol.IsOfType<FunctionSymbol>())
-                        continue;
-
-                    boundSymbol.ChangeType(symbol.GetTypeSymbol());
-                }
+                if (resolvedType != null)
+                    boundSymbol.ChangeType(resolvedType);
             }
         }        
 
