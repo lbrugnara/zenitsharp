@@ -12,17 +12,14 @@ using System.Text;
 
 namespace Fl.Semantics.Symbols
 {
-    public abstract class ComplexSymbol : TypeSymbol, IComplexSymbol
+    public abstract class ComplexSymbol : Container, IComplexSymbol
     {
-        /// <summary>
-        /// Contains symbols defined in this scope
-        /// </summary>
-        protected Dictionary<string, ISymbol> Symbols { get; }
+        public BuiltinType BuiltinType { get; }
 
         protected ComplexSymbol(string name, BuiltinType type, IContainer parent)
-            : base(name, type, parent)
+            : base(name, parent)
         {
-            this.Symbols = new Dictionary<string, ISymbol>();
+            this.BuiltinType = type;
         }
 
         public override bool Equals(object obj)
@@ -46,96 +43,14 @@ namespace Fl.Semantics.Symbols
             return true;
         }
 
-        #region IComplexSymbol implementation
-
-        public void Insert<T>(string name, T symbol)
-            where T : ISymbol
-        {
-            if (this.Symbols.ContainsKey(name))
-                throw new SymbolException($"Symbol {name} is already defined in current scope");
-
-            this.Symbols[name] = symbol;
-        }
-
-        public void Remove(string name)
-        {
-            if (this.Symbols.ContainsKey(name))
-                this.Symbols.Remove(name);
-        }
-
-        public bool Contains<T>(string name) 
-            where T : ISymbol
-        { 
-            return this.Symbols.ContainsKey(name) && this.Symbols[name] is T || (this.Parent != null && this.Parent.Contains<T>(name));
-        }
-
-        public T Get<T>(string name) 
-            where T : ISymbol
-        {
-            var symbol = this.TryGet<T>(name);
-
-            if (symbol == null)
-                throw new SymbolException($"Symbol {name} is not defined in current scope");
-
-            return symbol;
-        }
-
-        public T TryGet<T>(string name) 
-            where T : ISymbol
-        {
-            if (this.Symbols.ContainsKey(name))
-                return (T)this.Symbols[name];
-
-            var symbol = this.Symbols.Values.OfType<T>().FirstOrDefault(v => v.Name == name);
-
-            if (symbol != null)
-                return (T)symbol;
-
-            if (this.Parent == null || !this.Parent.Contains<T>(name))
-                return default(T);
-
-            return this.Parent.TryGet<T>(name);
-        }
-
-        public List<T> GetAllOfType<T>() where T : ISymbol => this.Symbols.Values.OfType<T>().Cast<T>().ToList();
-
-        #endregion
-
         public abstract string ToSafeString(params (ITypeSymbol type, string safestr)[] safeTypes);
 
-        public virtual string ToDumpString(int indent = 0)
+        public override int GetHashCode()
         {
-            int titleIndentN = indent + 2;
-            int memberIndentN = indent + 4;
-
-            // Title
-            var nameIndent = "".PadLeft(indent);
-
-            if (!this.Symbols.Any())
-                return $"{nameIndent}{this.Name} {{}}";
-
-            var sb = new StringBuilder();
-            sb.AppendLine($"{nameIndent}{this.Name} {{");
-
-            foreach (var (name, symbol) in this.Symbols)
-            {
-                if (symbol is IBoundSymbol bs)
-                {
-                    sb.AppendLine($"{"".PadLeft(memberIndentN)}{bs.ToValueString()}");
-                }
-                else if (symbol is IContainer sc)
-                {
-                    sb.AppendLine(sc.ToDumpString(memberIndentN));
-                }
-                else
-                {
-                    sb.AppendLine($"NOT HANDLED SYMBOL {symbol.GetType()}");
-                }
-            }
-
-            sb.Append($"{nameIndent}}}");
-
-            return sb.ToString();
+            var hashCode = 576743166;
+            hashCode = hashCode * -1521134295 + EqualityComparer<Dictionary<string, ISymbol>>.Default.GetHashCode(Symbols);
+            hashCode = hashCode * -1521134295 + BuiltinType.GetHashCode();
+            return hashCode;
         }
     }
 }

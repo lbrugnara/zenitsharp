@@ -13,10 +13,7 @@ namespace Fl.Semantics.Inferrers
         public ITypeSymbol Visit(TypeInferrerVisitor visitor, TupleNode node)
         {
             var inferredTypes = node.Items?.Select(i => i?.Visit(visitor));
-            return new TupleSymbol("tuple", visitor.SymbolTable.CurrentScope)
-            {
-                Types = inferredTypes.OfType<ITypeSymbol>().Where(it => it != null).ToList()
-            };
+            return new TupleSymbol(visitor.SymbolTable.CurrentScope, inferredTypes.OfType<ITypeSymbol>().Where(it => it != null).ToList());
         }
     }
 }

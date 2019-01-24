@@ -5,6 +5,7 @@ using Fl.Ast;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Symbols.Types;
+using Fl.Semantics.Symbols.Types.Specials;
 using System.Linq;
 
 namespace Fl.Semantics.Resolvers
@@ -13,13 +14,15 @@ namespace Fl.Semantics.Resolvers
     {
         public ISymbol Visit(SymbolResolverVisitor visitor, TupleNode node)
         {
-            // Tuples always return the TupleSymbol type
-            var types = new TupleSymbol("tuple", visitor.SymbolTable.CurrentScope)
-            {
-                Types = node.Items?.Select(item => item.Visit(visitor).GetTypeSymbol()).Cast<ITypeSymbol>().ToList()
-            };
+            var types = node.Items?.Select(item => item.Visit(visitor).GetTypeSymbol()).Cast<ITypeSymbol>().ToList();
 
-            return types != null && !types.Types.All(t => t == null) ? types : null;
+            if (types.Any(t => t is IUnresolvedTypeSymbol))
+                return new UnresolvedTupleType(visitor.SymbolTable.CurrentScope, types);
+
+            // Tuples always return the TupleSymbol type
+            var tupleType = new TupleSymbol(visitor.SymbolTable.CurrentScope, types);
+
+            return tupleType;
         }
     }
 }

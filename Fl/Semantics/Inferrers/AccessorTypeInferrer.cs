@@ -8,6 +8,7 @@ using Fl.Semantics.Symbols;
 using Fl.Semantics.Symbols.Types.Specials;
 using Fl.Semantics.Symbols.Values;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Containers;
 
 namespace Fl.Semantics.Inferrers
 {
@@ -21,8 +22,11 @@ namespace Fl.Semantics.Inferrers
             // scope and return its information
             if (accessor.Parent == null)
             {
-                // Get accessed symbol that must be defined in the symtable's scope
-                var symbol = inferrer.SymbolTable.CurrentScope.Get<ISymbol>(symbolName);
+                var symbol =
+                            // 1- Try to get a bound symbol
+                            inferrer.SymbolTable.CurrentScope.TryGet<IBoundSymbol>(accessor.Target.Value)
+                            // 2- Try to get a type symbol (like functions or objects)
+                            ?? inferrer.SymbolTable.CurrentScope.TryGet<ITypeSymbol>(accessor.Target.Value) as ISymbol;
 
                 if (symbol is IBoundSymbol bs)                
                     return bs.TypeSymbol;
@@ -57,11 +61,11 @@ namespace Fl.Semantics.Inferrers
                 // We have constraints that need to be added to the type
                 if (accessor.IsCall)
                 {
-                    memberType = /*parentSymbol.Type.Functions[symbolName] =*/ inferrer.Inferrer.NewAnonymousTypeFor();
+                    memberType = /*parentSymbol.Type.Functions[symbolName] =*/ inferrer.Inferrer.NewAnonymousType();
                 }
                 else
                 {
-                    memberType = /*parentSymbol.TypeSymbol.Type.Properties[symbolName] =*/ inferrer.Inferrer.NewAnonymousTypeFor();
+                    memberType = /*parentSymbol.TypeSymbol.Type.Properties[symbolName] =*/ inferrer.Inferrer.NewAnonymousType();
                 }
 
                 return memberType is ITypeSymbol mt ? mt : (memberType as IBoundSymbol).TypeSymbol;

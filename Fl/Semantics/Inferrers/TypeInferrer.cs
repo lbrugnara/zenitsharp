@@ -60,7 +60,17 @@ namespace Fl.Semantics.Inferrers
         /// Create a new anonymous type
         /// </summary>
         /// <returns></returns>
-        public AnonymousSymbol NewAnonymousTypeFor(IBoundSymbol symbol = null)
+        public AnonymousSymbol NewAnonymousType()
+        {
+            var asym = new AnonymousSymbol();
+
+            this.constraints[asym] = new Descendant();
+            this.trackedSymbols[asym] = new List<IBoundSymbol>();
+
+            return asym;
+        }
+
+        public AnonymousSymbol NewAnonymousTypeFor(IBoundSymbol symbol)
         {
             var asym = new AnonymousSymbol();
 
@@ -76,24 +86,30 @@ namespace Fl.Semantics.Inferrers
             return asym;
         }
 
+        public void TrackSymbol(AnonymousSymbol asym, IBoundSymbol symbol)
+        {
+            symbol.ChangeType(asym);
+            this.trackedSymbols[asym].Add(symbol);
+        }
+
         private void UpdateConstraints(AnonymousSymbol asym, ITypeSymbol type)
         {
-            var constraints = this.constraints.Where(kvp => kvp.Value.Left == asym || kvp.Value.Right == asym).ToList();
+            var dependants = this.constraints.Where(kvp => kvp.Value.Left == asym || kvp.Value.Right == asym).ToList();
 
-            foreach (var constraint in constraints)
+            foreach (var dependant in dependants)
             {
-                ITypeSymbol t1 = constraint.Value.Left;
-                ITypeSymbol t2 = constraint.Value.Right;
+                ITypeSymbol t1 = dependant.Value.Left;
+                ITypeSymbol t2 = dependant.Value.Right;
 
-                if (constraint.Value.Left == asym)
-                    this.inferredTypes[constraint.Value.Left] = t1 = type;
+                if (dependant.Value.Left == asym)
+                    this.inferredTypes[dependant.Value.Left] = t1 = type;
                 else
-                    this.inferredTypes[constraint.Value.Right] = t2 = type;
+                    this.inferredTypes[dependant.Value.Right] = t2 = type;
 
                 if (!(t1 is AnonymousSymbol) && !(t2 is AnonymousSymbol))
-                    this.inferredTypes[constraint.Key] = this.FindMostGeneralType(t1, t2);
-                else if (constraint.Key is AnonymousSymbol)
-                    this.UpdateConstraints(constraint.Key, type);
+                    this.inferredTypes[dependant.Key] = this.FindMostGeneralType(t1, t2);
+                else if (dependant.Key is AnonymousSymbol)
+                    this.UpdateConstraints(dependant.Key, type);
 
                 // this.trackedSymbols[constraint.Key].ForEach(symbol => this.Unify(null, this.inferredTypes[constraint.Key], symbol));
 
@@ -116,6 +132,20 @@ namespace Fl.Semantics.Inferrers
                     //this.trackedSymbols[constraint.Key].ForEach(symbol => this.Unify(null, type, symbol));
                 }*/
             }
+
+            var constraint = this.constraints[asym];
+
+            if (this.IsResolved(constraint))
+            {
+                this.inferredTypes[asym] = type;
+                this.trackedSymbols[asym].ForEach(symbol => symbol.ChangeType(type));
+            }
+        }
+
+        private bool IsResolved(Descendant constraints)
+        {
+            return constraints.Left != null && this.inferredTypes.ContainsKey(constraints.Left) && !(this.inferredTypes[constraints.Left] is AnonymousSymbol)
+                    && constraints.Right != null && this.inferredTypes.ContainsKey(constraints.Right) && !(this.inferredTypes[constraints.Right] is AnonymousSymbol);
         }
 
         /// <summary>
@@ -167,7 +197,7 @@ namespace Fl.Semantics.Inferrers
                 if (t1 == t2)
                     return t1;
 
-                var newType = this.NewAnonymousTypeFor();
+                var newType = this.NewAnonymousType();
 
                 this.constraints[newType] = new Descendant(at1, at2);
                 this.trackedSymbols[newType] = new List<IBoundSymbol>();

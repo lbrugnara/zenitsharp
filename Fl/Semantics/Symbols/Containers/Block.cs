@@ -5,7 +5,7 @@
 
 namespace Fl.Semantics.Symbols.Containers
 {
-    public class Block : Container
+    public class Block : Container, IBlock
     {
         public Block(string name)
             : base(name, null)
@@ -19,7 +19,7 @@ namespace Fl.Semantics.Symbols.Containers
 
         public override string ToString()
         {
-            return $"container-{this.Name}";
+            return $"block-{this.Name}";
         }
     }
 }

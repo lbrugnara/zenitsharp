@@ -25,13 +25,15 @@ namespace Fl.Semantics.Symbols
         /// </summary>
         public IContainer CurrentScope { get; private set; }
 
+        /// <summary>
+        /// The type inferrer keeps track of unresolved symbols
+        /// </summary>
         private TypeInferrer TypeInferrer { get; }
 
         public SymbolTable(TypeInferrer typeInferrer)
         {
             // Create the @global scope and set it as the current scope
             this.Global = this.CurrentScope = new Block("@global");
-            //this.CurrentScope.Insert<Expressions.Package>("myPackage", new Expressions.Package("myPackage", this.CurrentScope));
             this.TypeInferrer = typeInferrer;
         }
 
@@ -215,9 +217,26 @@ namespace Fl.Semantics.Symbols
                 var type = this.TypeInferrer.FindMostGeneralType(left, right);
 
                 if (type == null)
-                    return new UnresolvedExpressionType(uet.Name, uet.Parent, left, right);
+                    return new UnresolvedExpressionType(uet.Parent, left, right);
 
                 return type;
+            }
+            else if (uts is UnresolvedTupleType utt)
+            {
+                ITypeSymbol[] types = new ITypeSymbol[utt.Types.Count];
+
+                for (var i=0; i < utt.Types.Count; i++)
+                {
+                    var ttype = utt.Types[i];
+                    types[i] = ttype is IUnresolvedTypeSymbol uetl ? this.ResolveSymbolRference(uetl) ?? ttype : ttype;
+                }
+
+                for (var i = 0; i < utt.Types.Count; i++)
+                {
+                    utt.Types[i] = types[i];
+                }
+
+                return utt.Types.Any(t => t is IUnresolvedTypeSymbol) ? utt : (ITypeSymbol)new TupleSymbol(utt.Parent, utt.Types);
             }
             else if (uts is UnresolvedTypeSymbol us)
             {

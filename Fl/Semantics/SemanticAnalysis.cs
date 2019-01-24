@@ -78,7 +78,7 @@ namespace Fl.Semantics
             Console.WriteLine("================");
             Console.WriteLine(this.symbolTable.ToDebugString());
 
-            return this.symbolTable;
+            //return this.symbolTable;
 
             Console.WriteLine(this.typeInferrer.ToDebugString());
 

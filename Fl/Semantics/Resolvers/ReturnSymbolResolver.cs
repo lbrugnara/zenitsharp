@@ -15,17 +15,21 @@ namespace Fl.Semantics.Resolvers
         {
             var func = visitor.SymbolTable.GetCurrentFunction();
 
+            // If it is an empty return statement, we update
+            // the function's return type to void
             if (rnode.Expression == null)
             {
                 func.Return.ChangeType(new VoidSymbol());
-                return func.Return;
+                return func.Return.TypeSymbol;
             }
 
+            // At this point we do have an expression to evaluate,
+            // so we get the result and update the function's return type accordingly 
             var ret = rnode.Expression.Visit(visitor);
 
             func.Return.ChangeType(ret.GetTypeSymbol());
 
-            return func.Return;
+            return func.Return.TypeSymbol;
         }
     }
 }

@@ -5,6 +5,7 @@
 using Fl.Ast;
 using Fl.Semantics.Symbols;
 using Fl.Semantics.Symbols;
+using Fl.Semantics.Symbols.Types.Specials;
 
 namespace Fl.Semantics.Resolvers
 {
@@ -15,7 +16,15 @@ namespace Fl.Semantics.Resolvers
             var left = nullc.Left.Visit(visitor);
             var right = nullc.Right.Visit(visitor);
 
-            return visitor.Inferrer.FindMostGeneralType(left.GetTypeSymbol(), right.GetTypeSymbol());
+            // Check if the types have a common ancestor
+            var type = visitor.Inferrer.FindMostGeneralType(left.GetTypeSymbol(), right.GetTypeSymbol());
+
+            // If "type" is null, the common ancestor cannot be evaluated, it could be because left or right are unresolved types,
+            // so create a new unresolved expression type
+            if (type == null)
+                type = new UnresolvedExpressionType(visitor.SymbolTable.CurrentScope, left.GetTypeSymbol(), right.GetTypeSymbol());
+
+            return type;
         }
     }
 }

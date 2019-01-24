@@ -7,18 +7,25 @@ using Fl.Semantics.Types;
 
 namespace Fl.Semantics.Symbols
 {
-    public class PrimitiveSymbol : TypeSymbol, IPrimitiveSymbol
+    public class PrimitiveSymbol : IPrimitiveSymbol
     {
+        public BuiltinType BuiltinType { get; }
+
+        public IContainer Parent { get; }
+
         public PrimitiveSymbol(BuiltinType type, IContainer parent)
-            : base(type, parent)
         {
+            this.BuiltinType = type;
+            this.Parent = parent;
         }
+
+        public string Name => this.BuiltinType.GetName();
 
         public override string ToString()
         {
             return this.BuiltinType.GetName();
         }
 
-        public override string ToValueString() => this.ToString();
+        public virtual string ToValueString() => this.ToString();
     }
 }

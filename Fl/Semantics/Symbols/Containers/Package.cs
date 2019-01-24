@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Fl.Semantics.Symbols.Containers
 {
-    public class Package : Block, IPackage
+    public class Package : Container, IPackage
     {
         public Package(string name)
             : this (name, null)

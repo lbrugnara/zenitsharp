@@ -22,12 +22,17 @@ namespace Fl.Semantics.Symbols.Containers
         /// <summary>
         /// Contains symbols defined in this scope
         /// </summary>
-        private Dictionary<string, ISymbol> Symbols { get; }
+        protected Dictionary<string, ISymbol> Symbols { get; }
 
         /// <summary>
-        /// Contains symbols defined in this scope
+        /// Contains blocks defined in this scope
         /// </summary>
-        private Dictionary<string, ISymbol> TypeSymbols { get; }
+        protected Dictionary<string, ISymbol> Blocks { get; }
+
+        /// <summary>
+        /// Contains type symbols defined in this scope
+        /// </summary>
+        protected Dictionary<string, ISymbol> TypeSymbols { get; }
 
         /// <summary>
         /// If present, reference to the parent scope
@@ -43,6 +48,7 @@ namespace Fl.Semantics.Symbols.Containers
         {
             this.Name = name;
             this.Symbols = new Dictionary<string, ISymbol>();
+            this.Blocks = new Dictionary<string, ISymbol>();
             this.TypeSymbols = new Dictionary<string, ISymbol>();
             this.Parent = parent;
         }
@@ -54,7 +60,13 @@ namespace Fl.Semantics.Symbols.Containers
         
         private Dictionary<string, ISymbol> GetDestination<T>()
         {
-            return typeof(ITypeSymbol).IsAssignableFrom(typeof(T)) ? this.TypeSymbols : this.Symbols;
+            if (typeof(ITypeSymbol).IsAssignableFrom(typeof(T)))
+                return this.TypeSymbols;
+
+            if (typeof(IContainer).IsAssignableFrom(typeof(T)))
+                return this.Blocks;
+
+            return this.Symbols;
         }        
 
         #region IBlock implementation
@@ -123,6 +135,7 @@ namespace Fl.Semantics.Symbols.Containers
             var all = this.Symbols.Values.OfType<T>().Cast<T>().ToList();
 
             all.AddRange(this.TypeSymbols.Values.OfType<T>().Cast<T>().ToList());
+            all.AddRange(this.Blocks.Values.OfType<T>().Cast<T>().ToList());
 
             return all;
         }
@@ -143,7 +156,7 @@ namespace Fl.Semantics.Symbols.Containers
             var nameIndent = "".PadLeft(indent);
             var memberIndent = "".PadLeft(memberIndentN);
 
-            if (!this.Symbols.Any() && !this.TypeSymbols.Any())
+            if (!this.Symbols.Any() && !this.Blocks.Any() && !this.TypeSymbols.Any())
                 return $"{nameIndent}{this.Name} {{}}";
 
             var sb = new StringBuilder();
@@ -151,9 +164,31 @@ namespace Fl.Semantics.Symbols.Containers
 
             // Variables
             if (this.Symbols.Any())
-                sb.AppendLine($"{memberIndent}// Variables");
+                sb.AppendLine(this.DumpTable(this.Symbols, "Variables", memberIndentN));
 
-            foreach (var (name, symbol) in this.Symbols)
+            // Types
+            if (this.TypeSymbols.Any())
+                sb.AppendLine(this.DumpTable(this.TypeSymbols, "Types", memberIndentN));
+
+            // Blocks
+            if (this.Blocks.Any())
+                sb.AppendLine(this.DumpTable(this.Blocks, "Blocks", memberIndentN));            
+
+            sb.Append($"{nameIndent}}}");
+
+            return sb.ToString();
+        }
+
+        private string DumpTable(Dictionary<string, ISymbol> symbols, string title, int memberIndentN)
+        {
+            var memberIndent = "".PadLeft(memberIndentN);
+
+            var sb = new StringBuilder();
+
+            if (symbols.Any())
+                sb.AppendLine($"{memberIndent}// {title}");
+
+            foreach (var (name, symbol) in symbols)
             {
                 if (symbol is IBoundSymbol bs)
                 {
@@ -168,24 +203,6 @@ namespace Fl.Semantics.Symbols.Containers
                     sb.AppendLine($"NOT HANDLED SYMBOL {symbol.GetType()}");
                 }
             }
-
-            // Types
-            if (this.TypeSymbols.Any())
-                sb.AppendLine($"{memberIndent}// Types");
-
-            foreach (var (name, symbol) in this.TypeSymbols)
-            {
-                if (symbol is IContainer sc)
-                {
-                    sb.AppendLine(sc.ToDumpString(memberIndentN));
-                }
-                else
-                {
-                    sb.AppendLine($"NOT HANDLED SYMBOL {symbol.GetType()}");
-                }
-            }
-
-            sb.Append($"{nameIndent}}}");
 
             return sb.ToString();
         }

@@ -82,7 +82,7 @@ namespace Fl.Semantics.Resolvers
                 // If the type anotation is not specific (uses 'var'), we need to create an anonymous type
                 // for every variable. If not, we just get the type information from the token
                 var varType = destrnode.Information.Type.Type == Syntax.TokenType.Variable 
-                    ? visitor.Inferrer.NewAnonymousTypeFor()
+                    ? visitor.Inferrer.NewAnonymousType()
                     : SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, destrnode.Information.Type);
 
                 // Create the new symbol for the variable

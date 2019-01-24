@@ -78,7 +78,7 @@ namespace Fl.Semantics.Types
 
                 // Support complex types:
                 if (token.Value == "func" || token.Value == "tuple")
-                    return inferrer?.NewAnonymousTypeFor();
+                    return inferrer?.NewAnonymousType();
 
                 if (symtable.HasBoundSymbol(token.Value))
                 {

@@ -31,18 +31,31 @@ namespace Fl.Semantics.Resolvers
 
                 // We do allow lambdas that do not return a value
                 if (lastExpr != null)
+                {
                     functionSymbol.Return.ChangeType(lastExpr.IsOfType<VoidSymbol>() ? new VoidSymbol() : lastExpr.GetTypeSymbol());
+
+                    if (functionSymbol.Return.TypeSymbol is AnonymousSymbol asym)
+                        visitor.Inferrer.TrackSymbol(asym, functionSymbol.Return);
+                }
             }
             else
             {
+                // If the function is not a lambda, and the BuiltinType remained None after evaluating the function's body, we
+                // update the return type of be void
                 if (functionSymbol.Return.TypeSymbol.BuiltinType == BuiltinType.None)
+                {
                     functionSymbol.Return.ChangeType(new VoidSymbol());
+                }
+                else if (functionSymbol.Return.TypeSymbol is AnonymousSymbol asym)
+                {
+                    visitor.Inferrer.TrackSymbol(asym, functionSymbol.Return);
+                }
             }
 
             // Restore previous scope
             visitor.SymbolTable.LeaveScope();
 
-            // Trigger a lookup to update unresolved symbols
+            // Trigger a lookup to update unresolved symbols (backpatch)
             visitor.SymbolTable.UpdateSymbolReferences();
 
             return functionSymbol;
@@ -52,7 +65,7 @@ namespace Fl.Semantics.Resolvers
         {
             // If the parameter's type is present use it, if not use an anonymous type
             var paramTypeSymbol = parameter.SymbolInfo.Type == null
-                        ? visitor.Inferrer.NewAnonymousTypeFor()
+                        ? visitor.Inferrer.NewAnonymousType()
                         : SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, parameter.SymbolInfo.Type);
 
             // Check if the parameter has storage modifiers

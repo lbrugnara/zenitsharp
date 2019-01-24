@@ -11,12 +11,12 @@ namespace Fl.Semantics.Symbols
 {
     public class TupleSymbol : ComplexSymbol
     {
-        public List<ITypeSymbol> Types { get; set; }
+        public List<ITypeSymbol> Types { get; }
 
-        public TupleSymbol(string name, IContainer parent)
-            : base(name, BuiltinType.Tuple, parent)
+        public TupleSymbol(IContainer parent, List<ITypeSymbol> types)
+            : base("tuple", BuiltinType.Tuple, parent)
         {
-            this.Types = new List<ITypeSymbol>();
+            this.Types = types ?? new List<ITypeSymbol>();
         }
 
         public override bool Equals(object obj)

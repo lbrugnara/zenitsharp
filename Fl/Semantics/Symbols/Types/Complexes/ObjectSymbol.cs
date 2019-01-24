@@ -56,5 +56,10 @@ namespace Fl.Semantics.Symbols
         {
             return this.ToValueString();
         }
+
+        public override string ToString()
+        {
+            return this.ToValueString();
+        }
     }
 }

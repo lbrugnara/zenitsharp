@@ -20,7 +20,7 @@ namespace Fl.Semantics.Resolvers
             if (constdec.Type != null)
                 typeSymbol = SymbolHelper.GetTypeSymbol(binder.SymbolTable, binder.Inferrer, constdec.Type);
             else
-                typeSymbol = binder.Inferrer.NewAnonymousTypeFor();
+                typeSymbol = binder.Inferrer.NewAnonymousType();
 
             foreach (var definition in constdec.Definitions)
             {
