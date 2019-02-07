@@ -1,0 +1,16 @@
+﻿using Zenit.Ast;
+using Zenit.Semantics.Inferrers;
+using Zenit.Semantics.Symbols.Types;
+using Zenit.Semantics.Symbols.Types;
+
+namespace Zenit.Semantics.Inferrers
+{
+    class #Name#TypeInferrer : INodeVisitor<TypeInferrerVisitor, Ast#Name#Node, IValueSymbol>
+    {
+        public IValueSymbol Visit(TypeInferrerVisitor inferrer, Ast#Name#Node node)
+        {
+            // TODO: Implement #Name# inferrer
+            return null;
+        }
+    }
+}

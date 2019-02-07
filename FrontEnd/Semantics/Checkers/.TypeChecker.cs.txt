@@ -1,0 +1,14 @@
+﻿using Zenit.Ast;
+using Zenit.Semantics.Checkers;
+
+namespace Zenit.Semantics.Checkers
+{
+    class #Name#TypeChecker : INodeVisitor<TypeCheckerVisitor, Ast#Name#Node, CheckedType>
+    {
+        public CheckedType Visit(TypeCheckerVisitor checker, Ast#Name#Node node)
+        {
+            // TODO: Implement #Name# Checker
+            return null;
+        }
+    }
+}

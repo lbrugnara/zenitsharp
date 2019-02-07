@@ -1,0 +1,40 @@
+Semantic Analysis
+=================
+
+The semantic analysis comprehends 3 big aspects in the compiling process:
+
+1- Symbol resolution and bindings
+2- Type inference
+3- Type checking
+
+In order to properly work there are two data structures that allow the semantic analysis to be successful:
+
+- The `SymbolTable` that contains the information of every symbol of the program
+- The `TypeInferrer` that tracks the different constraints we collect in the analysis to determine the type of every symbol
+
+Symbol resolution and bindings
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this pass the compiler will add the variables to the symbol table, including as much information as possible from the information that is available on the declaration. Some AST nodes are simply "pass-through" nodes, like the `BinaryNode`, but others are the ones that will add rich information to the `SymbolTable` through the specific visitor of each node. They are:
+
+- `ConstantSymbolResolver`: Adds a new constant to the current scope. If the type information is available it uses that information while resolving the symbol. If the type information is not present, it creates a new `Anonymous` type that will need to be inferred on the type inference phase.
+
+- `FunctionSymbolResolver`: This resolver creates a new scope -the function's scope- and it will bind all the resolved symbols to that scope.
+
+- `ObjectSymbolResolver` and `ObjectPropertySymbolResolver`: The `ObjectSymbolResolver` creates a new scope where all the object's properties will be bound, and this task will be accomplished by the `ObjectPropertySymbolResolver`.
+
+- `VariableSymbolResolver`: This resolver will bind variables to the `SymbolTable`'s current scope
+
+As the `FunctionSymbolResolver` and the `ObjectSymbolResolver` creates new scopes, there are also other resolvers that do the same in order to get the expected binding of every symbol in the program, and these resolvers are:
+
+- `BlockSymbolResolver`
+- `ForSymbolResolver`
+- `IfSymbolResolver`
+- `WhileSymbolResolver`
+
+Type inference
+~~~~~~~~~~~~~~
+
+The type inference process make sure every symbol gets its type resolved no matter if the user has annotated it in the symbol definition statement. A lot of AST nodes are involved in type inference (unlike symbol resolution phase):
+
+- `VariableTypeInferrer`: 
