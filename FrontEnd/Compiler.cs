@@ -6,7 +6,8 @@ using Zenit.Semantics;
 
 namespace Zenit
 {
-    public class Compiler
+
+    public class Compiler : IZenitCompiler
     {
         public void Compile(string source)
         {

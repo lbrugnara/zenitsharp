@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zenit.FrontEnd", "FrontEnd\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Zenit.Cli", "Cli\Zenit.Cli.csproj", "{946F7701-E415-416F-A03C-6737750B8873}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Zenit.Tests", "Zenit.Tests\Zenit.Tests.csproj", "{30DD796D-C234-4FBF-9EFE-700E8A83E8C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{946F7701-E415-416F-A03C-6737750B8873}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{946F7701-E415-416F-A03C-6737750B8873}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{946F7701-E415-416F-A03C-6737750B8873}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30DD796D-C234-4FBF-9EFE-700E8A83E8C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30DD796D-C234-4FBF-9EFE-700E8A83E8C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30DD796D-C234-4FBF-9EFE-700E8A83E8C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30DD796D-C234-4FBF-9EFE-700E8A83E8C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

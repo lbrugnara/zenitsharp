@@ -3,7 +3,7 @@ using System;
 
 namespace Zenit.Syntax
 {
-    class SyntacticAnalysis
+    public class SyntacticAnalysis
     {
         private Lexer lexer;
         private Parser parser;

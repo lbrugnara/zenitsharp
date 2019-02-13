@@ -15,12 +15,12 @@ namespace Zenit.Semantics
         /// The type inferrer keeps track of unresolved types and granting anonymous types
         /// that will be replaced/updated once the types are resolved
         /// </summary>
-        private TypeInferrer typeInferrer;
+        public TypeInferrer TypeInferrer { get; private set; }
 
         /// <summary>
         /// It keeps track of the scopes and symbols declared on each of them
         /// </summary>
-        private SymbolTable symbolTable;
+        public SymbolTable SymbolTable { get; private set; }
 
         /// <summary>
         /// The symbol resolver will visit each node and will add scopes and symbols within them
@@ -46,13 +46,13 @@ namespace Zenit.Semantics
 
         public SemanticAnalysis()
         {
-            this.typeInferrer = new TypeInferrer();
-            this.symbolTable = new SymbolTable(typeInferrer);
+            this.TypeInferrer = new TypeInferrer();
+            this.SymbolTable = new SymbolTable(TypeInferrer);
 
-            this.resolver = new SymbolResolverVisitor(this.symbolTable, this.typeInferrer);
-            this.inferrer = new TypeInferrerVisitor(this.symbolTable, this.typeInferrer);
-            this.checker = new TypeCheckerVisitor(this.symbolTable);
-            this.mutabilityChecker = new MutabilityCheckerVisitor(this.symbolTable);
+            this.resolver = new SymbolResolverVisitor(this.SymbolTable, this.TypeInferrer);
+            this.inferrer = new TypeInferrerVisitor(this.SymbolTable, this.TypeInferrer);
+            this.checker = new TypeCheckerVisitor(this.SymbolTable);
+            this.mutabilityChecker = new MutabilityCheckerVisitor(this.SymbolTable);
 
             NameGenerator.Instance.Reset();
 
@@ -70,17 +70,17 @@ namespace Zenit.Semantics
             this.resolver.Visit(ast);
 
             // If there are unresolved types, throw an exception
-            this.symbolTable.UpdateSymbolReferences();
-            this.symbolTable.ThrowIfUnresolved();
+            this.SymbolTable.UpdateSymbolReferences();
+            this.SymbolTable.ThrowIfUnresolved();
 
             Console.WriteLine("================");
             Console.WriteLine("SYMBOL RESOLVING");
             Console.WriteLine("================");
-            Console.WriteLine(this.symbolTable.ToDebugString());
+            Console.WriteLine(this.SymbolTable.ToDebugString());
 
-            //return this.symbolTable;
+            return this.SymbolTable;
 
-            Console.WriteLine(this.typeInferrer.ToDebugString());
+            Console.WriteLine(this.TypeInferrer.ToDebugString());
 
             // Make the type inference
             this.inferrer.Visit(ast);
@@ -88,8 +88,8 @@ namespace Zenit.Semantics
             Console.WriteLine("=============");
             Console.WriteLine("TYPE INFERRER");
             Console.WriteLine("=============");
-            Console.WriteLine(this.symbolTable.ToDebugString());            
-            Console.WriteLine(this.typeInferrer.ToDebugString());
+            Console.WriteLine(this.SymbolTable.ToDebugString());            
+            Console.WriteLine(this.TypeInferrer.ToDebugString());
 
             // Check all the operations are valid
             /*this.checker.Visit(ast);
@@ -97,7 +97,7 @@ namespace Zenit.Semantics
             // Ensure the mutability rules of variables and function calls
             this.mutabilityChecker.Visit(ast);*/
 
-            return this.symbolTable;
+            return this.SymbolTable;
         }
     }
 }

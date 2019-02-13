@@ -305,6 +305,13 @@ namespace Zenit.Syntax
                     val += this.Consume();
                     type = TokenType.Double;
                 }
+                else if (c == 'D' || c == 'd')
+                {
+                    if (type != TokenType.Double)
+                        throw new Exception($"Invalid character '{c}'");
+                    // Do not add the D now, just Consume and let's try what happens
+                    this.Consume();
+                }
                 else if (c == 'F' || c == 'f')
                 {
                     if (type != TokenType.Double)
