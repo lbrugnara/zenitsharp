@@ -13,7 +13,7 @@
             switch (self)
             {
                 case BuiltinSymbol.This:
-                    return "@this";
+                    return "this";
 
                 case BuiltinSymbol.Return:
                     return "@ret";

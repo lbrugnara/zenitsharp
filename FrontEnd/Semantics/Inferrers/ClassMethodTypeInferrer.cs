@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ClassMethodTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassMethodNode, ITypeSymbol>
+    class ClassMethodTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassMethodNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ClassMethodNode method)
+        public IType Visit(TypeInferrerVisitor visitor, ClassMethodNode method)
         {
             return null;
             // Get the method symbol and type

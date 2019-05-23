@@ -6,13 +6,13 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ObjectPropertyTypeInferrer : INodeVisitor<TypeInferrerVisitor, ObjectPropertyNode, ITypeSymbol>
+    class ObjectPropertyTypeInferrer : INodeVisitor<TypeInferrerVisitor, ObjectPropertyNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ObjectPropertyNode node)
+        public IType Visit(TypeInferrerVisitor visitor, ObjectPropertyNode node)
         {
             var rightType = visitor.Visit(node.Value);
 
-            var property = visitor.SymbolTable.GetBoundSymbol(node.Name.Value);
+            var property = visitor.SymbolTable.GetVariableSymbol(node.Name.Value);
 
             // Get the most general type
             var generalType = visitor.Inferrer.FindMostGeneralType(property.TypeSymbol, rightType);

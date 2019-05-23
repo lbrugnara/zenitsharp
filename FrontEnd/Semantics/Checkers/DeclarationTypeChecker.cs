@@ -9,7 +9,7 @@ namespace Zenit.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, DeclarationNode decls)
         {
-            foreach (Node statement in decls.Statements)
+            foreach (Node statement in decls.Declarations)
                 statement.Visit(checker);
 
             return null;

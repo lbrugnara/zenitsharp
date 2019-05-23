@@ -11,7 +11,7 @@ namespace Zenit.Semantics.Resolvers
     {
         public ISymbol Visit(SymbolResolverVisitor visitor, DeclarationNode decls)
         {
-            foreach (Node statement in decls.Statements)
+            foreach (Node statement in decls.Declarations)
                 statement.Visit(visitor);
 
             return null;

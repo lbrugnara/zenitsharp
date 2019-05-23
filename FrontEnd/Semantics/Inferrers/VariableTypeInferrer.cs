@@ -5,14 +5,15 @@ using Zenit.Ast;
 using Zenit.Semantics.Exceptions;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types;
+using Zenit.Semantics.Symbols.Types.References;
 using Zenit.Semantics.Symbols.Types.Specials;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class VariableTypeInferrer : INodeVisitor<TypeInferrerVisitor, VariableNode, ITypeSymbol>
+    class VariableTypeInferrer : INodeVisitor<TypeInferrerVisitor, VariableNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, VariableNode vardecl)
+        public IType Visit(TypeInferrerVisitor visitor, VariableNode vardecl)
         {
             switch (vardecl)
             {
@@ -25,12 +26,12 @@ namespace Zenit.Semantics.Inferrers
             throw new AstWalkerException($"Invalid variable declaration of type {vardecl.GetType().FullName}");
         }
 
-        protected ITypeSymbol VarDefinitionNode(TypeInferrerVisitor visitor, VariableDefinitionNode vardecl)
+        protected IType VarDefinitionNode(TypeInferrerVisitor visitor, VariableDefinitionNode vardecl)
         {
             foreach (var definition in vardecl.Definitions)
             {
                 // Symbol should be already resolved here
-                var leftSymbol = visitor.SymbolTable.GetBoundSymbol(definition.Left.Value);
+                var leftSymbol = visitor.SymbolTable.GetVariableSymbol(definition.Left.Value);
 
                 // If the rhs is null, continue, is just a declaration
                 if (definition.Right == null)
@@ -40,7 +41,7 @@ namespace Zenit.Semantics.Inferrers
                 var rhsTypeSymbol = definition.Right?.Visit(visitor);
 
                 // If the symbol is an anonymous type, the rhs type is a must
-                if (leftSymbol.TypeSymbol is AnonymousSymbol && rhsTypeSymbol == null)
+                if (leftSymbol.TypeSymbol is Anonymous && rhsTypeSymbol == null)
                     throw new SymbolException($"Implicitly-typed variable '{leftSymbol.Name}' needs to be initialized");
 
                 // Get the most general type that encloses both types
@@ -53,9 +54,9 @@ namespace Zenit.Semantics.Inferrers
             return null;
         }
 
-        protected ITypeSymbol VarDestructuringNode(TypeInferrerVisitor visitor, VariableDestructuringNode destructuringNode)
+        protected IType VarDestructuringNode(TypeInferrerVisitor visitor, VariableDestructuringNode destructuringNode)
         {
-            var rhsTupleType = destructuringNode.Right.Visit(visitor) as TupleSymbol;
+            var rhsTupleType = destructuringNode.Right.Visit(visitor) as Tuple;
 
             for (int i=0; i < destructuringNode.Left.Count; i++)
             {
@@ -65,15 +66,15 @@ namespace Zenit.Semantics.Inferrers
                     continue;
 
                 // Symbol should be already resolved here
-                var lhs = visitor.SymbolTable.GetBoundSymbol(declaration.Value);
+                var lhs = visitor.SymbolTable.GetVariableSymbol(declaration.Value);
 
                 // If it is a variable definition, get the right-hand side type info
-                var rhsType = rhsTupleType.Types[i];
+                var rhsType = rhsTupleType.Elements[i];
 
                 // Check types to see if we can unify them
-                var generalType = visitor.Inferrer.FindMostGeneralType(lhs.TypeSymbol, rhsType is ITypeSymbol rts ? rts : (rhsType as IBoundSymbol).TypeSymbol);
+                var generalType = visitor.Inferrer.FindMostGeneralType(lhs.TypeSymbol, rhsType is IType rts ? rts : (rhsType as IVariable).TypeSymbol);
 
-                visitor.Inferrer.Unify(visitor.SymbolTable, generalType, lhs as IBoundSymbol);
+                visitor.Inferrer.Unify(visitor.SymbolTable, generalType, lhs as IVariable);
             }
 
             return rhsTupleType;

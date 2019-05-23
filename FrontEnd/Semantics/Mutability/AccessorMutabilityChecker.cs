@@ -15,7 +15,7 @@ namespace Zenit.Semantics.Mutability
 
             var symtable = (enclosing?.Symbol as ISymbolTable) ?? checker.SymbolTable;
 
-            return new MutabilityCheckResult(symtable.GetBoundSymbol(id));
+            return new MutabilityCheckResult(symtable.GetVariableSymbol(id));
         }
     }
 }

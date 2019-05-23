@@ -4,9 +4,8 @@
 using Zenit.Ast;
 using Zenit.Semantics.Exceptions;
 using Zenit.Semantics.Symbols;
-using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types.Specials;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 using Zenit.Semantics.Types;
 
 namespace Zenit.Semantics.Resolvers
@@ -43,23 +42,23 @@ namespace Zenit.Semantics.Resolvers
                 var storage = SymbolHelper.GetStorage(vardecl.Information.Mutability);
 
                 // Check if the symbol is already defined
-                if (visitor.SymbolTable.HasBoundSymbol(variableName))
+                if (visitor.SymbolTable.HasVariableSymbol(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // If it is a variable definition, visit the right-hand side expression
                 var rhsSymbol = definition.Right?.Visit(visitor);
 
-                IBoundSymbol lhsSymbol = null;
+                IVariable lhsSymbol = null;
 
                 if (rhsSymbol == null)
                 {
                     // Create the new symbol for the variable
                     var typeInfo = SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, vardecl.Information.Type);                    
-                    lhsSymbol = visitor.SymbolTable.BindSymbol(variableName, typeInfo, Access.Public, storage);
+                    lhsSymbol = visitor.SymbolTable.AddNewVariableSymbol(variableName, typeInfo, Access.Public, storage);
                 }
                 else
                 {
-                    visitor.SymbolTable.BindSymbol(variableName, rhsSymbol.GetTypeSymbol(), Access.Public, storage);
+                    visitor.SymbolTable.AddNewVariableSymbol(variableName, rhsSymbol.GetTypeSymbol(), Access.Public, storage);
                 }
             }
         }
@@ -77,7 +76,7 @@ namespace Zenit.Semantics.Resolvers
                 var variableName = declaration.Value;
 
                 // Check if the symbol is already defined
-                if (visitor.SymbolTable.HasBoundSymbol(variableName))
+                if (visitor.SymbolTable.HasVariableSymbol(variableName))
                     throw new SymbolException($"Symbol {variableName} is already defined.");
 
                 // If the type anotation is not specific (uses 'var'), we need to create an anonymous type
@@ -87,9 +86,9 @@ namespace Zenit.Semantics.Resolvers
                     : SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, destrnode.Information.Type);
 
                 // Create the new symbol for the variable
-                var boundSymbol = visitor.SymbolTable.BindSymbol(variableName, varType, Access.Public, SymbolHelper.GetStorage(destrnode.Information.Mutability));
+                var boundSymbol = visitor.SymbolTable.AddNewVariableSymbol(variableName, varType, Access.Public, SymbolHelper.GetStorage(destrnode.Information.Mutability));
 
-                if (varType is AnonymousSymbol asym)
+                if (varType is Anonymous asym)
                     visitor.Inferrer.TrackSymbol(asym, boundSymbol);
             }
         }

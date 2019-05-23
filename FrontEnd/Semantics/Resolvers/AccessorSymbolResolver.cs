@@ -5,7 +5,8 @@ using Zenit.Ast;
 using Zenit.Semantics.Symbols.Containers;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types.Specials;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
+using Zenit.Semantics.Symbols.Types.Specials.Unresolved;
 
 namespace Zenit.Semantics.Resolvers
 {
@@ -14,32 +15,25 @@ namespace Zenit.Semantics.Resolvers
         public ISymbol Visit(SymbolResolverVisitor visitor, AccessorNode accessor)
         {
             // If there is a parent, it must be an IContainer
-            IContainer owner = null;
+            IContainer parent = null;
 
-            var ownerSymbol = accessor.Parent?.Visit(visitor);
-
-            // If the ownerSymbol is present, process it to get the IContainer
-            if (ownerSymbol != null)
+            if (accessor.Parent != null)
             {
-                if (ownerSymbol is IBoundSymbol bs)
-                    owner = (IContainer)bs.GetTypeSymbol();
-                else
-                    owner = (IContainer)ownerSymbol;
+                var parentSymbol = accessor.Parent.Visit(visitor);
+                // A variable symbol can only be used as an IContainer if its underlying type is an IContainer
+                parent = parentSymbol is IVariable bs ? (IContainer)bs.GetTypeSymbol() : (IContainer)parentSymbol;
             }
             else
             {
-                // If the owner symbol is null, the current scope is the owner
-                owner = visitor.SymbolTable.CurrentScope;
+                parent = visitor.SymbolTable.CurrentScope;
             }
-            
-            return  // 1- Try to get a bound variable
-                    owner.TryGet<IBoundSymbol>(accessor.Target.Value) 
-                    
-                    // 2- Try to get a package
-                    ?? owner.TryGet<IPackage>(accessor.Target.Value)
-                    
-                    // 3- Return an unresolved type symbo
-                    ?? (ISymbol)new UnresolvedTypeSymbol(accessor.Target.Value, owner);
+
+            // 1- Try to get the target symbol as a variable symbol
+            // 2- Try to get it as a package
+            // 3- Create an unresolved type symbol
+            return parent.TryGet<IVariable>(accessor.Target.Value) 
+                   ?? parent.TryGet<IPackage>(accessor.Target.Value)
+                   ?? (ISymbol)new UnresolvedSymbol(accessor.Target.Value, parent);
         }
     }
 }

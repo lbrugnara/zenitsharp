@@ -9,7 +9,7 @@ namespace Zenit.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, ClassMethodNode method)
         {
-            var methodSymbol = checker.SymbolTable.GetBoundSymbol(method.Name);
+            var methodSymbol = checker.SymbolTable.GetVariableSymbol(method.Name);
 
             checker.SymbolTable.EnterFunctionScope(method.Name);
 

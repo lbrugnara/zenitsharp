@@ -19,7 +19,7 @@ namespace Zenit.Semantics.Resolvers
             // the function's return type to void
             if (rnode.Expression == null)
             {
-                func.Return.ChangeType(new VoidSymbol());
+                func.Return.ChangeType(new Void());
                 return func.Return.TypeSymbol;
             }
 

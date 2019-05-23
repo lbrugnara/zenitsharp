@@ -9,7 +9,7 @@ namespace Zenit.Semantics.Mutability
     {
         public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, DeclarationNode decls)
         {
-            foreach (Node statement in decls.Statements)
+            foreach (Node statement in decls.Declarations)
                 statement.Visit(checker);
 
             return null;

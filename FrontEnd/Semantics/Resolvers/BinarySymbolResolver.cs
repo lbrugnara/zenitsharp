@@ -5,6 +5,7 @@ using Zenit.Ast;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types.Specials;
+using Zenit.Semantics.Symbols.Types.Specials.Unresolved;
 
 namespace Zenit.Semantics.Resolvers
 {

@@ -2,7 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using Zenit.Semantics.Symbols.Types;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 
 namespace Zenit.Semantics.Symbols
 {
@@ -18,7 +18,7 @@ namespace Zenit.Semantics.Symbols
         /// <param name="access"></param>
         /// <param name="storage"></param>
         /// <returns></returns>
-        IBoundSymbol BindSymbol(string name, ITypeSymbol type, Access access, Storage storage);
+        IVariable AddNewVariableSymbol(string name, IType type, Access access, Storage storage);
 
         /// <summary>
         /// Return true if a symbol with that name exists in the
@@ -26,7 +26,7 @@ namespace Zenit.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to lookup</param>
         /// <returns>True if symbols exist</returns>
-        bool HasBoundSymbol(string name);
+        bool HasVariableSymbol(string name);
 
         /// <summary>
         /// Return a symbol with the provided name. It should throw
@@ -34,6 +34,6 @@ namespace Zenit.Semantics.Symbols
         /// </summary>
         /// <param name="name">Symbol's name to retrieve</param>
         /// <returns>Symbol instance identified by name</returns>
-        IBoundSymbol GetBoundSymbol(string name);
+        IVariable GetVariableSymbol(string name);
     }
 }

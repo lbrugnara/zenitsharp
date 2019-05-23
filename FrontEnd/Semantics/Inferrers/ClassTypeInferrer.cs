@@ -3,9 +3,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ClassTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassNode, ITypeSymbol>
+    class ClassTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor inferrer, ClassNode node)
+        public IType Visit(TypeInferrerVisitor inferrer, ClassNode node)
         {
             inferrer.SymbolTable.EnterClassScope(node.Name.Value);
 
@@ -17,7 +17,7 @@ namespace Zenit.Semantics.Inferrers
 
             inferrer.SymbolTable.LeaveScope();
 
-            return inferrer.SymbolTable.GetBoundSymbol(node.Name.Value).TypeSymbol;
+            return inferrer.SymbolTable.GetVariableSymbol(node.Name.Value).TypeSymbol;
         }
     }
 }

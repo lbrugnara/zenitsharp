@@ -1,0 +1,18 @@
+﻿// symbol_operator -> ( dot_operator | indexer_operator | call_operator )
+
+// dot_operator -> '.' IDENTIFIER
+.property
+.$1
+.somethingElse
+._test
+
+// indexer_operator -> '[' expression_list ']'
+[0]
+["test"]
+[0.1f]
+[0, 'a']
+
+// call_operator -> '(' expression_list? ')'
+()
+("a")
+(1, 2)

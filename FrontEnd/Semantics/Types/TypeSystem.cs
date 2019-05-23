@@ -5,7 +5,7 @@ namespace Zenit.Semantics.Types
 {
     public class TypeSystem
     {
-        private static Dictionary<BuiltinType, BuiltinType> TypeHierarchy = new Dictionary<BuiltinType, BuiltinType>()
+        private static Dictionary<BuiltinType, BuiltinType> TypesHierarchy = new Dictionary<BuiltinType, BuiltinType>()
         {
             { BuiltinType.Char,     BuiltinType.Bool    },
             { BuiltinType.Bool,     BuiltinType.Int     },
@@ -34,20 +34,20 @@ namespace Zenit.Semantics.Types
             if (t1 == BuiltinType.Object || t2 == BuiltinType.Object)
                 return BuiltinType.Object;
 
-            if (!TypeHierarchy.ContainsKey(t1) && !TypeHierarchy.ContainsKey(t2))
+            if (!TypesHierarchy.ContainsKey(t1) && !TypesHierarchy.ContainsKey(t2))
                 return BuiltinType.Object;
 
-            if (!TypeHierarchy.ContainsKey(t1))
-                return TypeHierarchy[t2] == t1 ? t1 : BuiltinType.Object;
+            if (!TypesHierarchy.ContainsKey(t1))
+                return TypesHierarchy[t2] == t1 ? t1 : BuiltinType.Object;
 
-            if (!TypeHierarchy.ContainsKey(t2))
-                return TypeHierarchy[t1] == t2 ? t2 : BuiltinType.Object;
+            if (!TypesHierarchy.ContainsKey(t2))
+                return TypesHierarchy[t1] == t2 ? t2 : BuiltinType.Object;
 
             BuiltinType child = t1 < t2 ? t1 : t2;
             BuiltinType parent = t1 < t2 ? t2 : t1;
 
-            while (child != parent && child != BuiltinType.Object && TypeHierarchy.ContainsKey(child))
-                child = TypeHierarchy[child];
+            while (child != parent && child != BuiltinType.Object && TypesHierarchy.ContainsKey(child))
+                child = TypesHierarchy[child];
 
             return child;
         }

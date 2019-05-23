@@ -7,7 +7,7 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    public class TypeInferrerVisitor : IAstWalker<ITypeSymbol>
+    public class TypeInferrerVisitor : IAstWalker<IType>
     {
         private UnaryTypeInferrer unaryTypeInferrer;
         private BinaryTypeInferrer binaryTypeInferrer;
@@ -16,7 +16,7 @@ namespace Zenit.Semantics.Inferrers
         private VariableTypeInferrer variableTypeInferrer;
         private BlockTypeInferrer blockTypeInferrer;
         private DeclarationTypeInferrer declarationTypeInferrer;
-        private LiteralTypeInferrer literalTypeInferrer;
+        private PrimitiveTypeInferrer primitiveTypeInferrer;
         private AccessorTypeInferrer accessorTypeInferrer;
         private IfTypeInferrer ifTypeInferrer;
         private WhileTypeInferrer whileTypeInferrer;
@@ -46,7 +46,7 @@ namespace Zenit.Semantics.Inferrers
             this.variableTypeInferrer = new VariableTypeInferrer();
             this.blockTypeInferrer = new BlockTypeInferrer();
             this.declarationTypeInferrer = new DeclarationTypeInferrer();
-            this.literalTypeInferrer = new LiteralTypeInferrer();
+            this.primitiveTypeInferrer = new PrimitiveTypeInferrer();
             this.accessorTypeInferrer = new AccessorTypeInferrer();
             this.ifTypeInferrer = new IfTypeInferrer();
             this.whileTypeInferrer = new WhileTypeInferrer();
@@ -73,7 +73,7 @@ namespace Zenit.Semantics.Inferrers
 
         public TypeInferrer Inferrer { get; private set; }
 
-        public ITypeSymbol Visit(Node node)
+        public IType Visit(Node node)
         {
             object n = node;
             switch (n)
@@ -99,8 +99,8 @@ namespace Zenit.Semantics.Inferrers
                 case DeclarationNode d:
                     return this.declarationTypeInferrer.Visit(this, d);
 
-                case LiteralNode l:
-                    return this.literalTypeInferrer.Visit(this, l);
+                case PrimitiveNode l:
+                    return this.primitiveTypeInferrer.Visit(this, l);
 
                 case AccessorNode ivk:
                     return this.accessorTypeInferrer.Visit(this, ivk);

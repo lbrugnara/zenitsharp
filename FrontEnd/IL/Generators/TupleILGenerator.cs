@@ -14,7 +14,7 @@ namespace Zenit.IL.Generators
             {
                 foreach (var item in node.Items)
                 {
-                    return item.Visit(generator);
+                    return item.Expression.Visit(generator);
                 }
             }
 

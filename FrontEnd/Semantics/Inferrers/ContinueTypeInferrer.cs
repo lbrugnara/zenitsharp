@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ContinueTypeInferrer : INodeVisitor<TypeInferrerVisitor, ContinueNode, ITypeSymbol>
+    class ContinueTypeInferrer : INodeVisitor<TypeInferrerVisitor, ContinueNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ContinueNode cnode)
+        public IType Visit(TypeInferrerVisitor visitor, ContinueNode cnode)
         {
             // continue is an empty statement
             return null;

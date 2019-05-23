@@ -16,4 +16,28 @@
     <ProjectReference Include="..\FrontEnd\Zenit.FrontEnd.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="FrontEnd\Syntax\Grammar\array_expression.z">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FrontEnd\Syntax\Grammar\object_expression.z">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FrontEnd\Syntax\Grammar\identifier.z">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FrontEnd\Syntax\Grammar\primary.z">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FrontEnd\Syntax\Grammar\symbol_operator.z">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FrontEnd\Syntax\Grammar\tuple_expression.z">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FrontEnd\Syntax\Grammar\symbol_expression.z">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

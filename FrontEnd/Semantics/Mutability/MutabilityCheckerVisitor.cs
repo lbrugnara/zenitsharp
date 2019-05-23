@@ -15,7 +15,7 @@ namespace Zenit.Semantics.Mutability
         private VariableMutabilityChecker variableMutabilityChecker;
         private BlockMutabilityChecker blockMutabilityChecker;
         private DeclarationMutabilityChecker declarationMutabilityChecker;
-        private LiteralMutabilityChecker literalMutabilityChecker;
+        private PrimitiveMutabilityChecker primitiveMutabilityChecker;
         private AccessorMutabilityChecker accessorMutabilityChecker;
         private IfMutabilityChecker ifMutabilityChecker;
         private WhileMutabilityChecker whileMutabilityChecker;
@@ -42,7 +42,7 @@ namespace Zenit.Semantics.Mutability
             this.variableMutabilityChecker = new VariableMutabilityChecker();
             this.blockMutabilityChecker = new BlockMutabilityChecker();
             this.declarationMutabilityChecker = new DeclarationMutabilityChecker();
-            this.literalMutabilityChecker = new LiteralMutabilityChecker();
+            this.primitiveMutabilityChecker = new PrimitiveMutabilityChecker();
             this.accessorMutabilityChecker = new AccessorMutabilityChecker();
             this.ifMutabilityChecker = new IfMutabilityChecker();
             this.whileMutabilityChecker = new WhileMutabilityChecker();
@@ -91,8 +91,8 @@ namespace Zenit.Semantics.Mutability
                 case DeclarationNode d:
                     return this.declarationMutabilityChecker.Visit(this, d);
 
-                case LiteralNode l:
-                    return this.literalMutabilityChecker.Visit(this, l);
+                case PrimitiveNode l:
+                    return this.primitiveMutabilityChecker.Visit(this, l);
 
                 case AccessorNode ivk:
                     return this.accessorMutabilityChecker.Visit(this, ivk);

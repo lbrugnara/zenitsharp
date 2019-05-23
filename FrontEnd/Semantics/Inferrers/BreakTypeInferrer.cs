@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class BreakTypeInferrer : INodeVisitor<TypeInferrerVisitor, BreakNode, ITypeSymbol>
+    class BreakTypeInferrer : INodeVisitor<TypeInferrerVisitor, BreakNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, BreakNode wnode)
+        public IType Visit(TypeInferrerVisitor visitor, BreakNode wnode)
         {
             return wnode.Number?.Visit(visitor);
         }

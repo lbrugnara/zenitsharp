@@ -4,22 +4,22 @@
 using Zenit.Ast;
 using Zenit.Semantics.Symbols.Types;
 using Zenit.Semantics.Symbols.Types.Specials;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 using Zenit.Semantics.Types;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class FunctionTypeInferrer : INodeVisitor<TypeInferrerVisitor, FunctionNode, ITypeSymbol>
+    class FunctionTypeInferrer : INodeVisitor<TypeInferrerVisitor, FunctionNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, FunctionNode funcdecl)
+        public IType Visit(TypeInferrerVisitor visitor, FunctionNode funcdecl)
         {
             // Get the function symbol
             var functionScope = visitor.SymbolTable.EnterFunctionScope(funcdecl.Name);
 
             // Grab all the parameters' symbols
-            var parametersSymbols = new List<BoundSymbol>();
+            var parametersSymbols = new List<Variable>();
 
             // TODO: Infer parameter types
             // parametersSymbols.AddRange(funcdecl.Parameters.Select(param => visitor.SymbolTable.GetSymbol(param.Name.Value)));
@@ -50,12 +50,12 @@ namespace Zenit.Semantics.Inferrers
                 }           
                 else
                 {
-                    visitor.Inferrer.Unify(visitor.SymbolTable, new VoidSymbol(), functionScope.Return);
+                    visitor.Inferrer.Unify(visitor.SymbolTable, new Void(), functionScope.Return);
                 }
             }
             else if (!statements.OfType<ReturnNode>().Any() && functionScope.Return.TypeSymbol.BuiltinType != BuiltinType.Void)
             {
-                visitor.Inferrer.Unify(visitor.SymbolTable, new VoidSymbol(), functionScope.Return);
+                visitor.Inferrer.Unify(visitor.SymbolTable, new Void(), functionScope.Return);
             }
 
             // Leave the function's scope

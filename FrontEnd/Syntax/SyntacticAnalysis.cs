@@ -1,5 +1,6 @@
 ﻿using Zenit.Ast;
 using System;
+using System.Linq;
 
 namespace Zenit.Syntax
 {
@@ -22,10 +23,8 @@ namespace Zenit.Syntax
 
             var ast = this.parser.Parse(tokens);
 
-            var errors = parser.ParsingErrors;
-
-            if (errors.Count > 0)
-                throw new Exception(string.Join("\n", errors));
+            if (parser.ParsingErrors.Any())
+                throw new AggregateException(parser.ParsingErrors);
 
             return ast;
         }

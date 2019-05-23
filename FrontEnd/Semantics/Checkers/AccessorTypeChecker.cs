@@ -3,7 +3,7 @@
 
 using Zenit.Ast;
 using Zenit.Semantics.Symbols;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 
 namespace Zenit.Semantics.Checkers
 {
@@ -11,7 +11,7 @@ namespace Zenit.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, AccessorNode accessor)
         {
-            IBoundSymbol symbol = null;
+            IVariable symbol = null;
             string symbolName = accessor.Target.Value;
 
             // If this is the end of the accessor path, get the symbol in the current
@@ -19,7 +19,7 @@ namespace Zenit.Semantics.Checkers
             if (accessor.Parent == null)
             {
                 // Get accessed symbol that must be defined in the symtable's scope
-                symbol = checker.SymbolTable.GetBoundSymbol(symbolName);
+                symbol = checker.SymbolTable.GetVariableSymbol(symbolName);
 
                 var type = symbol.TypeSymbol;
 
@@ -35,7 +35,7 @@ namespace Zenit.Semantics.Checkers
             // the symbol within the enclosing scope
             if (encsym is ISymbolTable)
             {
-                symbol = (encsym as ISymbolTable).GetBoundSymbol(symbolName);
+                symbol = (encsym as ISymbolTable).GetVariableSymbol(symbolName);
                 return new CheckedType(symbol.TypeSymbol, symbol);
             }
 

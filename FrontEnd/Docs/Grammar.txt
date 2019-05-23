@@ -30,22 +30,17 @@ func_param_declaration -> 'mut'? IDENTIFIER? IDENTIFIER
 variable_declaration -> 'mut'? ( implicit_var_declaration | typed_var_declaration )
 					  ;
 
-
 implicit_var_declaration -> VAR ( IDENTIFIER '=' expression | var_destructuring ) ';'
                          ;
-
-
-var_destructuring -> '(' ( ',' | IDENTIFIER )+ ')' '=' expression
-                  ;
-
 
 typed_var_declaration -> IDENTIFIER ( '[' ']' )* ( typed_var_definition | var_destructuring ) ';'
                       ;
 
-
 typed_var_definition -> IDENTIFIER ( '=' expression ( ',' typed_var_definition )* )?
                      ;
 
+var_destructuring -> '(' ( ',' | IDENTIFIER )+ ')' '=' expression
+                  ;
 
 (* Constant declaration *)
 constant_declaration -> 'const' IDENTIFIER? IDENTIFIER '=' expression ( ',' IDENTIFIER '=' expression )* ) ';'
@@ -148,46 +143,13 @@ return_statement -> 'return' ( expression )? ';'
 expression	-> expression_assignment
             ;
 
-
-expression_assignment	-> ( member_access | destructuring ) ( ( '=' | '+=' | '-=' | '/=' | '*=' )  expression_assignment )?
-                        | object_expression
-						| lambda_expression
-						| conditional_expression
+expression_assignment	-> lambda_expression 
+						| destructuring ( '=' | '+=' | '-=' | '/=' | '*=' ) expression_assignment 
+						| conditional_expression ( ( '=' | '+=' | '-=' | '/=' | '*=' ) expression_assignment )?
                         ;
 
-
-expression_list -> expression ( ',' expression )*
+destructuring	-> '(' IDENTIFIER ( '.' IDENTIFIER )* ( ',' destructuring )* ')'
                 ;
-
-
-member_access   -> IDENTIFIER ( '.' IDENTIFIER | arguments )*
-                ;
-
-
-(* Collection destructuring *)
-destructuring   -> '(' IDENTIFIER ( '.' IDENTIFIER )* ( ',' destructuring )* ')'
-                ;
-
-
-tuple_initializer   -> '(' expression_list? ')'
-                            ;
-
-
-(* Ternay operator *)
-conditional_expression  -> null_coalescing_expression ( '?' expression ':' expression )?
-                        ;
-
-
-(* Null coalescing operator *)
-null_coalescing_expression  -> or_expression ( '??' null_coalescing_expression )?
-                            ;
-
-(* Objects expression *)
-object_expression   -> '{' object_property ( ',' object_property )* ','? '}'
-                    ;
-
-object_property     -> 'mut'? IDENTIFIER ':' expression
-                    ;
 
 (* Lambdas *)
 lambda_expression   -> lambda_params '=>' ( block | expression )
@@ -197,6 +159,18 @@ lambda_expression   -> lambda_params '=>' ( block | expression )
 lambda_params -> '(' func_params ')'
 			  | func_params
               ;
+
+expression_list -> expression ( ',' expression )*
+                ;
+
+(* Ternay operator *)
+conditional_expression  -> null_coalescing_expression ( '?' expression ':' expression )?
+                        ;
+
+
+(* Null coalescing operator *)
+null_coalescing_expression  -> or_expression ( '??' null_coalescing_expression )?
+                            ;
 
 
 or_expression	-> and_expression ( '||' and_expression )*
@@ -224,30 +198,60 @@ multiplication_expression	-> unary_expression ( ( '/' | '*' ) unary_expression )
 
 
 unary_expression	-> ( '!' | '-' ) unary_expression
-					| ( '++' | '--' ) primary_expression
-					| primary_expression ( '++' | '--' )?
+					| ( '++' | '--' ) symbol_expression symbol_operator*
+					| symbol_expression symbol_operator* ( '++' | '--' )?
                     ;
 
+(* Symbol operators *)
+symbol_operator -> ( dot_operator | indexer_operator | call_operator )
+		;
 
-primary_expression  -> primary ( '.' IDENTIFIER | indexer | arguments )*
-                    ;
+dot_operator -> '.' IDENTIFIER
+			  ;
 
-
-indexer -> '[' expression_list ']'
+indexer_operator -> '[' expression_list ']'
         ;
 
-
-arguments -> '(' expression_list? ')'
+call_operator -> '(' expression_list? ')'
           ;
 
+(* Symbol expressions *)
+symbol_expression -> 'new' IDENTIFIER ( '.' IDENTIFIER )* call_operator
+				   | IDENTIFIER
+                   | object_expression
+				   | array_expression
+				   | tuple_expression
+				   | primary
+				   | '(' expression ')'
+				   ;
 
 primary	-> 'true' 
 		| 'false'
-		| INTEGER 
+		| CHAR
+		| INTEGER
+		| FLOAT
 		| DOUBLE 
 		| DECIMAL 
-		| STRING 
-		| IDENTIFIER
-		| tuple_initializer
-		| '(' expression ')'
+		| STRING
         ;
+
+(* Objects expression *)
+object_expression   -> '{' object_property ( ',' object_property )* ','? '}'
+                    ;
+
+object_property     -> 'mut'? IDENTIFIER ':' expression
+                    ;
+
+(* Arrays *)
+array_expression	-> '[' expression ( ',' expression )* ']'
+					;
+
+(* Tuples *)
+tuple_expression	-> '(' tuple_member ',' ( tuple_members )? ')'
+					;
+
+tuple_members -> tuple_member ( ',' tuple_member )*
+					;
+
+tuple_member	-> ( member_name ':' )? expression
+				;

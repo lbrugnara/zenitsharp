@@ -5,6 +5,7 @@ using Zenit.Ast;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types;
 using System.Linq;
+using Zenit.Semantics.Symbols.Types.References;
 
 namespace Zenit.Semantics.Checkers
 {
@@ -12,8 +13,8 @@ namespace Zenit.Semantics.Checkers
     {
         public CheckedType Visit(TypeCheckerVisitor checker, TupleNode node)
         {
-            var types = node.Items?.Select(i => i?.Visit(checker)?.TypeSymbol);
-            return new CheckedType(new TupleSymbol(checker.SymbolTable.CurrentScope, types.OfType<ITypeSymbol>().ToList()));
+            var elements = node.Items?.Select(i => i?.Expression?.Visit(checker)?.Symbol).Cast<ISymbol>();
+            return new CheckedType(new Tuple(node.Uid, checker.SymbolTable.CurrentScope, elements.ToList()));
         }
     }
 }

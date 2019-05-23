@@ -17,7 +17,7 @@ namespace Zenit.Semantics.Resolvers
         private VariableSymbolResolver variableSymbolResolver;
         private BlockSymbolResolver blockSymbolResolver;
         private DeclarationSymbolResolver declarationSymbolResolver;
-        private LiteralSymbolResolver literalSymbolResolver;
+        private PrimitiveSymbolResolver primitiveSymbolResolver;
         private AccessorSymbolResolver accessorSymbolResolver;
         private IfSymbolResolver ifSymbolResolver;
         private WhileSymbolResolver whileSymbolResolver;
@@ -47,7 +47,7 @@ namespace Zenit.Semantics.Resolvers
             this.variableSymbolResolver = new VariableSymbolResolver();
             this.blockSymbolResolver = new BlockSymbolResolver();
             this.declarationSymbolResolver = new DeclarationSymbolResolver();
-            this.literalSymbolResolver = new LiteralSymbolResolver();
+            this.primitiveSymbolResolver = new PrimitiveSymbolResolver();
             this.accessorSymbolResolver = new AccessorSymbolResolver();
             this.ifSymbolResolver = new IfSymbolResolver();
             this.whileSymbolResolver = new WhileSymbolResolver();
@@ -101,8 +101,8 @@ namespace Zenit.Semantics.Resolvers
                 case DeclarationNode d:
                     return this.declarationSymbolResolver.Visit(this, d);
 
-                case LiteralNode l:
-                    return this.literalSymbolResolver.Visit(this, l);
+                case PrimitiveNode l:
+                    return this.primitiveSymbolResolver.Visit(this, l);
 
                 case AccessorNode ivk:
                     return this.accessorSymbolResolver.Visit(this, ivk);

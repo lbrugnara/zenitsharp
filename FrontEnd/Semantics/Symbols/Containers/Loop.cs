@@ -4,7 +4,7 @@
 
 namespace Zenit.Semantics.Symbols.Containers
 {
-    public class Loop : Block
+    public class Loop : Block, ILoop
     {
         public Loop(string name, IContainer parent)
             : base(name, parent)

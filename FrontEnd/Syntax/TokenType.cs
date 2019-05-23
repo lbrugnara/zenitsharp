@@ -6,6 +6,7 @@ namespace Zenit.Syntax
     public enum TokenType
     {
         Unknown,
+
         // Types
         Char,
         Integer,
@@ -77,6 +78,7 @@ namespace Zenit.Syntax
         Question,
         QuestionQuestion,
         Colon,
+        At,
 
         // More keywords
         Class,

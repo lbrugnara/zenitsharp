@@ -4,6 +4,7 @@
 using Zenit.Ast;
 using Zenit.Semantics.Types;
 using Zenit.Semantics.Symbols;
+using Zenit.Semantics.Symbols.Types.References;
 
 namespace Zenit.Semantics.Checkers
 {
@@ -37,7 +38,7 @@ namespace Zenit.Semantics.Checkers
                 typeInfo.ChangeType(t.Types.First());*/
 
             if (returnSymbol.TypeSymbol.BuiltinType == BuiltinType.Void)
-                throw new System.Exception($"Function '{(checker.SymbolTable.CurrentScope as FunctionSymbol).Name}' returns void. Cannot return object of type '{typeInfo}'");
+                throw new System.Exception($"Function '{(checker.SymbolTable.CurrentScope as Function).Name}' returns void. Cannot return object of type '{typeInfo}'");
 
             /*if (!returnSymbol.TypeSymbol.Type.IsAssignableFrom(typeInfo.Type))
                 throw new System.Exception($"Function returns '{returnSymbol.TypeSymbol}', cannot convert return value from '{typeInfo}'");*/

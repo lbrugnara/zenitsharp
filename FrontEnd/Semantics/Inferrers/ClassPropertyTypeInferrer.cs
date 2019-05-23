@@ -3,12 +3,12 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ClassPropertyTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassPropertyNode, ITypeSymbol>
+    class ClassPropertyTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassPropertyNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor inferrer, ClassPropertyNode node)
+        public IType Visit(TypeInferrerVisitor inferrer, ClassPropertyNode node)
         {
             // Get the property symbol
-            var property = inferrer.SymbolTable.GetBoundSymbol(node.Name.Value);
+            var property = inferrer.SymbolTable.GetVariableSymbol(node.Name.Value);
 
             // If the right-hand side is present, get the inferred type and make the conclusions
             var defIValueSymbol = node.Definition?.Visit(inferrer);

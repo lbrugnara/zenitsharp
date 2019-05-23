@@ -6,15 +6,17 @@ using Zenit.Semantics.Exceptions;
 using Zenit.Semantics.Symbols.Types;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types.Specials;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Containers;
+using Zenit.Semantics.Symbols.Types.Primitives;
+using Zenit.Semantics.Symbols.Types.References;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class AccessorTypeInferrer : INodeVisitor<TypeInferrerVisitor, AccessorNode, ITypeSymbol>
+    class AccessorTypeInferrer : INodeVisitor<TypeInferrerVisitor, AccessorNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor inferrer, AccessorNode accessor)
+        public IType Visit(TypeInferrerVisitor inferrer, AccessorNode accessor)
         {           
             string symbolName = accessor.Target.Value;
 
@@ -24,21 +26,21 @@ namespace Zenit.Semantics.Inferrers
             {
                 var symbol =
                             // 1- Try to get a bound symbol
-                            inferrer.SymbolTable.CurrentScope.TryGet<IBoundSymbol>(accessor.Target.Value)
+                            inferrer.SymbolTable.CurrentScope.TryGet<IVariable>(accessor.Target.Value)
                             // 2- Try to get a type symbol (like functions or objects)
-                            ?? inferrer.SymbolTable.CurrentScope.TryGet<ITypeSymbol>(accessor.Target.Value) as ISymbol;
+                            ?? inferrer.SymbolTable.CurrentScope.TryGet<IType>(accessor.Target.Value) as ISymbol;
 
-                if (symbol is IBoundSymbol bs)                
+                if (symbol is IVariable bs)                
                     return bs.TypeSymbol;
 
-                return symbol as ITypeSymbol;
+                return symbol as IType;
             }
 
             // If the accessed member has an eclosing accessor node, visit
             // it to get the enclosing symbol's type
             var parentSymbol = accessor.Parent.Visit(inferrer);
 
-            if (parentSymbol is IComplexSymbol cs)
+            if (parentSymbol is IReference cs)
             {
                 ISymbol memberType = cs.Get<ISymbol>(symbolName);
                 /*if (accessor.IsCall)
@@ -46,29 +48,21 @@ namespace Zenit.Semantics.Inferrers
                 else
                     memberType = cs.Properties[symbolName];*/
 
-                return memberType is ITypeSymbol mt ? mt : (memberType as IBoundSymbol).TypeSymbol;
+                return memberType is IType mt ? mt : (memberType as IVariable).TypeSymbol;
             }
 
-            if (parentSymbol is IPrimitiveSymbol)
+            if (parentSymbol is IPrimitive)
             {
 
             }
 
-            if (parentSymbol is AnonymousSymbol anons)
+            if (parentSymbol is Anonymous anons)
             {
                 ISymbol memberType = null;
 
-                // We have constraints that need to be added to the type
-                if (accessor.IsCall)
-                {
-                    memberType = /*parentSymbol.Type.Functions[symbolName] =*/ inferrer.Inferrer.NewAnonymousType();
-                }
-                else
-                {
-                    memberType = /*parentSymbol.TypeSymbol.Type.Properties[symbolName] =*/ inferrer.Inferrer.NewAnonymousType();
-                }
+                memberType = /*parentSymbol.TypeSymbol.Type.Properties[symbolName] =*/ inferrer.Inferrer.NewAnonymousType();
 
-                return memberType is ITypeSymbol mt ? mt : (memberType as IBoundSymbol).TypeSymbol;
+                return memberType is IType mt ? mt : (memberType as IVariable).TypeSymbol;
             }
 
             throw new ScopeOperationException($"Member {symbolName} couldn't be retrieved from enclosing symbol {parentSymbol}");

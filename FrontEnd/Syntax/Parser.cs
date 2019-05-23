@@ -273,7 +273,7 @@ namespace Zenit.Syntax
         // program -> declaration*
         private DeclarationNode Program()
         {            
-            List<Node> statements = new List<Node>();
+            List<Node> declarations = new List<Node>();
             while (this.HasInput())
             {
                 try
@@ -283,7 +283,7 @@ namespace Zenit.Syntax
                         this.Consume();
                         continue;
                     }
-                    statements.Add(this.Declaration());
+                    declarations.Add(this.Declaration());
                 }
                 catch (ParserException pe)
                 {
@@ -292,7 +292,7 @@ namespace Zenit.Syntax
                         this.Consume();
                 }
             }
-            return new DeclarationNode(statements);
+            return new DeclarationNode(declarations);
         }
 
         // Rule:
@@ -757,7 +757,7 @@ namespace Zenit.Syntax
             Node nbreaks = null;
             Token kw = this.Consume(TokenType.Break);
             if (this.Match(TokenType.Integer))
-                nbreaks = new LiteralNode(this.Consume(TokenType.Integer));
+                nbreaks = new PrimitiveNode(this.Consume(TokenType.Integer));
             this.Consume(TokenType.Semicolon);
             return new BreakNode(kw, nbreaks);
         }
@@ -1020,6 +1020,9 @@ namespace Zenit.Syntax
         {
             var properties = new List<ObjectPropertyNode>();
 
+            if (this.Match(TokenType.At))
+                this.Consume();
+
             this.Consume(TokenType.LeftBrace);
 
             while (this.Match(TokenType.Identifier) || this.Match(TokenType.Mutable, TokenType.Identifier))
@@ -1101,40 +1104,10 @@ namespace Zenit.Syntax
         }
 
         // Rule:
-        // member_access -> IDENTIFIER ( '.' IDENTIFIER | arguments )*
-        private Node MemberAccess()
-        {
-            // Create an accessor node for the identifier
-            Node accessor = new AccessorNode(this.Consume(TokenType.Identifier), null);
-
-            // Try to find member accessors or callable members like:
-            //  member.property
-            //  member.property.property2
-            //  member.property()
-            //  member.property.property2()
-            //  member.property.property2().property3
-            while (true)
-            {
-                if (this.Match(TokenType.LeftParen))
-                {
-                    ExpressionListNode arguments = this.Arguments();
-                    accessor = new CallableNode(accessor, arguments);
-                }
-                else if (this.Match(TokenType.Dot))
-                {
-                    this.Consume();
-                    accessor = new AccessorNode(this.Consume(TokenType.Identifier), accessor, this.Match(TokenType.LeftParen));
-                }
-                else break;
-            }
-            return accessor;
-        }
-
-        // Rule:
         // destructuring -> '(' IDENTIFIER ( '.' IDENTIFIER )* ( ',' destructuring )* ')'
         private TupleNode Destructuring()
         {
-            List<Node> exprs = new List<Node>();
+            List<TupleMember> exprs = new List<TupleMember>();
 
             bool hasParenthesis = false;
 
@@ -1157,7 +1130,7 @@ namespace Zenit.Syntax
                 if (accessor == null)
                     accessor = new NoOpNode(null);
 
-                exprs.Add(accessor);
+                exprs.Add(new TupleMember(accessor));
 
             } while (this.Match(TokenType.Comma) && this.Consume(TokenType.Comma) != null);
 
@@ -1168,17 +1141,29 @@ namespace Zenit.Syntax
         }
 
         // Rule:
-        // tuple_initializer -> '(' expression_list? ')'
-        private TupleNode TupleInitializer()
+        // tuple_expression -> '(' tuple_member ',' ( tuple_members )? ')'
+        // tuple_members -> tuple_member ( ',' tuple_member )*
+        // tuple_member	-> ( member_name ':' )? expression
+        private TupleNode TupleExpression()
         {
-            List<Node> args = new List<Node>();
+            List<TupleMember> args = new List<TupleMember>();
             bool isValidTuple = false;
 
             this.Consume(TokenType.LeftParen);
 
             while (!this.Match(TokenType.RightParen))
             {
-                args.Add(this.Expression());
+                string name = null;
+                if (this.Match(TokenType.Identifier, TokenType.Colon))
+                {
+                    name = this.Consume(TokenType.Identifier).Value;
+                    this.Consume(TokenType.Colon);
+                }
+
+                var expression = this.Expression();
+
+                args.Add(new TupleMember(name, expression));
+
                 while (this.Match(TokenType.Comma))
                 {
                     isValidTuple = true;
@@ -1192,56 +1177,30 @@ namespace Zenit.Syntax
         }
 
         // Rule:
-        // expression_assignment	-> ( destructuring | member_access ) ( ( '=' | '+=' | '-=' | '/=' | '*=' )  expression_assignment )?
-        // 						     | lambda_expression
-        // 						     | conditional_expression
+        // expression_assignment -> lambda_expression 
+        //                        | destructuring ( '=' | '+=' | '-=' | '/=' | '*=' ) expression_assignment 
+        // 						  | conditional_expression ( ( '=' | '+=' | '-=' | '/=' | '*=' ) expression_assignment )? 
         private Node ExpressionAssignment()
         {
-            // Check for:
-            //  identifier ( = | += | -= | *= | /= )
-            //  identifier.
-            //  identifier(
-            if (this.IsAssignment())
-            {
-                var checkpoint = this.SaveCheckpoint();
-
-                Node lvalue = this.MemberAccess();
-
-                // If we now match an assignment of any type, create an assignment node
-                if (this.MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
-                {
-                    Token assignmentop = this.Consume();
-                    Node expression = this.Expression();
-
-                    if (lvalue is CallableNode)
-                        throw new ParserException($"{this.GetCurrentLineAndCol()} Left-hand side of an assignment must be a variable.");
-
-                    return new VariableAssignmentNode(lvalue as AccessorNode, assignmentop, expression);
-                }
-
-                // If we are not seeing an assignment operator, then try again with ConditionalExpression
-                this.RestoreCheckpoint(checkpoint);
-                return this.ConditionalExpression();
-            }
-
             // Try to parse a lambda expression
             if (this.IsLambdaExpression())
                 return this.LambdaExpression();
 
+            ParserCheckpoint checkpoint = this.SaveCheckpoint();
+
             if (this.IsDestructuring())
             {
-                ParserCheckpoint checkpoint = this.SaveCheckpoint();
                 // First try if it is a left-hand side expression
                 try
                 {
-                    TupleNode lvalue = this.Destructuring();
+                    TupleNode leftval = this.Destructuring();
 
                     // If we now match an assignment of any type, create an assignment node
                     if (this.MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
                     {
                         Token assignmentop = this.Consume();
-                        Node expression = this.TupleInitializer();
-                        return new DestructuringAssignmentNode(lvalue, assignmentop, expression as TupleNode);
+                        Node expression = this.TupleExpression();
+                        return new DestructuringAssignmentNode(leftval, assignmentop, expression as TupleNode);
                     }
                 }
                 catch
@@ -1251,8 +1210,20 @@ namespace Zenit.Syntax
                 this.RestoreCheckpoint(checkpoint);
             }
 
-            // Finally try with a conditional expression
-            return this.ConditionalExpression();
+            var lvalue = this.ConditionalExpression();
+
+            if (this.MatchAny(TokenType.Assignment, TokenType.IncrementAndAssign, TokenType.DecrementAndAssign, TokenType.DivideAndAssign, TokenType.MultAndAssign))
+            {
+                Token assignmentop = this.Consume();
+                Node expression = this.Expression();
+
+                if (lvalue is CallableNode)
+                    throw new ParserException($"{this.GetCurrentLineAndCol()} Left-hand side of an assignment must be a variable.");
+
+                return new VariableAssignmentNode(lvalue as AccessorNode, assignmentop, expression);
+            }
+
+            return lvalue;
         }
 
         // Rule:
@@ -1373,77 +1344,116 @@ namespace Zenit.Syntax
         }
 
         // Rule:
-        // unary_expression	-> ( "!" | "-" ) unary_expression
-        // 					| ( "++" | "--" ) primary_expression
-        // 					| primary_expression ( "++" | "--" )?
-        private UnaryNode UnaryExpression()
+        // unary_expression	-> ( '!' | '-' ) unary_expression
+        // 					| ( '++' | '--' ) symbol_expression symbol_operator*
+        // 					| symbol_expression symbol_operator* ( '++' | '--' )?
+        private Node UnaryExpression()
         {
+            // ( '!' | '-' ) unary_expression
             if (this.Match(TokenType.Not) || this.Match(TokenType.Minus))
-            {
-                Token op = this.Consume();
-                return new UnaryNode(op, this.UnaryExpression());
-            }
-            else if (this.Match(TokenType.Increment) || this.Match(TokenType.Decrement))
-            {
-                Token op = this.Consume();
-                return new UnaryPrefixNode(op, this.PrimaryExpression());
-            }
-            var expr = this.PrimaryExpression();
+                return new UnaryNode(this.Consume(), this.UnaryExpression());
+
+            // ( '++' | '--' ) symbol_expression symbol_operator*
             if (this.Match(TokenType.Increment) || this.Match(TokenType.Decrement))
-                return new UnaryPostfixNode(this.Consume(), expr);
-            return new UnaryNode(null, expr);
+            {
+                // ( '++' | '--' ) ...
+                var prefix = this.Consume();
+
+                // ... symbol_expression ...
+                var sexpr = this.SymbolExpression();
+
+                // ... symbol_operator*
+                while (this.MatchAny(TokenType.Dot, TokenType.LeftBracket, TokenType.LeftParen))
+                    sexpr = this.SymbolOperator(sexpr);
+
+                return new UnaryPrefixNode(prefix, sexpr);
+            }
+
+            // symbol_expression symbol_operator* ('++' | '--') ?
+            var symbolExpression = this.SymbolExpression();
+
+            // ... symbol_operator* ...
+            while (this.MatchAny(TokenType.Dot, TokenType.LeftBracket, TokenType.LeftParen))
+                symbolExpression = this.SymbolOperator(symbolExpression);
+
+            // ... ('++' | '--')?
+            if (this.Match(TokenType.Increment) || this.Match(TokenType.Decrement))
+                return new UnaryPostfixNode(this.Consume(), symbolExpression);
+
+            return symbolExpression;
         }
 
         // Rule:
-        // primary_expression -> primary ( "." IDENTIFIER | "(" arguments? ")" )*
-        private Node PrimaryExpression()
+        // symbol_expression -> 'new' IDENTIFIER ( '.' IDENTIFIER )* call_operator
+        //                    | IDENTIFIER
+        //                    | object_expression
+        // 				      | array_expression
+        // 				      | tuple_expression
+        // 				      | primary
+        private Node SymbolExpression()
         {
+            if (this.Match(TokenType.New))
+            {
+                var newt = this.Consume();
+                var symbol = new AccessorNode(this.Consume(TokenType.Identifier), null);
+
+                while (this.Match(TokenType.Dot))
+                {
+                    this.Consume(TokenType.Dot);
+                    symbol = new AccessorNode(this.Consume(TokenType.Identifier), symbol);
+                }
+
+                ExpressionListNode callOperator = this.Match(TokenType.LeftParen) ? this.CallOperator() : new ExpressionListNode(new List<Node>());
+                return new CallableNode(symbol, callOperator, newt);
+            }
+
+            if (this.Match(TokenType.Identifier))
+                return new AccessorNode(this.Consume(TokenType.Identifier), null);
+
             if (this.IsObjectExpression())
                 return this.ObjectExpression();
 
-            Token newt = null;
-            if (this.Match(TokenType.New))
-            {
-                newt = this.Consume();
-            }
-            Node primary = this.Primary();
-            var checkpoint = this.SaveCheckpoint();
-            while (true)
-            {
-                if (this.Match(TokenType.LeftParen))
-                {
-                    if (!(primary is FunctionNode) && this.TryGetAccessor(primary) == null && this.TryGetLiteral(primary)?.Literal?.Type != TokenType.Identifier)
-                        throw new ParserException($"{this.GetCurrentLineAndCol()} '{primary}' is not an invokable object");
-                    ExpressionListNode arguments = this.Arguments();
-                    primary = new CallableNode(primary, arguments, newt);
-                }
-                else if (this.Match(TokenType.LeftBracket))
-                {
-                    primary = new IndexerNode(primary, this.Indexer());
-                }
-                else if (this.Match(TokenType.Dot))
-                {
-                    this.Consume();
-                    primary = new AccessorNode(this.Consume(TokenType.Identifier), primary, this.Match(TokenType.LeftParen));
-                }
-                else
-                {
-                    if (this.pointer == checkpoint.Pointer
-                        && (primary is LiteralNode && (primary as LiteralNode).Literal.Type != TokenType.Identifier)
-                        && newt != null)
-                        throw new ParserException($"{this.GetCurrentLineAndCol()} Type expected");
-                    if (this.pointer == checkpoint.Pointer && (primary is AccessorNode) && newt != null)
-                        primary = new CallableNode(primary, new ExpressionListNode(new List<Node>()), newt);
-                    break;
-                }
+            /*if (this.Match(TokenType.LeftBracket))
+                return this.ArrayExpression();*/
 
+            if (this.Match(TokenType.LeftParen))
+                return this.Try(this.TupleExpression, this.ParenthesizedExpression);
+
+            return this.Primary();
+        }
+
+        // Rule:
+        // symbol_operator -> ( dot_operator | indexer_operator | call_operator )
+        //
+        // dot_operator -> '.' IDENTIFIER 
+        private Node SymbolOperator(Node parent)
+        {
+            Node child = null;
+
+            // dot_operator
+            if (this.Match(TokenType.Dot))
+            {
+                this.Consume(TokenType.Dot);
+                child = new AccessorNode(this.Consume(TokenType.Identifier), parent);
             }
-            return primary;
+            // indexer_operator
+            else if (this.Match(TokenType.LeftBracket))
+            {
+                child = new IndexerNode(parent, this.IndexerOperator());
+            }
+            // call_operator
+            else if (this.Match(TokenType.LeftParen))
+            {
+                ExpressionListNode callOperator = this.CallOperator();
+                child = new CallableNode(parent, callOperator);
+            }
+
+            return child;
         }
 
         // Rule: (it is easier to check the expression_list manually here)
         // indexer -> '[' expression_list ']'
-        private ExpressionListNode Indexer()
+        private ExpressionListNode IndexerOperator()
         {
             List<Node> args = new List<Node>();
             this.Consume(TokenType.LeftBracket);
@@ -1461,8 +1471,8 @@ namespace Zenit.Syntax
         }
 
         // Rule: (it is easier to check the expression_list manually here)
-        // arguments -> '(' expression_list? ')'
-        private ExpressionListNode Arguments()
+        // call_operator -> '(' expression_list? ')'
+        private ExpressionListNode CallOperator()
         {
             List<Node> args = new List<Node>();
             this.Consume(TokenType.LeftParen);
@@ -1480,48 +1490,47 @@ namespace Zenit.Syntax
         }
 
         // Rule:
-        // primary	-> "true" | "false" | "null" | INTEGER | DOUBLE | DECIMAL | STRING | IDENTIFIER	| tuple_initializer | "(" expression ")"
+        // primary	-> "true" | "false" | INTEGER | FLOAT | DOUBLE | DECIMAL | STRING | IDENTIFIER
         private Node Primary()
         {
-            if (this.Match(TokenType.LeftParen))
-            {
-                var checkpoint = this.SaveCheckpoint();
-                // Now we can try if it is a literal tuple initializer
-                try
-                {
-                    // This call will return null if it is not a valid tuple initializer
-                    var node = this.TupleInitializer();
-
-                    // If we match a dot, it could be a primary expression followed by a member access,
-                    // it is not a literal tuple initializer
-                    if (node != null && !this.MatchAny(TokenType.Dot))
-                        return node;
-                }
-                catch
-                {
-                }
-
-                // If we didn't match destructuring or tuple initializer, restore and try
-                // a parenthesized expression
-                this.RestoreCheckpoint(checkpoint);
-                return this.ParenthesizedExpression();
-            }
-
             bool isPrimary = this.Match(TokenType.Boolean)
                                 || this.Match(TokenType.Char)
-                                || this.Match(TokenType.Integer) 
-                                || this.Match(TokenType.Float) 
+                                || this.Match(TokenType.Integer)
+                                || this.Match(TokenType.Float)
                                 || this.Match(TokenType.Double)
-                                || this.Match(TokenType.Decimal) 
-                                || this.Match(TokenType.String) 
-                                || this.Match(TokenType.Identifier);
+                                || this.Match(TokenType.Decimal)
+                                || this.Match(TokenType.String);
 
             if (!isPrimary)
                 throw new ParserException($"{this.GetCurrentLineAndCol()} Expects primary but received {(this.HasInput() ? this.Peek().Type.ToString() : "end of input")}");
 
-            return this.Match(TokenType.Identifier) ? (Node)new AccessorNode(this.Consume(), null) : new LiteralNode(this.Consume());
+            return new PrimitiveNode(this.Consume());
         }
         #endregion
+
+        private Node Try(params Func<Node>[] actions)
+        {
+            Node result = null;
+            var checkpoint = this.SaveCheckpoint();
+
+            foreach (var action in actions)
+            {
+                try
+                {
+                    result = action.Invoke();
+                }
+                catch (Exception e)
+                {
+                }
+
+                if (result != null)
+                    break;
+
+                this.RestoreCheckpoint(checkpoint);
+            }
+
+            return result;
+        }
 
         #region Parser lookahead helpers
 
@@ -1636,6 +1645,9 @@ namespace Zenit.Syntax
 
         private bool IsObjectExpression()
         {
+            if (this.Match(TokenType.At, TokenType.LeftBrace))
+                return true;
+
             return this.Match(TokenType.LeftBrace) 
                 && (this.MatchFrom(1, TokenType.RightBrace) || this.MatchFrom(1, TokenType.Mutable, TokenType.Identifier, TokenType.Colon)
                     || this.MatchFrom(1, TokenType.Identifier, TokenType.Colon));
@@ -1690,13 +1702,13 @@ namespace Zenit.Syntax
             return null;
         }
 
-        private LiteralNode TryGetLiteral(Node primary)
+        private PrimitiveNode TryGetPrimitive(Node primary)
         {
             Node tmp = primary;
             while (tmp != null)
             {
-                if (tmp is LiteralNode)
-                    return tmp as LiteralNode;
+                if (tmp is PrimitiveNode)
+                    return tmp as PrimitiveNode;
 
                 if (tmp is AccessorNode)
                 {

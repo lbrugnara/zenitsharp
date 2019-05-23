@@ -3,12 +3,12 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ClassConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassConstantNode, ITypeSymbol>
+    class ClassConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, ClassConstantNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor inferrer, ClassConstantNode node)
+        public IType Visit(TypeInferrerVisitor inferrer, ClassConstantNode node)
         {
             // Get the constant symbol
-            var constant = inferrer.SymbolTable.GetBoundSymbol(node.Name.Value);
+            var constant = inferrer.SymbolTable.GetVariableSymbol(node.Name.Value);
 
             // Get the inferred type of the right-hand side expression and make the conclusions
             var defIValueSymbol = node.Definition.Visit(inferrer);

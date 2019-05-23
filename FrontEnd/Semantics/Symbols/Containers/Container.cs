@@ -5,7 +5,7 @@
 
 using Zenit.Semantics.Exceptions;
 using Zenit.Semantics.Symbols.Types;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -60,7 +60,7 @@ namespace Zenit.Semantics.Symbols.Containers
         
         private Dictionary<string, ISymbol> GetDestination<T>()
         {
-            if (typeof(ITypeSymbol).IsAssignableFrom(typeof(T)))
+            if (typeof(IType).IsAssignableFrom(typeof(T)))
                 return this.TypeSymbols;
 
             if (typeof(IContainer).IsAssignableFrom(typeof(T)))
@@ -71,7 +71,7 @@ namespace Zenit.Semantics.Symbols.Containers
 
         #region IBlock implementation
 
-        public void Insert<T>(T symbol)
+        public virtual void Insert<T>(T symbol)
             where T : ISymbol
         {
             var destination = this.GetDestination<T>();
@@ -82,7 +82,7 @@ namespace Zenit.Semantics.Symbols.Containers
             destination[symbol.Name] = symbol;
         }
 
-        public void Insert<T>(string name, T symbol)
+        public virtual void Insert<T>(string name, T symbol)
             where T : ISymbol
         {
             var destination = this.GetDestination<T>();
@@ -190,7 +190,7 @@ namespace Zenit.Semantics.Symbols.Containers
 
             foreach (var (name, symbol) in symbols)
             {
-                if (symbol is IBoundSymbol bs)
+                if (symbol is IVariable bs)
                 {
                     sb.AppendLine($"{memberIndent}{bs.ToValueString()}");
                 }

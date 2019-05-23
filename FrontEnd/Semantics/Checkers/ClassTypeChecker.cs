@@ -16,7 +16,7 @@ namespace Zenit.Semantics.Checkers
 
             checker.SymbolTable.LeaveScope();
 
-            return new CheckedType(checker.SymbolTable.GetBoundSymbol(node.Name.Value).TypeSymbol);
+            return new CheckedType(checker.SymbolTable.GetVariableSymbol(node.Name.Value).TypeSymbol);
         }
     }
 }

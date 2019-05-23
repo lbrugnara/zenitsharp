@@ -2,16 +2,16 @@
 // Full copyright and license information in LICENSE file
 
 using Zenit.Semantics.Symbols.Types;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 
 namespace Zenit.Semantics.Checkers
 {
     public class CheckedType
     {
-        public ITypeSymbol TypeSymbol { get; set; }
-        public IBoundSymbol Symbol { get; set; }
+        public IType TypeSymbol { get; set; }
+        public IVariable Symbol { get; set; }
 
-        public CheckedType(ITypeSymbol type, IBoundSymbol symbol = null)
+        public CheckedType(IType type, IVariable symbol = null)
         {
             this.TypeSymbol = type;
             this.Symbol = symbol;

@@ -7,9 +7,9 @@ using Zenit.Semantics.Symbols.Types.Specials;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ReturnTypeInferrer : INodeVisitor<TypeInferrerVisitor, ReturnNode, ITypeSymbol>
+    class ReturnTypeInferrer : INodeVisitor<TypeInferrerVisitor, ReturnNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ReturnNode rnode)
+        public IType Visit(TypeInferrerVisitor visitor, ReturnNode rnode)
         {
             // The current scope is the function's scope. We get a reference to the
             // return type and we update it if needed
@@ -18,7 +18,7 @@ namespace Zenit.Semantics.Inferrers
             // If there's an empty return statement, leave here
             if (rnode.Expression == null)
             {
-                visitor.Inferrer.Unify(visitor.SymbolTable, new VoidSymbol(), functionScope.Return);
+                visitor.Inferrer.Unify(visitor.SymbolTable, new Void(), functionScope.Return);
 
                 return functionScope.Return.TypeSymbol;
             }
@@ -26,7 +26,7 @@ namespace Zenit.Semantics.Inferrers
             // Infer the return's expression type
             var returnIValueSymbol = rnode.Expression.Visit(visitor);
             
-            ITypeSymbol typeInfo = returnIValueSymbol;
+            IType typeInfo = returnIValueSymbol;
 
             // The return statement expects a tuple and if that tuple contains
             // just one element, we use it as the return's type

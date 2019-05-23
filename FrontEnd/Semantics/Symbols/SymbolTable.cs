@@ -7,8 +7,10 @@ using Zenit.Semantics.Exceptions;
 using Zenit.Semantics.Inferrers;
 using Zenit.Semantics.Symbols.Containers;
 using Zenit.Semantics.Symbols.Types;
+using Zenit.Semantics.Symbols.Types.References;
 using Zenit.Semantics.Symbols.Types.Specials;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Types.Specials.Unresolved;
+using Zenit.Semantics.Symbols.Variables;
 using Zenit.Semantics.Types;
 
 namespace Zenit.Semantics.Symbols
@@ -84,23 +86,28 @@ namespace Zenit.Semantics.Symbols
             return scope;
         }
 
-        public FunctionSymbol EnterFunctionScope(string name)
+        public Function EnterFunctionScope(string name)
         {
-            return this.EnterComplexSymbolScope<FunctionSymbol>(name, this.CurrentScope);
+            return this.EnterComplexSymbolScope<Function>(name, this.CurrentScope);
         }
 
-        public ObjectSymbol EnterObjectScope(string name)
+        public Object EnterObjectScope(string name)
         {
-            return this.EnterComplexSymbolScope<ObjectSymbol>(name, this.CurrentScope);
+            return this.EnterComplexSymbolScope<Object>(name, this.CurrentScope);
         }
 
-        public ClassSymbol EnterClassScope(string name)
+        public Class EnterClassScope(string name)
         {
-            return this.EnterComplexSymbolScope<ClassSymbol>(name, this.Global);
+            return this.EnterComplexSymbolScope<Class>(name, this.Global);
+        }
+
+        public Tuple EnterTupleScope(string name)
+        {
+            return this.EnterComplexSymbolScope<Tuple>(name, this.CurrentScope);
         }
 
         private T EnterComplexSymbolScope<T>(string name, IContainer parent)
-            where T : ComplexSymbol
+            where T : Reference
         {
             T scope = parent.TryGet<T>(name);
 
@@ -110,17 +117,21 @@ namespace Zenit.Semantics.Symbols
                 return scope;
             }
 
-            if (typeof(T) == typeof(FunctionSymbol))
+            if (typeof(T) == typeof(Function))
             {
-                scope = new FunctionSymbol(name, new NoneSymbol(), parent) as T;
+                scope = new Function(name, new None(), parent) as T;
             }
-            else if (typeof(T) == typeof(ObjectSymbol))
+            else if (typeof(T) == typeof(Object))
             {
-                scope = new ObjectSymbol(name, parent) as T;
+                scope = new Object(name, parent) as T;
             }
-            else if (typeof(T) == typeof(ClassSymbol))
+            else if (typeof(T) == typeof(Class))
             {
-                scope = new ClassSymbol(name, parent) as T;
+                scope = new Class(name, parent) as T;
+            }
+            else if (typeof(T) == typeof(Tuple))
+            {
+                scope = new Tuple(name, parent) as T;
             }
             else
             {
@@ -144,12 +155,12 @@ namespace Zenit.Semantics.Symbols
             this.CurrentScope = this.CurrentScope.Parent;
         }
 
-        public FunctionSymbol GetCurrentFunction()
+        public Function GetCurrentFunction()
         {
             var scope = this.CurrentScope;
             while (scope != null)
             {
-                if (scope is FunctionSymbol fs)
+                if (scope is Function fs)
                     return fs;
 
                 scope = scope.Parent;
@@ -160,16 +171,16 @@ namespace Zenit.Semantics.Symbols
 
         #region ISymbolTable implementation
 
-        public IBoundSymbol BindSymbol(string name, ITypeSymbol type, Access access, Storage storage)
+        public IVariable AddNewVariableSymbol(string name, IType type, Access access, Storage storage)
         {
-            var symbol = new BoundSymbol(name, type, access, storage, this.CurrentScope);
+            var symbol = new Variable(name, type, access, storage, this.CurrentScope);
             this.CurrentScope.Insert(name, symbol);
             return symbol;
         }        
 
-        public bool HasBoundSymbol(string name) => this.CurrentScope.Contains<IBoundSymbol>(name);
+        public bool HasVariableSymbol(string name) => this.CurrentScope.Contains<IVariable>(name);
 
-        public IBoundSymbol GetBoundSymbol(string name) => this.CurrentScope.Get<IBoundSymbol>(name);
+        public IVariable GetVariableSymbol(string name) => this.CurrentScope.Get<IVariable>(name);
 
         #endregion
 
@@ -189,14 +200,14 @@ namespace Zenit.Semantics.Symbols
             this.ThrowIfUnresolved(this.Global);
         }
 
-        private ITypeSymbol ResolveSymbolRference(IUnresolvedTypeSymbol uts)
+        private IType ResolveSymbolReference(IUnresolvedType uts)
         {
-            if (uts is UnresolvedFunctionSymbol ufunc)
+            if (uts is UnresolvedFunctionType ufunc)
             {
-                if (!ufunc.Parent.Contains<FunctionSymbol>(ufunc.Name))
+                if (!ufunc.Parent.Contains<Function>(ufunc.Name))
                     return null;
 
-                var func = ufunc.Parent.Get<FunctionSymbol>(ufunc.Name);
+                var func = ufunc.Parent.Get<Function>(ufunc.Name);
 
                 if (func.Return.TypeSymbol.BuiltinType == BuiltinType.None)
                     return null;
@@ -205,14 +216,14 @@ namespace Zenit.Semantics.Symbols
             }
             else if (uts is UnresolvedExpressionType uet)
             {
-                ITypeSymbol left = uet.Left;
-                ITypeSymbol right = uet.Right;
+                IType left = uet.Left;
+                IType right = uet.Right;
 
-                if (uet.Left is IUnresolvedTypeSymbol uetl)
-                    left = this.ResolveSymbolRference(uetl) ?? uet.Left;
+                if (uet.Left is IUnresolvedType uetl)
+                    left = this.ResolveSymbolReference(uetl) ?? uet.Left;
 
-                if (uet.Right is IUnresolvedTypeSymbol uetr)
-                    right = this.ResolveSymbolRference(uetr) ?? uet.Right;
+                if (uet.Right is IUnresolvedType uetr)
+                    right = this.ResolveSymbolReference(uetr) ?? uet.Right;
 
                 var type = this.TypeInferrer.FindMostGeneralType(left, right);
 
@@ -221,37 +232,33 @@ namespace Zenit.Semantics.Symbols
 
                 return type;
             }
-            else if (uts is UnresolvedTupleType utt)
+            else if (uts is UnresolvedSymbol us)
             {
-                ITypeSymbol[] types = new ITypeSymbol[utt.Types.Count];
+                var symbol = us.Parent.TryGet<ISymbol>(us.Name);
 
-                for (var i=0; i < utt.Types.Count; i++)
-                {
-                    var ttype = utt.Types[i];
-                    types[i] = ttype is IUnresolvedTypeSymbol uetl ? this.ResolveSymbolRference(uetl) ?? ttype : ttype;
-                }
+                // Symbol not defined, return the same unresolved symbol
+                if (symbol == null)
+                    return us;
+                
+                // If this is an IVarible, we will get the IType of it, and if it is an IType, we will get the same reference,
+                // so we can safely work with the type here
+                var type = symbol.GetTypeSymbol();
 
-                for (var i = 0; i < utt.Types.Count; i++)
-                {
-                    utt.Types[i] = types[i];
-                }
-
-                return utt.Types.Any(t => t is IUnresolvedTypeSymbol) ? utt : (ITypeSymbol)new TupleSymbol(utt.Parent, utt.Types);
-            }
-            else if (uts is UnresolvedTypeSymbol us)
-            {
-                if (!us.Parent.Contains<FunctionSymbol>(us.Name))
+                // If the type is not present (odd..), we return null (error)
+                if (type == null)
                     return null;
 
-                var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
+                // If the builtin type is None, keep trying, return the unresolved type
+                if (type.BuiltinType == BuiltinType.None)
+                    return us;
 
-                if (symbol.BuiltinType == BuiltinType.None)
+                // If the parent is not a class or an object, we don't allow forward references to objects types
+                // other than functions, in that case return null (error)
+                if (!(us.Parent is Object || us.Parent is Class) && !type.IsOfType<Function>())
                     return null;
 
-                if (!symbol.IsOfType<FunctionSymbol>())
-                    return null;
-
-                return symbol.GetTypeSymbol();
+                // Otherwise, return the type symbol we have resolved
+                return type;
             }
             return null;
         }
@@ -268,11 +275,11 @@ namespace Zenit.Semantics.Symbols
             foreach (var container in containers)
                 this.UpdateSymbolReferences(container);
 
-            var boundSymbols = scope.GetAllOfType<IBoundSymbol>().Where(bs => bs.TypeSymbol is IUnresolvedTypeSymbol);
+            var boundSymbols = scope.GetAllOfType<IVariable>().Where(bs => bs.TypeSymbol is IUnresolvedType);
 
             foreach (var boundSymbol in boundSymbols)
             {
-                var resolvedType = this.ResolveSymbolRference(boundSymbol.TypeSymbol as IUnresolvedTypeSymbol);
+                var resolvedType = this.ResolveSymbolReference(boundSymbol.TypeSymbol as IUnresolvedType);
 
                 if (resolvedType != null)
                     boundSymbol.ChangeType(resolvedType);
@@ -291,20 +298,20 @@ namespace Zenit.Semantics.Symbols
             foreach (var container in containers)
                 this.ThrowIfUnresolved(container);
 
-            var boundSymbols = scope.GetAllOfType<IBoundSymbol>().Where(bs => bs.TypeSymbol is IUnresolvedTypeSymbol);
+            var boundSymbols = scope.GetAllOfType<IVariable>().Where(bs => bs.TypeSymbol is IUnresolvedType);
 
             foreach (var boundSymbol in boundSymbols)
             {
-                var uts = boundSymbol.TypeSymbol as IUnresolvedTypeSymbol;
+                var uts = boundSymbol.TypeSymbol as IUnresolvedType;
 
-                if (uts is UnresolvedFunctionSymbol ufunc)
+                if (uts is UnresolvedFunctionType ufunc)
                 {
-                    if (!ufunc.Parent.Contains<FunctionSymbol>(ufunc.Name))
+                    if (!ufunc.Parent.Contains<Function>(ufunc.Name))
                         throw new SymbolException($"Function '{ufunc.Name}' is not defined in scope '{ufunc.Parent.Name}'.");
 
-                    var func = ufunc.Parent.Get<FunctionSymbol>(ufunc.Name);
+                    var func = ufunc.Parent.Get<Function>(ufunc.Name);
 
-                    if (func.Return.TypeSymbol is IUnresolvedTypeSymbol)
+                    if (func.Return.TypeSymbol is IUnresolvedType)
                     {
                         // Circular reference?
                         if (boundSymbol.TypeSymbol == func.Return.TypeSymbol)
@@ -319,17 +326,17 @@ namespace Zenit.Semantics.Symbols
 
                     boundSymbol.ChangeType(func.Return.TypeSymbol.GetTypeSymbol());
                 }
-                else if (uts is UnresolvedTypeSymbol us)
+                else if (uts is UnresolvedSymbol us)
                 {
-                    if (!us.Parent.Contains<FunctionSymbol>(us.Name))
+                    if (!us.Parent.Contains<Function>(us.Name))
                         throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
 
-                    var symbol = us.Parent.Get<ITypeSymbol>(us.Name);
+                    var symbol = us.Parent.Get<IType>(us.Name);
 
                     if (symbol.BuiltinType == BuiltinType.None)
                         throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
 
-                    if (!symbol.IsOfType<FunctionSymbol>())
+                    if (!symbol.IsOfType<Function>())
                         throw new SymbolException($"'{us.Name}' is not defined in scope '{us.Parent.Name}'.");
 
                     boundSymbol.ChangeType(symbol.GetTypeSymbol());

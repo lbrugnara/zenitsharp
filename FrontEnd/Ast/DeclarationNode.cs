@@ -7,11 +7,11 @@ namespace Zenit.Ast
 {
     public class DeclarationNode : Node
     {
-        public List<Node> Statements { get; }
+        public List<Node> Declarations { get; }
 
-        public DeclarationNode(List<Node> statements)
+        public DeclarationNode(List<Node> declarations)
         {
-            this.Statements = statements;
+            this.Declarations = declarations;
         }
     }
 }

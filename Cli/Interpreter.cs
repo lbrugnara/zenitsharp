@@ -2,6 +2,7 @@
 // Full copyright and license information in LICENSE file
 
 using System;
+using System.Linq;
 using Zenit;
 
 namespace FlInterpreter
@@ -49,15 +50,29 @@ namespace FlInterpreter
                 }
                 catch (Exception e)
                 {
-                    string type = "Unknown";
-                    var tmp = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"{type} Error: {e.Message}");
-                    if (type == "Unknown")
-                        Console.WriteLine(e.StackTrace);
-                    Console.ForegroundColor = tmp;
+                    this.WriteException(e);
                 }
             }
+        }
+
+        private void WriteException(Exception e)
+        {
+            if (e is AggregateException ae)
+            {
+                foreach (var ex in ae.InnerExceptions)
+                    this.WriteException(ex);
+
+                return;
+            }
+
+            var tmp = Console.ForegroundColor;
+            Console.ForegroundColor = ConsoleColor.Red;
+
+            Console.WriteLine($"Error: {e.Message}");
+            Console.WriteLine($"------------------");
+            Console.WriteLine($"Stack trace: \n{e.StackTrace}");
+
+            Console.ForegroundColor = tmp;
         }
     }
 }

@@ -14,7 +14,7 @@ namespace Zenit.Semantics.Checkers
             foreach (var definition in constdec.Definitions)
             {
                 if (lhsType == null)
-                    lhsType = new CheckedType(checker.SymbolTable.GetBoundSymbol(definition.Left.Value).TypeSymbol);
+                    lhsType = new CheckedType(checker.SymbolTable.GetVariableSymbol(definition.Left.Value).TypeSymbol);
 
                 // Get the right-hand side operand (a must for a constant)
                 var rhsType = definition.Right.Visit(checker);

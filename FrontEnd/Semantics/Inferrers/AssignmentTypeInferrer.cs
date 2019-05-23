@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class AssignmentTypeInferrer : INodeVisitor<TypeInferrerVisitor, AssignmentNode, ITypeSymbol>
+    class AssignmentTypeInferrer : INodeVisitor<TypeInferrerVisitor, AssignmentNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, AssignmentNode node)
+        public IType Visit(TypeInferrerVisitor visitor, AssignmentNode node)
         {
             if (node is VariableAssignmentNode)
                 return this.MakeVariableAssignment(node as VariableAssignmentNode, visitor);
@@ -18,7 +18,7 @@ namespace Zenit.Semantics.Inferrers
             throw new AstWalkerException($"Invalid variable assignment of type {node.GetType().FullName}");
         }
 
-        private ITypeSymbol MakeVariableAssignment(VariableAssignmentNode node, TypeInferrerVisitor visitor)
+        private IType MakeVariableAssignment(VariableAssignmentNode node, TypeInferrerVisitor visitor)
         {
             var leftHandSide = node.Accessor.Visit(visitor);
             var rightHandSide = node.Right.Visit(visitor);
@@ -26,7 +26,7 @@ namespace Zenit.Semantics.Inferrers
             return visitor.Inferrer.FindMostGeneralType(leftHandSide, rightHandSide);
         }
 
-        private ITypeSymbol MakeDestructuringAssignment(DestructuringAssignmentNode node, TypeInferrerVisitor visitor)
+        private IType MakeDestructuringAssignment(DestructuringAssignmentNode node, TypeInferrerVisitor visitor)
         {
             var tupleIValueSymbol = node.Left.Visit(visitor);
             var exprIValueSymbol = node.Right.Visit(visitor);

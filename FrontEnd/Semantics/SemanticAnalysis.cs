@@ -55,18 +55,10 @@ namespace Zenit.Semantics
             this.mutabilityChecker = new MutabilityCheckerVisitor(this.SymbolTable);
 
             NameGenerator.Instance.Reset();
+        }
 
-            /*var intClass = new Class();
-
-            this.SymbolTable.NewSymbol("int", intClass);
-            this.SymbolTable.EnterClassScope("int");
-            this.SymbolTable.NewSymbol("toStr", new Function(String.Instance));
-            this.SymbolTable.LeaveScope();*/
-        }        
-
-        public SymbolTable Run(Node ast)
+        public void ResolveSymbols(Node ast)
         {
-            // First step is to resolve all the symbols in the program
             this.resolver.Visit(ast);
 
             // If there are unresolved types, throw an exception
@@ -77,25 +69,48 @@ namespace Zenit.Semantics
             Console.WriteLine("SYMBOL RESOLVING");
             Console.WriteLine("================");
             Console.WriteLine(this.SymbolTable.ToDebugString());
+        }
 
-            return this.SymbolTable;
-
-            Console.WriteLine(this.TypeInferrer.ToDebugString());
-
+        public void InferTypes(Node ast)
+        {
             // Make the type inference
             this.inferrer.Visit(ast);
 
             Console.WriteLine("=============");
             Console.WriteLine("TYPE INFERRER");
             Console.WriteLine("=============");
-            Console.WriteLine(this.SymbolTable.ToDebugString());            
+            Console.WriteLine(this.SymbolTable.ToDebugString());
             Console.WriteLine(this.TypeInferrer.ToDebugString());
+        }
 
-            // Check all the operations are valid
-            /*this.checker.Visit(ast);
+        public void CheckTypes(Node ast)
+        {
+            this.checker.Visit(ast);
 
-            // Ensure the mutability rules of variables and function calls
-            this.mutabilityChecker.Visit(ast);*/
+            Console.WriteLine("==========");
+            Console.WriteLine("TYPE CHECK");
+            Console.WriteLine("==========");
+            Console.WriteLine(this.SymbolTable.ToDebugString());
+            Console.WriteLine(this.TypeInferrer.ToDebugString());
+        }
+
+        public void CheckMutability(Node ast)
+        {
+            this.mutabilityChecker.Visit(ast);
+
+            Console.WriteLine("================");
+            Console.WriteLine("MUTABILITY CHECK");
+            Console.WriteLine("================");
+            Console.WriteLine(this.SymbolTable.ToDebugString());
+            Console.WriteLine(this.TypeInferrer.ToDebugString());
+        }
+
+        public SymbolTable Run(Node ast)
+        {
+            this.ResolveSymbols(ast);
+            //this.InferTypes(ast);
+            //this.CheckTypes(ast);
+            //this.CheckMutability(ast);
 
             return this.SymbolTable;
         }

@@ -4,11 +4,14 @@
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types;
 using Zenit.Semantics.Symbols.Types.Specials;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 using Zenit.Semantics.Types;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Zenit.Semantics.Symbols.Types.Specials.Unresolved;
+using Zenit.Semantics.Symbols.Types.Primitives;
+using Zenit.Semantics.Symbols.Types.References;
 
 namespace Zenit.Semantics.Inferrers
 {
@@ -27,18 +30,18 @@ namespace Zenit.Semantics.Inferrers
         /// descendants of a type is resolved to be a non-anonymous type, the
         /// hierarchy must be updated correctly
         /// </summary>
-        private readonly Dictionary<AnonymousSymbol, Descendant> constraints;
+        private readonly Dictionary<Anonymous, Descendant> constraints;
 
         /// <summary>
         /// All the symbols that are assumed to be of a certain anonymous type, must be
         /// tracked in order to be updated accordingly once the anonymous type is resolved 
         /// </summary>
-        private readonly Dictionary<AnonymousSymbol, List<IBoundSymbol>> trackedSymbols;
+        private readonly Dictionary<Anonymous, List<IVariable>> trackedSymbols;
 
         /// <summary>
         /// Inferred types
         /// </summary>
-        private readonly Dictionary<AnonymousSymbol, ITypeSymbol> inferredTypes;
+        private readonly Dictionary<Anonymous, IType> inferredTypes;
 
         #endregion
 
@@ -47,9 +50,9 @@ namespace Zenit.Semantics.Inferrers
         public TypeInferrer()
         {
             this.typeSystem = new TypeSystem();
-            this.constraints = new Dictionary<AnonymousSymbol, Descendant>();
-            this.trackedSymbols = new Dictionary<AnonymousSymbol, List<IBoundSymbol>>();
-            this.inferredTypes = new Dictionary<AnonymousSymbol, ITypeSymbol>();
+            this.constraints = new Dictionary<Anonymous, Descendant>();
+            this.trackedSymbols = new Dictionary<Anonymous, List<IVariable>>();
+            this.inferredTypes = new Dictionary<Anonymous, IType>();
         }
 
         #endregion
@@ -60,22 +63,22 @@ namespace Zenit.Semantics.Inferrers
         /// Create a new anonymous type
         /// </summary>
         /// <returns></returns>
-        public AnonymousSymbol NewAnonymousType()
+        public Anonymous NewAnonymousType()
         {
-            var asym = new AnonymousSymbol();
+            var asym = new Anonymous();
 
             this.constraints[asym] = new Descendant();
-            this.trackedSymbols[asym] = new List<IBoundSymbol>();
+            this.trackedSymbols[asym] = new List<IVariable>();
 
             return asym;
         }
 
-        public AnonymousSymbol NewAnonymousTypeFor(IBoundSymbol symbol)
+        public Anonymous NewAnonymousTypeFor(IVariable symbol)
         {
-            var asym = new AnonymousSymbol();
+            var asym = new Anonymous();
 
             this.constraints[asym] = new Descendant();
-            this.trackedSymbols[asym] = new List<IBoundSymbol>();
+            this.trackedSymbols[asym] = new List<IVariable>();
 
             if (symbol != null)
             {
@@ -86,29 +89,29 @@ namespace Zenit.Semantics.Inferrers
             return asym;
         }
 
-        public void TrackSymbol(AnonymousSymbol asym, IBoundSymbol symbol)
+        public void TrackSymbol(Anonymous asym, IVariable symbol)
         {
             symbol.ChangeType(asym);
             this.trackedSymbols[asym].Add(symbol);
         }
 
-        private void UpdateConstraints(AnonymousSymbol asym, ITypeSymbol type)
+        private void UpdateConstraints(Anonymous asym, IType type)
         {
             var dependants = this.constraints.Where(kvp => kvp.Value.Left == asym || kvp.Value.Right == asym).ToList();
 
             foreach (var dependant in dependants)
             {
-                ITypeSymbol t1 = dependant.Value.Left;
-                ITypeSymbol t2 = dependant.Value.Right;
+                IType t1 = dependant.Value.Left;
+                IType t2 = dependant.Value.Right;
 
                 if (dependant.Value.Left == asym)
                     this.inferredTypes[dependant.Value.Left] = t1 = type;
                 else
                     this.inferredTypes[dependant.Value.Right] = t2 = type;
 
-                if (!(t1 is AnonymousSymbol) && !(t2 is AnonymousSymbol))
+                if (!(t1 is Anonymous) && !(t2 is Anonymous))
                     this.inferredTypes[dependant.Key] = this.FindMostGeneralType(t1, t2);
-                else if (dependant.Key is AnonymousSymbol)
+                else if (dependant.Key is Anonymous)
                     this.UpdateConstraints(dependant.Key, type);
 
                 // this.trackedSymbols[constraint.Key].ForEach(symbol => this.Unify(null, this.inferredTypes[constraint.Key], symbol));
@@ -144,8 +147,8 @@ namespace Zenit.Semantics.Inferrers
 
         private bool IsResolved(Descendant constraints)
         {
-            return constraints.Left != null && this.inferredTypes.ContainsKey(constraints.Left) && !(this.inferredTypes[constraints.Left] is AnonymousSymbol)
-                    && constraints.Right != null && this.inferredTypes.ContainsKey(constraints.Right) && !(this.inferredTypes[constraints.Right] is AnonymousSymbol);
+            return constraints.Left != null && this.inferredTypes.ContainsKey(constraints.Left) && !(this.inferredTypes[constraints.Left] is Anonymous)
+                    && constraints.Right != null && this.inferredTypes.ContainsKey(constraints.Right) && !(this.inferredTypes[constraints.Right] is Anonymous);
         }
 
         /// <summary>
@@ -156,7 +159,7 @@ namespace Zenit.Semantics.Inferrers
         ///     <item>t1 and t2 are the special type BuiltinType.None: return NoneSymbol</item>
         ///     <item>t1 or t2 are the special type BuiltinType.None: return the type that is not a NoneSymbol</item>
         ///     <item>t1 and t2 are primitives: return the common ancestor</item>
-        ///     <item>t1 or t2 are anonymous (but not both): update the anonymous constraint with the non-anonymous type information (see <see cref="UpdateConstraints(AnonymousSymbol, ITypeSymbol)"/>)</item>
+        ///     <item>t1 or t2 are anonymous (but not both): update the anonymous constraint with the non-anonymous type information (see <see cref="UpdateConstraints(Anonymous, IType)"/>)</item>
         ///     <item>t1 and t2 are anonymous: return a new anonymous type that will be the most general type that encloses both anonymous types, and track the relationship on <see cref="constraints"/></item>
         ///     <item>t1 and t2 are structural: FIXME</item>
         /// </list>
@@ -164,7 +167,7 @@ namespace Zenit.Semantics.Inferrers
         /// <param name="t1">Type 1</param>
         /// <param name="t2">Type 2</param>
         /// <returns>Most general type that encloses both t1 and t2</returns>
-        public ITypeSymbol FindMostGeneralType(ITypeSymbol t1, ITypeSymbol t2)
+        public IType FindMostGeneralType(IType t1, IType t2)
         {
             if (t1 == null || t2 == null)
                 return null;
@@ -173,12 +176,12 @@ namespace Zenit.Semantics.Inferrers
             if (!this.CanUnify(t1.BuiltinType, t2.BuiltinType))
                 return null;
 
-            if (t1 is IUnresolvedTypeSymbol || t2 is IUnresolvedTypeSymbol)
+            if (t1 is IUnresolvedType || t2 is IUnresolvedType)
                 return null;
 
             // t1 and t2 are NoneSymbol
             if (t1.BuiltinType == BuiltinType.None && t2.BuiltinType == BuiltinType.None)
-                return new NoneSymbol();
+                return new None();
 
             // t1 or t2 are NoneSymbol
             if (t1.BuiltinType == BuiltinType.None)
@@ -188,11 +191,11 @@ namespace Zenit.Semantics.Inferrers
                 return t1;
 
             // t1 and t2 are primitives
-            if (t1 is IPrimitiveSymbol && t2 is IPrimitiveSymbol)
-                return new PrimitiveSymbol(this.typeSystem.GetCommonAncestor(t1.BuiltinType, t2.BuiltinType), t1.Parent ?? t2.Parent);
+            if (t1 is IPrimitive && t2 is IPrimitive)
+                return new Primitive(this.typeSystem.GetCommonAncestor(t1.BuiltinType, t2.BuiltinType), t1.Parent ?? t2.Parent);
 
             // t1 and t2 are anonymous types
-            if (t1 is AnonymousSymbol at1 && t2 is AnonymousSymbol at2)
+            if (t1 is Anonymous at1 && t2 is Anonymous at2)
             {
                 if (t1 == t2)
                     return t1;
@@ -200,20 +203,20 @@ namespace Zenit.Semantics.Inferrers
                 var newType = this.NewAnonymousType();
 
                 this.constraints[newType] = new Descendant(at1, at2);
-                this.trackedSymbols[newType] = new List<IBoundSymbol>();
+                this.trackedSymbols[newType] = new List<IVariable>();
 
                 return newType;
             }
 
             // t1 or t2 are anonymous symbol
-            if (t1 is AnonymousSymbol anonT1 && !(t2 is AnonymousSymbol))
+            if (t1 is Anonymous anonT1 && !(t2 is Anonymous))
             {
                 this.UpdateConstraints(anonT1, t2);
 
                 return t2;
             }
 
-            if (t2 is AnonymousSymbol anonT2 && !(t1 is AnonymousSymbol))
+            if (t2 is Anonymous anonT2 && !(t1 is Anonymous))
             {
                 this.UpdateConstraints(anonT2, t1);
 
@@ -225,7 +228,7 @@ namespace Zenit.Semantics.Inferrers
 
             // If the types are structural types and are the same built-in type
             // they can be "merged"
-            if (t1 is IComplexSymbol && t2 is IComplexSymbol)
+            if (t1 is IReference && t2 is IReference)
             {
                 /*IComplexSymbol type = null;
 
@@ -260,22 +263,22 @@ namespace Zenit.Semantics.Inferrers
             }
         }
 
-        public void Unify(ISymbolTable symtable, ITypeSymbol generalType, params IBoundSymbol[] symbols)
+        public void Unify(ISymbolTable symtable, IType generalType, params IVariable[] symbols)
         {
             foreach (var symbol in symbols)
             {
                 if (symbol.TypeSymbol.Equals(generalType))
                     continue;
 
-                var oldType = symbol.TypeSymbol as AnonymousSymbol;
+                var oldType = symbol.TypeSymbol as Anonymous;
 
                 if (oldType != null)
                 {
                     //this.trackedSymbols[oldType] = new List<IBoundSymbol>();
-                    var toRemove = new List<IBoundSymbol>();
+                    var toRemove = new List<IVariable>();
                     this.trackedSymbols[oldType].Where(s => s != symbol).ToList().ForEach(os => {
                         os.ChangeType(generalType);
-                        if (generalType is AnonymousSymbol anonsym)
+                        if (generalType is Anonymous anonsym)
                         {                            
                             toRemove.Add(os);
                             this.trackedSymbols[anonsym].Add(os);
@@ -286,7 +289,7 @@ namespace Zenit.Semantics.Inferrers
                 }
 
                 symbol.ChangeType(generalType);
-                if (generalType is AnonymousSymbol asym)
+                if (generalType is Anonymous asym)
                 {
                     this.trackedSymbols[oldType].Remove(symbol);
                     this.trackedSymbols[asym].Add(symbol);
@@ -374,14 +377,14 @@ namespace Zenit.Semantics.Inferrers
 
         private class Descendant
         {
-            public AnonymousSymbol Left { get; set; }
-            public AnonymousSymbol Right { get; set; }
+            public Anonymous Left { get; set; }
+            public Anonymous Right { get; set; }
 
             public Descendant()
             {
             }
 
-            public Descendant(AnonymousSymbol left, AnonymousSymbol right = null)
+            public Descendant(Anonymous left, Anonymous right = null)
             {
                 this.Left = left;
                 this.Right = right;

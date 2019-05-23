@@ -3,10 +3,7 @@
 
 using Zenit.Ast;
 using Zenit.Semantics.Symbols;
-using Zenit.Semantics.Symbols;
-using Zenit.Semantics.Symbols.Types;
-using Zenit.Semantics.Symbols.Types.Specials;
-using System.Linq;
+using Zenit.Semantics.Symbols.Variables;
 
 namespace Zenit.Semantics.Resolvers
 {
@@ -14,15 +11,22 @@ namespace Zenit.Semantics.Resolvers
     {
         public ISymbol Visit(SymbolResolverVisitor visitor, TupleNode node)
         {
-            var types = node.Items?.Select(item => item.Visit(visitor).GetTypeSymbol()).Cast<ITypeSymbol>().ToList();
+            // Create a new Tuple and enter to the scope
+            var tuple = visitor.SymbolTable.EnterTupleScope(node.Uid);
 
-            if (types.Any(t => t is IUnresolvedTypeSymbol))
-                return new UnresolvedTupleType(visitor.SymbolTable.CurrentScope, types);
+            node.Items?.ForEach(item => {
+                var el = item.Expression.Visit(visitor);
 
-            // Tuples always return the TupleSymbol type
-            var tupleType = new TupleSymbol(visitor.SymbolTable.CurrentScope, types);
+                // We are using the default name, but we can extend this to support named elements within tuples
+                var name = item.Name ?? $"${tuple.Count}";
 
-            return tupleType;
+                visitor.SymbolTable.AddNewVariableSymbol(name, el.GetTypeSymbol(), Access.Public, Storage.Immutable);
+            });
+
+            // Leave the tuple's scope
+            visitor.SymbolTable.LeaveScope();
+
+            return tuple;
         }
     }
 }

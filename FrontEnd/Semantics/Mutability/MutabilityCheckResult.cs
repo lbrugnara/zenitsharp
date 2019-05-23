@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Leonardo Brugnara
 // Full copyright and license information in LICENSE file
 
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 
 namespace Zenit.Semantics.Mutability
 {
     public class MutabilityCheckResult
     {
-        public IBoundSymbol Symbol { get; set; }
+        public IVariable Symbol { get; set; }
 
-        public MutabilityCheckResult(IBoundSymbol symbol)
+        public MutabilityCheckResult(IVariable symbol)
         {
             this.Symbol = symbol;
         }

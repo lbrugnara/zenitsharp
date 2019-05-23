@@ -9,13 +9,11 @@ namespace Zenit.Ast
     {
         public readonly Token Target;
         public readonly Node Parent;
-        public readonly bool IsCall;
 
-        public AccessorNode(Token target, Node parent, bool isCall = false)
+        public AccessorNode(Token target, Node parent)
         {
             this.Target = target;
             this.Parent = parent;
-            this.IsCall = isCall;
         }
     }
 }

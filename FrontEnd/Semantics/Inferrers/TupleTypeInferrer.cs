@@ -5,15 +5,17 @@ using Zenit.Ast;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types;
 using System.Linq;
+using Zenit.Semantics.Symbols.Types.References;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class TupleTypeInferrer : INodeVisitor<TypeInferrerVisitor, TupleNode, ITypeSymbol>
+    class TupleTypeInferrer : INodeVisitor<TypeInferrerVisitor, TupleNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, TupleNode node)
+        public IType Visit(TypeInferrerVisitor visitor, TupleNode node)
         {
-            var inferredTypes = node.Items?.Select(i => i?.Visit(visitor));
-            return new TupleSymbol(visitor.SymbolTable.CurrentScope, inferredTypes.OfType<ITypeSymbol>().Where(it => it != null).ToList());
+            var inferredTypes = node.Items?.Select(i => i?.Expression?.Visit(visitor));
+
+            return new Tuple(node.Uid, visitor.SymbolTable.CurrentScope, inferredTypes.OfType<IType>().Where(it => it != null).Cast<ISymbol>().ToList());
         }
     }
 }

@@ -1,0 +1,26 @@
+﻿// symbol_expression -> 'new' IDENTIFIER ( '.' IDENTIFIER )* arguments
+// 				      | IDENTIFIER
+//                    | object_expression
+// 				      | array_initializer
+// 				      | tuple_initializer
+// 				      | primary
+//					  | '(' expression ')'
+//
+// arguments -> '(' expression_list? ')'
+
+// (a)
+new Class()
+new Class(1)
+new Class(1, 'c')
+new Namespace.Class()
+new Namespace.Class(1)
+new Namespace.Class(1, 'c')
+new Namespace.Namespace.Class()
+new Namespace.Namespace.Class(1)
+new Namespace.Namespace.Class(1, 'c')
+
+@include identifier.z
+@include object_expression.z
+@include array_expression.z
+@include tuple_expression.z
+@include primary.z

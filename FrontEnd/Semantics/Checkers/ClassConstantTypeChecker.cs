@@ -7,7 +7,7 @@ namespace Zenit.Semantics.Checkers
         public CheckedType Visit(TypeCheckerVisitor checker, ClassConstantNode node)
         {
             // Get the constant symbol
-            var constant = checker.SymbolTable.GetBoundSymbol(node.Name.Value);
+            var constant = checker.SymbolTable.GetVariableSymbol(node.Name.Value);
 
             // Get the right-hand side expression's type
             var rhs = node.Definition.Visit(checker);            

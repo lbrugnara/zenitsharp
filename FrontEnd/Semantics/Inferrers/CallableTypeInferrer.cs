@@ -5,24 +5,25 @@ using Zenit.Semantics.Symbols.Types;
 using Zenit.Ast;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types.Specials;
+using Zenit.Semantics.Symbols.Types.References;
 
 namespace Zenit.Semantics.Inferrers
 {
-    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, CallableNode, ITypeSymbol>
+    public class CallableTypeInferrer : INodeVisitor<TypeInferrerVisitor, CallableNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, CallableNode node)
+        public IType Visit(TypeInferrerVisitor visitor, CallableNode node)
         {
             // Get the callable inferred type (and symbol)
             var typeSymbol = node.Target.Visit(visitor);
 
             // If the inferred type is an anonymous type, it means the target symbol's type has not
             // been defined yet, we need to infer the function type
-            if (typeSymbol is AnonymousSymbol)
+            if (typeSymbol is Anonymous)
                 return this.InferFromAnonymousCall(visitor, node, typeSymbol);
 
             // If the inferred type is a Function, we have more information about the target, we can infer
             // both parameter and arguments types
-            if (typeSymbol is FunctionSymbol)
+            if (typeSymbol is Function)
                 return this.InferFromFunctionCall(visitor, node, typeSymbol);
 
             /*if (inferredInfo.Type is ClassMethod cm)
@@ -45,10 +46,10 @@ namespace Zenit.Semantics.Inferrers
             return new IValueSymbol(new ITypeSymbol(new ClassInstance(classType)));
         }*/
 
-        private ITypeSymbol InferFromAnonymousCall(TypeInferrerVisitor visitor, CallableNode node, ITypeSymbol inferred)
+        private IType InferFromAnonymousCall(TypeInferrerVisitor visitor, CallableNode node, IType inferred)
         {
             // The function we need to infer here is a Function type
-            var funcType = new FunctionSymbol(inferred.Name, new NoneSymbol(), inferred.Parent);
+            var funcType = new Function(inferred.Name, new None(), inferred.Parent);
 
             // Iterate over the function arguments and infer funcType's types
             for (var i = 0; i < node.Arguments.Count; i++)
@@ -71,9 +72,9 @@ namespace Zenit.Semantics.Inferrers
             return rettype;
         }
 
-        private ITypeSymbol InferFromFunctionCall(TypeInferrerVisitor visitor, CallableNode node, ITypeSymbol inferredType)
+        private IType InferFromFunctionCall(TypeInferrerVisitor visitor, CallableNode node, IType inferredType)
         {
-            var funcType = inferredType as FunctionSymbol;
+            var funcType = inferredType as Function;
             
             // Check parameters count
             // TODO: This is not needed to be here

@@ -6,17 +6,17 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, ConstantNode, ITypeSymbol>
+    class ConstantTypeInferrer : INodeVisitor<TypeInferrerVisitor, ConstantNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ConstantNode constdec)
+        public IType Visit(TypeInferrerVisitor visitor, ConstantNode constdec)
         {
-            ITypeSymbol typeInfo = null;
+            IType typeInfo = null;
 
             foreach (var definition in constdec.Definitions)
             {
                 // Multiple constant definitions in the same statement are all of the same type so take the first
                 if (typeInfo == null)
-                    typeInfo = visitor.SymbolTable.GetBoundSymbol(definition.Left.Value).TypeSymbol;
+                    typeInfo = visitor.SymbolTable.GetVariableSymbol(definition.Left.Value).TypeSymbol;
 
                 // Get the right-hand side expression-s type (a must for a constant)
                 var rhs = definition.Right.Visit(visitor);

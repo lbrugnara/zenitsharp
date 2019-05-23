@@ -6,6 +6,7 @@ using Zenit.Semantics.Exceptions;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Symbols.Types;
+using Zenit.Semantics.Symbols.Types.Primitives;
 using Zenit.Semantics.Symbols.Types.Specials;
 using Zenit.Semantics.Types;
 
@@ -15,7 +16,7 @@ namespace Zenit.Semantics.Resolvers
     {
         public ISymbol Visit(SymbolResolverVisitor binder, ConstantNode constdec)
         {            
-            ITypeSymbol typeSymbol = null;
+            IType typeSymbol = null;
 
             // Get the constant's type or assume it if not present
             if (constdec.Type != null)
@@ -29,19 +30,19 @@ namespace Zenit.Semantics.Resolvers
                 var constantName = definition.Left.Value;
 
                 // Check if the symbol is already defined
-                if (binder.SymbolTable.HasBoundSymbol(constantName))
+                if (binder.SymbolTable.HasVariableSymbol(constantName))
                     throw new SymbolException($"Symbol {constantName} is already defined.");
 
                 // If it is a variable definition, visit the right-hand side expression
                 var rhsSymbol = definition.Right?.Visit(binder);
 
-                if (rhsSymbol != null && !(rhsSymbol is IPrimitiveSymbol))
+                if (rhsSymbol != null && !(rhsSymbol is IPrimitive))
                     throw new SymbolException($"The expression to initialize '{constantName}' must be constant");                
 
                 // Create the new symbol for the variable
-                var boundSymbol = binder.SymbolTable.BindSymbol(constantName, typeSymbol, Access.Public, Storage.Constant);
+                var boundSymbol = binder.SymbolTable.AddNewVariableSymbol(constantName, typeSymbol, Access.Public, Storage.Constant);
 
-                if (typeSymbol is AnonymousSymbol asym)
+                if (typeSymbol is Anonymous asym)
                     binder.Inferrer.TrackSymbol(asym, boundSymbol);
             }
 

@@ -4,6 +4,7 @@
 using System.Linq;
 using Zenit.Ast;
 using Zenit.Semantics.Symbols;
+using Zenit.Semantics.Symbols.Types.References;
 using Zenit.Semantics.Symbols.Types.Specials;
 using Zenit.Semantics.Types;
 
@@ -31,9 +32,9 @@ namespace Zenit.Semantics.Resolvers
                 // We do allow lambdas that do not return a value
                 if (lastExpr != null)
                 {
-                    functionSymbol.Return.ChangeType(lastExpr.IsOfType<VoidSymbol>() ? new VoidSymbol() : lastExpr.GetTypeSymbol());
+                    functionSymbol.Return.ChangeType(lastExpr.IsOfType<Void>() ? new Void() : lastExpr.GetTypeSymbol());
 
-                    if (functionSymbol.Return.TypeSymbol is AnonymousSymbol asym)
+                    if (functionSymbol.Return.TypeSymbol is Anonymous asym)
                         visitor.Inferrer.TrackSymbol(asym, functionSymbol.Return);
                 }
             }
@@ -43,9 +44,9 @@ namespace Zenit.Semantics.Resolvers
                 // update the return type of be void
                 if (functionSymbol.Return.TypeSymbol.BuiltinType == BuiltinType.None)
                 {
-                    functionSymbol.Return.ChangeType(new VoidSymbol());
+                    functionSymbol.Return.ChangeType(new Void());
                 }
-                else if (functionSymbol.Return.TypeSymbol is AnonymousSymbol asym)
+                else if (functionSymbol.Return.TypeSymbol is Anonymous asym)
                 {
                     visitor.Inferrer.TrackSymbol(asym, functionSymbol.Return);
                 }
@@ -60,7 +61,7 @@ namespace Zenit.Semantics.Resolvers
             return functionSymbol;
         }
 
-        private void CreateParameterSymbol(SymbolResolverVisitor visitor, FunctionSymbol functionSymbol, ParameterNode parameter)
+        private void CreateParameterSymbol(SymbolResolverVisitor visitor, Function functionSymbol, ParameterNode parameter)
         {
             // If the parameter's type is present use it, if not use an anonymous type
             var paramTypeSymbol = parameter.SymbolInfo.Type == null
@@ -73,7 +74,7 @@ namespace Zenit.Semantics.Resolvers
             // Create the parameter symbol in the function's scope
             var boundSymbol = functionSymbol.CreateParameter(parameter.Name.Value, paramTypeSymbol, storage);
 
-            if (paramTypeSymbol is AnonymousSymbol asym)
+            if (paramTypeSymbol is Anonymous asym)
                 visitor.Inferrer.TrackSymbol(asym, boundSymbol);
         }
     }

@@ -39,7 +39,7 @@ namespace Zenit.Semantics.Mutability
 
                 var varnode = node.Left.Items[i];
 
-                var leftHandSide = varnode.Visit(checker);
+                var leftHandSide = varnode.Expression.Visit(checker);
 
                 /*if (leftHandSide.Symbol.Storage == Symbols.Storage.Immutable)
                     throw new System.Exception($"Cannot change value of immutable variable {leftHandSide.Symbol.Name} '{leftHandSide.Symbol.Name}'");*/

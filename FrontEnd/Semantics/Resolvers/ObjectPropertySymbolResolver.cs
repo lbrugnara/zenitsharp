@@ -19,14 +19,14 @@ namespace Zenit.Semantics.Resolvers
 
             if (rhsSymbol != null)
             {
-                visitor.SymbolTable.BindSymbol(node.Name.Value, rhsSymbol.GetTypeSymbol(), Access.Public, storage);
+                visitor.SymbolTable.AddNewVariableSymbol(node.Name.Value, rhsSymbol.GetTypeSymbol(), Access.Public, storage);
                 return rhsSymbol;
             }
 
             var typeSymbol = SymbolHelper.GetTypeSymbol(visitor.SymbolTable, visitor.Inferrer, node.Information.Type);
 
             // Create the symbol for the object's property
-            visitor.SymbolTable.BindSymbol(node.Name.Value, typeSymbol, Access.Public, storage);
+            visitor.SymbolTable.AddNewVariableSymbol(node.Name.Value, typeSymbol, Access.Public, storage);
 
             return typeSymbol;
         }

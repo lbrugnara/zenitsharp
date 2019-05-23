@@ -3,7 +3,8 @@
 
 using Zenit.Ast;
 using Zenit.Semantics.Symbols;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Types.References;
+using Zenit.Semantics.Symbols.Variables;
 
 namespace Zenit.Semantics.Checkers
 {
@@ -13,11 +14,11 @@ namespace Zenit.Semantics.Checkers
         {
             var target = node.Target.Visit(checker);
 
-            var targetFuncScope = checker.SymbolTable.CurrentScope.Get<FunctionSymbol>(target.Symbol.Name);
+            var targetFuncScope = checker.SymbolTable.CurrentScope.Get<Function>(target.Symbol.Name);
 
             for (var i=0; i < node.Arguments.Expressions.Count; i++)
             {
-                var parameter = targetFuncScope.Get<IBoundSymbol>(targetFuncScope.Parameters[i].Name);
+                var parameter = targetFuncScope.Get<IVariable>(targetFuncScope.Parameters[i].Name);
                 var argument = node.Arguments.Expressions[i];
 
                 var argCheckedType = argument.Visit(checker);
@@ -26,7 +27,7 @@ namespace Zenit.Semantics.Checkers
                     throw new SymbolException($"Function '{targetFuncScope.Name}' expects parameter '{parameter.Name}' to be of type '{parameter.TypeSymbol}'. Received '{argCheckedType.TypeSymbol}' instead.");*/
             }
 
-            if (target.TypeSymbol is FunctionSymbol f1)
+            if (target.TypeSymbol is Function f1)
                 return new CheckedType(f1.Return.TypeSymbol);
 
             /*if (target.Type is ClassMethod cm && cm.Type is Function f2)

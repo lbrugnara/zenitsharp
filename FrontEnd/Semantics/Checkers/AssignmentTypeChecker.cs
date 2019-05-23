@@ -3,6 +3,7 @@
 
 using Zenit.Ast;
 using Zenit.Semantics.Symbols;
+using Zenit.Semantics.Symbols.Types.References;
 
 namespace Zenit.Semantics.Checkers
 {
@@ -47,19 +48,19 @@ namespace Zenit.Semantics.Checkers
             var tupleCheckedType = node.Left.Visit(checker);
             var exprCheckedType = node.Right.Visit(checker);
 
-            var tupleTypes = tupleCheckedType.TypeSymbol as TupleSymbol;
-            var exprTypes = exprCheckedType.TypeSymbol as TupleSymbol;
+            var tupleTypes = tupleCheckedType.TypeSymbol as Tuple;
+            var exprTypes = exprCheckedType.TypeSymbol as Tuple;
 
             for (int i = 0; i < tupleTypes.Count; i++)
             {
-                var varType = tupleTypes.Types[i];
+                var varType = tupleTypes.Elements[i];
 
                 if (varType == null)
                     continue;
 
                 var varnode = node.Left.Items[i];
 
-                if (varnode is AccessorNode accessor && accessor.Parent != null)
+                if (varnode.Expression is AccessorNode accessor && accessor.Parent != null)
                 {
                     var enc = accessor.Parent.Visit(checker);
 
@@ -67,12 +68,12 @@ namespace Zenit.Semantics.Checkers
                         throw new System.Exception($"An instance of {c.Name} '{c.ClassName}' is required to access member '{accessor.Target.Value}'");*/
                 }
 
-                var leftHandSide = varnode.Visit(checker);
+                var leftHandSide = varnode.Expression.Visit(checker);
 
                 if (leftHandSide.Symbol.Storage == Symbols.Storage.Constant)
                     throw new System.Exception($"Cannot change value of constant {leftHandSide.TypeSymbol.Name} '{leftHandSide.Symbol.Name}'");
 
-                var exprType = exprTypes.Types[i];
+                var exprType = exprTypes.Elements[i];
 
                 /*if (!varType.IsAssignableFrom(exprType))
                     throw new System.Exception($"Cannot convert from {varType} to {exprType}");*/

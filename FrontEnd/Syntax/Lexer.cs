@@ -249,6 +249,8 @@ namespace Zenit.Syntax
                     return this.BuildToken(TokenType.Question, this.Consume(), line, col);
                 case ':':
                     return this.BuildToken(TokenType.Colon, this.Consume(), line, col);
+                case '@':
+                    return this.BuildToken(TokenType.At, this.Consume(), line, col);
             }
             return null;
         }

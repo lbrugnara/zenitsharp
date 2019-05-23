@@ -8,6 +8,7 @@ using Zenit.Semantics.Symbols;
 using Zenit.Semantics.Inferrers;
 using Zenit.Semantics.Symbols.Types;
 using Zenit.Semantics.Symbols.Types.Specials;
+using Zenit.Semantics.Symbols.Types.Primitives;
 
 namespace Zenit.Semantics.Types
 {
@@ -50,37 +51,37 @@ namespace Zenit.Semantics.Types
             return GetTypeSymbol(symtable, inferrer, token).BuiltinType;
         }
 
-        internal static ITypeSymbol GetTypeSymbol(SymbolTable symtable, TypeInferrer inferrer, Token token)
+        internal static IType GetTypeSymbol(SymbolTable symtable, TypeInferrer inferrer, Token token)
         {
             // If the token has a reference to an identifier, the types come from the explicit annotation
             if (token.Type == TokenType.Identifier)
             {
                 if (token.Value == BuiltinType.Bool.GetName())
-                    return new PrimitiveSymbol(BuiltinType.Bool, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Bool, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Char.GetName())
-                    return new PrimitiveSymbol(BuiltinType.Char, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Char, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Int.GetName())
-                    return new PrimitiveSymbol(BuiltinType.Int, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Int, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Float.GetName())
-                    return new PrimitiveSymbol(BuiltinType.Float, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Float, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Double.GetName())
-                    return new PrimitiveSymbol(BuiltinType.Double, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Double, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.Decimal.GetName())
-                    return new PrimitiveSymbol(BuiltinType.Decimal, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Decimal, symtable.CurrentScope);
 
                 if (token.Value == BuiltinType.String.GetName())
-                    return new PrimitiveSymbol(BuiltinType.String, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.String, symtable.CurrentScope);
 
                 // Support complex types:
                 if (token.Value == "func" || token.Value == "tuple")
                     return inferrer?.NewAnonymousType();
 
-                if (symtable.HasBoundSymbol(token.Value))
+                if (symtable.HasVariableSymbol(token.Value))
                 {
                     /*var typeInfo = symtable.Get(token.Value).ITypeSymbol;
                     if (typeInfo.Type is Class ctype)
@@ -99,28 +100,28 @@ namespace Zenit.Semantics.Types
             switch (token.Type)
             {
                 case TokenType.Boolean:
-                    return new PrimitiveSymbol(BuiltinType.Bool, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Bool, symtable.CurrentScope);
 
                 case TokenType.Char:
-                    return new PrimitiveSymbol(BuiltinType.Char, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Char, symtable.CurrentScope);
 
                 case TokenType.Integer:
-                    return new PrimitiveSymbol(BuiltinType.Int, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Int, symtable.CurrentScope);
 
                 case TokenType.Float:
-                    return new PrimitiveSymbol(BuiltinType.Float, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Float, symtable.CurrentScope);
 
                 case TokenType.Double:
-                    return new PrimitiveSymbol(BuiltinType.Double, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Double, symtable.CurrentScope);
 
                 case TokenType.Decimal:
-                    return new PrimitiveSymbol(BuiltinType.Decimal, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.Decimal, symtable.CurrentScope);
 
                 case TokenType.String:
-                    return new PrimitiveSymbol(BuiltinType.String, symtable.CurrentScope);
+                    return new Primitive(BuiltinType.String, symtable.CurrentScope);
 
                 case TokenType.Variable:
-                    return new NoneSymbol();
+                    return new None();
                     //return inferrer?.NewAnonymousType(); // Auto
             }
 

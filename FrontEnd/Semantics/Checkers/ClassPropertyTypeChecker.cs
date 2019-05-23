@@ -7,7 +7,7 @@ namespace Zenit.Semantics.Checkers
         public CheckedType Visit(TypeCheckerVisitor checker, ClassPropertyNode node)
         {
             // Get the property symbol
-            var property = checker.SymbolTable.GetBoundSymbol(node.Name.Value);
+            var property = checker.SymbolTable.GetVariableSymbol(node.Name.Value);
 
             // If the right-hand side is present, get the type
             var rhs = node.Definition?.Visit(checker);

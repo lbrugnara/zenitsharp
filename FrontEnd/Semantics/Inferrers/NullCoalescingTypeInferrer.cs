@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class NullCoalescingTypeInferrer : INodeVisitor<TypeInferrerVisitor, NullCoalescingNode, ITypeSymbol>
+    class NullCoalescingTypeInferrer : INodeVisitor<TypeInferrerVisitor, NullCoalescingNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, NullCoalescingNode nullc)
+        public IType Visit(TypeInferrerVisitor visitor, NullCoalescingNode nullc)
         {
             var left = nullc.Left.Visit(visitor);
             var right = nullc.Right.Visit(visitor);

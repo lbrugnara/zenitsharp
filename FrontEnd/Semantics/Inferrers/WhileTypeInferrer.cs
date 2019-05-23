@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class WhileTypeInferrer : INodeVisitor<TypeInferrerVisitor, WhileNode, ITypeSymbol>
+    class WhileTypeInferrer : INodeVisitor<TypeInferrerVisitor, WhileNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, WhileNode wnode)
+        public IType Visit(TypeInferrerVisitor visitor, WhileNode wnode)
         {
             // Generate an eblock instruction for the whole while-block
             visitor.SymbolTable.EnterLoopScope($"{wnode.Uid}");

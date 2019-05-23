@@ -1,0 +1,16 @@
+﻿// The '@' symbol is needed for literal object expressions that are evaluated as the solely expression to be evaluated. If we don't use it, 
+// the parser will interpret '{' and '}' as block's starting and ending tokens.
+// The '@' is not needed on assignment expression or object expressions surrounded by parentheses like the followings:
+//		var obj = {};
+//		var obj = { a: 1 };
+//		var obj = ({});
+//		var obj = ({a : 1 });
+//		({});
+//		({a:1})
+//
+// It is very unlikely to use the '@' symbol, but we need it in order to combine the object literals with another expressions
+
+@{}
+@{ a: 1 }
+@{ a: {} }
+@{ a: { z: "string" }, mut b: 1.3f }

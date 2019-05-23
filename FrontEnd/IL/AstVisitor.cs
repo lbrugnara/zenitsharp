@@ -17,7 +17,7 @@ namespace Zenit.IL
         private VariableILGenerator variableILGenerator;
         private BlockILGenerator blockILGenerator;
         private DeclarationILGenerator declarationILGenerator;
-        private LiteralILGenerator literalILGenerator;
+        private PrimitiveILGenerator primitiveILGenerator;
         private AccessorILGenerator accessorILGenerator;
         private IfILGenerator ifILGenerator;
         private WhileILGenerator whileILGenerator;
@@ -40,7 +40,7 @@ namespace Zenit.IL
             this.variableILGenerator = new VariableILGenerator();
             this.blockILGenerator = new BlockILGenerator();
             this.declarationILGenerator = new DeclarationILGenerator();
-            this.literalILGenerator = new LiteralILGenerator();
+            this.primitiveILGenerator = new PrimitiveILGenerator();
             this.accessorILGenerator = new AccessorILGenerator();
             this.ifILGenerator = new IfILGenerator();
             this.whileILGenerator = new WhileILGenerator();
@@ -73,8 +73,8 @@ namespace Zenit.IL
                     return this.blockILGenerator.Visit(this.generator, bl);
                 case DeclarationNode d:
                     return this.declarationILGenerator.Visit(this.generator, d);
-                case LiteralNode l:
-                    return this.literalILGenerator.Visit(this.generator, l);
+                case PrimitiveNode l:
+                    return this.primitiveILGenerator.Visit(this.generator, l);
                 case AccessorNode ivk:
                     return this.accessorILGenerator.Visit(this.generator, ivk);
                 case IfNode i:

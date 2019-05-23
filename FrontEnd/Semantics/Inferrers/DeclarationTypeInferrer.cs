@@ -6,11 +6,11 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class DeclarationTypeInferrer : INodeVisitor<TypeInferrerVisitor, DeclarationNode, ITypeSymbol>
+    class DeclarationTypeInferrer : INodeVisitor<TypeInferrerVisitor, DeclarationNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, DeclarationNode decls)
+        public IType Visit(TypeInferrerVisitor visitor, DeclarationNode decls)
         {
-            decls.Statements.ForEach(statement => statement.Visit(visitor));
+            decls.Declarations.ForEach(statement => statement.Visit(visitor));
 
             return null;
         }

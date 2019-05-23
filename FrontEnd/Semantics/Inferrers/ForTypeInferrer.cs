@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, ForNode, ITypeSymbol>
+    class ForTypeInferrer : INodeVisitor<TypeInferrerVisitor, ForNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ForNode fornode)
+        public IType Visit(TypeInferrerVisitor visitor, ForNode fornode)
         {
             // Create a new block to contain the for's initialization
             visitor.SymbolTable.EnterLoopScope(fornode.Uid);

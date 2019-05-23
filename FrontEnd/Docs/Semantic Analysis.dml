@@ -1,40 +1,76 @@
 Semantic Analysis
 =================
 
-The semantic analysis comprehends 3 big aspects in the compiling process:
+The semantic analysis consists of 4 passes (all tied with each other) that determine if a program is semantically valid: 
 
-1- Symbol resolution and bindings
-2- Type inference
-3- Type checking
+- Symbol resolving
+- Type inference
+- Type checking
+- Mutability check
 
-In order to properly work there are two data structures that allow the semantic analysis to be successful:
+All these passes implement the visitor pattern and walk through the AST in order to accomplish their goal.
 
-- The `SymbolTable` that contains the information of every symbol of the program
-- The `TypeInferrer` that tracks the different constraints we collect in the analysis to determine the type of every symbol
+The semantic analysis also includes the creation and usage of a [Symbol Table] and introduces the [Type System] of the [Zenit] compiler.
 
-Symbol resolution and bindings
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Symbol table
+~~~~~~~~~~~~
 
-In this pass the compiler will add the variables to the symbol table, including as much information as possible from the information that is available on the declaration. Some AST nodes are simply "pass-through" nodes, like the `BinaryNode`, but others are the ones that will add rich information to the `SymbolTable` through the specific visitor of each node. They are:
+The [Symbol Table] is the data structure that contains all the symbol information which is used -and updated- by the different semantic analysis passes in order to properly validate the program. In the Zenit Compiler, the symbol table is a data structure that contains 2 references to objects that implement `IContainer`:
 
-- `ConstantSymbolResolver`: Adds a new constant to the current scope. If the type information is available it uses that information while resolving the symbol. If the type information is not present, it creates a new `Anonymous` type that will need to be inferred on the type inference phase.
+```c#
+    public class SymbolTable : ISymbolTable
+    {
+        // ...
+        private IContainer Global { get; set; }
 
-- `FunctionSymbolResolver`: This resolver creates a new scope -the function's scope- and it will bind all the resolved symbols to that scope.
+        // ...
+        public IContainer CurrentScope { get; private set; }
 
-- `ObjectSymbolResolver` and `ObjectPropertySymbolResolver`: The `ObjectSymbolResolver` creates a new scope where all the object's properties will be bound, and this task will be accomplished by the `ObjectPropertySymbolResolver`.
+        // ...
+    }
+```
 
-- `VariableSymbolResolver`: This resolver will bind variables to the `SymbolTable`'s current scope
+The `Global` container is a reference to the root scope within the symbol table, whilst the `CurrentScope` is the "target" scope for all the symbol table's operations, like adding new symbols, or retrieving existing symbols.
 
-As the `FunctionSymbolResolver` and the `ObjectSymbolResolver` creates new scopes, there are also other resolvers that do the same in order to get the expected binding of every symbol in the program, and these resolvers are:
+Symbols
+~~~~~~~
 
-- `BlockSymbolResolver`
-- `ForSymbolResolver`
-- `IfSymbolResolver`
-- `WhileSymbolResolver`
+In the [Zenit] compiler, all the symbols are objects that satisfy the `ISymbol` interface. The `IContainer` interface extends from the `ISymbol` interface, therefore `Global` and `CurrentScope` members from the [Symbol Table] are [Zenit] symbols.
 
-Type inference
-~~~~~~~~~~~~~~
+The namespace `Zenit.Semantics.Symbols` (and its children) contains the different symbols that are used in the semantic analysis in order to validate the source program. The symbol hierarchy is as follow:
 
-The type inference process make sure every symbol gets its type resolved no matter if the user has annotated it in the symbol definition statement. A lot of AST nodes are involved in type inference (unlike symbol resolution phase):
+!```
+´ISymbol´
+ |-- ´IContainer´
+ |      |-- ´IBlock´
+ |      |       \`-- ´ILoop´
+ |      \`-- ´IPackage´
+ |
+ |-- ´IVariableSymbol´
+ |
+ \`-- ´ITypeSymbol´
+        |-- ´IPrimitiveSymbol´
+        |-- ´IComplexSymbol´
+        \`-- ´ISpecialTypeSymbol´
+                \`-- ´IUnresolvedTypeSymbol´
+```
 
-- `VariableTypeInferrer`: 
+
+
+Symbol resolving
+~~~~~~~~~~~~~~~~
+
+The [SymbolResolver]s walk through the AST resolving and using the symbols involved in the program. Many of the ´resolvers´ simply do a pass-through, like the ´statement resolvers´ (`If`, `Block`, `While`, etc), or simply return a registered symbol like the ´expression resolvers´ (`Accessor`, `Callable`, `Return`, etc), but other ´expression resolvers´ are key in the process in order to allow registering new symbols (along with the symbol table). These resolvers are:
+
+- Primitive
+- Object
+- Tuple
+- Constant
+- Variable
+- Function
+
+
+Primitive symbol resolver
+-------------------------
+
+This resolver 

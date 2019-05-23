@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Diagnostics;
 using System.Text;
 using Zenit.Semantics;
 using Zenit.Semantics.Symbols;
@@ -18,11 +17,18 @@ namespace Zenit.FrontEnd
             this.semanticAnalysis = new SemanticAnalysis();
         }
 
-        public SymbolTable SymbolTable => this.semanticAnalysis.SymbolTable;
+        public SymbolTable SymbolTable => this.semanticAnalysis.SymbolTable;        
 
         public void Compile(string source)
         {
-            this.semanticAnalysis.Run(syntacticAnalysis.Run(source));
+            var ast = syntacticAnalysis.Run(source);
+            this.semanticAnalysis.Run(ast);
+        }
+
+        public void ResolveSymbols(string source)
+        {
+            var ast = syntacticAnalysis.Run(source);
+            this.semanticAnalysis.ResolveSymbols(ast);
         }
     }
 }

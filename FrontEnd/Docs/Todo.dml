@@ -1,5 +1,2 @@
-﻿[ ] Fix tuple type: Add scope to contain and represent the different type of items
-[ ] Add anonymous types definition
-[ ] Add named function parameters support
-[ ] Add named tuple properties support
-[ ] Type inference: Fix void type to represent fn that do not return a value
+﻿[ ] Numbers: Add long type
+[ ] Numbers: Parse numeric types according to its MaxValue and MinValue

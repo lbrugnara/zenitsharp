@@ -5,18 +5,30 @@ using System.Collections.Generic;
 
 namespace Zenit.Ast
 {
-    public class TupleNode : Node
+    public class TupleMember
     {
-        public List<Node> Items { get; }
+        public string Name { get; }
+        public Node Expression { get; }
 
-        public TupleNode(List<Node> init)
+        public TupleMember(Node expression)
+            : this(null, expression)
         {
-            this.Items = init;
         }
 
-        public TupleNode(ExpressionListNode exprlist)
+        public TupleMember(string name, Node expression)
         {
-            this.Items = exprlist.Expressions;
+            this.Name = name;
+            this.Expression = expression;
+        }
+    }
+
+    public class TupleNode : Node
+    {
+        public List<TupleMember> Items { get; }
+
+        public TupleNode(List<TupleMember> init)
+        {
+            this.Items = init;
         }
     }
 }

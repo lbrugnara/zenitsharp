@@ -1,7 +1,7 @@
 ﻿using Zenit.Semantics.Exceptions;
 using Zenit.Semantics.Symbols.Types;
 using Zenit.Semantics.Symbols.Types.Specials;
-using Zenit.Semantics.Symbols.Values;
+using Zenit.Semantics.Symbols.Variables;
 
 namespace Zenit.Semantics.Symbols
 {
@@ -14,15 +14,15 @@ namespace Zenit.Semantics.Symbols
         /// <returns></returns>
         public static bool IsAssignable(this ISymbol self)
         {
-            if (self is IBoundSymbol)
+            if (self is IVariable)
                 return true;
 
-            var selfType = self as ITypeSymbol;
+            var selfType = self as IType;
 
             if (selfType == null)
                 return false;
 
-            return !selfType.IsOfType<VoidSymbol>() && !selfType.IsOfType<NoneSymbol>();
+            return !selfType.IsOfType<Void>() && !selfType.IsOfType<None>();
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Zenit.Semantics.Symbols
         /// <typeparam name="T">Type to check</typeparam>
         /// <param name="self">Target symbol</param>
         /// <returns></returns>
-        public static bool IsOfType<T>(this ISymbol self) where T : ITypeSymbol
+        public static bool IsOfType<T>(this ISymbol self) where T : IType
         {
             return self is T;
         }
@@ -41,15 +41,15 @@ namespace Zenit.Semantics.Symbols
         /// </summary>
         /// <param name="self">Symbol to retrieve the type information</param>
         /// <returns></returns>
-        public static ITypeSymbol GetTypeSymbol(this ISymbol self)
+        public static IType GetTypeSymbol(this ISymbol self)
         {
             if (!self.IsAssignable())
                 throw new SymbolException($"'{self.Name}' cannot be used as a value");
 
-            if (self is IBoundSymbol bs)
+            if (self is IVariable bs)
                 return bs.TypeSymbol;
 
-            return self as ITypeSymbol;
+            return self as IType;
         }
     }
 }

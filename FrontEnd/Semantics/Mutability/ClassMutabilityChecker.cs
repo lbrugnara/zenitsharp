@@ -16,7 +16,7 @@ namespace Zenit.Semantics.Mutability
 
             checker.SymbolTable.LeaveScope();
 
-            return new MutabilityCheckResult(checker.SymbolTable.GetBoundSymbol(node.Name.Value));
+            return new MutabilityCheckResult(checker.SymbolTable.GetVariableSymbol(node.Name.Value));
         }
     }
 }

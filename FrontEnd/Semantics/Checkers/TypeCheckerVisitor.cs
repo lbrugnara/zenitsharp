@@ -15,7 +15,7 @@ namespace Zenit.Semantics.Checkers
         private VariableTypeChecker variableTypeChecker;
         private BlockTypeChecker blockTypeChecker;
         private DeclarationTypeChecker declarationTypeChecker;
-        private LiteralTypeChecker literalTypeChecker;
+        private PrimitiveTypeChecker primitiveTypeChecker;
         private AccessorTypeChecker accessorTypeChecker;
         private IfTypeChecker ifTypeChecker;
         private WhileTypeChecker whileTypeChecker;
@@ -42,7 +42,7 @@ namespace Zenit.Semantics.Checkers
             this.variableTypeChecker = new VariableTypeChecker();
             this.blockTypeChecker = new BlockTypeChecker();
             this.declarationTypeChecker = new DeclarationTypeChecker();
-            this.literalTypeChecker = new LiteralTypeChecker();
+            this.primitiveTypeChecker = new PrimitiveTypeChecker();
             this.accessorTypeChecker = new AccessorTypeChecker();
             this.ifTypeChecker = new IfTypeChecker();
             this.whileTypeChecker = new WhileTypeChecker();
@@ -91,8 +91,8 @@ namespace Zenit.Semantics.Checkers
                 case DeclarationNode d:
                     return this.declarationTypeChecker.Visit(this, d);
 
-                case LiteralNode l:
-                    return this.literalTypeChecker.Visit(this, l);
+                case PrimitiveNode l:
+                    return this.primitiveTypeChecker.Visit(this, l);
 
                 case AccessorNode ivk:
                     return this.accessorTypeChecker.Visit(this, ivk);

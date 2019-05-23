@@ -3,6 +3,7 @@
 
 using Zenit.Ast;
 using Zenit.Semantics.Symbols;
+using Zenit.Semantics.Symbols.Types.References;
 
 namespace Zenit.Semantics.Checkers
 {
@@ -26,7 +27,7 @@ namespace Zenit.Semantics.Checkers
             foreach (var definition in vardecl.Definitions)
             {
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.GetBoundSymbol(definition.Left.Value).TypeSymbol;
+                var lhsType = checker.SymbolTable.GetVariableSymbol(definition.Left.Value).TypeSymbol;
 
                 // If it is a variable definition, get the right-hand side type info
                 var rhs = definition.Right?.Visit(checker);
@@ -50,8 +51,8 @@ namespace Zenit.Semantics.Checkers
                     continue;
 
                 // Get the variable type from the declaration
-                var lhsType = checker.SymbolTable.GetBoundSymbol(declaration.Value).TypeSymbol;
-                var rhsType = (initType.TypeSymbol as TupleSymbol).Types[i];
+                var lhsType = checker.SymbolTable.GetVariableSymbol(declaration.Value).TypeSymbol;
+                var rhsType = (initType.TypeSymbol as Tuple).Elements[i];
 
                 // When lhs is "var", take the type from the right hand side expression, or throw if it is not available
                 /*if (!lhsType.Type.IsAssignableFrom(rhsType))

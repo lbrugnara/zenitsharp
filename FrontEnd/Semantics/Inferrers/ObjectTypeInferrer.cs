@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class ObjectTypeInferrer : INodeVisitor<TypeInferrerVisitor, ObjectNode, ITypeSymbol>
+    class ObjectTypeInferrer : INodeVisitor<TypeInferrerVisitor, ObjectNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, ObjectNode node)
+        public IType Visit(TypeInferrerVisitor visitor, ObjectNode node)
         {
             var self = visitor.SymbolTable.EnterObjectScope(node.Uid);
             

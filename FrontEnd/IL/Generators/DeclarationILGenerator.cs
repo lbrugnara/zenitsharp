@@ -10,7 +10,7 @@ namespace Zenit.IL.Generators
     {
         public Operand Visit(ILGenerator generator, DeclarationNode decls)
         {
-            foreach (Node statement in decls.Statements)
+            foreach (Node statement in decls.Declarations)
             {
                 statement.Visit(generator);
             }

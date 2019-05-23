@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class UnaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, UnaryNode, ITypeSymbol>
+    class UnaryTypeInferrer : INodeVisitor<TypeInferrerVisitor, UnaryNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, UnaryNode unary)
+        public IType Visit(TypeInferrerVisitor visitor, UnaryNode unary)
         {
             // TODO: Check Prefix/Postfix increment
             return unary.Left.Visit(visitor);

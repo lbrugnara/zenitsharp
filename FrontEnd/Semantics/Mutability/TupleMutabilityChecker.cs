@@ -10,7 +10,7 @@ namespace Zenit.Semantics.Mutability
     {
         public MutabilityCheckResult Visit(MutabilityCheckerVisitor checker, TupleNode node)
         {
-            node.Items?.Select(i => i?.Visit(checker));
+            node.Items?.Select(i => i?.Expression?.Visit(checker));
             return null;
         }
     }

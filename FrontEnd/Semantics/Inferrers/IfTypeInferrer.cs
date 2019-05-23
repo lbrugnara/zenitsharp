@@ -6,9 +6,9 @@ using Zenit.Semantics.Symbols.Types;
 
 namespace Zenit.Semantics.Inferrers
 {
-    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, IfNode, ITypeSymbol>
+    class IfTypeInferrer : INodeVisitor<TypeInferrerVisitor, IfNode, IType>
     {
-        public ITypeSymbol Visit(TypeInferrerVisitor visitor, IfNode ifnode)
+        public IType Visit(TypeInferrerVisitor visitor, IfNode ifnode)
         {
             var conditionType = ifnode.Condition.Visit(visitor);
 
